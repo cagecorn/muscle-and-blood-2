@@ -431,7 +431,10 @@ export class GameEngine {
 
     _draw() {
         // ✨ LayerEngine이 메인 캔버스에 그리도록 명시적으로 컨텍스트를 전달
-        this.layerEngine.draw(this.renderer.mainContext);
+        // Renderer에서 관리하는 주 컨텍스트는 `ctx` 프로퍼티에 저장됩니다.
+        // 기존 코드에서 사용하던 `mainContext`는 존재하지 않아 오류가 발생했으므로
+        // 올바른 프로퍼티 이름으로 수정합니다.
+        this.layerEngine.draw(this.renderer.ctx);
         
         // 메인 캔버스와는 별도로 관리되는 패널도 그립니다.
         // 각 패널 매니저가 자신의 캔버스 컨텍스트를 관리하고 그리도록 합니다.
