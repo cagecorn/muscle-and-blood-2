@@ -1,35 +1,40 @@
 // js/managers/LogicManager.js
 
 export class LogicManager {
-    constructor(measureManager, sceneManager) {
-        console.log("\ud0d1\uc815 \ub85c\uc9c1 \ub9c8\ub2c8\uc800 \ucd08\uae30\ud654\ub428. \uc0c1\uc2e4\uc744 \uac15\uc81c\ud560 \uc900\ube44 \ub41c\ub2e4. \ud83d\udd75\ufe0f");
+    // ✨ resolutionEngine을 매개변수로 추가 (GameEngine에서 이미 전달하도록 수정되었음)
+    constructor(measureManager, sceneManager, resolutionEngine) {
+        console.log("🧠 Logic Manager initialized. Ready to enforce sanity. 🧠");
         this.measureManager = measureManager;
         this.sceneManager = sceneManager;
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 인스턴스 저장
     }
 
     /**
-     * \ud604\uc7ac \ud65c\uc131\ud654\ub41c \uc2fc\uc758 \uc2e4\uc81c \ucf58\ud150\uce20 \ud06c\uae30\ub97c \ubc18\ud658\ud569\ub2c8\ub2e4.
-     * \uc774 \ud06c\uae30\ub294 \uce74\uba54\ub77c\uac00 \ud654\uba74\uc758 \ube48\ud73c \uc5c6\uc774 \ubcf4\uc5ec \uc788\ub294 \ubmax \uc601\uc5ed\uc744 \uc815\uc758\ud569\ub2c8\ub2e4.
-     * @returns {{width: number, height: number}} \ud604\uc7ac \uc2fc \ucf58\ud150\uce20\uc758 \ub5a8\uae30 \ubc0f \ub192\uc774
+     * 현재 활성화된 씬의 실제 콘텐츠 크기를 반환합니다.
+     * 이 크기는 카메라가 화면의 빈틈 없이 보여줄 수 있는 최대 영역을 정의합니다.
+     * 모든 반환 값은 게임의 기준 해상도 단위입니다.
+     * @returns {{width: number, height: number}} 현재 씬 콘텐츠의 너비 및 높이 (기준 해상도 단위)
      */
     getCurrentSceneContentDimensions() {
-        const canvasWidth = this.measureManager.get('gameResolution.width');
-        const canvasHeight = this.measureManager.get('gameResolution.height');
+        // ✨ 캔버스 크기를 resolutionEngine의 '기준 해상도'에서 가져옵니다.
+        const baseCanvasWidth = this.resolutionEngine.baseWidth;
+        const baseCanvasHeight = this.resolutionEngine.baseHeight;
         const currentSceneName = this.sceneManager.getCurrentSceneName();
 
         let contentWidth, contentHeight;
         if (currentSceneName === 'territoryScene') {
-            // 영지 씬은 캔버스와 동일한 크기를 사용
-            contentWidth = canvasWidth;
-            contentHeight = canvasHeight;
+            // 영지 씬은 캔버스와 동일한 크기를 사용 (기준 해상도 단위)
+            contentWidth = baseCanvasWidth;
+            contentHeight = baseCanvasHeight;
         } else if (currentSceneName === 'battleScene') {
-            // 전투 씬의 경우 실제 그리드 크기를 계산
+            // 전투 씬의 경우 실제 그리드 크기를 계산 (기준 해상도 단위)
             const gridCols = 15;
             const gridRows = 10;
+            // stagePadding도 기준 해상도 단위라고 가정합니다.
             const stagePadding = this.measureManager.get('battleStage.padding');
 
-            const gridDrawableWidth = canvasWidth - 2 * stagePadding;
-            const gridDrawableHeight = canvasHeight - 2 * stagePadding;
+            const gridDrawableWidth = baseCanvasWidth - 2 * stagePadding;
+            const gridDrawableHeight = baseCanvasHeight - 2 * stagePadding;
 
             const effectiveTileSize = Math.min(
                 gridDrawableWidth / gridCols,
@@ -40,55 +45,52 @@ export class LogicManager {
             contentHeight = gridRows * effectiveTileSize;
         } else {
             console.warn(`[LogicManager] Unknown scene name '${currentSceneName}'. Returning main game canvas dimensions as content dimensions.`);
-            contentWidth = canvasWidth;
-            contentHeight = canvasHeight;
+            contentWidth = baseCanvasWidth;
+            contentHeight = baseCanvasHeight;
         }
-        // ✨ 추가: 계산된 콘텐츠 크기 확인
-        console.log(`[LogicManager Debug] Scene: ${currentSceneName}, Content Dimensions: ${contentWidth}x${contentHeight}`);
+        console.log(`[LogicManager Debug] Scene: ${currentSceneName}, Content Dimensions: ${contentWidth}x${contentHeight} (Base Units)`);
         return { width: contentWidth, height: contentHeight };
     }
 
     /**
-     * \uce74\uba54\ub77c\uc758 \ubmax\/\ubc18\uc18c \uc90c \ub808\ubca8\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4.
-     * \ucd5c\uc18c \uc90c \ub808\ubca8\uc740 \ucf58\ud150\uce20\uac00 \ud654\uba74\uc744 \ube48\ud73c\uc5c6\uc774 \ucc44\uc6cc \ub0a8\uc544\uc788\b294\uc9c0 \ubcfc\uc218 \uc788\uac8c \ud569\ub2c8\ub2e4.
-     * @returns {{minZoom: number, maxZoom: number}} \uc90c \ubc94\uc704
+     * 카메라의 최대/최소 줌 레벨을 반환합니다.
+     * 최소 줌 레벨은 콘텐츠 전체가 화면에 빈틈 없이 보이도록 합니다.
+     * @returns {{minZoom: number, maxZoom: number}} 줌 범위
      */
     getZoomLimits() {
-        const canvasWidth = this.measureManager.get('gameResolution.width');
-        const canvasHeight = this.measureManager.get('gameResolution.height');
-        const contentDimensions = this.getCurrentSceneContentDimensions();
+        // ✨ 캔버스 크기를 resolutionEngine의 '기준 해상도'에서 가져옵니다.
+        const baseCanvasWidth = this.resolutionEngine.baseWidth;
+        const baseCanvasHeight = this.resolutionEngine.baseHeight;
+        const contentDimensions = this.getCurrentSceneContentDimensions(); // 이 값은 이미 기준 해상도 단위입니다.
 
         // 콘텐츠를 캔버스 너비에 맞추기 위한 줌 비율
-        const minZoomX = canvasWidth / contentDimensions.width;
+        const minZoomX = baseCanvasWidth / contentDimensions.width;
         // 콘텐츠를 캔버스 높이에 맞추기 위한 줌 비율
-        const minZoomY = canvasHeight / contentDimensions.height;
+        const minZoomY = baseCanvasHeight / contentDimensions.height;
 
-        // 🔥 여기가 핵심 변경사항입니다.
-        // 콘텐츠 전체가 화면에 '모두 보이도록' 하려면, 두 비율 중 더 작은 값을 선택해야 합니다.
-        // 이전의 Math.max는 콘텐츠가 화면에 꽉 차게 보이도록 했지만, 이는 콘텐츠의 일부가 잘릴 수 있다는 의미였습니다.
-        // Math.min을 사용하면 콘텐츠 전체가 보이되, 남는 공간(빈틈)이 생길 수 있습니다.
-        const minZoom = Math.min(minZoomX, minZoomY); // <--- Math.max를 Math.min으로 변경했습니다.
+        // 콘텐츠 전체가 화면에 '모두 보이도록' 하려면, 두 비율 중 더 작은 값을 선택합니다.
+        const minZoom = Math.min(minZoomX, minZoomY); // Math.max를 Math.min으로 변경했습니다.
 
         const maxZoom = 10.0; // 최대 줌 값 (필요에 따라 MeasureManager에서 가져올 수 있음)
 
-        // ✨ 추가: 줌 리미트 계산 값 확인
-        console.log(`[LogicManager Debug] Canvas: ${canvasWidth}x${canvasHeight}, Content: ${contentDimensions.width}x${contentDimensions.height}, minZoomX: ${minZoomX.toFixed(2)}, minZoomY: ${minZoomY.toFixed(2)}, Final minZoom: ${minZoom.toFixed(2)}`);
-
+        console.log(`[LogicManager Debug] Canvas (Base): ${baseCanvasWidth}x${baseCanvasHeight}, Content (Base): ${contentDimensions.width}x${contentDimensions.height}, minZoomX: ${minZoomX.toFixed(2)}, minZoomY: ${minZoomY.toFixed(2)}, Final minZoom: ${minZoom.toFixed(2)}`);
         return { minZoom: minZoom, maxZoom: maxZoom };
     }
 
     /**
-     * \uc8fc\uc5b4\uc9c4 \uce74\uba54\ub77c \uc704\uce58(x, y)\ub97c \ub180\ub9c8\uc790\uc801 \uc81c\uc57d \uc870\uac74\uc5d0 \ub9de\uac8c \uc870\uc815\ud569\ub2c8\ub2e4.
-     * \uc774\ub294 \ud654\uba74\uc5d0 \ube48\ud73c\uc774 \ubcf4\uc774\uc9c0 \uc54a\ub3c4\ub85d \uce74\uba54\ub77c \uc774\ub3d9\uc744 \uc81c\ud55c\ud569\ub2c8\ub2e4.
-     * @param {number} currentX - \ud604\uc7ac \uce74\uba54\ub77c x \uc704\uce58
-     * @param {number} currentY - \ud604\uc7ac \uce74\uba54\ub77c y \uc704\uce58
-     * @param {number} currentZoom - \ud604\uc7ac \uce74\uba54\ub77c \uc90c \ub808\ubca8
-     * @returns {{x: number, y: number}} \uc870\uc815\ub41c \uce74\uba54\ub77c \uc704\uce58
+     * 주어진 카메라 위치(x, y)를 논리적 제약 조건에 맞게 조정합니다.
+     * 이 함수는 화면에 빈틈이 보이지 않도록 카메라 이동을 제한합니다.
+     * 모든 입력 및 반환 값은 게임의 기준 해상도 단위입니다.
+     * @param {number} currentX - 현재 카메라 x 위치 (기준 해상도 단위)
+     * @param {number} currentY - 현재 카메라 y 위치 (기준 해상도 단위)
+     * @param {number} currentZoom - 현재 카메라 줌 레벨
+     * @returns {{x: number, y: number}} 조정된 카메라 위치 (기준 해상도 단위)
      */
     applyPanConstraints(currentX, currentY, currentZoom) {
-        const canvasWidth = this.measureManager.get('gameResolution.width');
-        const canvasHeight = this.measureManager.get('gameResolution.height');
-        const contentDimensions = this.getCurrentSceneContentDimensions();
+        // ✨ 캔버스 크기를 resolutionEngine의 '기준 해상도'에서 가져옵니다.
+        const baseCanvasWidth = this.resolutionEngine.baseWidth;
+        const baseCanvasHeight = this.resolutionEngine.baseHeight;
+        const contentDimensions = this.getCurrentSceneContentDimensions(); // 이 값은 이미 기준 해상도 단위입니다.
 
         const effectiveContentWidth = contentDimensions.width * currentZoom;
         const effectiveContentHeight = contentDimensions.height * currentZoom;
@@ -97,21 +99,21 @@ export class LogicManager {
         let clampedY = currentY;
 
         // X축 제약
-        if (effectiveContentWidth < canvasWidth) {
-            // 콘텐츠가 화면보다 작으면 중앙 정렬 (이 경우 LogicManager가 캔버스 크기를 콘텐츠로 정의했으므로, 이 조건은 currentZoom < 1.0일 때만 발생)
-            clampedX = (canvasWidth - effectiveContentWidth) / 2;
+        if (effectiveContentWidth < baseCanvasWidth) {
+            // 콘텐츠가 캔버스보다 작으면 중앙 정렬
+            clampedX = (baseCanvasWidth - effectiveContentWidth) / 2;
         } else {
-            // 콘텐츠가 화면보다 크면 이동 범위 제한
-            clampedX = Math.min(0, Math.max(currentX, canvasWidth - effectiveContentWidth));
+            // 콘텐츠가 캔버스보다 크면 이동 범위 제한
+            clampedX = Math.min(0, Math.max(currentX, baseCanvasWidth - effectiveContentWidth));
         }
 
         // Y축 제약
-        if (effectiveContentHeight < canvasHeight) {
-            // 콘텐츠가 화면보다 작으면 중앙 정렬
-            clampedY = (canvasHeight - effectiveContentHeight) / 2;
+        if (effectiveContentHeight < baseCanvasHeight) {
+            // 콘텐츠가 캔버스보다 작으면 중앙 정렬
+            clampedY = (baseCanvasHeight - effectiveContentHeight) / 2;
         } else {
-            // 콘텐츠가 화면보다 크면 이동 범위 제한
-            clampedY = Math.min(0, Math.max(currentY, canvasHeight - effectiveContentHeight));
+            // 콘텐츠가 캔버스보다 크면 이동 범위 제한
+            clampedY = Math.min(0, Math.max(currentY, baseCanvasHeight - effectiveContentHeight));
         }
 
         return { x: clampedX, y: clampedY };
@@ -119,7 +121,7 @@ export class LogicManager {
 
     /**
      * 게임이 시작하기 위해 필요한 최소 해상도 요구 사항을 반환합니다.
-     * @returns {{minWidth: number, minHeight: number}} 최소 너비와 높이
+     * @returns {{minWidth: number, minHeight: number}} 최소 너비와 높이 (기준 해상도 단위)
      */
     getMinGameResolution() {
         // 이 값은 GuardianManager.js의 규칙과 동기화되어야 합니다.
