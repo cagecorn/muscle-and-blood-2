@@ -9,9 +9,10 @@ class ImmutableRuleViolationError extends Error {
 }
 
 export class GuardianManager {
-    constructor() {
-        console.log("\uD83D\uDEE1️ GuardianManager is now monitoring the system. \uD83D\uDEE1️");
-        // 앞으로 MapLoader나 TestRunner 같은 종속성을 받을 수 있습니다.
+    // ✨ resolutionEngine 인스턴스를 받도록 생성자 수정
+    constructor(resolutionEngine = null) {
+        console.log("🛡️ GuardianManager is now monitoring the system. 🛡️");
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 저장
     }
 
     /**
@@ -36,12 +37,24 @@ export class GuardianManager {
                 }
             }
         } else {
-            // 초기 게임 데이터가 없어도 오류는 아니지만, 규칙 검증이 불완전할 수 있음을 알림
             console.warn("[GuardianManager] No unit data provided for HP rule enforcement.");
         }
 
         // 규칙 2: 게임의 최소 해상도는 800x600 이상이어야 한다.
-        if (gameData && gameData.config && gameData.config.resolution) {
+        // ✨ 이제 resolutionEngine을 통해 기준 해상도를 검증합니다.
+        if (this.resolutionEngine) {
+            const baseWidth = this.resolutionEngine.baseWidth;
+            const baseHeight = this.resolutionEngine.baseHeight;
+            const minRequiredWidth = 800; // 최소 요구 너비
+            const minRequiredHeight = 600; // 최소 요구 높이
+
+            if (baseWidth < minRequiredWidth || baseHeight < minRequiredHeight) {
+                throw new ImmutableRuleViolationError(
+                    `Rule Violation: Base resolution requirement not met (${baseWidth}x${baseHeight}). Must be at least ${minRequiredWidth}x${minRequiredHeight}.`
+                );
+            }
+        } else if (gameData && gameData.config && gameData.config.resolution) {
+            // resolutionEngine이 없는 경우 (예: 초기 테스트 등) 기존 gameData의 해상도 정보로 폴백
             const { width, height } = gameData.config.resolution;
             if (width < 800 || height < 600) {
                 throw new ImmutableRuleViolationError(
@@ -49,15 +62,11 @@ export class GuardianManager {
                 );
             }
         } else {
-            console.warn("[GuardianManager] No resolution config provided for rule enforcement.");
+            console.warn("[GuardianManager] No resolution config or ResolutionEngine provided for rule enforcement.");
         }
 
         // --- 모든 규칙이 준수됨 ---
-        console.log("[GuardianManager] All rules checked and respected. \u2705");
+        console.log("[GuardianManager] All rules checked and respected. ✅");
         return true;
     }
-
-    // 앞으로 맵 로딩 후 검증이나 특정 상태 변화 시 규칙을 검증하는 메서드가 추가될 수 있습니다.
-    // 예를 들어, setupMapValidation(mapLoader) { ... }
-    // 또는 onUnitCreated(unitData) { this.enforceRules({ units: [unitData] }); }
 }
