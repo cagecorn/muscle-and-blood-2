@@ -1,14 +1,16 @@
 // js/managers/BattleSimulationManager.js
 
 export class BattleSimulationManager {
-    constructor(measureManager, assetLoaderManager, idManager, logicManager, animationManager, valorEngine) {
-        console.log("\u2694\ufe0f BattleSimulationManager initialized. Preparing units for battle. \u2694\ufe0f");
+    // ✨ resolutionEngine을 매개변수로 추가
+    constructor(measureManager, assetLoaderManager, idManager, logicManager, animationManager, valorEngine, resolutionEngine) {
+        console.log("⚔️ BattleSimulationManager initialized. Preparing units for battle. ⚔️");
         this.measureManager = measureManager;
         this.assetLoaderManager = assetLoaderManager;
-        this.idManager = idManager; // Keep for other potential uses, though not directly in draw
+        this.idManager = idManager;
         this.logicManager = logicManager;
         this.animationManager = animationManager;
         this.valorEngine = valorEngine;
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 인스턴스 저장
         this.unitsOnGrid = [];
         this.gridRows = 10; // BattleGridManager와 동일한 그리드 차원
         this.gridCols = 15;
@@ -22,24 +24,22 @@ export class BattleSimulationManager {
      * @param {number} gridY
      */
     addUnit(fullUnitData, unitImage, gridX, gridY) {
-        // ✨ 유닛의 용맹 스탯에 기반하여 초기 배리어를 계산합니다.
         const initialBarrier = this.valorEngine.calculateInitialBarrier(fullUnitData.baseStats.valor || 0);
 
         const unitInstance = {
             id: fullUnitData.id,
             name: fullUnitData.name,
             spriteId: fullUnitData.spriteId,
-            image: unitImage, // ✨ 로드된 이미지 객체를 직접 저장합니다.
+            image: unitImage,
             classId: fullUnitData.classId,
             gridX,
             gridY,
-            // 필요한 경우 다른 데이터도 여기에 추가할 수 있습니다.
             baseStats: fullUnitData.baseStats,
             type: fullUnitData.type,
             fullUnitData: fullUnitData,
             currentHp: fullUnitData.currentHp !== undefined ? fullUnitData.currentHp : fullUnitData.baseStats.hp,
-            currentBarrier: initialBarrier, // ✨ 현재 배리어 설정
-            maxBarrier: initialBarrier // ✨ 최대 배리어는 초기 배리어와 동일
+            currentBarrier: initialBarrier,
+            maxBarrier: initialBarrier
         };
         this.unitsOnGrid.push(unitInstance);
         console.log(`[BattleSimulationManager] Added unit '${unitInstance.id}' at (${gridX}, ${gridY}) with initial barrier ${initialBarrier}.`);
@@ -99,27 +99,31 @@ export class BattleSimulationManager {
      * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
-        const sceneContentDimensions = this.logicManager.getCurrentSceneContentDimensions(); // 이제 순수 그리드 크기를 반환
-        const canvasWidth = this.measureManager.get('gameResolution.width'); // 캔버스 실제 CSS 너비
-        const canvasHeight = this.measureManager.get('gameResolution.height'); // 캔버스 실제 CSS 높이
+        // sceneContentDimensions는 LogicManager에서 기준 해상도 단위로 그리드 크기를 반환한다고 가정합니다.
+        const sceneContentDimensions = this.logicManager.getCurrentSceneContentDimensions(); 
+        
+        // ✨ canvasWidth, canvasHeight를 resolutionEngine의 기준 해상도에서 가져옵니다.
+        const baseCanvasWidth = this.resolutionEngine.baseWidth; 
+        const baseCanvasHeight = this.resolutionEngine.baseHeight; 
 
-        const stagePadding = this.measureManager.get('battleStage.padding');
+        // stagePadding도 기준 해상도 단위라고 가정 (현재 코드에서 사용되지 않음)
+        // const stagePadding = this.measureManager.get('battleStage.padding');
 
-        // LogicManager에서 계산된 순수 그리드 컨텐츠 크기 (패딩 제외)
+        // LogicManager에서 계산된 순수 그리드 컨텐츠 크기 (패딩 제외, 기준 해상도 단위)
         const gridContentWidth = sceneContentDimensions.width;
         const gridContentHeight = sceneContentDimensions.height;
 
-        // 이 gridContentWidth/Height를 사용하여 effectiveTileSize를 역으로 계산
+        // 이 gridContentWidth/Height를 사용하여 effectiveTileSize를 역으로 계산 (기준 해상도 단위)
         const effectiveTileSize = gridContentWidth / this.gridCols;
 
         // 전체 그리드 크기 (여기서는 gridContentWidth/Height와 동일)
         const totalGridWidth = gridContentWidth;
         const totalGridHeight = gridContentHeight;
 
-        // ✨ 그리드를 캔버스 중앙에 배치하기 위한 오프셋 계산 (패딩 포함)
-        // (캔버스 전체 크기 - 그리드 컨텐츠 크기) / 2 + 패딩
-        const gridOffsetX = (canvasWidth - totalGridWidth) / 2;
-        const gridOffsetY = (canvasHeight - totalGridHeight) / 2;
+        // ✨ 그리드를 캔버스 중앙에 배치하기 위한 오프셋 계산 (기준 해상도 단위)
+        // (기준 캔버스 전체 크기 - 그리드 컨텐츠 크기) / 2
+        const gridOffsetX_base = (baseCanvasWidth - totalGridWidth) / 2;
+        const gridOffsetY_base = (baseCanvasHeight - totalGridHeight) / 2;
 
         for (const unit of this.unitsOnGrid) {
             const image = unit.image;
@@ -128,20 +132,28 @@ export class BattleSimulationManager {
                 continue;
             }
 
+            // AnimationManager.getRenderPosition은 이미 스케일링된 픽셀 위치를 반환합니다.
             const { drawX, drawY } = this.animationManager.getRenderPosition(
                 unit.id,
                 unit.gridX,
                 unit.gridY,
-                effectiveTileSize,
-                gridOffsetX,
-                gridOffsetY
+                effectiveTileSize, // 이 값은 기준 단위입니다. getRenderPosition 내부에서 스케일링됩니다.
+                gridOffsetX_base,  // 이 값은 기준 단위입니다. getRenderPosition 내부에서 스케일링됩니다.
+                gridOffsetY_base   // 이 값은 기준 단위입니다. getRenderPosition 내부에서 스케일링됩니다.
             );
 
-            const imageSize = effectiveTileSize;
-            const imgOffsetX = (effectiveTileSize - imageSize) / 2;
-            const imgOffsetY = (effectiveTileSize - imageSize) / 2;
+            // ✨ 이미지 크기와 오프셋도 기준 단위로 계산한 후, 스케일링합니다.
+            const baseImageSize = effectiveTileSize;
+            const baseImgOffsetX = (effectiveTileSize - baseImageSize) / 2; // 보통 0이 됨
+            const baseImgOffsetY = (effectiveTileSize - baseImageSize) / 2; // 보통 0이 됨
 
-            ctx.drawImage(image, drawX + imgOffsetX, drawY + imgOffsetY, imageSize, imageSize);
+            const scaledImageSize = this.resolutionEngine.getScaledCoordinate(baseImageSize);
+            const scaledImgOffsetX = this.resolutionEngine.getScaledCoordinate(baseImgOffsetX);
+            const scaledImgOffsetY = this.resolutionEngine.getScaledCoordinate(baseImgOffsetY);
+            
+            // ✨ drawX, drawY는 이미 스케일링되어 있으므로 그대로 사용합니다.
+            // ✨ 이미지 오프셋과 크기는 스케일링된 값을 사용합니다.
+            ctx.drawImage(image, drawX + scaledImgOffsetX, drawY + scaledImgOffsetY, scaledImageSize, scaledImageSize);
         }
     }
 }
