@@ -1,15 +1,17 @@
 // js/managers/PanelEngine.js
 
 export class PanelEngine {
-    constructor() {
-        console.log("\uD83D\uDD33 PanelEngine initialized. Ready to manage various game panels. \uD83D\uDD33");
+    // ✨ resolutionEngine을 매개변수로 추가
+    constructor(resolutionEngine) {
+        console.log("🔳 PanelEngine initialized. Ready to manage various game panels. 🔳");
         this.panels = new Map();
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 인스턴스 저장
     }
 
     /**
-     * \ud328\ub110\uc744 \ub4f1\ub85d\ud569\ub2c8\ub2e4.
-     * @param {string} name - \ud328\ub110\uc758 \uace0\uc720 \uc774\ub984 (\uc608: 'mercenaryPanel')
-     * @param {object} panelInstance - \uadf8\ub9ac\uae30 \uba54\uc11c\ub4dc(draw)\ub97c \uac16\uc740 \ud328\ub110 \ub9e4\ub2c8\uc800 \uc778\uc2a4\ud134\uc2a4
+     * 패널을 등록합니다.
+     * @param {string} name - 패널의 고유 이름 (예: 'mercenaryPanel')
+     * @param {object} panelInstance - 그리기 메서드(draw)를 가진 패널 매니저 인스턴스
      */
     registerPanel(name, panelInstance) {
         if (!panelInstance || typeof panelInstance.draw !== 'function') {
@@ -21,15 +23,18 @@ export class PanelEngine {
     }
 
     /**
-     * \ud2b9\uc815 \ud328\ub110\uc744 \uadf8\ub9b4\uac83\uc785\ub2c8\ub2e4. LayerEngine\uc5d0 \uc758\ud574 \ud638\ucd9c\ub429\ub2c8\ub2e4.
-     * PanelEngine\uc740 \ud328\ub110 \uc790\uccb4 \uce90\ubc84\uc2a4\uc5d0 \uadf8\ub9b0\uc758 \ucc45\uc784\uc744 \ud328\ub110 \uc778\uc2a4\ud134\uc2a4\uc5d0 \uc704\uc784\ud569\ub2c8\ub2e4.
-     * @param {string} panelName - \uadf8\ub9ac\ub294 \ud328\ub110\uc758 \uc774\ub984
-     * @param {CanvasRenderingContext2D} ctx - \ud328\ub110 \uce90\ubc84\uc2a4\uc758 2D \ub80c\ub354\ub9c1 \ucee8\ud2b8\ub799\uc2a4
+     * 특정 패널을 그립니다. LayerEngine에 의해 호출됩니다.
+     * PanelEngine은 패널 자체 캔버스에 그리는 책임을 패널 인스턴스에 위임합니다.
+     * @param {string} panelName - 그리는 패널의 이름
+     * @param {CanvasRenderingContext2D} [ctx] - (선택 사항) 패널 캔버스의 2D 렌더링 컨텍스트.
+     * 이제 대부분의 패널은 자체 컨텍스트에 그리므로 이 인자는 사용되지 않을 수 있습니다.
      */
-    drawPanel(panelName, ctx) {
+    drawPanel(panelName, ctx = null) { // ctx는 이제 사용되지 않을 가능성이 높지만, 하위 호환성을 위해 유지
         const panel = this.panels.get(panelName);
         if (panel) {
-            panel.draw(ctx);
+            // panel.draw() 메서드가 인자를 받지 않거나, 필요에 따라 resolutionEngine을 직접 활용하도록 가정합니다.
+            // MercenaryPanelManager와 BattleLogManager는 이미 자체 컨텍스트에 그리도록 수정되었습니다.
+            panel.draw();
         } else {
             console.warn(`[PanelEngine] Panel '${panelName}' not found.`);
         }
