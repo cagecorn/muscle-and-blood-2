@@ -83,7 +83,12 @@ export class GameEngine {
         this.sceneEngine = new SceneEngine();
 
         // LogicManager 초기화
-        this.logicManager = new LogicManager(this.measureManager, this.sceneEngine);
+        // ResolutionEngine을 함께 전달하여 화면 크기 계산에 사용합니다.
+        this.logicManager = new LogicManager(
+            this.measureManager,
+            this.sceneEngine,
+            this.resolutionEngine
+        );
 
         // IdManager 및 AssetLoaderManager 초기화
         this.idManager = new IdManager();
