@@ -1,9 +1,11 @@
 // js/managers/MapManager.js
 
 export class MapManager {
-    constructor(measureManager) {
-        console.log("\ud83d\udddc\ufe0f MapManager initialized. Ready to build worlds. \ud83d\udddc\ufe0f");
+    // ✨ resolutionEngine을 매개변수로 추가
+    constructor(measureManager, resolutionEngine) {
+        console.log("🗺️ MapManager initialized. Ready to build worlds. 🗺️");
         this.measureManager = measureManager;
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 인스턴스 저장
 
         // 측정값을 기반으로 초기 맵 크기를 계산
         this.recalculateMapDimensions();
@@ -11,18 +13,19 @@ export class MapManager {
         this.mapData = this._generateRandomMap();
         this.pathfindingEngine = this._createPathfindingEngine();
 
-        console.log(`[MapManager] Map grid: ${this.gridCols}x${this.gridRows}, Tile size: ${this.tileSize}`);
+        console.log(`[MapManager] Map grid: ${this.gridCols}x${this.gridRows}, Tile size (base): ${this.tileSize}`);
     }
 
     /**
      * 맵의 그리드 및 타일 크기를 MeasureManager로부터 다시 계산합니다.
-     * 측정값이 변경된 경우 호출됩니다.
+     * 이 메서드는 measureManager의 값이 변경된 경우 (예: 게임 시작 시, 해상도 변경 시) 호출됩니다.
+     * 여기서 계산되는 모든 치수는 '기준 해상도' 단위입니다.
      */
     recalculateMapDimensions() {
-        console.log("[MapManager] Recalculating map dimensions based on MeasureManager...");
+        console.log("[MapManager] Recalculating map dimensions based on MeasureManager (base units)...");
         this.gridRows = this.measureManager.get('mapGrid.rows');
         this.gridCols = this.measureManager.get('mapGrid.cols');
-        this.tileSize = this.measureManager.get('tileSize');
+        this.tileSize = this.measureManager.get('tileSize'); // 이 tileSize는 이제 기준 해상도 단위입니다.
     }
 
     _createPathfindingEngine() {
@@ -68,11 +71,13 @@ export class MapManager {
             mapData: this.mapData,
             gridCols: this.gridCols,
             gridRows: this.gridRows,
-            tileSize: this.tileSize
+            // ✨ tileSize는 이제 getScaledTileSize()를 통해 스케일링된 값을 제공할 수 있습니다.
+            // 하지만 이 메서드는 렌더링 데이터 자체를 제공하므로,
+            // 여기서 tileSize는 여전히 기준 해상도 값으로 유지하고, 그릴 때 스케일링하는 것이 더 유연합니다.
+            tileSize: this.tileSize 
         };
     }
 
-    // 테스트를 위해 그리드 크기와 타일 크기를 반환합니다.
     getGridDimensions() {
         return {
             rows: this.gridRows,
@@ -81,6 +86,8 @@ export class MapManager {
     }
 
     getTileSize() {
+        // ✨ 이 tileSize는 기준 해상도 단위의 타일 크기를 반환합니다.
+        // 렌더링 시에는 resolutionEngine.getScaledCoordinate(this.tileSize)를 사용해야 합니다.
         return this.tileSize;
     }
 }
