@@ -1,45 +1,48 @@
 // js/managers/MercenaryPanelManager.js
 
-// Renderer는 이제 PanelEngine 또는 상위 GameEngine에서 관리되므로 여기서는 필요 없습니다.
-
 export class MercenaryPanelManager {
-    // 생성자에서 캔버스 ID 대신 캔버스 요소를 직접 받도록 변경합니다.
-    constructor(mercenaryCanvasElement, measureManager, battleSimulationManager, logicManager) {
-        console.log("\uD83D\uDC65 MercenaryPanelManager initialized. Ready to display mercenary details. \uD83D\uDC65");
-        this.canvas = mercenaryCanvasElement; // ✨ 캔버스 요소를 직접 받습니다.
-        this.ctx = this.canvas.getContext('2d'); // ✨ 컨텍스트를 직접 얻습니다.
+    // ✨ resolutionEngine을 매개변수로 추가
+    constructor(mercenaryCanvasElement, measureManager, battleSimulationManager, logicManager, resolutionEngine) {
+        console.log("👥 MercenaryPanelManager initialized. Ready to display mercenary details. 👥");
+        this.canvas = mercenaryCanvasElement;
+        this.ctx = this.canvas.getContext('2d');
         this.measureManager = measureManager;
-        this.battleSimulationManager = battleSimulationManager; // 유닛 데이터를 가져오기 위함
-        this.logicManager = logicManager; // ✨ LogicManager 추가
+        this.battleSimulationManager = battleSimulationManager;
+        this.logicManager = logicManager;
+        this.resolutionEngine = resolutionEngine; // ✨ resolutionEngine 인스턴스 저장
 
-        // ✨ MeasureManager에서 그리드 행/열 정보를 가져옴
         this.gridRows = this.measureManager.get('mercenaryPanel.gridRows');
         this.gridCols = this.measureManager.get('mercenaryPanel.gridCols');
         this.numSlots = this.gridRows * this.gridCols;
 
-        this.pixelRatio = window.devicePixelRatio || 1;
+        this.pixelRatio = window.devicePixelRatio || 1; // 이 캔버스 자체의 devicePixelRatio
 
-        // 초기 내부 해상도 설정 후 패널 치수 계산
-        this.resizeCanvas();
-        this.recalculatePanelDimensions();
+        // 이 캔버스는 CSS에 의해 크기가 조절되므로, 내부 해상도와 컨텍스트 스케일을 자체적으로 관리합니다.
+        this.resizeCanvas(); // 초기 크기 조정
+        // recalculatePanelDimensions는 resizeCanvas 내부에서 호출되도록 변경
 
-        // ✨ window.resize 이벤트 리스너 제거 (CompatibilityManager가 크기 제어)
+        // 윈도우 크기 변경 시에도 패널의 크기를 업데이트합니다.
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+        });
     }
 
     /**
      * 패널의 내부 치수(슬롯 크기 등)를 재계산합니다.
-     * 이 메서드는 CompatibilityManager가 캔버스 크기를 조정한 후 호출해야 합니다.
+     * 이 메서드는 캔버스 크기가 변경될 때 호출되어야 합니다.
+     * 여기서 계산되는 slotWidth와 slotHeight는 CSS 픽셀 단위입니다 (devicePixelRatio 적용 후).
      */
     recalculatePanelDimensions() {
-        // ✨ 캔버스 요소의 현재 크기를 기반으로 내부 슬롯 크기 계산
+        // ✨ 캔버스 요소의 현재 내부 픽셀 크기 (devicePixelRatio가 적용된)를 사용합니다.
+        // 그리고 이를 CSS 픽셀 기준으로 나누어 슬롯 크기를 계산합니다.
         this.slotWidth = (this.canvas.width / this.pixelRatio) / this.gridCols;
         this.slotHeight = (this.canvas.height / this.pixelRatio) / this.gridRows;
-        console.log(`[MercenaryPanelManager] Panel dimensions recalculated. Canvas size: ${this.canvas.width}x${this.canvas.height}, Slot size: ${this.slotWidth}x${this.slotHeight}`);
-        this.resizeCanvas();
+        console.log(`[MercenaryPanelManager] Panel dimensions recalculated. Canvas size: ${this.canvas.width}x${this.canvas.height}, Slot size: ${this.slotWidth.toFixed(2)}x${this.slotHeight.toFixed(2)} (CSS Pixels)`);
     }
 
     /**
      * 캔버스 내부 해상도를 CSS 크기와 pixelRatio에 맞춰 조정합니다.
+     * 이 캔버스는 메인 게임 캔버스와 별개로 자신의 해상도를 관리합니다.
      */
     resizeCanvas() {
         const displayWidth = this.canvas.clientWidth;
@@ -50,61 +53,77 @@ export class MercenaryPanelManager {
             this.canvas.width = displayWidth * this.pixelRatio;
             this.canvas.height = displayHeight * this.pixelRatio;
             this.ctx = this.canvas.getContext('2d');
-            this.ctx.scale(this.pixelRatio, this.pixelRatio);
+            // 이 캔버스 컨텍스트에는 자체적으로 devicePixelRatio만 스케일링합니다.
+            // 게임 콘텐츠의 전역 스케일 비율은 그리기 함수에서 getScaledCoordinate를 통해 적용됩니다.
+            this.ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
             console.log(`[MercenaryPanelManager] Canvas internal resolution set to: ${this.canvas.width}x${this.canvas.height} (Display: ${displayWidth}x${displayHeight}, Ratio: ${this.pixelRatio})`);
+            this.recalculatePanelDimensions(); // 크기 변경 후 패널 치수 다시 계산
         }
     }
 
     /**
      * 용병 패널과 그리드를 그립니다.
-     * 이 메서드는 PanelEngine에 의해 호출되며, 해당 패널 캔버스의 컨텍스트를 받습니다.
-     * @param {CanvasRenderingContext2D} ctx - 패널 캔버스의 2D 렌더링 컨텍스트
+     * 이 메서드는 PanelEngine에 의해 호출되며, 이제 인자를 받지 않고 내부 this.ctx를 사용합니다.
      */
-    draw(ctx) {
-        ctx.clearRect(0, 0, this.canvas.width / this.pixelRatio, this.canvas.height / this.pixelRatio);
-        ctx.fillStyle = '#1A1A1A';
-        ctx.fillRect(0, 0, this.canvas.width / this.pixelRatio, this.canvas.height / this.pixelRatio);
+    draw() {
+        // 캔버스 전체를 지우고 배경을 그립니다. (이미 pixelRatio 스케일이 적용된 컨텍스트)
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = '#1A1A1A';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        ctx.strokeStyle = '#555';
-        ctx.lineWidth = 1;
+        // 선 굵기도 스케일링 (전역 스케일 비율에 따름)
+        this.ctx.strokeStyle = '#555';
+        this.ctx.lineWidth = this.resolutionEngine.getScaledCoordinate(1);
 
         for (let i = 0; i <= this.gridCols; i++) {
-            ctx.beginPath();
-            ctx.moveTo(i * this.slotWidth, 0);
-            ctx.lineTo(i * this.slotWidth, this.canvas.height / this.pixelRatio);
-            ctx.stroke();
+            this.ctx.beginPath();
+            // ✨ 모든 좌표에 resolutionEngine의 getScaledCoordinate() 적용
+            const x = this.resolutionEngine.getScaledCoordinate(i * this.slotWidth);
+            const y1 = this.resolutionEngine.getScaledCoordinate(0);
+            const y2 = this.resolutionEngine.getScaledCoordinate(this.canvas.height / this.pixelRatio); // 이 높이는 CSS 픽셀 기준
+            this.ctx.moveTo(x, y1);
+            this.ctx.lineTo(x, y2);
+            this.ctx.stroke();
         }
         for (let i = 0; i <= this.gridRows; i++) {
-            ctx.beginPath();
-            ctx.moveTo(0, i * this.slotHeight);
-            ctx.lineTo(this.canvas.width / this.pixelRatio, i * this.slotHeight);
-            ctx.stroke();
+            this.ctx.beginPath();
+            // ✨ 모든 좌표에 resolutionEngine의 getScaledCoordinate() 적용
+            const x1 = this.resolutionEngine.getScaledCoordinate(0);
+            const x2 = this.resolutionEngine.getScaledCoordinate(this.canvas.width / this.pixelRatio); // 이 너비는 CSS 픽셀 기준
+            const y = this.resolutionEngine.getScaledCoordinate(i * this.slotHeight);
+            this.ctx.moveTo(x1, y);
+            this.ctx.lineTo(x2, y);
+            this.ctx.stroke();
         }
 
         const units = this.battleSimulationManager ? this.battleSimulationManager.unitsOnGrid : [];
-        ctx.fillStyle = 'white';
-        ctx.font = '14px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        this.ctx.fillStyle = 'white';
+        // 폰트 크기도 스케일링
+        this.ctx.font = `${this.resolutionEngine.getScaledCoordinate(14)}px Arial`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
 
         for (let i = 0; i < this.numSlots; i++) {
             const row = Math.floor(i / this.gridCols);
             const col = i % this.gridCols;
-            const x = col * this.slotWidth + this.slotWidth / 2;
-            const y = row * this.slotHeight + this.slotHeight / 2;
+            // ✨ 슬롯 위치도 스케일링된 값으로 계산
+            const x = this.resolutionEngine.getScaledCoordinate(col * this.slotWidth + this.slotWidth / 2);
+            const y = this.resolutionEngine.getScaledCoordinate(row * this.slotHeight + this.slotHeight / 2);
 
             if (units[i]) {
                 const unit = units[i];
-                ctx.fillText(`${unit.name}`, x, y - 10);
-                ctx.fillText(`HP: ${unit.currentHp}/${unit.baseStats.hp}`, x, y + 10);
+                // 텍스트 위치도 스케일링된 값으로 조정
+                this.ctx.fillText(`${unit.name}`, x, y - this.resolutionEngine.getScaledCoordinate(10));
+                this.ctx.fillText(`HP: ${unit.currentHp}/${unit.baseStats.hp}`, x, y + this.resolutionEngine.getScaledCoordinate(10));
                 if (unit.image) {
-                    const imgSize = Math.min(this.slotWidth, this.slotHeight) * 0.7;
-                    const imgX = col * this.slotWidth + (this.slotWidth - imgSize) / 2;
-                    const imgY = row * this.slotHeight + (this.slotHeight - imgSize) / 2 - 25;
-                    ctx.drawImage(unit.image, imgX, imgY, imgSize, imgSize);
+                    // 이미지 크기와 위치도 스케일링된 값으로 조정
+                    const imgSize = this.resolutionEngine.getScaledCoordinate(Math.min(this.slotWidth, this.slotHeight) * 0.7);
+                    const imgX = this.resolutionEngine.getScaledCoordinate(col * this.slotWidth + (this.slotWidth - imgSize / this.resolutionEngine.currentScaleRatio) / 2); // 이미지 사이즈는 이미 스케일링된 크기이므로 역변환하여 계산
+                    const imgY = this.resolutionEngine.getScaledCoordinate(row * this.slotHeight + (this.slotHeight - imgSize / this.resolutionEngine.currentScaleRatio) / 2 - 25);
+                    this.ctx.drawImage(unit.image, imgX, imgY, imgSize, imgSize);
                 }
             } else {
-                ctx.fillText(`Slot ${i + 1}`, x, y);
+                this.ctx.fillText(`Slot ${i + 1}`, x, y);
             }
         }
     }
