@@ -44,6 +44,17 @@ export class UIEngine {
         console.log("[UIEngine] Initialized for overlay UI rendering.");
     }
 
+    /**
+     * 프레임 단위 UI 업데이트를 처리합니다.
+     * 현재는 UI 애니메이션이 없지만, 향후 시간 기반 효과를
+     * 추가하기 위해 빈 메서드를 제공합니다.
+     * @param {number} deltaTime - 지난 프레임과의 시간 차이(ms)
+     */
+    update(deltaTime) {
+        // UI 요소에 애니메이션이 도입될 경우 이곳에서 처리합니다.
+        // 지금은 별도 로직이 없으므로 남겨둡니다.
+    }
+
     recalculateUIDimensions() {
         console.log("[UIEngine] Recalculating UI dimensions based on MeasureManager...");
 
