@@ -46,8 +46,9 @@ export class BattleSimulatorEngine {
      * @param {string} color - 이름표 배경색
      */
     _createNameLabels(sprites, units, color) {
-        sprites.forEach((sprite, idx) => {
-            const unit = units[idx];
+        sprites.forEach(sprite => {
+            const unitId = sprite.getData('unitId');
+            const unit = units.find(u => u.uniqueId === unitId);
             if (!unit) return;
 
             this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
