@@ -1,6 +1,5 @@
 import { formationEngine } from './FormationEngine.js';
-import { createNameLabelCanvas } from './NameLabelFactory.js';
-import { debugCoordinateManager } from '../debug/DebugCoordinateManager.js';
+import { OffscreenTextEngine } from './OffscreenTextEngine.js';
 
 /**
  * 전투의 전체 과정을 시뮬레이션하고 관리하는 엔진입니다.
@@ -9,13 +8,15 @@ import { debugCoordinateManager } from '../debug/DebugCoordinateManager.js';
 export class BattleSimulatorEngine {
     /**
      * @param {Phaser.Scene} scene - 전투가 벌어질 Phaser 씬
-     * @param {DOMEngine} domEngine - 이름표 등 DOM 요소를 관리할 DOM 엔진
      */
-    constructor(scene, domEngine) {
+    constructor(scene) {
         this.scene = scene;
-        this.domEngine = domEngine;
+        this.textEngine = new OffscreenTextEngine(scene);
         this.allySprites = [];
         this.enemySprites = [];
+
+        // 씬의 update 루프에 맞춰 텍스트 엔진을 갱신합니다.
+        this.scene.events.on('update', this.textEngine.update, this.textEngine);
     }
 
     /**
@@ -30,9 +31,11 @@ export class BattleSimulatorEngine {
         // 2. 적군을 무작위 위치에 배치합니다.
         this.enemySprites = formationEngine.placeMonsters(this.scene, enemies, 8); // 8번 열부터 적군 지역
 
-        // 3. 모든 유닛에 대해 이름표를 생성하고 디버그 로그를 기록합니다.
-        this._createNameLabels(this.allySprites, allies, 'rgba(0,0,255,0.7)');
-        this._createNameLabels(this.enemySprites, enemies, 'rgba(255,0,0,0.7)');
+        console.log(`[BattleSimulatorEngine] 유닛 배치 완료. 아군: ${this.allySprites.length}명, 적군: ${this.enemySprites.length}명`);
+
+        // 새 텍스트 엔진을 사용하여 이름표를 표시합니다.
+        this._createNameLabels(this.allySprites, allies, '#63b1ff');
+        this._createNameLabels(this.enemySprites, enemies, '#ff6363');
     }
 
     /**
@@ -47,24 +50,7 @@ export class BattleSimulatorEngine {
             const unit = units[idx];
             if (!unit) return;
 
-            const label = createNameLabelCanvas(unit.instanceName || unit.name, color);
-
-            const labelWidth = parseFloat(label.style.width) || 0;
-            const labelHeight = parseFloat(label.style.height) || 0;
-            label.style.marginLeft = `-${labelWidth / 2}px`;
-            label.style.marginTop = `${sprite.displayHeight / 2 - labelHeight}px`;
-
-            const syncedElement = this.domEngine.syncElement(sprite, label);
-
-            // 디버그 좌표 기록
-            const imageCoord = { x: sprite.x, y: sprite.y };
-            const labelRect = syncedElement.getBoundingClientRect();
-            const gameRect = this.scene.sys.game.canvas.getBoundingClientRect();
-            const labelCoord = {
-                x: labelRect.left - gameRect.left,
-                y: labelRect.top - gameRect.top,
-            };
-            debugCoordinateManager.logCoordinates(unit.instanceName || unit.name, imageCoord, labelCoord);
+            this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
         });
     }
 
@@ -72,7 +58,8 @@ export class BattleSimulatorEngine {
      * 전투와 관련된 모든 리소스를 정리합니다.
      */
     shutdown() {
-        // 나중에 전투 관련 객체들이 추가되면 여기서 정리합니다.
+        this.scene.events.off('update', this.textEngine.update, this.textEngine);
+        this.textEngine.shutdown();
         console.log('BattleSimulatorEngine이 종료되었습니다.');
     }
 }

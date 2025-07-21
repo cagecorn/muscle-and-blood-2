@@ -5,7 +5,6 @@ import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { monsterEngine } from '../utils/MonsterEngine.js';
 import { getMonsterBase } from '../data/monster.js';
-import { DOMEngine } from '../utils/DOMEngine.js';
 import { BattleSimulatorEngine } from '../utils/BattleSimulatorEngine.js';
 
 export class CursedForestBattleScene extends Scene {
@@ -13,8 +12,6 @@ export class CursedForestBattleScene extends Scene {
         super('CursedForestBattle');
         this.stageManager = null;
         this.cameraControl = null;
-        this.domEngine = null;
-        // BattleSimulatorEngine 인스턴스를 보관할 속성
         this.battleSimulator = null;
     }
 
@@ -28,10 +25,9 @@ export class CursedForestBattleScene extends Scene {
         this.stageManager = new BattleStageManager(this);
         this.stageManager.createStage('battle-stage-cursed-forest');
         this.cameraControl = new CameraControlEngine(this);
-        this.domEngine = new DOMEngine(this);
 
         // BattleSimulatorEngine 사용
-        this.battleSimulator = new BattleSimulatorEngine(this, this.domEngine);
+        this.battleSimulator = new BattleSimulatorEngine(this);
 
         // 파티 유닛과 몬스터 데이터를 준비합니다.
         const partyIds = partyEngine.getPartyMembers().filter(id => id !== undefined);
@@ -58,9 +54,6 @@ export class CursedForestBattleScene extends Scene {
             }
             if (this.cameraControl) {
                 this.cameraControl.destroy();
-            }
-            if (this.domEngine) {
-                this.domEngine.shutdown();
             }
             if (this.battleSimulator) {
                 this.battleSimulator.shutdown();
