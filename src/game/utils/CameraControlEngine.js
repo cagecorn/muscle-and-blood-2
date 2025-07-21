@@ -15,7 +15,9 @@ export class CameraControlEngine {
         this.isDragging = false;
         this.prevPointer = { x: 0, y: 0 };
         this.minZoom = 0.5;
-        this.maxZoom = 2;
+        // 기본 최대 줌을 기존의 2에서 6으로 확장하여
+        // 보다 깊은 클로즈업이 가능하도록 합니다.
+        this.maxZoom = 6;
 
         scene.input.on('pointerdown', this.onPointerDown, this);
         scene.input.on('pointermove', this.onPointerMove, this);
