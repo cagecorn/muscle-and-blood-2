@@ -12,9 +12,6 @@ import { surveyEngine } from './utils/SurveyEngine.js';
 // Phaser를 CDN에서 불러와 배포 시 404 오류를 방지합니다.
 // ESM 빌드에는 기본 내보내기가 없으므로 전체 네임스페이스를 가져옵니다.
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
-
-// 현재 기기 화면의 물리적 픽셀 비율을 구합니다.
-const dpr = window.devicePixelRatio || 1;
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
@@ -32,11 +29,9 @@ const config = {
     render: {
         pixelArt: false,
         antialias: true, // 안티에일리어싱을 활성화하여 이미지를 부드럽게 표현합니다.
-        mipmapFilter: 'LINEAR_MIPMAP_LINEAR', // 고품질 밉맵 필터를 사용해 텍스처 품질을 향상합니다.
-        powerPreference: 'high-performance',
+        resolution: window.devicePixelRatio || 1, // 기기의 픽셀 비율에 맞춰 해상도를 설정합니다.
         roundPixels: true,
     },
-    resolution: dpr,
     // Boot 씬만 초기 설정에 등록합니다.
     // Boot 씬이 실행되면서 나머지 씬들을 동적으로 추가합니다.
     scene: [Boot]
