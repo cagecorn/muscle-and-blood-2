@@ -26,7 +26,8 @@ class FormationEngine {
      * @param {Array<object>} units 유닛 데이터 배열
      */
     applyFormation(scene, units) {
-        if (!this.grid) return;
+        if (!this.grid) return [];
+        const sprites = [];
         units.forEach(unit => {
             const index = this.getPosition(unit.uniqueId);
             const cell = this.grid.gridCells[index];
@@ -44,7 +45,9 @@ class FormationEngine {
             } else {
                 sprite.setDisplaySize(cell.width, cell.height);
             }
+            sprites.push(sprite);
         });
+        return sprites;
     }
 
     /**
@@ -54,8 +57,9 @@ class FormationEngine {
      * @param {number} startCol 적군 배치가 시작될 최소 열
      */
     placeMonsters(scene, monsters, startCol = 8) {
-        if (!this.grid) return;
+        if (!this.grid) return [];
         const cells = this.grid.gridCells.filter(c => c.col >= startCol && !c.isOccupied);
+        const sprites = [];
         monsters.forEach(mon => {
             const cell = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
             if (!cell) return;
@@ -73,7 +77,9 @@ class FormationEngine {
             } else {
                 sprite.setDisplaySize(cell.width, cell.height);
             }
+            sprites.push(sprite);
         });
+        return sprites;
     }
 }
 

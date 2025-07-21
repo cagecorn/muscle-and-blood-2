@@ -605,6 +605,16 @@ body {
     text-align: center;
 }
 
+/* --- 전투 이름표 스타일 --- */
+.battle-name-tag {
+    font-size: 12px;
+    color: #fff;
+    border-radius: 2px;
+    padding: 2px 4px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
 #formation-back-button {
     position: absolute;
     top: 20px;

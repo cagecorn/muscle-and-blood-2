@@ -42,6 +42,20 @@ export class DOMEngine {
     }
 
     /**
+     * 임의의 DOM 요소를 게임 오브젝트와 동기화합니다.
+     * @param {Phaser.GameObjects.GameObject} target - DOM 요소가 따라다닐 게임 오브젝트
+     * @param {HTMLElement} element - 동기화할 DOM 요소
+     * @returns {HTMLElement} 동기화된 DOM 요소
+     */
+    syncElement(target, element) {
+        element.style.position = 'absolute';
+        this.uiContainer.appendChild(element);
+        const sync = new DomSync(this.scene, target, element);
+        this.activeSyncs.push(sync);
+        return element;
+    }
+
+    /**
      * 툴팁을 표시합니다.
      * @param {number} x - 툴팁의 기준 x 좌표
      * @param {number} y - 툴팁의 기준 y 좌표
