@@ -23,8 +23,7 @@ const config = {
     transparent: true, // 캔버스 자체를 투명하게 설정합니다.
     backgroundColor: 'transparent', // 배경색을 투명하게 만듭니다.
     scale: {
-        // mode: Phaser.Scale.FIT, // 기존 FIT 모드를 잠시 주석 처리하고
-        mode: Phaser.Scale.NONE, // NONE 모드로 변경하여 테스트합니다.
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     render: {
