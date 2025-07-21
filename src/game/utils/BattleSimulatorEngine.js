@@ -1,5 +1,7 @@
 import { formationEngine } from './FormationEngine.js';
 import { OffscreenTextEngine } from './OffscreenTextEngine.js';
+// 새로 만든 디버그 매니저를 가져옵니다.
+import { debugDisplayLogManager } from '../debug/DebugDisplayLogManager.js';
 
 /**
  * 전투의 전체 과정을 시뮬레이션하고 관리하는 엔진입니다.
@@ -46,12 +48,25 @@ export class BattleSimulatorEngine {
      * @param {string} color - 이름표 배경색
      */
     _createNameLabels(sprites, units, color) {
+        // [수정된 부분]
+        // 스프라이트 배열을 순회하며, 각 스프라이트의 고유 ID를 이용해
+        // 올바른 유닛 정보를 찾습니다.
         sprites.forEach(sprite => {
             const unitId = sprite.getData('unitId');
             const unit = units.find(u => u.uniqueId === unitId);
-            if (!unit) return;
 
-            this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
+            // 만약 해당 ID의 유닛을 찾지 못하면 아무것도 하지 않고 넘어갑니다.
+            if (!unit) {
+                console.warn(`[BattleSimulatorEngine] ID: ${unitId}에 해당하는 유닛 데이터를 찾을 수 없습니다.`);
+                return;
+            }
+
+            // 올바른 유닛 정보로 이름표를 생성합니다.
+            const label = this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
+
+            // [추가된 부분]
+            // 새로 만든 디버그 매니저를 사용하여 콘솔에 좌표를 기록합니다.
+            debugDisplayLogManager.logCreationPoint(sprite, label, unit);
         });
     }
 
