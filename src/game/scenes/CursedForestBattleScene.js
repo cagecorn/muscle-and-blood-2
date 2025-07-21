@@ -6,12 +6,15 @@ import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { monsterEngine } from '../utils/MonsterEngine.js';
 import { getMonsterBase } from '../data/monster.js';
+import { DOMEngine } from '../utils/DOMEngine.js';
+import { createNameLabelCanvas } from '../utils/NameLabelFactory.js';
 
 export class CursedForestBattleScene extends Scene {
     constructor() {
         super('CursedForestBattle');
         this.stageManager = null;
         this.cameraControl = null;
+        this.domEngine = null;
     }
 
     create() {
@@ -24,12 +27,13 @@ export class CursedForestBattleScene extends Scene {
         this.stageManager = new BattleStageManager(this);
         this.stageManager.createStage('battle-stage-cursed-forest');
         this.cameraControl = new CameraControlEngine(this);
+        this.domEngine = new DOMEngine(this);
 
         // 아군 배치
         const partyIds = partyEngine.getPartyMembers().filter(id => id !== undefined);
         const allMercs = mercenaryEngine.getAllAlliedMercenaries();
         const partyUnits = allMercs.filter(m => partyIds.includes(m.uniqueId));
-        formationEngine.applyFormation(this, partyUnits);
+        const allySprites = formationEngine.applyFormation(this, partyUnits);
 
         // 적 몬스터 생성 및 배치
         const monsters = [];
@@ -37,7 +41,26 @@ export class CursedForestBattleScene extends Scene {
         for (let i = 0; i < 5; i++) {
             monsters.push(monsterEngine.spawnMonster(zombieBase, 'enemy'));
         }
-        formationEngine.placeMonsters(this, monsters, 8);
+        const enemySprites = formationEngine.placeMonsters(this, monsters, 8);
+
+        // 이름표 생성
+        allySprites.forEach((sprite, idx) => {
+            const unit = partyUnits[idx];
+            const label = createNameLabelCanvas(unit.instanceName || unit.name, 'rgba(0,0,255,0.7)');
+            const width = parseFloat(label.style.width) || 0;
+            label.style.marginLeft = -(width / 2) + 'px';
+            label.style.marginTop = sprite.displayHeight / 2 + 'px';
+            this.domEngine.syncElement(sprite, label);
+        });
+
+        enemySprites.forEach((sprite, idx) => {
+            const mon = monsters[idx];
+            const label = createNameLabelCanvas(mon.instanceName || mon.name, 'rgba(255,0,0,0.7)');
+            const width = parseFloat(label.style.width) || 0;
+            label.style.marginLeft = -(width / 2) + 'px';
+            label.style.marginTop = sprite.displayHeight / 2 + 'px';
+            this.domEngine.syncElement(sprite, label);
+        });
 
         this.events.on('shutdown', () => {
             ['dungeon-container', 'territory-container'].forEach(id => {
@@ -50,6 +73,9 @@ export class CursedForestBattleScene extends Scene {
             }
             if (this.cameraControl) {
                 this.cameraControl.destroy();
+            }
+            if (this.domEngine) {
+                this.domEngine.shutdown();
             }
         });
     }
