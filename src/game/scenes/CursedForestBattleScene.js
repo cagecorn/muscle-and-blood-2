@@ -8,6 +8,7 @@ import { monsterEngine } from '../utils/MonsterEngine.js';
 import { getMonsterBase } from '../data/monster.js';
 import { DOMEngine } from '../utils/DOMEngine.js';
 import { createNameLabelCanvas } from '../utils/NameLabelFactory.js';
+import { debugCoordinateManager } from '../debug/DebugCoordinateManager.js';
 
 export class CursedForestBattleScene extends Scene {
     constructor() {
@@ -46,20 +47,62 @@ export class CursedForestBattleScene extends Scene {
         // 이름표 생성
         allySprites.forEach((sprite, idx) => {
             const unit = partyUnits[idx];
-            const label = createNameLabelCanvas(unit.instanceName || unit.name, 'rgba(0,0,255,0.7)');
-            const width = parseFloat(label.style.width) || 0;
-            label.style.marginLeft = -(width / 2) + 'px';
-            label.style.marginTop = sprite.displayHeight / 2 + 'px';
-            this.domEngine.syncElement(sprite, label);
+            const label = createNameLabelCanvas(
+                unit.instanceName || unit.name,
+                'rgba(0,0,255,0.7)'
+            );
+
+            // 이름표 위치 보정 및 디버그 로그 추가
+            const labelWidth = parseFloat(label.style.width) || 0;
+            const labelHeight = parseFloat(label.style.height) || 0;
+            label.style.marginLeft = `-${labelWidth / 2}px`;
+            label.style.marginTop = `${sprite.displayHeight / 2 - labelHeight}px`;
+
+            const syncedElement = this.domEngine.syncElement(sprite, label);
+
+            // 디버그: 좌표 기록
+            const imageCoord = { x: sprite.x, y: sprite.y };
+            const labelRect = syncedElement.getBoundingClientRect();
+            const gameRect = this.sys.game.canvas.getBoundingClientRect();
+            const labelCoord = {
+                x: labelRect.left - gameRect.left,
+                y: labelRect.top - gameRect.top
+            };
+            debugCoordinateManager.logCoordinates(
+                unit.instanceName || unit.name,
+                imageCoord,
+                labelCoord
+            );
         });
 
         enemySprites.forEach((sprite, idx) => {
             const mon = monsters[idx];
-            const label = createNameLabelCanvas(mon.instanceName || mon.name, 'rgba(255,0,0,0.7)');
-            const width = parseFloat(label.style.width) || 0;
-            label.style.marginLeft = -(width / 2) + 'px';
-            label.style.marginTop = sprite.displayHeight / 2 + 'px';
-            this.domEngine.syncElement(sprite, label);
+            const label = createNameLabelCanvas(
+                mon.instanceName || mon.name,
+                'rgba(255,0,0,0.7)'
+            );
+
+            // 이름표 위치 보정 및 디버그 로그 추가
+            const labelWidth = parseFloat(label.style.width) || 0;
+            const labelHeight = parseFloat(label.style.height) || 0;
+            label.style.marginLeft = `-${labelWidth / 2}px`;
+            label.style.marginTop = `${sprite.displayHeight / 2 - labelHeight}px`;
+
+            const syncedElement = this.domEngine.syncElement(sprite, label);
+
+            // 디버그: 좌표 기록
+            const imageCoord = { x: sprite.x, y: sprite.y };
+            const labelRect = syncedElement.getBoundingClientRect();
+            const gameRect = this.sys.game.canvas.getBoundingClientRect();
+            const labelCoord = {
+                x: labelRect.left - gameRect.left,
+                y: labelRect.top - gameRect.top
+            };
+            debugCoordinateManager.logCoordinates(
+                mon.instanceName || mon.name,
+                imageCoord,
+                labelCoord
+            );
         });
 
         this.events.on('shutdown', () => {
