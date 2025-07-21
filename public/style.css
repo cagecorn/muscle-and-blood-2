@@ -1,0 +1,619 @@
+body {
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #000000;
+}
+
+#app {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.ui-element {
+    pointer-events: all;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #fff;
+    border-radius: 5px;
+    color: #fff;
+    user-select: none;
+}
+
+/* --- 영지 화면 DOM 스타일 --- */
+
+#territory-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; 
+    background-size: cover;
+    background-position: center;
+    background-image: url(../assets/images/territory/city-1.png);
+}
+
+/* --- 용병 관리 화면 DOM 스타일 --- */
+#party-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    background-image: url(../assets/images/territory/party-scene.png);
+    display: none; /* 초기에는 숨김 */
+}
+
+#party-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#party-active-grid {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 25%;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
+    pointer-events: auto;
+}
+
+#party-reserve-grid {
+    position: absolute;
+    top: 35%;
+    left: 5%;
+    width: 90%;
+    height: 60%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    overflow-y: auto;
+    pointer-events: auto;
+}
+
+.party-slot, .reserve-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.party-slot-image, .reserve-image {
+    width: 100%;
+    height: 60px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.slot-name {
+    font-size: 12px;
+    color: #fff;
+    margin-top: 4px;
+    text-align: center;
+}
+
+#party-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+#territory-grid {
+    position: absolute;
+    top: 35%;
+    left: 15%;
+    width: 40%;
+    height: 50%;
+    display: grid;
+    gap: 15px;
+    pointer-events: auto;
+}
+
+.building-icon {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+.building-icon:hover {
+    transform: scale(1.1);
+}
+
+/* --- 선술집 뷰 스타일 (수정) --- */
+#tavern-view {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    pointer-events: auto;
+    display: flex; /* Flexbox를 사용하여 중앙 정렬 */
+    justify-content: center;
+    align-items: center;
+}
+
+#tavern-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+#tavern-grid {
+    /* position, top, left, transform 속성 제거 */
+    width: 60%; /* 너비 조정 */
+    height: 20%; /* 높이 조정 */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.tavern-button {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.tavern-button:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* --- 용병 고용 모달 스타일 (수정) --- */
+#hire-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+#hire-modal-content {
+    position: relative;
+    /* 배경을 반투명하게 수정 */
+    background-color: rgba(26, 26, 26, 0.85); 
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #444;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#hire-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+}
+
+#hire-image-viewer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#mercenary-image {
+    max-width: 400px;
+    max-height: 600px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#mercenary-image:hover {
+    transform: scale(1.02);
+}
+
+.hire-arrow {
+    font-size: 40px;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    padding: 10px;
+}
+
+/* Phaser 게임 캔버스를 담는 컨테이너 */
+#game-container {
+    position: absolute;
+    z-index: 1; 
+}
+
+/* --- 유닛 상세 정보창 스타일 --- */
+#unit-detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    pointer-events: auto;
+}
+
+#unit-detail-pane {
+    /* 가로형 레이아웃을 위해 크기 조정 */
+    width: 1000px;
+    height: 550px;
+    background-color: #2c2a29;
+    border: 3px solid #1a1817;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    color: #e0e0e0;
+    font-family: sans-serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#unit-detail-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+}
+#unit-detail-close:hover {
+    color: #fff;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 24px;
+    font-weight: bold;
+    border-bottom: 2px solid #444;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+.unit-name {
+    color: #fff;
+}
+.unit-level {
+    color: #f0e68c;
+}
+
+.detail-content {
+    display: flex;
+    flex-grow: 1;
+    gap: 20px;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+}
+.detail-section.left {
+    width: 50%;
+}
+.detail-section.right {
+    width: 50%;
+    display: flex;
+    gap: 15px;
+}
+
+.unit-portrait {
+    width: 100%;
+    height: 300px;
+    /* 이미지가 잘리지 않도록 contain 사용 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center top;
+    border-radius: 5px;
+    border: 2px solid #555;
+    margin-bottom: 15px;
+}
+
+.unit-description {
+    font-style: italic;
+    color: #aaa;
+    border: 1px dashed #555;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.traits-section, .synergy-section {
+    margin-top: 10px;
+}
+
+.placeholder-box {
+    height: 60px;
+    background-color: rgba(0,0,0,0.3);
+    border: 1px dashed #444;
+    border-radius: 4px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    background-color: #3a3837;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.stats-grid, .equipment-grid {
+    flex: 1;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background-color: rgba(0,0,0,0.2);
+    margin-bottom: 4px;
+    border-radius: 2px;
+}
+.stat-item span:last-child {
+    color: #fff;
+    font-weight: bold;
+}
+
+.equip-slot {
+    height: 50px;
+    background-color: rgba(0,0,0,0.3);
+    border: 1px solid #444;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.detail-footer {
+    display: flex;
+    border-top: 2px solid #444;
+    padding-top: 10px;
+    margin-top: 15px;
+    gap: 20px;
+}
+
+.unit-class {
+    width: 100px;
+}
+.class-icon {
+    width: 100%;
+    height: 60px;
+    background-color: rgba(0,0,0,0.3);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.unit-skills {
+    flex-grow: 1;
+}
+.skill-grid {
+    display: flex;
+    gap: 10px;
+}
+.skill-slot {
+    flex: 1;
+    height: 60px;
+    background-color: rgba(0,0,0,0.3);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+/* --- 용병 고용 모달에 버튼 스타일 추가 --- */
+#hire-enemy-button {
+    width: 50%;
+    padding: 8px;
+    margin-top: 15px;
+    background-color: #7f1d1d;
+    color: #fecaca;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #991b1b;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#hire-enemy-button:hover {
+    background-color: #991b1b;
+    color: #fff;
+}
+
+
+/* --- 출정 화면 DOM 스타일 --- */
+#dungeon-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    display: none;
+}
+
+#dungeon-grid {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 80%;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(10, 1fr);
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.dungeon-tile {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.dungeon-label {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+}
+
+#dungeon-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    background-color: rgba(0,0,0,0.7);
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* --- 진형 화면 DOM 스타일 --- */
+#formation-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    display: none;
+}
+
+#formation-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+}
+
+#formation-grid {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 90%;
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    pointer-events: auto;
+}
+
+.formation-cell {
+    border: 1px solid rgba(255,255,255,0.3);
+    position: relative;
+}
+
+.formation-cell.ally-area {
+    background-color: rgba(0,0,255,0.1);
+}
+
+.formation-unit {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    cursor: grab;
+}
+
+.formation-unit-name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+}
+
+#formation-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    background-color: rgba(0,0,0,0.7);
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+}
