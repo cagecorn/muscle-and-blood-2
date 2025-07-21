@@ -1,5 +1,6 @@
 import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { BattleStageManager } from '../utils/BattleStageManager.js';
+import { CameraControlEngine } from '../utils/CameraControlEngine.js';
 import { formationEngine } from '../utils/FormationEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
@@ -10,6 +11,7 @@ export class CursedForestBattleScene extends Scene {
     constructor() {
         super('CursedForestBattle');
         this.stageManager = null;
+        this.cameraControl = null;
     }
 
     create() {
@@ -21,6 +23,7 @@ export class CursedForestBattleScene extends Scene {
 
         this.stageManager = new BattleStageManager(this);
         this.stageManager.createStage('battle-stage-cursed-forest');
+        this.cameraControl = new CameraControlEngine(this);
 
         // 아군 배치
         const partyIds = partyEngine.getPartyMembers().filter(id => id !== undefined);
@@ -44,6 +47,9 @@ export class CursedForestBattleScene extends Scene {
 
             if (this.stageManager) {
                 this.stageManager.destroy();
+            }
+            if (this.cameraControl) {
+                this.cameraControl.destroy();
             }
         });
     }
