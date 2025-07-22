@@ -14,9 +14,9 @@ import SuccessNode from '../nodes/SuccessNode.js';
 /**
  * 원거리 유닛(거너)을 위한 카이팅 행동 트리를 생성합니다.
  * 행동 로직:
- * 1. 생존: 적이 너무 가까우면 뒤로 물러난다.
+ * 1. 생존: 가장 가까운 적이 너무 가까우면 뒤로 물러난다. (수정됨)
  * 2. 타겟팅: 체력이 가장 낮은 적을 노린다.
- * 3. 공격: 사거리 내에 있으면 공격, 아니면 접근 후 공격.
+ * 3. 공격: 사거리 내에 있으면 공격, 아니면 최대 사거리를 유지하는 위치로 이동 후 공격. (수정됨)
  * @param {object} engines - AI 노드들이 사용할 엔진 및 매니저 모음
  * @returns {BehaviorTree}
  */
@@ -29,9 +29,9 @@ function createRangedAI(engines) {
         ]),
         // 단계 2: 상황에 따른 행동 결정
         new SelectorNode([
-            // 2a. (최우선) 생존: 적이 너무 가까우면 카이팅 위치로 이동
+            // 2a. (최우선) 생존: "가장 가까운 적"이 너무 가까우면 카이팅 위치로 이동
             new SequenceNode([
-                new IsTargetTooCloseNode({ dangerZone: 1 }),
+                new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }), // 위험 거리 2로 상향
                 new FindKitingPositionNode(engines),
                 new MoveToTargetNode(engines),
             ]),

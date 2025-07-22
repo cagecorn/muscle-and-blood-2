@@ -12,47 +12,48 @@ class FindKitingPositionNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const target = blackboard.get('currentTargetUnit');
-        if (!target) return NodeState.FAILURE;
+        if (!target) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, "카이팅할 대상 없음");
+            return NodeState.FAILURE;
+        }
 
-        const safeRange = unit.finalStats.attackRange || 3;
+        const attackRange = unit.finalStats.attackRange || 3;
+        const dangerZone = 2; // IsTargetTooCloseNode와 동일하게 설정
         const start = { col: unit.gridX, row: unit.gridY };
         const targetPos = { col: target.gridX, row: target.gridY };
 
-        // 1. 이동 가능한 모든 빈 셀 찾기
         const availableCells = this.formationEngine.grid.gridCells.filter(cell => !cell.isOccupied || (cell.col === start.col && cell.row === start.row));
 
-        // 2. 각 셀의 "안전 점수" 계산
         let bestCell = null;
-        let maxScore = -Infinity;
+        let minDistanceToTravel = Infinity;
 
         availableCells.forEach(cell => {
             const distanceToTarget = Math.abs(cell.col - targetPos.col) + Math.abs(cell.row - targetPos.row);
-            // 점수 = (목표와의 거리 - 목표 사거리) -> 목표로부터 멀수록, 사거리 안에 있을수록 점수 높음
-            let score = distanceToTarget - safeRange;
 
-            // 이동 불가능한 셀은 점수 대폭 하락
-            if (this.pathfinderEngine.findPath(start, cell) === null) {
-                score = -Infinity;
-            }
+            // 조건 1: 위험 지역(dangerZone)보다 멀리 떨어져 있는가?
+            // 조건 2: 최대 공격 사거리(attackRange) 안에 있는가?
+            if (distanceToTarget > dangerZone && distanceToTarget <= attackRange) {
+                const distanceToTravel = Math.abs(cell.col - start.col) + Math.abs(cell.row - start.row);
 
-            if (score > maxScore) {
-                maxScore = score;
-                bestCell = cell;
+                // 조건 3: 위 조건들을 만족하는 셀 중에서 가장 이동 거리가 짧은 곳인가?
+                if (distanceToTravel < minDistanceToTravel) {
+                    minDistanceToTravel = distanceToTravel;
+                    bestCell = cell;
+                }
             }
         });
         
-        // 3. 가장 좋은 위치로의 경로 탐색
         if (bestCell) {
             const path = this.pathfinderEngine.findPath(start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) {
                 blackboard.set('movementPath', path);
-                debugAIManager.logNodeResult(NodeState.SUCCESS);
+                debugAIManager.logNodeResult(NodeState.SUCCESS, `최적 카이팅 위치 (${bestCell.col}, ${bestCell.row})로 경로 설정`);
                 return NodeState.SUCCESS;
             }
         }
 
-        debugAIManager.logNodeResult(NodeState.FAILURE);
-        return NodeState.FAILURE;
+        debugAIManager.logNodeResult(NodeState.FAILURE, "적절한 카이팅 위치를 찾지 못함");
+        return NodeState.FAILURE; // 마땅한 후퇴 지점 없음
     }
 }
 export default FindKitingPositionNode;
