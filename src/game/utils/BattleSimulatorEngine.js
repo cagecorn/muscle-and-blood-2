@@ -7,6 +7,9 @@ import { shadowManager } from './ShadowManager.js';
 import { BindingManager } from './BindingManager.js';
 // 새로 만든 VFXManager를 가져옵니다.
 import { VFXManager } from './VFXManager.js';
+// AI 매니저와 전사 AI를 가져옵니다.
+import { aiManager } from '../../ai/AIManager.js';
+import { createWarriorAI } from '../../ai/behaviors/WarriorAI.js';
 // --- ⬆️ 여기까지 ---
 
 /**
@@ -22,6 +25,10 @@ export class BattleSimulatorEngine {
         this.textEngine = new OffscreenTextEngine(scene);
         this.allySprites = [];
         this.enemySprites = [];
+
+        // 턴 진행을 위한 큐 초기화
+        this.turnQueue = [];
+        this.currentTurnIndex = 0;
 
         // --- ⬇️ 매니저들을 초기화합니다. ---
         this.shadowManager = shadowManager(scene);
@@ -47,7 +54,48 @@ export class BattleSimulatorEngine {
         this.enemySprites = formationEngine.placeMonsters(this.scene, enemies, 8);
         this._setupUnits(this.enemySprites, enemies, '#ff6363');
 
+        // AI 유닛 등록 및 위치 데이터 초기화
+        enemies.forEach(enemyUnit => {
+            const sprite = this.enemySprites.find(s => s.getData('unitId') === enemyUnit.uniqueId);
+            if (sprite) {
+                const cell = this.scene.stageManager.gridEngine.gridCells.find(c => c.x === sprite.x && c.y === sprite.y);
+                if (cell) {
+                    enemyUnit.gridX = cell.col;
+                    enemyUnit.gridY = cell.row;
+                }
+            }
+            enemyUnit.currentHp = enemyUnit.finalStats.hp;
+            const warriorAI = createWarriorAI();
+            aiManager.registerUnit(enemyUnit, warriorAI);
+        });
+
+        // 턴 큐 생성 및 전투 시작
+        this.turnQueue = [...allies, ...enemies];
+        this.currentTurnIndex = 0;
+        this.nextTurn();
+
         console.log(`[BattleSimulatorEngine] 유닛 배치 완료. 아군: ${this.allySprites.length}명, 적군: ${this.enemySprites.length}명`);
+    }
+
+    async nextTurn() {
+        if (this.currentTurnIndex >= this.turnQueue.length) {
+            this.currentTurnIndex = 0;
+        }
+
+        const currentUnit = this.turnQueue[this.currentTurnIndex];
+
+        if (aiManager.unitData.has(currentUnit.uniqueId)) {
+            const allies = this.turnQueue.filter(u => !aiManager.unitData.has(u.uniqueId));
+            const enemies = this.turnQueue.filter(u => aiManager.unitData.has(u.uniqueId));
+
+            await aiManager.executeTurn(currentUnit, [...allies, ...enemies], allies);
+        } else {
+            console.log(`플레이어 유닛 ${currentUnit.instanceName}의 턴입니다.`);
+        }
+
+        this.currentTurnIndex++;
+
+        this.scene.time.delayedCall(1000, this.nextTurn, [], this);
     }
 
     /**

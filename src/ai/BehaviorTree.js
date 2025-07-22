@@ -1,5 +1,5 @@
 import Blackboard from './Blackboard.js';
-import { debugLogEngine } from '../utils/DebugLogEngine.js';
+import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
 
 /**
  * 행동 트리와 블랙보드를 함께 캡슐화하는 클래스입니다.
