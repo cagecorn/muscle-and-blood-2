@@ -23,6 +23,64 @@ class FormationEngine {
     }
 
     /**
+     * 주어진 유닛들을 그리드에 배치합니다. 위치가 지정되지 않은 유닛은 빈 칸에 무작위로 배치됩니다.
+     * 배치된 스프라이트를 반환하며 unit.sprite 속성에 저장합니다.
+     * @param {Phaser.Scene} scene
+     * @param {Array<object>} units
+     * @param {number} startCol 배치를 시작할 최소 열 (기본값 0)
+     * @returns {Array<Phaser.GameObjects.Image>}
+     */
+    placeUnits(scene, units, startCol = 0) {
+        if (!this.grid) return [];
+        const sprites = [];
+        const available = this.grid.gridCells.filter(c => c.col >= startCol && !c.isOccupied);
+
+        units.forEach(unit => {
+            let cell;
+            const index = this.getPosition(unit.uniqueId);
+            if (index !== undefined) {
+                cell = this.grid.gridCells[index];
+            } else {
+                cell = available.shift();
+            }
+            if (!cell) return;
+            cell.isOccupied = true;
+
+            const spriteKey = unit.spriteKey || unit.battleSprite || unit.id || unit.name;
+            const sprite = scene.add.image(cell.x, cell.y, spriteKey);
+            sprite.setData('unitId', unit.uniqueId);
+            const texture = scene.textures.get(spriteKey);
+            if (texture && texture.source[0]) {
+                const scale = Math.min(
+                    cell.width / texture.source[0].width,
+                    cell.height / texture.source[0].height
+                );
+                sprite.setScale(scale);
+            } else {
+                sprite.setDisplaySize(cell.width, cell.height);
+            }
+
+            sprites.push(sprite);
+            unit.sprite = sprite;
+            cell.sprite = sprite;
+            unit.gridX = cell.col;
+            unit.gridY = cell.row;
+        });
+
+        return sprites;
+    }
+
+    /**
+     * 스프라이트 위치를 통해 해당 그리드 셀 정보를 반환합니다.
+     * @param {Phaser.GameObjects.Image} sprite
+     * @returns {object|null}
+     */
+    getCellFromSprite(sprite) {
+        if (!this.grid || !sprite) return null;
+        return this.grid.gridCells.find(c => c.x === sprite.x && c.y === sprite.y) || null;
+    }
+
+    /**
      * 저장된 위치를 기반으로 유닛 스프라이트를 전투 그리드에 배치합니다.
      * @param {Phaser.Scene} scene 배치가 이루어질 씬
      * @param {Array<object>} units 유닛 데이터 배열

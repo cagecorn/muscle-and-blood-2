@@ -1,38 +1,27 @@
 import Node, { NodeState } from './Node.js';
-import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 
-/**
- * 전장에 있는 적들 중에서 가장 가까운 적을 찾아 블랙보드에 저장합니다.
- */
 class FindTargetNode extends Node {
+    constructor({ targetManager }) {
+        super();
+        this.targetManager = targetManager;
+    }
+
     async evaluate(unit, blackboard) {
+        debugAIManager.logNodeEvaluation(this, unit);
+
         const enemyUnits = blackboard.get('enemyUnits');
-        if (!enemyUnits || enemyUnits.length === 0) {
-            debugLogEngine.log('FindTargetNode', '타겟을 찾을 수 없음: 적이 없습니다.');
-            return NodeState.FAILURE;
-        }
+        // 'nearest' 전략 사용
+        const target = this.targetManager.findNearestEnemy(unit, enemyUnits);
 
-        let nearestEnemy = null;
-        let minDistance = Infinity;
-        const unitPos = { x: unit.gridX, y: unit.gridY };
-
-        for (const enemy of enemyUnits) {
-            const enemyPos = { x: enemy.gridX, y: enemy.gridY };
-            const distance = Math.abs(unitPos.x - enemyPos.x) + Math.abs(unitPos.y - enemyPos.y);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestEnemy = enemy;
-            }
-        }
-
-        if (nearestEnemy) {
-            blackboard.set('currentTargetUnit', nearestEnemy);
-            debugLogEngine.log('FindTargetNode', `${unit.instanceName}: 가장 가까운 타겟 설정 -> ${nearestEnemy.instanceName}`);
+        if (target) {
+            blackboard.set('currentTargetUnit', target);
+            debugAIManager.logNodeResult(NodeState.SUCCESS);
             return NodeState.SUCCESS;
         }
-
+        
+        debugAIManager.logNodeResult(NodeState.FAILURE);
         return NodeState.FAILURE;
     }
 }
-
 export default FindTargetNode;

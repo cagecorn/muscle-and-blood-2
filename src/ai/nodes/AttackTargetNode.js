@@ -1,30 +1,46 @@
 import Node, { NodeState } from './Node.js';
-import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngine.js';
-import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 
-/**
- * 블랙보드에 저장된 타겟을 공격하는 행동 노드입니다.
- */
 class AttackTargetNode extends Node {
+    constructor({ combatCalculationEngine, vfxManager, animationEngine, delayEngine, terminationManager }) {
+        super();
+        this.combatEngine = combatCalculationEngine;
+        this.vfxManager = vfxManager;
+        this.animationEngine = animationEngine;
+        this.delayEngine = delayEngine;
+        this.terminationManager = terminationManager;
+    }
+
     async evaluate(unit, blackboard) {
+        debugAIManager.logNodeEvaluation(this, unit);
         const target = blackboard.get('currentTargetUnit');
         if (!target) {
+            debugAIManager.logNodeResult(NodeState.FAILURE);
             return NodeState.FAILURE;
         }
 
-        debugLogEngine.log('AttackTargetNode', `${unit.instanceName}이(가) ${target.instanceName}을(를) 공격합니다.`);
+        // 공격 애니메이션
+        await this.animationEngine.attack(unit.sprite, target.sprite);
 
-        const damage = combatCalculationEngine.calculateDamage(unit, target);
+        // 데미지 계산 및 적용
+        const damage = this.combatEngine.calculateDamage(unit, target);
         target.currentHp -= damage;
 
-        console.log(`[Attack] ${target.instanceName}이(가) ${damage}의 피해를 입었습니다. 남은 체력: ${target.currentHp}`);
+        // 시각 효과
+        this.vfxManager.updateHealthBar(target.healthBar, target.currentHp, target.finalStats.hp);
+        this.vfxManager.createBloodSplatter(target.sprite.x, target.sprite.y);
 
+        // 딜레이
+        await this.delayEngine.hold(200);
+
+        // 사망 처리
         if (target.currentHp <= 0) {
-            console.log(`[Attack] ${target.instanceName}이(가) 쓰러졌습니다!`);
+            this.terminationManager.handleUnitDeath(target);
+            blackboard.set('currentTargetUnit', null); // 타겟이 죽었으므로 초기화
         }
 
+        debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
     }
 }
-
 export default AttackTargetNode;
