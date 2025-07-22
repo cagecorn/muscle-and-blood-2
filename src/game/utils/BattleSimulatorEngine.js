@@ -2,6 +2,10 @@ import { formationEngine } from './FormationEngine.js';
 import { OffscreenTextEngine } from './OffscreenTextEngine.js';
 // 새로 만든 디버그 매니저를 가져옵니다.
 import { debugDisplayLogManager } from '../debug/DebugDisplayLogManager.js';
+// --- ⬇️ 새로 만든 매니저들을 가져옵니다. ---
+import { shadowManager } from './ShadowManager.js';
+import { BindingManager } from './BindingManager.js';
+// --- ⬆️ 여기까지 ---
 
 /**
  * 전투의 전체 과정을 시뮬레이션하고 관리하는 엔진입니다.
@@ -17,6 +21,11 @@ export class BattleSimulatorEngine {
         this.allySprites = [];
         this.enemySprites = [];
 
+        // --- ⬇️ 매니저들을 초기화합니다. ---
+        this.shadowManager = shadowManager(scene);
+        this.bindingManager = new BindingManager(scene);
+        // --- ⬆️ 여기까지 ---
+
         // 씬의 update 루프에 맞춰 텍스트 엔진을 갱신합니다.
         this.scene.events.on('update', this.textEngine.update, this.textEngine);
     }
@@ -27,46 +36,39 @@ export class BattleSimulatorEngine {
      * @param {Array<object>} enemies - 적군 유닛 데이터 배열
      */
     start(allies, enemies) {
-        // 1. 아군을 진형에 맞춰 배치합니다.
+        // 1. 아군을 진형에 맞춰 배치하고, 이름표와 그림자를 바인딩합니다.
         this.allySprites = formationEngine.applyFormation(this.scene, allies);
+        this._setupUnits(this.allySprites, allies, '#63b1ff');
 
-        // 2. 적군을 무작위 위치에 배치합니다.
-        this.enemySprites = formationEngine.placeMonsters(this.scene, enemies, 8); // 8번 열부터 적군 지역
+        // 2. 적군을 무작위 위치에 배치하고, 이름표와 그림자를 바인딩합니다.
+        this.enemySprites = formationEngine.placeMonsters(this.scene, enemies, 8);
+        this._setupUnits(this.enemySprites, enemies, '#ff6363');
 
         console.log(`[BattleSimulatorEngine] 유닛 배치 완료. 아군: ${this.allySprites.length}명, 적군: ${this.enemySprites.length}명`);
-
-        // 새 텍스트 엔진을 사용하여 이름표를 표시합니다.
-        this._createNameLabels(this.allySprites, allies, '#63b1ff');
-        this._createNameLabels(this.enemySprites, enemies, '#ff6363');
     }
 
     /**
-     * 유닛 스프라이트에 이름표를 생성하고 부착합니다.
+     * 유닛 스프라이트에 이름표와 그림자를 생성하고 바인딩합니다.
      * @private
-     * @param {Array<Phaser.GameObjects.Image>} sprites - 대상 스프라이트 배열
-     * @param {Array<object>} units - 유닛 데이터 배열
-     * @param {string} color - 이름표 배경색
+     * @param {Array<Phaser.GameObjects.Image>} sprites 대상 스프라이트 배열
+     * @param {Array<object>} units 유닛 데이터 배열
+     * @param {string} color 이름표 배경색
      */
-    _createNameLabels(sprites, units, color) {
-        // [수정된 부분]
-        // 스프라이트 배열을 순회하며, 각 스프라이트의 고유 ID를 이용해
-        // 올바른 유닛 정보를 찾습니다.
+    _setupUnits(sprites, units, color) {
         sprites.forEach(sprite => {
             const unitId = sprite.getData('unitId');
             const unit = units.find(u => u.uniqueId === unitId);
 
-            // 만약 해당 ID의 유닛을 찾지 못하면 아무것도 하지 않고 넘어갑니다.
             if (!unit) {
                 console.warn(`[BattleSimulatorEngine] ID: ${unitId}에 해당하는 유닛 데이터를 찾을 수 없습니다.`);
                 return;
             }
 
-            // 올바른 유닛 정보로 이름표를 생성합니다.
-            const label = this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
+            const nameLabel = this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
+            const shadow = this.shadowManager.createShadow(sprite);
+            this.bindingManager.bind(sprite, [nameLabel, shadow]);
 
-            // [추가된 부분]
-            // 새로 만든 디버그 매니저를 사용하여 콘솔에 좌표를 기록합니다.
-            debugDisplayLogManager.logCreationPoint(sprite, label, unit);
+            debugDisplayLogManager.logCreationPoint(sprite, nameLabel, unit);
         });
     }
 
@@ -76,6 +78,12 @@ export class BattleSimulatorEngine {
     shutdown() {
         this.scene.events.off('update', this.textEngine.update, this.textEngine);
         this.textEngine.shutdown();
+
+        // --- ⬇️ 새로 추가된 매니저들의 종료 처리를 호출합니다. ---
+        if (this.shadowManager) this.shadowManager.shutdown();
+        if (this.bindingManager) this.bindingManager.shutdown();
+        // --- ⬆️ 여기까지 ---
+
         console.log('BattleSimulatorEngine이 종료되었습니다.');
     }
 }
