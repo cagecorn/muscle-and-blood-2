@@ -11,6 +11,14 @@ class AIManager {
     }
 
     /**
+     * 등록된 모든 AI 유닛 정보를 초기화합니다.
+     */
+    clear() {
+        this.unitData.clear();
+        debugLogEngine.log('AIManager', '모든 AI 유닛 데이터가 초기화되었습니다.');
+    }
+
+    /**
      * 새로운 AI 유닛과 해당 유닛이 사용할 행동 트리를 등록합니다.
      * @param {object} unitInstance - AI에 의해 제어될 유닛
      * @param {BehaviorTree} behaviorTree - 이 유닛이 사용할 BehaviorTree 인스턴스

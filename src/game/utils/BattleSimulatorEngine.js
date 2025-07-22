@@ -18,7 +18,8 @@ import { delayEngine } from './DelayEngine.js';
 export class BattleSimulatorEngine {
     constructor(scene) {
         this.scene = scene;
-        
+        this.isRunning = false;
+
         // --- 모든 엔진과 매니저 초기화 ---
         this.animationEngine = new AnimationEngine(scene);
         this.textEngine = new OffscreenTextEngine(scene);
@@ -43,76 +44,89 @@ export class BattleSimulatorEngine {
     }
 
     start(allies, enemies) {
-        const allUnits = [...allies, ...enemies];
-        
-        // 유닛 배치 및 시각 요소 설정
-        this._setupUnits(allies, '#63b1ff');
-        this._setupUnits(enemies, '#ff6363');
+        if (this.isRunning) return;
+        this.isRunning = true;
 
-        // AI 등록
-        enemies.forEach(unit => aiManager.registerUnit(unit, createMeleeAI(this.aiEngines)));
-        allies.forEach(unit => { // 아군 전사도 AI로 등록 (테스트용)
-            if (unit.name === '전사') {
+        aiManager.clear();
+
+        const allUnits = [...allies, ...enemies];
+        allies.forEach(u => u.team = 'ally');
+        enemies.forEach(u => u.team = 'enemy');
+
+        formationEngine.placeUnits(this.scene, allies, 0, 7);
+        formationEngine.placeUnits(this.scene, enemies, 8, 15);
+
+        this._setupUnits(allUnits);
+
+        allUnits.forEach(unit => {
+            if (unit.name === '전사' || unit.name === '좀비') {
                 aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
             }
         });
 
-        // 턴 큐 생성 및 전투 시작
         this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
-        this.nextTurn();
+        this.currentTurnIndex = 0;
+
+        this.gameLoop();
     }
 
-    _setupUnits(units, color) {
-        formationEngine.placeUnits(this.scene, units); // 유닛 배치
+    _setupUnits(units) {
         units.forEach(unit => {
-            // 초기 데이터 설정
+            if (!unit.sprite) return;
+
             unit.currentHp = unit.finalStats.hp;
             const cell = formationEngine.getCellFromSprite(unit.sprite);
-            unit.gridX = cell.col;
-            unit.gridY = cell.row;
+            if (cell) {
+                unit.gridX = cell.col;
+                unit.gridY = cell.row;
+            }
 
-            // 시각 요소 생성 및 바인딩
+            const color = (unit.team === 'ally') ? '#63b1ff' : '#ff6363';
             const nameLabel = this.textEngine.createLabel(unit.sprite, unit.instanceName, color);
             const healthBar = this.vfxManager.createHealthBar(unit.sprite);
-            unit.healthBar = healthBar; // 유닛 객체에 체력바 참조 저장
-            
+            unit.healthBar = healthBar;
+
             this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground]);
         });
     }
 
-    async nextTurn() {
-        // 모든 유닛이 행동했으면 턴 인덱스 초기화
-        if (this.currentTurnIndex >= this.turnQueue.length) {
-            this.currentTurnIndex = 0;
+    async gameLoop() {
+        if (!this.isRunning || this.isBattleOver()) {
+            console.log('전투 종료!');
+            return;
         }
 
         const currentUnit = this.turnQueue[this.currentTurnIndex];
 
-        // 유닛이 사망했으면 턴을 건너뜀
-        if (currentUnit.currentHp <= 0) {
-            this.currentTurnIndex++;
-            this.nextTurn();
-            return;
-        }
+        if (currentUnit.currentHp > 0) {
+            this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
+            await delayEngine.hold(500);
 
-        // 현재 턴인 유닛을 카메라가 따라감
-        this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
-        await delayEngine.hold(500); // 카메라 이동 시간 대기
+            if (aiManager.unitData.has(currentUnit.uniqueId)) {
+                const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
+                const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
 
-        if (aiManager.unitData.has(currentUnit.uniqueId)) {
-            const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
-            const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
-            
-            await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+            }
         }
 
         this.currentTurnIndex++;
-        
-        // 1초 후 다음 턴 진행
-        this.scene.time.delayedCall(1000, this.nextTurn, [], this);
+        if (this.currentTurnIndex >= this.turnQueue.length) {
+            this.currentTurnIndex = 0;
+        }
+
+        await delayEngine.hold(1000);
+        this.gameLoop();
     }
-    
+
+    isBattleOver() {
+        const aliveAllies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0).length;
+        const aliveEnemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0).length;
+        return aliveAllies === 0 || aliveEnemies === 0;
+    }
+
     shutdown() {
+        this.isRunning = false;
         // 모든 매니저 종료 처리...
     }
 }
