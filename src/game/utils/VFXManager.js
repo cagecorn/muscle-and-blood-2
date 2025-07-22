@@ -8,6 +8,7 @@ export class VFXManager {
         this.scene = scene;
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
         this.vfxLayer = this.scene.add.layer();
+        this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
 
@@ -52,25 +53,30 @@ export class VFXManager {
      * @param {number} y - 파티클이 생성될 y 좌표
      */
     createBloodSplatter(x, y) {
-        const textureKey = 'red-pixel';
+        const textureKey = 'blood-particle';
         if (!this.scene.textures.exists(textureKey)) {
             const g = this.scene.add.graphics();
             g.fillStyle(0xff0000, 1);
-            g.fillRect(0, 0, 2, 2);
-            g.generateTexture(textureKey, 2, 2);
+            g.fillCircle(2, 2, 2); // 4x4 크기의 원형 파티클
+            g.generateTexture(textureKey, 4, 4);
             g.destroy();
         }
 
-        const circle = this.scene.add.circle(x, y, 3, 0xff0000).setDepth(10);
-        this.scene.tweens.add({
-            targets: circle,
-            alpha: 0,
-            scale: 2,
-            duration: 500,
-            ease: 'Cubic.easeOut',
-            onComplete: () => circle.destroy()
+        const emitter = this.scene.add.particles(x, y, textureKey, {
+            speed: { min: 50, max: 200 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 1, end: 0 },
+            lifespan: { min: 300, max: 600 },
+            quantity: { min: 10, max: 20 },
+            blendMode: 'ADD'
         });
-        debugLogEngine.log('VFXManager', '핏방울 효과를 생성했습니다.');
+
+        // 파티클이 모두 사라지면 이미터 자동 파괴
+        this.scene.time.delayedCall(600, () => {
+            emitter.destroy();
+        });
+
+        debugLogEngine.log('VFXManager', '핏방울 파티클 효과를 생성했습니다.');
     }
 
     /**
