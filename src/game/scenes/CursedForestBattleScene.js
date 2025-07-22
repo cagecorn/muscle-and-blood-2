@@ -47,13 +47,6 @@ export class CursedForestBattleScene extends Scene {
         // BattleSimulatorEngine을 통해 전투를 시작합니다.
         this.battleSimulator.start(partyUnits, monsters);
 
-        // 약간의 지연 후 첫 번째 아군 유닛을 따라가 보며 카메라 이동을 테스트합니다.
-        this.time.delayedCall(2000, () => {
-            const firstAlly = this.partyUnits.find(u => u.sprite);
-            if (firstAlly && firstAlly.sprite) {
-                this.cameraControl.panTo(firstAlly.sprite.x, firstAlly.sprite.y);
-            }
-        });
 
         this.events.on('shutdown', () => {
             ['dungeon-container', 'territory-container'].forEach(id => {
