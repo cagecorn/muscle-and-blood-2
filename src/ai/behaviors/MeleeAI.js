@@ -7,6 +7,7 @@ import AttackTargetNode from '../nodes/AttackTargetNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import IsTargetValidNode from '../nodes/IsTargetValidNode.js';
+import SuccessNode from '../nodes/SuccessNode.js';
 
 /**
  * 근접 유닛을 위한 범용 행동 트리를 생성합니다.
@@ -25,15 +26,23 @@ function createMeleeAI(engines) {
         ]),
         // 단계 2: 확보된 타겟에 대해 행동 결정
         new SelectorNode([
-            // 2a. 사거리 내라면 공격
+            // 2a. 사거리 내라면 즉시 공격
             new SequenceNode([
                 new IsTargetInRangeNode(),
                 new AttackTargetNode(engines),
             ]),
-            // 2b. 사거리 밖이라면 이동
+            // 2b. 사거리 밖이라면 이동 후 다시 공격 시도
             new SequenceNode([
                 new FindPathToTargetNode(engines),
                 new MoveToTargetNode(engines),
+                new SelectorNode([
+                    new SequenceNode([
+                        new IsTargetInRangeNode(),
+                        new AttackTargetNode(engines),
+                    ]),
+                    // 공격 사거리 밖인 경우에도 턴은 성공적으로 종료
+                    new SuccessNode(),
+                ]),
             ]),
         ]),
     ]);
