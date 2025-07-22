@@ -1,5 +1,6 @@
 import { statEngine } from './StatEngine.js';
 import { birthReportManager } from '../debug/BirthReportManager.js';
+import { uniqueIDManager } from './UniqueIDManager.js';
 
 /**
  * 몬스터의 생성과 관리를 담당하는 엔진
@@ -8,7 +9,6 @@ class MonsterEngine {
     constructor() {
         this.alliedMonsters = new Map();
         this.enemyMonsters = new Map();
-        this.nextId = 1;
     }
 
     /**
@@ -18,7 +18,7 @@ class MonsterEngine {
      * @returns {object} 생성된 몬스터 인스턴스
      */
     spawnMonster(baseData = {}, type = 'enemy') {
-        const id = this.nextId++;
+        const id = uniqueIDManager.getNextId();
         const instance = {
             ...baseData,
             uniqueId: id,

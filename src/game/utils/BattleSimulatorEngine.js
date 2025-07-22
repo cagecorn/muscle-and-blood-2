@@ -67,7 +67,7 @@ export class BattleSimulatorEngine {
         this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
         this.currentTurnIndex = 0;
 
-        this.gameLoop();
+        this.gameLoop(); // 수정된 루프 시작
     }
 
     _setupUnits(units) {
@@ -90,33 +90,34 @@ export class BattleSimulatorEngine {
         });
     }
 
+    // gameLoop를 while 루프로 변경
     async gameLoop() {
-        if (!this.isRunning || this.isBattleOver()) {
-            console.log('전투 종료!');
-            return;
-        }
+        while (this.isRunning && !this.isBattleOver()) {
+            const currentUnit = this.turnQueue[this.currentTurnIndex];
 
-        const currentUnit = this.turnQueue[this.currentTurnIndex];
+            if (currentUnit && currentUnit.currentHp > 0) {
+                this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
+                await delayEngine.hold(500);
 
-        if (currentUnit.currentHp > 0) {
-            this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
-            await delayEngine.hold(500);
+                if (aiManager.unitData.has(currentUnit.uniqueId)) {
+                    const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
+                    const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
 
-            if (aiManager.unitData.has(currentUnit.uniqueId)) {
-                const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
-                const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
-
-                await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                    await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                }
             }
+
+            this.currentTurnIndex++;
+            if (this.currentTurnIndex >= this.turnQueue.length) {
+                this.currentTurnIndex = 0;
+            }
+
+            await delayEngine.hold(1000); // 다음 턴까지 잠시 대기
         }
 
-        this.currentTurnIndex++;
-        if (this.currentTurnIndex >= this.turnQueue.length) {
-            this.currentTurnIndex = 0;
-        }
-
-        await delayEngine.hold(1000);
-        this.gameLoop();
+        if (!this.isRunning) return;
+        
+        console.log('전투 종료!');
     }
 
     isBattleOver() {

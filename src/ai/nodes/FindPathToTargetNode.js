@@ -20,7 +20,16 @@ class FindPathToTargetNode extends Node {
         const path = this.pathfinderEngine.findPath(start, end);
 
         if (path && path.length > 0) {
-            blackboard.set('movementPath', path);
+            // 경로의 마지막 단계(적의 위치)를 제외하여 바로 앞까지만 이동하도록 설정
+            const movementPath = path.slice(0, path.length - 1);
+
+            // 최종 경로가 없으면(이미 인접해 있으면) 이동할 필요가 없으므로 실패 처리
+            if (movementPath.length === 0) {
+                debugAIManager.logNodeResult(NodeState.FAILURE);
+                return NodeState.FAILURE;
+            }
+
+            blackboard.set('movementPath', movementPath);
             debugAIManager.logNodeResult(NodeState.SUCCESS);
             return NodeState.SUCCESS;
         }

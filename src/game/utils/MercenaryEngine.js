@@ -2,6 +2,7 @@ import { statEngine } from './StatEngine.js';
 import { birthReportManager } from '../debug/BirthReportManager.js';
 // PartyEngine을 불러옵니다.
 import { partyEngine } from './PartyEngine.js';
+import { uniqueIDManager } from './UniqueIDManager.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -12,7 +13,6 @@ class MercenaryEngine {
         this.enemyMercenaries = new Map();
 
         this.mercenaryNames = ['크리스', '레온', '아이온', '가레스', '로릭', '이반', '오린', '바엘', '팰크', '스팅'];
-        this.nextUnitId = 1;
     }
 
     /**
@@ -23,7 +23,7 @@ class MercenaryEngine {
      */
     hireMercenary(baseMercenaryData, type = 'ally') {
         const randomName = this.mercenaryNames[Math.floor(Math.random() * this.mercenaryNames.length)];
-        const uniqueId = this.nextUnitId++;
+        const uniqueId = uniqueIDManager.getNextId();
 
         const newInstance = {
             ...baseMercenaryData,
