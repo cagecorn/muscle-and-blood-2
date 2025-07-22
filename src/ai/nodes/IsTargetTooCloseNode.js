@@ -3,27 +3,32 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 
 // 타겟이 너무 가까운지(위험 지역 내에 있는지) 확인하는 노드
 class IsTargetTooCloseNode extends Node {
-    constructor({ dangerZone = 1 }) {
+    constructor({ targetManager, dangerZone = 1 }) {
         super();
+        this.targetManager = targetManager;
         this.dangerZone = dangerZone;
     }
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
-        const target = blackboard.get('currentTargetUnit');
-        if (!target) {
-            debugAIManager.logNodeResult(NodeState.FAILURE);
-            return NodeState.FAILURE;
+        const enemyUnits = blackboard.get('enemyUnits');
+
+        // 공격 대상이 아닌, "가장 가까운" 적을 기준으로 위험을 판단합니다.
+        const nearestEnemy = this.targetManager.findNearestEnemy(unit, enemyUnits);
+
+        if (!nearestEnemy) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, "주변에 위협적인 적 없음");
+            return NodeState.FAILURE; // 주변에 적이 없으면 안전
         }
 
-        const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
+        const distance = Math.abs(unit.gridX - nearestEnemy.gridX) + Math.abs(unit.gridY - nearestEnemy.gridY);
 
         if (distance <= this.dangerZone) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS);
+            debugAIManager.logNodeResult(NodeState.SUCCESS, `가장 가까운 적 '${nearestEnemy.instanceName}'이 위험거리(${this.dangerZone}) 내에 있음!`);
             return NodeState.SUCCESS; // 너무 가까움!
         }
         
-        debugAIManager.logNodeResult(NodeState.FAILURE);
+        debugAIManager.logNodeResult(NodeState.FAILURE, `가장 가까운 적 '${nearestEnemy.instanceName}'과의 거리가 안전함`);
         return NodeState.FAILURE; // 안전함
     }
 }
