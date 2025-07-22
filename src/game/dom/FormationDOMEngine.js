@@ -80,9 +80,7 @@ export class FormationDOMEngine {
             const unitDiv = document.createElement('div');
             unitDiv.className = 'formation-unit';
             unitDiv.dataset.unitId = id;
-            // 실제 이미지 경로를 사용하여 표시합니다.
-            const spritePath = unit.uiImage || `assets/images/unit/${unit.battleSprite}.png`;
-            unitDiv.style.backgroundImage = `url(${spritePath})`;
+            unitDiv.style.backgroundImage = `url(${unit.battleSprite})`;
             unitDiv.draggable = true;
             unitDiv.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('unit-id', id);

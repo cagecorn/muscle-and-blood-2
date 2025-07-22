@@ -78,11 +78,7 @@ export class BattleSimulatorEngine {
         units.forEach(unit => {
             if (!unit.sprite) return;
 
-            // finalStats가 없거나 hp가 0 이하인 경우를 대비해 기본값을 설정합니다.
-            const baseHp = unit.finalStats && typeof unit.finalStats.hp === 'number'
-                ? unit.finalStats.hp
-                : (unit.baseStats?.hp ?? 1);
-            unit.currentHp = baseHp;
+            unit.currentHp = unit.finalStats.hp;
             const cell = formationEngine.getCellFromSprite(unit.sprite);
             if (cell) {
                 unit.gridX = cell.col;

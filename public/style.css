@@ -35,18 +35,6 @@ body {
     user-select: none;
 }
 
-/* --- 9등분 UI 패널 스타일 --- */
-.ui-panel {
-    border-image-source: url('../assets/images/ui-panel.png');
-    border-image-slice: 60 fill;
-    border-image-width: 25px;
-    border-image-repeat: stretch;
-    border-style: solid;
-    padding: 25px;
-    background-color: #2c2a29;
-    box-sizing: border-box;
-}
-
 /* --- 영지 화면 DOM 스타일 --- */
 
 #territory-container {
@@ -307,9 +295,13 @@ body {
     /* 가로형 레이아웃을 위해 크기 조정 */
     width: 1000px;
     height: 550px;
+    background-color: #2c2a29;
+    border: 3px solid #1a1817;
+    border-radius: 8px;
     box-shadow: 0 0 30px rgba(0,0,0,0.7);
     color: #e0e0e0;
     font-family: sans-serif;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     position: relative;
