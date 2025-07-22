@@ -26,6 +26,13 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
     render: {
         pixelArt: false,
         antialias: true, // 안티에일리어싱을 활성화하여 이미지를 부드럽게 표현합니다.

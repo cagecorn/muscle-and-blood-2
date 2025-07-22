@@ -82,6 +82,44 @@ export class VFXManager {
     }
 
     /**
+     * 물리 효과가 적용된 데미지 숫자를 생성합니다.
+     * @param {number} x - 생성 위치 x
+     * @param {number} y - 생성 위치 y
+     * @param {number|string} damage - 표시할 데미지 숫자
+     */
+    createDamageNumber(x, y, damage) {
+        const style = {
+            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontSize: '32px',
+            color: '#ff4d4d',
+            stroke: '#000000',
+            strokeThickness: 4,
+        };
+
+        const damageText = this.scene.physics.add
+            .text(x, y, damage.toString(), style)
+            .setOrigin(0.5, 0.5);
+
+        const randomX = Math.random() * 200 - 100; // -100 ~ 100
+        const randomY = -(Math.random() * 150 + 150); // -150 ~ -300
+        damageText.setVelocity(randomX, randomY);
+        damageText.setGravityY(400);
+        damageText.setAngularVelocity(Math.random() * 200 - 100);
+
+        this.scene.tweens.add({
+            targets: damageText,
+            alpha: 0,
+            duration: 800,
+            ease: 'Cubic.easeIn',
+            onComplete: () => {
+                damageText.destroy();
+            },
+        });
+
+        debugLogEngine.log('VFXManager', `${damage} 데미지 숫자를 생성했습니다.`);
+    }
+
+    /**
      * 유닛의 체력바를 갱신합니다.
      * @param {object} healthBar - 갱신할 체력바 객체 { background, foreground }
      * @param {number} currentHp - 현재 체력
