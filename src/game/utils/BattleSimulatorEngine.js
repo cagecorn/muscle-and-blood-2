@@ -1,156 +1,118 @@
 import { formationEngine } from './FormationEngine.js';
 import { OffscreenTextEngine } from './OffscreenTextEngine.js';
-// 새로 만든 디버그 매니저를 가져옵니다.
-import { debugDisplayLogManager } from '../debug/DebugDisplayLogManager.js';
-// --- ⬇️ 새로 만든 매니저들을 가져옵니다. ---
-import { shadowManager } from './ShadowManager.js';
 import { BindingManager } from './BindingManager.js';
-// 새로 만든 VFXManager를 가져옵니다.
 import { VFXManager } from './VFXManager.js';
-// AI 매니저와 전사 AI를 가져옵니다.
-import { aiManager } from '../../ai/AIManager.js';
-import { createWarriorAI } from '../../ai/behaviors/WarriorAI.js';
-// --- ⬆️ 여기까지 ---
+import { AnimationEngine } from './AnimationEngine.js';
+import { TerminationManager } from './TerminationManager.js';
 
-/**
- * 전투의 전체 과정을 시뮬레이션하고 관리하는 엔진입니다.
- * 이 엔진은 특정 씬에 종속되지 않으며, 어떤 씬에서든 전투를 시작할 수 있습니다.
- */
+import { aiManager } from '../../ai/AIManager.js';
+import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
+
+import { targetManager } from './TargetManager.js';
+import { pathfinderEngine } from './PathfinderEngine.js';
+import { turnOrderManager } from './TurnOrderManager.js';
+import { combatCalculationEngine } from './CombatCalculationEngine.js';
+import { delayEngine } from './DelayEngine.js';
+
+
 export class BattleSimulatorEngine {
-    /**
-     * @param {Phaser.Scene} scene - 전투가 벌어질 Phaser 씬
-     */
     constructor(scene) {
         this.scene = scene;
+        
+        // --- 모든 엔진과 매니저 초기화 ---
+        this.animationEngine = new AnimationEngine(scene);
         this.textEngine = new OffscreenTextEngine(scene);
-        this.allySprites = [];
-        this.enemySprites = [];
-
-        // 턴 진행을 위한 큐 초기화
-        this.turnQueue = [];
-        this.currentTurnIndex = 0;
-
-        // --- ⬇️ 매니저들을 초기화합니다. ---
-        this.shadowManager = shadowManager(scene);
         this.bindingManager = new BindingManager(scene);
         this.vfxManager = new VFXManager(scene);
-        // --- ⬆️ 여기까지 ---
+        this.terminationManager = new TerminationManager(scene);
+        
+        // AI 노드에 주입할 엔진 패키지
+        this.aiEngines = {
+            targetManager,
+            pathfinderEngine,
+            formationEngine,
+            combatCalculationEngine,
+            delayEngine,
+            animationEngine: this.animationEngine,
+            vfxManager: this.vfxManager,
+            terminationManager: this.terminationManager,
+        };
 
-        // 씬의 update 루프에 맞춰 텍스트 엔진을 갱신합니다.
-        this.scene.events.on('update', this.textEngine.update, this.textEngine);
+        this.turnQueue = [];
+        this.currentTurnIndex = 0;
     }
 
-    /**
-     * 지정된 아군 및 적군 유닛으로 전투를 시작합니다.
-     * @param {Array<object>} allies - 아군 유닛 데이터 배열
-     * @param {Array<object>} enemies - 적군 유닛 데이터 배열
-     */
     start(allies, enemies) {
-        // 1. 아군을 진형에 맞춰 배치하고, 이름표와 그림자를 바인딩합니다.
-        this.allySprites = formationEngine.applyFormation(this.scene, allies);
-        this._setupUnits(this.allySprites, allies, '#63b1ff');
+        const allUnits = [...allies, ...enemies];
+        
+        // 유닛 배치 및 시각 요소 설정
+        this._setupUnits(allies, '#63b1ff');
+        this._setupUnits(enemies, '#ff6363');
 
-        // 2. 적군을 무작위 위치에 배치하고, 이름표와 그림자를 바인딩합니다.
-        this.enemySprites = formationEngine.placeMonsters(this.scene, enemies, 8);
-        this._setupUnits(this.enemySprites, enemies, '#ff6363');
-
-        // AI 유닛 등록 및 위치 데이터 초기화
-        enemies.forEach(enemyUnit => {
-            const sprite = this.enemySprites.find(s => s.getData('unitId') === enemyUnit.uniqueId);
-            if (sprite) {
-                const cell = this.scene.stageManager.gridEngine.gridCells.find(c => c.x === sprite.x && c.y === sprite.y);
-                if (cell) {
-                    enemyUnit.gridX = cell.col;
-                    enemyUnit.gridY = cell.row;
-                }
+        // AI 등록
+        enemies.forEach(unit => aiManager.registerUnit(unit, createMeleeAI(this.aiEngines)));
+        allies.forEach(unit => { // 아군 전사도 AI로 등록 (테스트용)
+            if (unit.name === '전사') {
+                aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
             }
-            enemyUnit.currentHp = enemyUnit.finalStats.hp;
-            const warriorAI = createWarriorAI();
-            aiManager.registerUnit(enemyUnit, warriorAI);
         });
 
         // 턴 큐 생성 및 전투 시작
-        this.turnQueue = [...allies, ...enemies];
-        this.currentTurnIndex = 0;
+        this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
         this.nextTurn();
+    }
 
-        console.log(`[BattleSimulatorEngine] 유닛 배치 완료. 아군: ${this.allySprites.length}명, 적군: ${this.enemySprites.length}명`);
+    _setupUnits(units, color) {
+        formationEngine.placeUnits(this.scene, units); // 유닛 배치
+        units.forEach(unit => {
+            // 초기 데이터 설정
+            unit.currentHp = unit.finalStats.hp;
+            const cell = formationEngine.getCellFromSprite(unit.sprite);
+            unit.gridX = cell.col;
+            unit.gridY = cell.row;
+
+            // 시각 요소 생성 및 바인딩
+            const nameLabel = this.textEngine.createLabel(unit.sprite, unit.instanceName, color);
+            const healthBar = this.vfxManager.createHealthBar(unit.sprite);
+            unit.healthBar = healthBar; // 유닛 객체에 체력바 참조 저장
+            
+            this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground]);
+        });
     }
 
     async nextTurn() {
+        // 모든 유닛이 행동했으면 턴 인덱스 초기화
         if (this.currentTurnIndex >= this.turnQueue.length) {
             this.currentTurnIndex = 0;
         }
 
         const currentUnit = this.turnQueue[this.currentTurnIndex];
 
-        if (aiManager.unitData.has(currentUnit.uniqueId)) {
-            const allies = this.turnQueue.filter(u => !aiManager.unitData.has(u.uniqueId));
-            const enemies = this.turnQueue.filter(u => aiManager.unitData.has(u.uniqueId));
+        // 유닛이 사망했으면 턴을 건너뜀
+        if (currentUnit.currentHp <= 0) {
+            this.currentTurnIndex++;
+            this.nextTurn();
+            return;
+        }
 
-            await aiManager.executeTurn(currentUnit, [...allies, ...enemies], allies);
-        } else {
-            console.log(`플레이어 유닛 ${currentUnit.instanceName}의 턴입니다.`);
+        // 현재 턴인 유닛을 카메라가 따라감
+        this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
+        await delayEngine.hold(500); // 카메라 이동 시간 대기
+
+        if (aiManager.unitData.has(currentUnit.uniqueId)) {
+            const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
+            const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
+            
+            await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
         }
 
         this.currentTurnIndex++;
-
+        
+        // 1초 후 다음 턴 진행
         this.scene.time.delayedCall(1000, this.nextTurn, [], this);
     }
-
-    /**
-     * 유닛 스프라이트에 이름표와 그림자를 생성하고 바인딩합니다.
-     * @private
-     * @param {Array<Phaser.GameObjects.Image>} sprites 대상 스프라이트 배열
-     * @param {Array<object>} units 유닛 데이터 배열
-     * @param {string} color 이름표 배경색
-     */
-    _setupUnits(sprites, units, color) {
-        sprites.forEach(sprite => {
-            const unitId = sprite.getData('unitId');
-            const unit = units.find(u => u.uniqueId === unitId);
-
-            if (!unit) {
-                console.warn(`[BattleSimulatorEngine] ID: ${unitId}에 해당하는 유닛 데이터를 찾을 수 없습니다.`);
-                return;
-            }
-
-            // 1. 이름표 생성 (발밑에 표시됩니다)
-            const nameLabel = this.textEngine.createLabel(sprite, unit.instanceName || unit.name, color);
-
-            // 2. 그림자 생성 (더 길고 오른쪽에 위치)
-            const shadow = this.shadowManager.createShadow(sprite);
-
-            // 3. 체력바 생성 및 초기화
-            const healthBar = this.vfxManager.createHealthBar(sprite);
-            const initialHealthPercentage = 1; // 현재는 풀피로 시작
-            healthBar.foreground.width = healthBar.background.width * initialHealthPercentage;
-
-            // 4. 모든 요소를 바인딩하여 스프라이트와 함께 움직이도록 합니다
-            this.bindingManager.bind(sprite, [
-                nameLabel,
-                shadow,
-                healthBar.background,
-                healthBar.foreground
-            ]);
-
-            debugDisplayLogManager.logCreationPoint(sprite, nameLabel, unit);
-        });
-    }
-
-    /**
-     * 전투와 관련된 모든 리소스를 정리합니다.
-     */
+    
     shutdown() {
-        this.scene.events.off('update', this.textEngine.update, this.textEngine);
-        this.textEngine.shutdown();
-
-        // --- ⬇️ 새로 추가된 매니저들의 종료 처리를 호출합니다. ---
-        if (this.shadowManager) this.shadowManager.shutdown();
-        if (this.bindingManager) this.bindingManager.shutdown();
-        if (this.vfxManager) this.vfxManager.shutdown();
-        // --- ⬆️ 여기까지 ---
-
-        console.log('BattleSimulatorEngine이 종료되었습니다.');
+        // 모든 매니저 종료 처리...
     }
 }

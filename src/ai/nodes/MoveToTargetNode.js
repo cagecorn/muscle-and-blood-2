@@ -1,33 +1,32 @@
 import Node, { NodeState } from './Node.js';
-import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 
-/**
- * 타겟을 향해 한 칸 이동하는 행동 노드입니다.
- * (Pathfinding은 구현되지 않았으므로, 직선으로 다가가는 로직으로 단순화합니다.)
- */
 class MoveToTargetNode extends Node {
+    constructor({ formationEngine, animationEngine }) {
+        super();
+        this.formationEngine = formationEngine;
+        this.animationEngine = animationEngine;
+    }
+
     async evaluate(unit, blackboard) {
-        const target = blackboard.get('currentTargetUnit');
-        if (!target) {
+        debugAIManager.logNodeEvaluation(this, unit);
+        const path = blackboard.get('movementPath');
+        const movementRange = unit.finalStats.movement || 3;
+
+        if (!path || path.length === 0) {
+            debugAIManager.logNodeResult(NodeState.FAILURE);
             return NodeState.FAILURE;
         }
+        
+        // 이동력만큼만 경로를 잘라냄
+        const movePath = path.slice(0, movementRange);
+        const destination = movePath[movePath.length - 1];
 
-        const unitPos = { x: unit.gridX, y: unit.gridY };
-        const targetPos = { x: target.gridX, y: target.gridY };
-
-        const dx = targetPos.x - unitPos.x;
-        const dy = targetPos.y - unitPos.y;
-
-        if (Math.abs(dx) > Math.abs(dy)) {
-            unit.gridX += Math.sign(dx);
-        } else {
-            unit.gridY += Math.sign(dy);
-        }
-
-        debugLogEngine.log('MoveToTargetNode', `${unit.instanceName}이(가) 타겟을 향해 이동 -> 새로운 위치: (${unit.gridX}, ${unit.gridY})`);
-
+        // 이동 애니메이션 실행 및 유닛 위치 업데이트
+        await this.formationEngine.moveUnitOnGrid(unit, destination, this.animationEngine);
+        
+        debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
     }
 }
-
 export default MoveToTargetNode;
