@@ -1,4 +1,4 @@
-import { debugLogEngine } from '../utils/DebugLogEngine.js';
+import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
 
 /**
  * 게임 내 모든 AI 유닛을 관리하고, 각 유닛의 행동 트리를 실행합니다.
