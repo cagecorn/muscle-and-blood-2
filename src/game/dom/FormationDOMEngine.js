@@ -80,7 +80,9 @@ export class FormationDOMEngine {
             const unitDiv = document.createElement('div');
             unitDiv.className = 'formation-unit';
             unitDiv.dataset.unitId = id;
-            unitDiv.style.backgroundImage = `url(${unit.battleSprite})`;
+            // Use the mercenary id to build an explicit path so images load
+            // correctly regardless of sprite key configuration.
+            unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
             unitDiv.draggable = true;
             unitDiv.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('unit-id', id);
