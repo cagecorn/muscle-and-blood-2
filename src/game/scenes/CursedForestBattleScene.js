@@ -36,6 +36,7 @@ export class CursedForestBattleScene extends Scene {
         const partyIds = partyEngine.getPartyMembers().filter(id => id !== undefined);
         const allMercs = mercenaryEngine.getAllAlliedMercenaries();
         const partyUnits = allMercs.filter(m => partyIds.includes(m.uniqueId));
+        this.partyUnits = partyUnits; // 추적을 위해 저장
 
         const monsters = [];
         const zombieBase = getMonsterBase('zombie');
@@ -48,9 +49,9 @@ export class CursedForestBattleScene extends Scene {
 
         // 약간의 지연 후 첫 번째 아군 유닛을 따라가 보며 카메라 이동을 테스트합니다.
         this.time.delayedCall(2000, () => {
-            if (this.battleSimulator.allySprites.length > 0) {
-                const firstAlly = this.battleSimulator.allySprites[0];
-                this.cameraControl.panTo(firstAlly.x, firstAlly.y);
+            const firstAlly = this.partyUnits.find(u => u.sprite);
+            if (firstAlly && firstAlly.sprite) {
+                this.cameraControl.panTo(firstAlly.sprite.x, firstAlly.sprite.y);
             }
         });
 
