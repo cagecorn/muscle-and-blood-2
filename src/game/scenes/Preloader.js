@@ -54,6 +54,9 @@ export class Preloader extends Scene
         // 게임에 필요한 모든 애셋을 여기서 로드합니다.
         this.load.setPath('assets');
 
+        // UI 패널 이미지 로드
+        this.load.image('ui-panel', 'images/ui-panel.png');
+
         // 로고 이미지를 로드합니다.
         this.load.image('logo', 'logo.png');
 
