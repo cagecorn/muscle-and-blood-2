@@ -26,12 +26,13 @@ export class OffscreenTextEngine {
             strokeThickness: 5,
         });
 
-        label.setOrigin(0.5, 1); // \ud14d\uc2a4\ud2b8\uc758 \uae30\uc900\uc810\uc744 \uc911\uac04 \ud558\ub2e8\uc73c\ub85c \uc124\uc815
-        label.setResolution(2);  // \ud574\uc0c1\ub3c4\ub97c 2\ubc88\ub85c \uc124\uc815 (\ud574\uacb0!)
+        // 이름표가 캐릭터의 발밑에 위치하도록 기준점을 중간 상단으로 설정합니다.
+        label.setOrigin(0.5, 0);
+        label.setResolution(2);  // 해상도를 2배로 설정
         label.setScale(0.5);     // \ud06c\uae30\ub97c 0.5\ubc84\ub2e4\ub97c \ucd95\uc18c\ud558\uc5ec \uc120\uba85\ub3c4 \ud655\ub960
 
-        // \uc2a4\ud504\ub808\uc774\ud2b8\uc758 \ub192\uc774\ub97c \uace0\ub824\ud574 \uc774\ub984\ud3a0 \uc704\uce58\ub97c \uba38\ub9ac \uc704\ub85c \uc870\uc815
-        label.y = sprite.y - (sprite.displayHeight / 2) * 0.8;
+        // 유닛의 발밑으로 위치를 조정합니다. (상수 5는 약간의 여백)
+        label.y = sprite.y + (sprite.displayHeight / 2) + 5;
 
         this.labels.push({ label, sprite });
         return label;
@@ -45,7 +46,7 @@ export class OffscreenTextEngine {
         this.labels.forEach(item => {
             if (item.sprite.active) {
                 item.label.x = item.sprite.x;
-                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) * 0.8;
+                item.label.y = item.sprite.y + (item.sprite.displayHeight / 2) + 5;
             } else {
                 // \uc2a4\ud504\ub808\uc774\ud2b8\uac00 \ube44\ud65c\uc131\ud654\ub418\uba74 \uc774\ub984\ud3a0\ub3c4 \uc228\uae38\ub9ac\ub2c8\ub2e4.
                 item.label.setVisible(false);

@@ -32,13 +32,14 @@ class ShadowManager {
         shadow.setScale(parentSprite.scaleX, parentSprite.scaleY);
         shadow.setOrigin(parentSprite.originX, parentSprite.originY);
 
-        // 45도 기울이고 세로 크기를 절반으로 줄입니다.
-        shadow.skewX = PhaserMath.DegToRad(45);
-        shadow.scaleY *= 0.5;
+        // 60도로 더 기울이고 세로 크기를 조금 더 눌러줍니다.
+        shadow.skewX = PhaserMath.DegToRad(60);
+        shadow.scaleY *= 0.4;
 
-        // 발밑에 보이도록 위치 조정
+        // 발밑에 보이도록 위치 조정하고 약간 오른쪽으로 이동
         const parentHeight = parentSprite.displayHeight;
-        shadow.y += parentHeight / 2 - shadow.displayHeight / 2;
+        shadow.x += parentSprite.displayWidth * 0.2; // 오른쪽으로 20% 이동
+        shadow.y += parentHeight / 2 - (shadow.displayHeight / 2);
 
         // 레이어에 추가하고 깊이를 원본보다 한 단계 낮춥니다.
         this.shadowLayer.add(shadow);
