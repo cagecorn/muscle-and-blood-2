@@ -161,6 +161,7 @@ class FormationEngine {
                 sprite.setDisplaySize(cell.width, cell.height);
             }
             sprites.push(sprite);
+            mon.sprite = sprite;
         });
         return sprites;
     }
