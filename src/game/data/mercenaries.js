@@ -31,7 +31,8 @@ export const mercenaryData = {
         description: '"한 발, 한 발. 신중하게, 그리고 차갑게."',
         baseStats: {
             hp: 80, valor: 5, strength: 7, endurance: 6,
-            agility: 15, intelligence: 8, wisdom: 10, luck: 12
+            agility: 15, intelligence: 8, wisdom: 10, luck: 12,
+            attackRange: 3
         }
     }
 };
