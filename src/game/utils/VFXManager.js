@@ -63,36 +63,18 @@ export class VFXManager {
         }
 
         const emitter = this.scene.add.particles(x, y, textureKey, {
-            // 조금 더 멀리 튈 수 있도록 속도를 조정합니다.
-            speed: { min: 200, max: 450 },
-            // 모든 방향으로 흩어지게 합니다.
-            angle: { min: 0, max: 360 },
-            // 중력 값을 키워 포물선 궤적을 강화합니다.
-            gravityY: 800,
-            // 바닥 충돌 후 튀도록 반발력을 설정합니다.
-            bounce: 0.4,
+            speed: { min: 150, max: 300 },
+            angle: { min: -90, max: 90 },
+            gravityY: 500,
             scale: { start: 1, end: 0 },
             alpha: { start: 1, end: 0 },
-            lifespan: { min: 800, max: 1200 },
-            // 핏방울 숫자를 조금 줄입니다.
-            quantity: { min: 2, max: 4 },
+            lifespan: { min: 600, max: 1000 },
+            quantity: { min: 3, max: 6 },
             blendMode: 'ADD'
         });
 
-        // 화면 하단에 맞춰 충돌 영역을 설정합니다.
-        emitter.addParticleBounds(
-            0,
-            0,
-            this.scene.scale.width,
-            this.scene.scale.height,
-            false,
-            false,
-            false,
-            true
-        );
-
-        // 파티클이 모두 사라지면 이미터를 정리합니다.
-        this.scene.time.delayedCall(1500, () => {
+        // 파티클이 모두 사라지면 이미터 자동 파괴
+        this.scene.time.delayedCall(1000, () => {
             emitter.destroy();
         });
 
