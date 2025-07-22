@@ -48,15 +48,14 @@ export class CameraControlEngine {
     }
 
     onWheel(pointer, gameObjects, deltaX, deltaY) {
-        // 마우스 휠을 아래로 스크롤(축소)할 때만 적용합니다.
-        if (deltaY > 0) {
-            const newZoom = PhaserMath.Clamp(
-                this.camera.zoom - deltaY * 0.001,
-                this.minZoom,
-                this.maxZoom
-            );
-            this.camera.setZoom(newZoom);
-        }
+        // 휠 스크롤 방향에 관계없이 확대/축소합니다.
+        // Clamp로 minZoom(1)과 maxZoom(2) 사이를 유지합니다.
+        const newZoom = PhaserMath.Clamp(
+            this.camera.zoom - deltaY * 0.001,
+            this.minZoom,
+            this.maxZoom
+        );
+        this.camera.setZoom(newZoom);
     }
 
     /**
