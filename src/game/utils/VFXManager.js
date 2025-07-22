@@ -61,22 +61,16 @@ export class VFXManager {
             g.destroy();
         }
 
-        const particles = this.scene.add.particles(textureKey);
-        const emitter = particles.createEmitter({
-            x,
-            y,
-            speed: { min: 50, max: 200 },
-            angle: { min: -120, max: -60 },
-            scale: { start: 1, end: 0 },
-            lifespan: 500,
-            gravityY: 300,
-            blendMode: 'ADD'
+        const circle = this.scene.add.circle(x, y, 3, 0xff0000).setDepth(10);
+        this.scene.tweens.add({
+            targets: circle,
+            alpha: 0,
+            scale: 2,
+            duration: 500,
+            ease: 'Cubic.easeOut',
+            onComplete: () => circle.destroy()
         });
-
-        emitter.explode(10, x, y);
-        debugLogEngine.log('VFXManager', '핏방울 파티클을 생성했습니다.');
-        // 파티클이 모두 소멸한 후 매니저를 정리합니다.
-        this.scene.time.delayedCall(600, () => particles.destroy());
+        debugLogEngine.log('VFXManager', '핏방울 효과를 생성했습니다.');
     }
 
     /**

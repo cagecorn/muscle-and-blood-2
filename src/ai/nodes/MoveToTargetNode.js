@@ -22,9 +22,13 @@ class MoveToTargetNode extends Node {
         const movePath = path.slice(0, movementRange);
         const destination = movePath[movePath.length - 1];
 
-        // 이동 애니메이션 실행 및 유닛 위치 업데이트
-        await this.formationEngine.moveUnitOnGrid(unit, destination, this.animationEngine);
-        
+        const moved = await this.formationEngine.moveUnitOnGrid(unit, destination, this.animationEngine);
+
+        if (!moved) {
+            debugAIManager.logNodeResult(NodeState.FAILURE);
+            return NodeState.FAILURE;
+        }
+
         debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
     }
