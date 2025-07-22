@@ -6,30 +6,36 @@ import IsTargetInRangeNode from '../nodes/IsTargetInRangeNode.js';
 import AttackTargetNode from '../nodes/AttackTargetNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import IsTargetValidNode from '../nodes/IsTargetValidNode.js';
 
 /**
  * 근접 유닛을 위한 범용 행동 트리를 생성합니다.
  * 행동 로직:
- * 1. (공격) 타겟이 사거리 내에 있는가? -> 그렇다면 공격한다.
- * 2. (이동) 타겟이 사거리 밖에 있는가? -> 경로를 찾아 이동한다.
- * 3. (탐색) 타겟이 없는가? -> 새로운 타겟을 찾는다.
+ * 1. 대상 확보: 유효한 타겟이 있는가? 없다면 새로 찾는다.
+ * 2. 행동 실행: 확보된 타겟에 대해, 공격 또는 이동을 실행한다.
  * @param {object} engines - AI 노드들이 사용할 엔진 및 매니저 모음
  * @returns {BehaviorTree}
  */
 function createMeleeAI(engines) {
-    const rootNode = new SelectorNode([
-        // 1. 공격 시도 (가장 우선순위가 높음)
-        new SequenceNode([
-            new IsTargetInRangeNode(),
-            new AttackTargetNode(engines), // 엔진 전달
+    const rootNode = new SequenceNode([
+        // 단계 1: 타겟 확보 (현재 타겟이 유효한지 먼저 검사하고, 없으면 탐색)
+        new SelectorNode([
+            new IsTargetValidNode(),
+            new FindTargetNode(engines),
         ]),
-        // 2. 이동 시도
-        new SequenceNode([
-            new FindPathToTargetNode(engines), // 엔진 전달
-            new MoveToTargetNode(engines),   // 엔진 전달
+        // 단계 2: 확보된 타겟에 대해 행동 결정
+        new SelectorNode([
+            // 2a. 사거리 내라면 공격
+            new SequenceNode([
+                new IsTargetInRangeNode(),
+                new AttackTargetNode(engines),
+            ]),
+            // 2b. 사거리 밖이라면 이동
+            new SequenceNode([
+                new FindPathToTargetNode(engines),
+                new MoveToTargetNode(engines),
+            ]),
         ]),
-        // 3. 타겟 탐색
-        new FindTargetNode(engines), // 엔진 전달
     ]);
 
     return new BehaviorTree(rootNode);
