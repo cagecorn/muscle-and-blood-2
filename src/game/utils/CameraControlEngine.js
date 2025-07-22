@@ -14,10 +14,12 @@ export class CameraControlEngine {
         this.camera = scene.cameras.main;
         this.isDragging = false;
         this.prevPointer = { x: 0, y: 0 };
-        this.minZoom = 0.5;
-        // 기본 최대 줌을 기존의 2에서 6으로 확장하여
-        // 보다 깊은 클로즈업이 가능하도록 합니다.
-        this.maxZoom = 6;
+
+        // 타일이 2배로 보이도록 최대 줌 레벨을 고정합니다.
+        this.maxZoom = 2;
+        // 기본 줌보다 더 확대하지 못하도록 최소 줌은 1로 설정하여
+        // 축소는 가능하지만 확대는 제한합니다.
+        this.minZoom = 1;
 
         scene.input.on('pointerdown', this.onPointerDown, this);
         scene.input.on('pointermove', this.onPointerMove, this);
@@ -46,8 +48,25 @@ export class CameraControlEngine {
     }
 
     onWheel(pointer, gameObjects, deltaX, deltaY) {
-        const newZoom = PhaserMath.Clamp(this.camera.zoom - deltaY * 0.001, this.minZoom, this.maxZoom);
-        this.camera.setZoom(newZoom);
+        // 마우스 휠을 아래로 스크롤(축소)할 때만 적용합니다.
+        if (deltaY > 0) {
+            const newZoom = PhaserMath.Clamp(
+                this.camera.zoom - deltaY * 0.001,
+                this.minZoom,
+                this.maxZoom
+            );
+            this.camera.setZoom(newZoom);
+        }
+    }
+
+    /**
+     * 지정된 좌표로 카메라를 부드럽게 이동시킵니다.
+     * @param {number} x 목표 x 좌표
+     * @param {number} y 목표 y 좌표
+     * @param {number} duration 이동 시간(ms)
+     */
+    panTo(x, y, duration = 500) {
+        this.camera.pan(x, y, duration, 'Sine.easeInOut');
     }
 
     /**
