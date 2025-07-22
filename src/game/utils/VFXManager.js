@@ -47,6 +47,55 @@ export class VFXManager {
     }
 
     /**
+     * 지정된 위치에 핏방울 파티클 효과를 생성합니다.
+     * @param {number} x - 파티클이 생성될 x 좌표
+     * @param {number} y - 파티클이 생성될 y 좌표
+     */
+    createBloodSplatter(x, y) {
+        const textureKey = 'red-pixel';
+        if (!this.scene.textures.exists(textureKey)) {
+            const g = this.scene.add.graphics();
+            g.fillStyle(0xff0000, 1);
+            g.fillRect(0, 0, 2, 2);
+            g.generateTexture(textureKey, 2, 2);
+            g.destroy();
+        }
+
+        const particles = this.scene.add.particles(textureKey);
+        const emitter = particles.createEmitter({
+            x,
+            y,
+            speed: { min: 50, max: 200 },
+            angle: { min: -120, max: -60 },
+            scale: { start: 1, end: 0 },
+            lifespan: 500,
+            gravityY: 300,
+            blendMode: 'ADD'
+        });
+
+        emitter.explode(10, x, y);
+        debugLogEngine.log('VFXManager', '핏방울 파티클을 생성했습니다.');
+        // 파티클이 모두 소멸한 후 매니저를 정리합니다.
+        this.scene.time.delayedCall(600, () => particles.destroy());
+    }
+
+    /**
+     * 유닛의 체력바를 갱신합니다.
+     * @param {object} healthBar - 갱신할 체력바 객체 { background, foreground }
+     * @param {number} currentHp - 현재 체력
+     * @param {number} maxHp - 최대 체력
+     */
+    updateHealthBar(healthBar, currentHp, maxHp) {
+        const percentage = Math.max(0, currentHp / maxHp);
+        this.scene.tweens.add({
+            targets: healthBar.foreground,
+            width: healthBar.background.width * percentage,
+            duration: 200,
+            ease: 'Linear'
+        });
+    }
+
+    /**
      * 매니저와 관련된 모든 리소스를 정리합니다.
      */
     shutdown() {
