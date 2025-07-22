@@ -1,3 +1,5 @@
+import { debugLogEngine } from './DebugLogEngine.js';
+
 class FormationEngine {
     constructor() {
         this.positions = new Map();
@@ -80,6 +82,39 @@ class FormationEngine {
             sprites.push(sprite);
         });
         return sprites;
+    }
+
+    /**
+     * 유닛을 그리드 상의 새로운 위치로 이동시키고, 애니메이션을 재생합니다.
+     * @param {object} unit - 이동할 유닛 객체 (gridX, gridY, sprite 포함)
+     * @param {object} newGridPos - 새로운 그리드 좌표 { col, row }
+     * @param {AnimationEngine} animationEngine - 애니메이션을 실행할 엔진
+     * @param {BindingManager} bindingManager - 바인딩된 요소들을 함께 움직일 매니저
+     * @param {number} duration - 이동 시간 (밀리초)
+     * @returns {Promise<void>}
+     */
+    async moveUnitOnGrid(unit, newGridPos, animationEngine, bindingManager, duration = 500) {
+        if (!this.grid || !unit || !unit.sprite) return;
+
+        const targetCell = this.grid.getCell(newGridPos.col, newGridPos.row);
+        if (!targetCell) return;
+
+        const targetPixelPos = { x: targetCell.x, y: targetCell.y };
+
+        await animationEngine.moveTo(unit.sprite, targetPixelPos.x, targetPixelPos.y, duration);
+
+        const oldCell = this.grid.getCell(unit.gridX, unit.gridY);
+        if (oldCell) {
+            oldCell.isOccupied = false;
+            oldCell.sprite = null;
+        }
+
+        unit.gridX = newGridPos.col;
+        unit.gridY = newGridPos.row;
+        targetCell.isOccupied = true;
+        targetCell.sprite = unit.sprite;
+
+        debugLogEngine.log('FormationEngine', `유닛을 (${newGridPos.col}, ${newGridPos.row})로 이동 완료.`);
     }
 }
 
