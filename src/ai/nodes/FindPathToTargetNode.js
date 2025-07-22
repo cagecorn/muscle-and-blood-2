@@ -49,7 +49,7 @@ class FindPathToTargetNode extends Node {
 
         // 3. 해당 셀까지의 경로 탐색
         for (const bestCell of potentialAttackCells) {
-            const path = this.pathfinderEngine.findPath(start, { col: bestCell.col, row: bestCell.row });
+            const path = this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) {
                 // 경로가 존재하면 해당 경로를 사용
                 blackboard.set('movementPath', path);
