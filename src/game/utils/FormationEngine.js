@@ -30,22 +30,22 @@ class FormationEngine {
      * @param {number} startCol 배치를 시작할 최소 열 (기본값 0)
      * @returns {Array<Phaser.GameObjects.Image>}
      */
-    placeUnits(scene, units, startCol = 0) {
+    placeUnits(scene, units, startCol = 0, endCol = 7) {
         if (!this.grid) return [];
         const sprites = [];
-        const available = this.grid.gridCells.filter(c => c.col >= startCol && !c.isOccupied);
+        const availableCells = this.grid.gridCells.filter(c => c.col >= startCol && c.col <= endCol && !c.isOccupied);
 
         units.forEach(unit => {
-            let cell;
-            const index = this.getPosition(unit.uniqueId);
-            if (index !== undefined) {
-                cell = this.grid.gridCells[index];
-            } else {
-                cell = available.shift();
+            if (availableCells.length === 0) {
+                console.warn('FormationEngine: 유닛을 배치할 비어있는 셀이 없습니다.');
+                return;
             }
-            if (!cell) return;
-            cell.isOccupied = true;
 
+            const cellIndex = Math.floor(Math.random() * availableCells.length);
+            const cell = availableCells.splice(cellIndex, 1)[0];
+
+            cell.isOccupied = true;
+            
             const spriteKey = unit.spriteKey || unit.battleSprite || unit.id || unit.name;
             const sprite = scene.add.image(cell.x, cell.y, spriteKey);
             sprite.setData('unitId', unit.uniqueId);
