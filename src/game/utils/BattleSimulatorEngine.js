@@ -7,6 +7,7 @@ import { TerminationManager } from './TerminationManager.js';
 
 import { aiManager } from '../../ai/AIManager.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
+import { createRangedAI } from '../../ai/behaviors/RangedAI.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
@@ -63,7 +64,9 @@ export class BattleSimulatorEngine {
         this._setupUnits(allUnits);
 
         allUnits.forEach(unit => {
-            if (unit.name === '전사' || unit.name === '좀비') {
+            if (unit.name === '거너') {
+                aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
+            } else if (unit.name === '전사' || unit.name === '좀비') {
                 aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
             }
         });

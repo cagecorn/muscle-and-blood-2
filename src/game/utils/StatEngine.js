@@ -98,6 +98,7 @@ class StatEngine {
             intelligence: baseStats.intelligence || 0,
             wisdom: baseStats.wisdom || 0,
             luck: baseStats.luck || 0,
+            attackRange: baseStats.attackRange || 1,
         });
 
         // 2. \uC804\uBB38 \uC5D4\uC9C4\uC744 \uD1B5\uD574 \uD30C\uC9C0 \uC2A4\uD0EF\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
