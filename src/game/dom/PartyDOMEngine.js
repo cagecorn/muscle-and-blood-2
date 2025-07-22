@@ -150,6 +150,7 @@ export class PartyDOMEngine {
 
         const detailPane = document.createElement('div');
         detailPane.id = 'unit-detail-pane';
+        detailPane.classList.add('ui-panel');
 
         const instanceName = unitData.instanceName || unitData.name;
         detailPane.innerHTML += `
