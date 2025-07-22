@@ -14,19 +14,30 @@ class MoveToTargetNode extends Node {
         const movementRange = unit.finalStats.movement || 3;
 
         if (!path || path.length === 0) {
-            debugAIManager.logNodeResult(NodeState.FAILURE);
-            return NodeState.FAILURE;
+            // 이동할 필요가 없거나 경로가 없으면 그대로 성공 처리
+            debugAIManager.logNodeResult(NodeState.SUCCESS);
+            return NodeState.SUCCESS;
         }
-        
-        // 이동력만큼만 경로를 잘라냄
+
+        // 이동력 범위 내에서 가능한 한 한 칸씩 이동
         const movePath = path.slice(0, movementRange);
-        const destination = movePath[movePath.length - 1];
+        let movedAtLeastOnce = false;
+        for (const step of movePath) {
+            const moved = await this.formationEngine.moveUnitOnGrid(
+                unit,
+                step,
+                this.animationEngine
+            );
+            if (!moved) {
+                break;
+            }
+            movedAtLeastOnce = true;
+        }
 
-        const moved = await this.formationEngine.moveUnitOnGrid(unit, destination, this.animationEngine);
-
-        if (!moved) {
-            debugAIManager.logNodeResult(NodeState.FAILURE);
-            return NodeState.FAILURE;
+        if (!movedAtLeastOnce) {
+            // 한 칸도 이동하지 못했더라도 턴 진행을 위해 성공 처리
+            debugAIManager.logNodeResult(NodeState.SUCCESS);
+            return NodeState.SUCCESS;
         }
 
         debugAIManager.logNodeResult(NodeState.SUCCESS);
