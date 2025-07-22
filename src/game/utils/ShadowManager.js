@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+// Phaser의 Math 모듈만 불러와 필요한 범위에서 사용합니다.
+import { Math as PhaserMath } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 
 /**
  * 유닛의 그림자를 생성하고 관리하는 엔진
@@ -31,7 +33,7 @@ class ShadowManager {
         shadow.setOrigin(parentSprite.originX, parentSprite.originY);
 
         // 45도 기울이고 세로 크기를 절반으로 줄입니다.
-        shadow.skewX = Phaser.Math.DegToRad(45);
+        shadow.skewX = PhaserMath.DegToRad(45);
         shadow.scaleY *= 0.5;
 
         // 발밑에 보이도록 위치 조정
