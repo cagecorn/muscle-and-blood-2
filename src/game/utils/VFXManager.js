@@ -63,16 +63,18 @@ export class VFXManager {
         }
 
         const emitter = this.scene.add.particles(x, y, textureKey, {
-            speed: { min: 50, max: 200 },
-            angle: { min: 0, max: 360 },
+            speed: { min: 150, max: 300 },
+            angle: { min: -90, max: 90 },
+            gravityY: 500,
             scale: { start: 1, end: 0 },
-            lifespan: { min: 300, max: 600 },
-            quantity: { min: 10, max: 20 },
+            alpha: { start: 1, end: 0 },
+            lifespan: { min: 600, max: 1000 },
+            quantity: { min: 3, max: 6 },
             blendMode: 'ADD'
         });
 
         // 파티클이 모두 사라지면 이미터 자동 파괴
-        this.scene.time.delayedCall(600, () => {
+        this.scene.time.delayedCall(1000, () => {
             emitter.destroy();
         });
 
