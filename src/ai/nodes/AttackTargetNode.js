@@ -29,6 +29,7 @@ class AttackTargetNode extends Node {
         // 시각 효과
         this.vfxManager.updateHealthBar(target.healthBar, target.currentHp, target.finalStats.hp);
         this.vfxManager.createBloodSplatter(target.sprite.x, target.sprite.y);
+        this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, damage);
 
         // 딜레이
         await this.delayEngine.hold(200);
