@@ -12,6 +12,7 @@ import { surveyEngine } from './utils/SurveyEngine.js';
 // Phaser를 CDN에서 불러와 배포 시 404 오류를 방지합니다.
 // ESM 빌드에는 기본 내보내기가 없으므로 전체 네임스페이스를 가져옵니다.
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
+
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
@@ -26,11 +27,12 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
+    // --- ✨ 물리 엔진 설정 추가 ---
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 },
-            debug: false
+            gravity: { y: 0 }, // 기본 중력은 0으로 설정, 필요시 객체별로 적용
+            debug: false // 물리 디버그 모드 비활성화
         }
     },
     render: {
