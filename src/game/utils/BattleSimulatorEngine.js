@@ -11,6 +11,7 @@ import { createRangedAI } from '../../ai/behaviors/RangedAI.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
+import { visionManager } from './VisionManager.js'; // VisionManager를 import합니다.
 import { turnOrderManager } from './TurnOrderManager.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { delayEngine } from './DelayEngine.js';
@@ -38,6 +39,7 @@ export class BattleSimulatorEngine {
             animationEngine: this.animationEngine,
             vfxManager: this.vfxManager,
             terminationManager: this.terminationManager,
+            visionManager, // visionManager를 엔진 패키지에 추가합니다.
         };
 
         this.turnQueue = [];

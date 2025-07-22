@@ -3,46 +3,67 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 
 // 최적의 카이팅(거리두기) 위치를 찾는 노드
 class FindKitingPositionNode extends Node {
-    constructor({ formationEngine, pathfinderEngine }) {
+    // visionManager를 의존성으로 추가합니다.
+    constructor({ formationEngine, pathfinderEngine, visionManager }) {
         super();
         this.formationEngine = formationEngine;
         this.pathfinderEngine = pathfinderEngine;
+        this.visionManager = visionManager; // VisionManager 인스턴스 저장
     }
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const target = blackboard.get('currentTargetUnit');
+        const enemyUnits = blackboard.get('enemyUnits');
+
         if (!target) {
-            debugAIManager.logNodeResult(NodeState.FAILURE, "카이팅할 대상 없음");
+            debugAIManager.logNodeResult(NodeState.FAILURE, "카이팅할 주 대상 없음");
             return NodeState.FAILURE;
         }
 
         const attackRange = unit.finalStats.attackRange || 3;
-        const dangerZone = 2; // IsTargetTooCloseNode와 동일하게 설정
+        const dangerZone = 2; // 이 거리 안으로는 어떤 적도 들어오면 안 됨
+        const sightRange = unit.finalStats.sightRange || 10; // 유닛의 시야 범위
         const start = { col: unit.gridX, row: unit.gridY };
-        const targetPos = { col: target.gridX, row: target.gridY };
+
+        // **수정된 로직**: 시야 내 모든 위협적인 적을 가져옵니다.
+        const enemiesInSight = this.visionManager.findEnemiesInSight(unit, enemyUnits, sightRange);
+        if (enemiesInSight.length === 0) {
+            // 시야 내에 적이 없으면 카이팅할 필요가 없습니다.
+            // 이 경우는 IsTargetTooCloseNode에서 이미 걸러지지만, 방어 코드로 추가합니다.
+            debugAIManager.logNodeResult(NodeState.FAILURE, "시야 내에 위협적인 적 없음");
+            return NodeState.FAILURE;
+        }
 
         const availableCells = this.formationEngine.grid.gridCells.filter(cell => !cell.isOccupied || (cell.col === start.col && cell.row === start.row));
 
         let bestCell = null;
         let minDistanceToTravel = Infinity;
 
+        // **수정된 로직**: 최적의 셀을 찾는 기준 변경
         availableCells.forEach(cell => {
-            const distanceToTarget = Math.abs(cell.col - targetPos.col) + Math.abs(cell.row - targetPos.row);
+            // **조건 1: 주변의 "모든" 적으로부터 안전한가?**
+            const isSafeFromAllEnemies = enemiesInSight.every(enemy => {
+                const distanceToEnemy = Math.abs(cell.col - enemy.gridX) + Math.abs(cell.row - enemy.gridY);
+                return distanceToEnemy > dangerZone;
+            });
 
-            // 조건 1: 위험 지역(dangerZone)보다 멀리 떨어져 있는가?
-            // 조건 2: 최대 공격 사거리(attackRange) 안에 있는가?
-            if (distanceToTarget > dangerZone && distanceToTarget <= attackRange) {
-                const distanceToTravel = Math.abs(cell.col - start.col) + Math.abs(cell.row - start.row);
+            if (isSafeFromAllEnemies) {
+                // **조건 2: 주 공격 대상은 여전히 사거리 안에 있는가?**
+                const distanceToTarget = Math.abs(cell.col - target.gridX) + Math.abs(cell.row - target.gridY);
 
-                // 조건 3: 위 조건들을 만족하는 셀 중에서 가장 이동 거리가 짧은 곳인가?
-                if (distanceToTravel < minDistanceToTravel) {
-                    minDistanceToTravel = distanceToTravel;
-                    bestCell = cell;
+                if (distanceToTarget <= attackRange) {
+                    const distanceToTravel = Math.abs(cell.col - start.col) + Math.abs(cell.row - start.row);
+
+                    // **조건 3: 위 조건들을 만족하는 셀 중 가장 이동 거리가 짧은가?**
+                    if (distanceToTravel < minDistanceToTravel) {
+                        minDistanceToTravel = distanceToTravel;
+                        bestCell = cell;
+                    }
                 }
             }
         });
-        
+
         if (bestCell) {
             const path = this.pathfinderEngine.findPath(start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) {
@@ -52,7 +73,7 @@ class FindKitingPositionNode extends Node {
             }
         }
 
-        debugAIManager.logNodeResult(NodeState.FAILURE, "적절한 카이팅 위치를 찾지 못함");
+        debugAIManager.logNodeResult(NodeState.FAILURE, "주변 모든 적을 고려한 안전한 카이팅 위치를 찾지 못함");
         return NodeState.FAILURE; // 마땅한 후퇴 지점 없음
     }
 }
