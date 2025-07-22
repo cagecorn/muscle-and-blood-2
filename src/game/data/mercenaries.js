@@ -4,8 +4,13 @@ export const mercenaryData = {
         name: '전사',
         hireImage: 'assets/images/territory/warrior-hire.png',
         uiImage: 'assets/images/territory/warrior-ui.png',
-        battleSprite: 'assets/images/unit/warrior.png',
-        spriteKey: 'warrior',
+        battleSprite: 'warrior',
+        // 유닛의 행동별 스프라이트 키를 정의합니다.
+        sprites: {
+            idle: 'warrior',
+            attack: 'warrior-attack',
+            hitted: 'warrior-hitted',
+        },
         description: '"그는 단 한 사람을 지키기 위해 검을 든다."',
         baseStats: {
             hp: 120, valor: 10, strength: 15, endurance: 12,
@@ -17,8 +22,12 @@ export const mercenaryData = {
         name: '거너',
         hireImage: 'assets/images/territory/gunner-hire.png',
         uiImage: 'assets/images/territory/gunner-ui.png',
-        battleSprite: 'assets/images/unit/gunner.png',
-        spriteKey: 'gunner',
+        battleSprite: 'gunner',
+        sprites: {
+            idle: 'gunner',
+            attack: 'gunner-attack',
+            hitted: 'gunner-hitted',
+        },
         description: '"한 발, 한 발. 신중하게, 그리고 차갑게."',
         baseStats: {
             hp: 80, valor: 5, strength: 7, endurance: 6,
