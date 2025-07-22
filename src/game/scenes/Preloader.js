@@ -61,6 +61,14 @@ export class Preloader extends Scene
         this.load.image('warrior', 'images/unit/warrior.png');
         this.load.image('gunner', 'images/unit/gunner.png');
 
+        // --- 전사의 행동별 스프라이트 로드 ---
+        this.load.image('warrior-attack', 'images/unit/warrior-attack.png');
+        this.load.image('warrior-hitted', 'images/unit/warrior-hitted.png');
+
+        // --- 거너의 행동별 스프라이트 로드 ---
+        this.load.image('gunner-attack', 'images/unit/gunner-attack.png');
+        this.load.image('gunner-hitted', 'images/unit/gunner-hitted.png');
+
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
 

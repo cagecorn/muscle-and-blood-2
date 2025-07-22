@@ -1,5 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
+import { spriteEngine } from '../../game/utils/SpriteEngine.js';
 
 class AttackTargetNode extends Node {
     constructor({ combatCalculationEngine, vfxManager, animationEngine, delayEngine, terminationManager }) {
@@ -19,8 +20,17 @@ class AttackTargetNode extends Node {
             return NodeState.FAILURE;
         }
 
+        // 공격 스프라이트로 일시 변경
+        if (unit.sprite.scene && !spriteEngine.scene) {
+            spriteEngine.setScene(unit.sprite.scene);
+        }
+        spriteEngine.changeSpriteForDuration(unit, 'attack', 400);
+
         // 공격 애니메이션
         await this.animationEngine.attack(unit.sprite, target.sprite);
+
+        // 피격 스프라이트로 변경
+        spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
 
         // 데미지 계산 및 적용
         const damage = this.combatEngine.calculateDamage(unit, target);
