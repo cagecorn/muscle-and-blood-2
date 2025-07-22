@@ -53,8 +53,12 @@ export class BattleSimulatorEngine {
         allies.forEach(u => u.team = 'ally');
         enemies.forEach(u => u.team = 'enemy');
 
-        formationEngine.placeUnits(this.scene, allies, 0, 7);
-        formationEngine.placeUnits(this.scene, enemies, 8, 15);
+        formationEngine.applyFormation(this.scene, allies, 0, 7);
+        const unplaced = allies.filter(u => !u.sprite);
+        if (unplaced.length > 0) {
+            formationEngine.placeUnits(this.scene, unplaced, 0, 7);
+        }
+        formationEngine.placeMonsters(this.scene, enemies, 8);
 
         this._setupUnits(allUnits);
 
