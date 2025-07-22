@@ -152,10 +152,13 @@ class FormationEngine {
      * @returns {Promise<void>}
      */
     async moveUnitOnGrid(unit, newGridPos, animationEngine, bindingManager, duration = 500) {
-        if (!this.grid || !unit || !unit.sprite) return;
+        if (!this.grid || !unit || !unit.sprite) return false;
 
         const targetCell = this.grid.getCell(newGridPos.col, newGridPos.row);
-        if (!targetCell) return;
+        if (!targetCell || targetCell.isOccupied) {
+            debugLogEngine.log('FormationEngine', '목표 셀이 이미 점유되어 이동할 수 없습니다.');
+            return false;
+        }
 
         const targetPixelPos = { x: targetCell.x, y: targetCell.y };
 
@@ -173,6 +176,7 @@ class FormationEngine {
         targetCell.sprite = unit.sprite;
 
         debugLogEngine.log('FormationEngine', `유닛을 (${newGridPos.col}, ${newGridPos.row})로 이동 완료.`);
+        return true;
     }
 }
 
