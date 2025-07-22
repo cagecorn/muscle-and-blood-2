@@ -96,15 +96,16 @@ export class VFXManager {
             strokeThickness: 4,
         };
 
-        const damageText = this.scene.physics.add
+        const damageText = this.scene.add
             .text(x, y, damage.toString(), style)
             .setOrigin(0.5, 0.5);
+        this.scene.physics.add.existing(damageText);
 
         const randomX = Math.random() * 200 - 100; // -100 ~ 100
         const randomY = -(Math.random() * 150 + 150); // -150 ~ -300
-        damageText.setVelocity(randomX, randomY);
-        damageText.setGravityY(400);
-        damageText.setAngularVelocity(Math.random() * 200 - 100);
+        damageText.body.setVelocity(randomX, randomY);
+        damageText.body.setGravityY(400);
+        damageText.body.setAngularVelocity(Math.random() * 200 - 100);
 
         this.scene.tweens.add({
             targets: damageText,
