@@ -83,6 +83,9 @@ export class BattleSimulatorEngine {
         units.forEach(unit => {
             if (!unit.sprite) return;
 
+            // 유닛 스프라이트에 팀 정보를 명시적으로 저장합니다.
+            unit.sprite.setData('team', unit.team);
+
             unit.currentHp = unit.finalStats.hp;
             const cell = formationEngine.getCellFromSprite(unit.sprite);
             if (cell) {

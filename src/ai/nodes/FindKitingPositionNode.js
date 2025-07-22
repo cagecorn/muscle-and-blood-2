@@ -65,7 +65,7 @@ class FindKitingPositionNode extends Node {
         });
 
         if (bestCell) {
-            const path = this.pathfinderEngine.findPath(start, { col: bestCell.col, row: bestCell.row });
+            const path = this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) {
                 blackboard.set('movementPath', path);
                 debugAIManager.logNodeResult(NodeState.SUCCESS, `최적 카이팅 위치 (${bestCell.col}, ${bestCell.row})로 경로 설정`);
