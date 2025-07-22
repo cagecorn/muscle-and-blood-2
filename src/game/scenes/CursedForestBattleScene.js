@@ -26,6 +26,9 @@ export class CursedForestBattleScene extends Scene {
         this.stageManager.createStage('battle-stage-cursed-forest');
         this.cameraControl = new CameraControlEngine(this);
 
+        // 전투가 시작되면 기본 카메라 줌을 2배로 고정합니다.
+        this.cameras.main.setZoom(2);
+
         // BattleSimulatorEngine 사용
         this.battleSimulator = new BattleSimulatorEngine(this);
 
@@ -42,6 +45,14 @@ export class CursedForestBattleScene extends Scene {
 
         // BattleSimulatorEngine을 통해 전투를 시작합니다.
         this.battleSimulator.start(partyUnits, monsters);
+
+        // 약간의 지연 후 첫 번째 아군 유닛을 따라가 보며 카메라 이동을 테스트합니다.
+        this.time.delayedCall(2000, () => {
+            if (this.battleSimulator.allySprites.length > 0) {
+                const firstAlly = this.battleSimulator.allySprites[0];
+                this.cameraControl.panTo(firstAlly.x, firstAlly.y);
+            }
+        });
 
         this.events.on('shutdown', () => {
             ['dungeon-container', 'territory-container'].forEach(id => {
