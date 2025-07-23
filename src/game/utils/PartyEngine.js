@@ -1,6 +1,8 @@
 /**
  * 플레이어의 파티를 관리하는 엔진 (싱글턴)
  */
+import { mercenaryEngine } from './MercenaryEngine.js';
+
 class PartyEngine {
     constructor() {
         this.maxPartySize = 12;
@@ -57,6 +59,17 @@ class PartyEngine {
      */
     getPartyMembers() {
         return [...this.partyMembers];
+    }
+
+    getDeployedMercenaries() {
+        return this.getPartyMembers()
+            .filter(id => id !== undefined)
+            .map(id => mercenaryEngine.getMercenaryById(id, 'ally'))
+            .filter(m => m);
+    }
+
+    getMercenaryById(id) {
+        return mercenaryEngine.getMercenaryById(id, 'ally');
     }
 }
 

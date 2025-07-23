@@ -29,6 +29,8 @@ export class TerritoryDOMEngine {
         this.addExpeditionButton(2, 0);
         // --- 진형 관리 버튼 추가 ---
         this.addFormationButton(0, 1);
+        // --- 스킬 관리 버튼 추가 ---
+        this.addSkillManagementButton(1, 1);
     }
 
     createGrid() {
@@ -113,6 +115,21 @@ export class TerritoryDOMEngine {
         button.addEventListener('click', () => {
             this.container.style.display = 'none';
             this.scene.scene.start('FormationScene');
+        });
+        this.grid.appendChild(button);
+    }
+
+    addSkillManagementButton(col, row) {
+        const button = document.createElement('div');
+        button.className = 'building-icon';
+        button.style.backgroundImage = `url(assets/images/territory/skills-icon.png)`;
+        button.style.gridColumnStart = col + 1;
+        button.style.gridRowStart = row + 1;
+        button.addEventListener('mouseover', (event) => this.domEngine.showTooltip(event.clientX, event.clientY, '[스킬 관리]'));
+        button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
+        button.addEventListener('click', () => {
+            this.container.style.display = 'none';
+            this.scene.scene.start('SkillManagementScene');
         });
         this.grid.appendChild(button);
     }

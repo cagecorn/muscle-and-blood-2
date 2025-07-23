@@ -12,6 +12,7 @@ import { PartyScene } from './PartyScene.js';
 import { DungeonScene } from './DungeonScene.js';
 import { FormationScene } from './FormationScene.js';
 import { CursedForestBattleScene } from './CursedForestBattleScene.js';
+import { SkillManagementScene } from './SkillManagementScene.js';
 
 export class Boot extends Scene
 {
@@ -40,6 +41,7 @@ export class Boot extends Scene
         this.scene.add('DungeonScene', DungeonScene);
         this.scene.add('FormationScene', FormationScene);
         this.scene.add('CursedForestBattle', CursedForestBattleScene);
+        this.scene.add('SkillManagementScene', SkillManagementScene);
 
         this.scene.start('Preloader');
     }
