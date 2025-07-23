@@ -88,8 +88,8 @@ export class BattleSimulatorEngine {
         this.currentTurnIndex = 0;
         this.currentTurnNumber = 1; // 턴 번호 초기화
 
-        // --- ✨ 첫 턴 시작 시 모든 유닛에게 토큰 1개 지급 ---
-        tokenEngine.addOneTokenPerTurn();
+        // --- ✨ 첫 턴 시작 시 현재 턴 번호에 맞춰 토큰 지급 ---
+        tokenEngine.addTokensForNewTurn(this.currentTurnNumber);
         // 스킬 사용 기록 초기화
         skillEngine.resetTurnActions();
 
@@ -146,7 +146,7 @@ export class BattleSimulatorEngine {
                 this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
 
                 statusEffectManager.onTurnEnd();
-                tokenEngine.addOneTokenPerTurn();
+                tokenEngine.addTokensForNewTurn(this.currentTurnNumber);
                 skillEngine.resetTurnActions();
             }
 
