@@ -20,10 +20,12 @@ class SkillInventoryManager {
      * 게임 시작 시 기본 스킬 카드를 지급합니다.
      */
     initializeSkillCards() {
+        // ✨ 각 스킬을 넉넉하게 10장씩 생성하도록 변경
         for (const skillId in skillCardDatabase) {
             if (skillCardDatabase.hasOwnProperty(skillId)) {
-                this.addSkillById(skillId);
-                this.addSkillById(skillId);
+                for (let i = 0; i < 10; i++) {
+                    this.addSkillById(skillId);
+                }
             }
         }
         debugLogEngine.log('SkillInventoryManager', `초기 스킬 카드 ${this.skillInventory.length}장 생성 완료.`);
@@ -45,6 +47,21 @@ class SkillInventoryManager {
      */
     removeSkillByInstanceId(instanceId) {
         this.skillInventory = this.skillInventory.filter(s => s.instanceId !== instanceId);
+    }
+
+    /**
+     * ✨ [새 메서드] 인벤토리에서 특정 skillId를 가진 첫 번째 인스턴스를 찾아 제거하고 반환합니다.
+     * @param {string} skillId - 찾을 스킬의 ID (예: 'attack')
+     * @returns {object|null} - 찾은 스킬 인스턴스 또는 null
+     */
+    findAndRemoveInstanceOfSkill(skillId) {
+        const index = this.skillInventory.findIndex(s => s.skillId === skillId);
+        if (index !== -1) {
+            const instance = this.skillInventory.splice(index, 1)[0];
+            return instance;
+        }
+        console.warn(`[SkillInventoryManager] 인벤토리에서 '${skillId}' 스킬을 찾을 수 없습니다.`);
+        return null;
     }
 
     /** 현재 인벤토리에 있는 스킬 인스턴스 배열을 반환 */

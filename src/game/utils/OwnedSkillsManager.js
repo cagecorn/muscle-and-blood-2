@@ -13,7 +13,8 @@ class OwnedSkillsManager {
 
     initializeSlots(unitId) {
         if (!this.equippedSkills.has(unitId)) {
-            this.equippedSkills.set(unitId, [null, null, null]);
+            // ✨ 슬롯을 4개로 확장합니다.
+            this.equippedSkills.set(unitId, [null, null, null, null]);
         }
     }
 
@@ -29,7 +30,7 @@ class OwnedSkillsManager {
         const slots = this.equippedSkills.get(unitId);
         const prev = slots[slotIndex];
         slots[slotIndex] = instanceId;
-        console.log(`[OwnedSkillsManager] 유닛 ${unitId}의 ${slotIndex}번 슬롯에 스킬 인스턴스 ${instanceId} 장착. 이전 스킬: ${prev}`);
+        console.log(`[OwnedSkillsManager] 유닛 ${unitId}의 ${slotIndex + 1}번 슬롯에 스킬 인스턴스 ${instanceId} 장착. 이전 스킬: ${prev}`);
         return prev;
     }
 
@@ -41,7 +42,7 @@ class OwnedSkillsManager {
         const slots = this.equippedSkills.get(unitId);
         const removed = slots[slotIndex];
         slots[slotIndex] = null;
-        console.log(`[OwnedSkillsManager] 유닛 ${unitId}의 ${slotIndex}번 슬롯에서 스킬 인스턴스 ${removed} 해제.`);
+        console.log(`[OwnedSkillsManager] 유닛 ${unitId}의 ${slotIndex + 1}번 슬롯에서 스킬 인스턴스 ${removed} 해제.`);
         return removed;
     }
 
