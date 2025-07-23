@@ -5,6 +5,8 @@ import { partyEngine } from './PartyEngine.js';
 import { uniqueIDManager } from './UniqueIDManager.js';
 // 스킬 엔진을 불러옵니다.
 import { skillEngine } from './SkillEngine.js';
+import { ownedSkillsManager } from './OwnedSkillsManager.js';
+import { skillInventoryManager } from './SkillInventoryManager.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -29,14 +31,30 @@ class MercenaryEngine {
 
         const newInstance = {
             ...baseMercenaryData,
-            uniqueId: uniqueId,
+            uniqueId,
             instanceName: randomName,
             level: 1,
             exp: 0,
             equippedItems: [],
-            // 무작위 스킬 슬롯을 생성하여 저장합니다.
+            // ✨ 1. 먼저 3개의 무작위 스킬 슬롯을 생성합니다.
             skillSlots: skillEngine.generateRandomSkillSlots()
         };
+
+        // ✨ 2. '전사' 클래스에 대한 특별 처리
+        if (newInstance.id === 'warrior') {
+            // 4번째 슬롯을 'ACTIVE' 타입으로 고정
+            newInstance.skillSlots.push('ACTIVE');
+
+            // 인벤토리에서 'attack' 스킬 인스턴스를 찾아 장착
+            const attackInstance = skillInventoryManager.findAndRemoveInstanceOfSkill('attack');
+            if (attackInstance) {
+                // 4번 슬롯(인덱스 3)에 장착
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
+            }
+        } else {
+            // 다른 클래스는 4번째 슬롯을 빈 슬롯(null)으로 추가
+            newInstance.skillSlots.push(null);
+        }
         
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
 
