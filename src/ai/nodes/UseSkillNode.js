@@ -13,15 +13,26 @@ class UseSkillNode extends Node {
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
-        const target = blackboard.get('currentTargetUnit');
+        // 기본 대상은 현재 AI가 노리고 있는 유닛으로 설정
+        let skillTarget = blackboard.get('currentTargetUnit');
         const skillInfo = blackboard.get('currentTargetSkill');
 
-        if (!target || !skillInfo) {
-            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 대상 또는 스킬 정보 없음');
+        if (!skillInfo) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 정보 없음');
             return NodeState.FAILURE;
         }
 
         const { skillData, instanceId } = skillInfo;
+
+        // 스킬의 targetType에 따라 대상 결정. 기본값은 전달된 대상 유지
+        if (skillData.targetType === 'self') {
+            skillTarget = unit;
+        }
+
+        if (!skillTarget) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 대상 없음');
+            return NodeState.FAILURE;
+        }
 
         this.skillEngine.recordSkillUse(unit, skillData);
 
@@ -29,13 +40,18 @@ class UseSkillNode extends Node {
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);
 
-        await this.animationEngine.attack(unit.sprite, target.sprite);
-
-        if (skillData.effect) {
-            statusEffectManager.addEffect(target, skillData);
+        if (skillData.targetType === 'self') {
+            // 자신에게 사용하는 모션이 존재한다면 여기서 처리 가능
+            // await this.animationEngine.cast(unit.sprite);
+        } else {
+            await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
         }
 
-        console.log(`[AI] ${unit.instanceName}이(가) ${target.instanceName}에게 스킬 [${skillData.name}] 사용!`);
+        if (skillData.effect) {
+            statusEffectManager.addEffect(skillTarget, skillData);
+        }
+
+        console.log(`[AI] ${unit.instanceName}이(가) ${skillTarget.instanceName}에게 스킬 [${skillData.name}] 사용!`);
 
         blackboard.set('currentTargetSkill', null);
 
