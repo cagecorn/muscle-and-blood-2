@@ -1,6 +1,8 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
+import { skillEngine } from '../../game/utils/SkillEngine.js';
+import { skillCardDatabase } from '../../game/data/skills/SkillCardDatabase.js';
 
 class AttackTargetNode extends Node {
     constructor({ combatCalculationEngine, vfxManager, animationEngine, delayEngine, terminationManager }) {
@@ -19,6 +21,14 @@ class AttackTargetNode extends Node {
             debugAIManager.logNodeResult(NodeState.FAILURE);
             return NodeState.FAILURE;
         }
+
+        // ✨ 일반 공격도 토큰을 사용하는 스킬로 간주
+        const attackSkill = skillCardDatabase.attack;
+        if (!skillEngine.canUseSkill(unit, attackSkill)) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '일반 공격을 위한 토큰 부족');
+            return NodeState.FAILURE;
+        }
+        skillEngine.recordSkillUse(unit, attackSkill);
 
         // 공격 스프라이트로 일시 변경
         if (unit.sprite.scene && !spriteEngine.scene) {

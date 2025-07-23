@@ -28,13 +28,18 @@ class TokenEngine {
     }
 
     /**
-     * 새로운 턴이 시작될 때 모든 유닛에게 토큰을 1개씩 지급합니다.
+     * 새로운 턴이 시작될 때 모든 유닛에게 토큰을 지급합니다.
+     * 하스스톤처럼 턴이 지날수록 지급량이 늘어나도록
+     * 현재 턴 번호를 받아 해당 수만큼 지급합니다.
+     * @param {number} turnNumber - 현재 턴 번호
      */
-    addOneTokenPerTurn() {
+    addTokensForNewTurn(turnNumber) {
         for (const [unitId, data] of this.tokenData.entries()) {
-            if (data.currentTokens < this.maxTokens) {
-                data.currentTokens += 1;
-                debugTokenManager.logTokenChange(unitId, data.unitName, '턴 시작', 1, data.currentTokens);
+            const newTokens = Math.min(this.maxTokens, data.currentTokens + turnNumber);
+            if (newTokens > data.currentTokens) {
+                const addedAmount = newTokens - data.currentTokens;
+                data.currentTokens = newTokens;
+                debugTokenManager.logTokenChange(unitId, data.unitName, '턴 시작', addedAmount, data.currentTokens);
             }
         }
     }
