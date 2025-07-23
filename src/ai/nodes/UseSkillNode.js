@@ -51,6 +51,9 @@ class UseSkillNode extends Node {
                 this.terminationManager.handleUnitDeath(skillTarget);
             }
         } else {
+            if (unit.sprite.scene && !spriteEngine.scene) {
+                spriteEngine.setScene(unit.sprite.scene);
+            }
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 

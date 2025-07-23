@@ -20,8 +20,12 @@ class SpriteEngine {
 
         const originalTexture = unit.sprites.idle || unit.battleSprite;
         const actionTexture = unit.sprites[actionType];
+        const scene = this.scene || unit.sprite.scene;
+        if (!this.scene && scene) {
+            this.scene = scene;
+        }
 
-        if (!actionTexture || !this.scene.textures.exists(actionTexture)) {
+        if (!actionTexture || !scene || !scene.textures || !scene.textures.exists(actionTexture)) {
             debugLogEngine.warn('SpriteEngine', `${actionType}\uC5D0 \uD574\uB2F9\uD558\uB294 \uC2A4\uD504\uB77C\uC774\uD2B8 \uD0A4 '${actionTexture}'\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.`);
             return;
         }
