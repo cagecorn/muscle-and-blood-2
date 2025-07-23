@@ -1,8 +1,9 @@
 import { statEngine } from '../utils/StatEngine.js';
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
-// ✨ [추가] 스킬 관리 매니저들을 import
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
+// ✨ 스킬 툴팁 매니저를 import하여 슬롯에 마우스 오버 기능을 제공합니다.
+import { SkillTooltipManager } from './SkillTooltipManager.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -64,38 +65,42 @@ export class UnitDetailDOM {
         const rightSection = document.createElement('div');
         rightSection.className = 'detail-section right';
         
-        let skillsHTML = `
-            <div class="equipment-grid"> ... </div>
-            <div class="unit-skills">
-                <div class="section-title">스킬 슬롯</div>
-                <div class="skill-grid">`;
+        const skillsContainer = document.createElement('div');
+        skillsContainer.className = 'unit-skills';
+        skillsContainer.innerHTML = `<div class="section-title">스킬 슬롯</div>`;
 
-        // ✨ [핵심 수정] 장착된 스킬 정보를 가져옵니다.
+        const skillGrid = document.createElement('div');
+        skillGrid.className = 'skill-grid';
+
         const equippedSkills = ownedSkillsManager.getEquippedSkills(unitData.uniqueId);
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
                 const typeClass = `${slotType.toLowerCase()}-slot`;
                 const instanceId = equippedSkills[index];
+
+                const slot = document.createElement('div');
+                slot.className = `skill-slot ${typeClass}`;
+
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
                     const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
                     const skillData = skillInventoryManager.getSkillData(skillId);
-                    if (skillData) bgImage = `url(${skillData.illustrationPath})`;
+                    if (skillData) {
+                        bgImage = `url(${skillData.illustrationPath})`;
+                        slot.onmouseenter = (e) => SkillTooltipManager.show(skillId, e);
+                        slot.onmouseleave = () => SkillTooltipManager.hide();
+                    }
                 }
-                skillsHTML += `
-                    <div class="skill-slot ${typeClass}" style="background-image: ${bgImage};">
-                        <span class="slot-rank">${index + 1} 순위</span>
-                    </div>`;
+                slot.style.backgroundImage = bgImage;
+
+                slot.innerHTML = `<span class="slot-rank">${index + 1} 순위</span>`;
+                skillGrid.appendChild(slot);
             });
-        } else {
-            for(let i = 0; i < 3; i++) {
-                skillsHTML += `<div class="skill-slot" style="background-image: url(assets/images/skills/skill-slot.png);"><span class="slot-rank">${i + 1} 순위</span></div>`;
-            }
         }
-        
-        skillsHTML += `</div></div>`;
-        rightSection.innerHTML = skillsHTML;
+
+        skillsContainer.appendChild(skillGrid);
+        rightSection.appendChild(skillsContainer);
 
         detailContent.appendChild(leftSection);
         detailContent.appendChild(rightSection);
