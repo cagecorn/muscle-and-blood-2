@@ -91,6 +91,9 @@ export class Preloader extends Scene
 
         // 몬스터 스프라이트 로드
         this.load.image('zombie', 'images/unit/zombie.png');
+
+        // --- 추가된 토큰 이미지 로드 ---
+        this.load.image('token', 'images/battle/token.png');
     }
 
     create ()
