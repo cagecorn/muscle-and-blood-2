@@ -34,20 +34,13 @@ function createMeleeAI(engines) {
                 new IsTargetInRangeNode(),
                 new AttackTargetNode(engines),
             ]),
-            // 2b. (차선) 사거리 밖이라면 이동 후 다시 공격 시도
+            // 2b. (차선) 사거리 밖이라면 이동 후 반드시 공격
             new SequenceNode([
                 new FindPathToTargetNode(engines),
                 new MoveToTargetNode(engines),
-                // 이동 후, 다시 사거리 체크 후 공격
-                new SelectorNode([
-                    new SequenceNode([
-                        new IsTargetInRangeNode(),
-                        new AttackTargetNode(engines),
-                    ]),
-                    // 이동은 했지만 공격은 실패한 경우 (예: 적이 그 사이 이동)
-                    // 턴을 성공으로 간주하여 AI가 멈추지 않게 함
-                    new SuccessNode(),
-                ]),
+                // 이동 후 공격을 다시 시도합니다. 실패하면 이 행동 전체가 실패합니다.
+                new IsTargetInRangeNode(),
+                new AttackTargetNode(engines),
             ]),
              // 2c. (대안) 공격도, 공격 위치로 이동도 할 수 없을 때
              // 턴을 성공으로 처리하여 아무것도 하지 않고 턴을 넘김
