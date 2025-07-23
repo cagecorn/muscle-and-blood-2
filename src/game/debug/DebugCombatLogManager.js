@@ -15,14 +15,23 @@ class DebugCombatLogManager {
      * @param {number} finalDamage - 최종 데미지
      */
     logAttackCalculation(attacker, defender, baseDamage, finalDamage) {
-        console.groupCollapsed(`%c[${this.name}]`, `color: #d946ef; font-weight: bold;`, `${attacker.name}이(가) ${defender.name}을(를) 공격!`);
-        
+        const atkName = attacker.instanceName || attacker.name || 'unknown';
+        const defName = defender.instanceName || defender.name || 'unknown';
+        const atkValue = attacker.finalStats?.physicalAttack ?? attacker.atk;
+        const defValue = defender.finalStats?.physicalDefense ?? defender.def;
+
+        console.groupCollapsed(
+            `%c[${this.name}]`,
+            `color: #d946ef; font-weight: bold;`,
+            `${atkName}이(가) ${defName}을(를) 공격!`
+        );
+
         debugLogEngine.log(this.name, '--- 공격 상세 계산 ---');
-        debugLogEngine.log(this.name, `공격자: ${attacker.name} (공격력: ${attacker.atk})`);
-        debugLogEngine.log(this.name, `방어자: ${defender.name} (방어력: ${defender.def})`);
+        debugLogEngine.log(this.name, `공격자: ${atkName} (공격력: ${atkValue})`);
+        debugLogEngine.log(this.name, `방어자: ${defName} (방어력: ${defValue})`);
         debugLogEngine.log(this.name, `기본 데미지: ${baseDamage}`);
         debugLogEngine.log(this.name, `데미지 공식: 기본 데미지 - 방어자 방어력`);
-        debugLogEngine.log(this.name, `계산: ${baseDamage} - ${defender.def} = ${finalDamage}`);
+        debugLogEngine.log(this.name, `계산: ${baseDamage} - ${defValue} = ${finalDamage}`);
         debugLogEngine.log(this.name, `최종 적용 데미지: ${finalDamage}`);
         
         console.groupEnd();
