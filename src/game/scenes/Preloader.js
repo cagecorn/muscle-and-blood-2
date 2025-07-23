@@ -64,6 +64,7 @@ export class Preloader extends Scene
         // --- 전사의 행동별 스프라이트 로드 ---
         this.load.image('warrior-attack', 'images/unit/warrior-attack.png');
         this.load.image('warrior-hitted', 'images/unit/warrior-hitted.png');
+        this.load.image('warrior-cast', 'images/unit/warrior-cast.png');
 
         // --- 거너의 행동별 스프라이트 로드 ---
         this.load.image('gunner-attack', 'images/unit/gunner-attack.png');
