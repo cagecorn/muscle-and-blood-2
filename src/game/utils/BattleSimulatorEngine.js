@@ -19,6 +19,7 @@ import { delayEngine } from './DelayEngine.js';
 import { tokenEngine } from './TokenEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
+import { cooldownManager } from './CooldownManager.js';
 
 
 export class BattleSimulatorEngine {
@@ -57,6 +58,7 @@ export class BattleSimulatorEngine {
         this.isRunning = true;
 
         aiManager.clear();
+        cooldownManager.reset();
 
         const allUnits = [...allies, ...enemies];
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
@@ -130,6 +132,8 @@ export class BattleSimulatorEngine {
 
                     await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
                 }
+
+                cooldownManager.reduceCooldowns(currentUnit.uniqueId);
             }
 
             this.currentTurnIndex++;

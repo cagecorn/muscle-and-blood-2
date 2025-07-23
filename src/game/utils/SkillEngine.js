@@ -1,6 +1,7 @@
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
-import { tokenEngine } from './TokenEngine.js'; // 토큰 엔진 import
+import { tokenEngine } from './TokenEngine.js';
+import { cooldownManager } from './CooldownManager.js';
 
 // 스킬 종류와 해당 색상, 이름을 상수로 정의합니다.
 export const SKILL_TYPES = {
@@ -56,6 +57,11 @@ class SkillEngine {
             return false;
         }
 
+        // 4. 쿨타임이 지났는가?
+        if (!cooldownManager.isReady(unit.uniqueId, skill.id)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -74,6 +80,10 @@ class SkillEngine {
         this.usedSkillsThisTurn.add(skill.id);
         const currentUses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
         this.skillUsesThisTurn.set(unit.uniqueId, currentUses + 1);
+
+        if (skill.cooldown && skill.cooldown > 0) {
+            cooldownManager.setCooldown(unit.uniqueId, skill.id, skill.cooldown);
+        }
 
         debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost} 소모).`);
     }
