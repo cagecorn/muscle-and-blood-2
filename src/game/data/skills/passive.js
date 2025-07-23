@@ -7,5 +7,6 @@ export const passiveSkills = {
         cost: 0,
         description: '체력이 적을 수록 받는 데미지가 감소합니다. 최대 30%감소',
         illustrationPath: 'assets/images/skills/iron_will.png',
+        requiredClass: 'warrior', // ✨ 전사 전용 설정
     },
 };
