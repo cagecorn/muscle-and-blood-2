@@ -7,29 +7,37 @@ import { debugStatusEffectManager } from '../debug/DebugStatusEffectManager.js';
  */
 class CombatCalculationEngine {
     /**
-     * 기본 공격 데미지 계산
+     * 스킬 또는 기본 공격 데미지 계산
      * @param {object} attacker
      * @param {object} defender
+     * @param {object} skill - 사용된 스킬 데이터 (기본 공격 포함)
      * @returns {number} 최종 적용될 데미지
      */
-    calculateDamage(attacker = {}, defender = {}) {
+    calculateDamage(attacker = {}, defender = {}, skill = {}) {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
         const baseDefense = defender.finalStats?.physicalDefense || 0;
 
-        const initialDamage = Math.max(1, baseAttack - baseDefense);
+        // ✨ 스킬의 데미지 배율 적용
+        const damageMultiplier = skill.damageMultiplier || 1.0;
+        const skillDamage = baseAttack * damageMultiplier;
 
+        const initialDamage = Math.max(1, skillDamage - baseDefense);
+
+        // ✨ 방어자의 받는 데미지 증가/감소 효과 적용
         const damageReductionPercent = statusEffectManager.getModifierValue(defender, 'damageReduction');
+        const damageIncreasePercent = statusEffectManager.getModifierValue(defender, 'damageIncrease');
+        const finalDamageMultiplier = 1 - damageReductionPercent + damageIncreasePercent;
 
-        const finalDamage = initialDamage * (1 - damageReductionPercent);
+        const finalDamage = initialDamage * finalDamageMultiplier;
 
-        if (damageReductionPercent > 0) {
+        if (damageReductionPercent > 0 || damageIncreasePercent > 0) {
             const effects = (statusEffectManager.activeEffects.get(defender.uniqueId) || [])
-                .filter(e => e.modifiers.stat === 'damageReduction');
+                .filter(e => e.modifiers && (e.modifiers.stat === 'damageReduction' || e.modifiers.stat === 'damageIncrease'));
             debugStatusEffectManager.logDamageModification(defender, initialDamage, finalDamage, effects);
         }
 
-        debugCombatLogManager.logAttackCalculation(attacker, defender, baseAttack, finalDamage);
-        return finalDamage;
+        debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage);
+        return Math.round(finalDamage);
     }
 }
 

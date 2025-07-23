@@ -17,5 +17,16 @@ export const statusEffects = {
             unit.isStunned = false;
         },
     },
-    // 다른 상태 효과들은 필요 시 여기에 추가합니다.
+    // ✨ 스톤 스킨 효과 추가
+    stoneSkin: {
+        id: 'stoneSkin',
+        name: '스톤 스킨',
+        iconPath: 'assets/images/skills/ston-skin.png',
+    },
+    // ✨ 쉴드 브레이크 효과 추가
+    shieldBreak: {
+        id: 'shieldBreak',
+        name: '쉴드 브레이크',
+        iconPath: 'assets/images/skills/shield-break.png',
+    }
 };

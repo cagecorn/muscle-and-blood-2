@@ -58,16 +58,15 @@ export class IconManager {
 
         // 활성 효과를 기반으로 아이콘을 추가하거나 업데이트합니다.
         activeEffects.forEach((effect, index) => {
-            const effectDef = statusEffects[effect.id];
-            const skillData = skillCardDatabase[effect.sourceSkillName];
-            const iconKey = effectDef ? effectDef.id : (skillData ? skillData.id : null);
+            const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
+            const iconKey = effectDef ? effectDef.id : null;
             if (!iconKey) return;
 
             let iconData = display.icons.get(effect.instanceId);
 
             if (!iconData) { // 새로운 아이콘 생성
                 const iconContainer = this.scene.add.container(0, 0);
-                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.2);
+                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.04);
                 const turnText = this.scene.add.text(0, 8, effect.duration, {
                     fontSize: '12px',
                     color: '#fff',
