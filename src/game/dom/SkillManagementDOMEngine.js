@@ -1,6 +1,8 @@
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
+import { SkillCardManager } from './SkillCardManager.js';
+import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -16,6 +18,7 @@ export class SkillManagementDOMEngine {
         this.selectedMercenaryId = null;
 
         this.createView();
+        this.populateSkillInventory();
     }
 
     createView() {
@@ -43,7 +46,6 @@ export class SkillManagementDOMEngine {
         this.skillInventoryContent = inventoryPanel.querySelector('.panel-content');
 
         this.populateMercenaryList();
-        this.createSkillInventoryGrid();
 
         // 뒤로가기 버튼 추가
         const backButton = document.createElement('div');
@@ -120,6 +122,30 @@ export class SkillManagementDOMEngine {
             cell.className = 'skill-inventory-cell';
             this.skillInventoryContent.appendChild(cell);
         }
+    }
+
+    populateSkillInventory() {
+        this.skillInventoryContent.innerHTML = '';
+        const inventory = skillInventoryManager.getInventory();
+        inventory.forEach(skill => {
+            const cardElement = SkillCardManager.createCardElement(skill);
+
+            // 스킬 종류에 따라 테두리 색상 적용 (CSS 클래스 활용)
+            cardElement.classList.add(`${skill.type.toLowerCase()}-card`);
+
+            // 소모 토큰 표시
+            const costContainer = document.createElement('div');
+            costContainer.className = 'skill-cost-container';
+            for (let i = 0; i < skill.cost; i++) {
+                const tokenIcon = document.createElement('img');
+                tokenIcon.src = 'assets/images/battle/token.png';
+                tokenIcon.className = 'token-icon';
+                costContainer.appendChild(tokenIcon);
+            }
+            cardElement.querySelector('.skill-info').appendChild(costContainer);
+
+            this.skillInventoryContent.appendChild(cardElement);
+        });
     }
 
     destroy() {
