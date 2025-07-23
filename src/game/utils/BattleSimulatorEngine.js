@@ -17,6 +17,7 @@ import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { delayEngine } from './DelayEngine.js';
 // --- ✨ TokenEngine을 import 합니다. ---
 import { tokenEngine } from './TokenEngine.js';
+import { skillEngine } from './SkillEngine.js';
 
 
 export class BattleSimulatorEngine {
@@ -85,6 +86,8 @@ export class BattleSimulatorEngine {
 
         // --- ✨ 첫 턴 시작 시 모든 유닛에게 토큰 1개 지급 ---
         tokenEngine.addOneTokenPerTurn();
+        // 스킬 사용 기록 초기화
+        skillEngine.resetTurnActions();
 
         // 첫 턴 시작 직후 모든 유닛의 토큰 UI를 업데이트합니다.
         allUnits.forEach(unit => this.vfxManager.updateTokenDisplay(unit.uniqueId));
@@ -144,6 +147,8 @@ export class BattleSimulatorEngine {
 
                 // 새로운 턴이 시작되었으므로 토큰을 1개씩 지급합니다.
                 tokenEngine.addOneTokenPerTurn();
+                // 스킬 사용 기록 초기화
+                skillEngine.resetTurnActions();
             }
 
             // --- ✨ 매 행동 후 모든 유닛의 토큰 UI 업데이트 ---
