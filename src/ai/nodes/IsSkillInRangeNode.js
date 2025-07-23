@@ -4,15 +4,14 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 class IsSkillInRangeNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
-        const target = blackboard.get('currentTargetUnit');
-        const skillInfo = blackboard.get('currentTargetSkill');
+        const target = blackboard.get('skillTarget');
+        const skillData = blackboard.get('currentSkillData');
 
-        if (!target || !skillInfo) {
+        if (!target || !skillData) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '타겟 또는 스킬 정보 없음');
             return NodeState.FAILURE;
         }
 
-        const skillData = skillInfo.skillData;
         const attackRange = skillData.range || unit.finalStats.attackRange || 1;
         const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
 
