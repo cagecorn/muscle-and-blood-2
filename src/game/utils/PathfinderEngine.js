@@ -47,9 +47,10 @@ class PathfinderEngine {
             this._getNeighbors(currentNode).forEach(neighbor => {
                 const key = `${neighbor.col},${neighbor.row}`;
                 const cell = grid.getCell(neighbor.col, neighbor.row);
-                const isOccupiedByEnemy = cell && cell.isOccupied && cell.sprite?.getData('team') !== unit.team;
 
-                if (closedSet.has(key) || isOccupiedByEnemy) {
+                // ✨ [수정된 부분]
+                // 적군과 아군을 모두 포함하여, 점유된 셀은 경로에서 제외합니다.
+                if (closedSet.has(key) || (cell && cell.isOccupied)) {
                     return;
                 }
 
