@@ -1,8 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-import { activeSkills } from '../data/skills/active.js';
-import { buffSkills } from '../data/skills/buff.js';
-import { debuffSkills } from '../data/skills/debuff.js';
-import { passiveSkills } from '../data/skills/passive.js';
+import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
 
 /**
  * 플레이어가 획득한 모든 스킬 카드의 인벤토리를 관리하는 엔진
@@ -15,10 +12,7 @@ class SkillInventoryManager {
     }
 
     initializeSkillCards() {
-        this.addSkillCards(activeSkills);
-        this.addSkillCards(buffSkills);
-        this.addSkillCards(debuffSkills);
-        this.addSkillCards(passiveSkills);
+        this.addSkillCards(skillCardDatabase);
     }
 
     addSkillCards(skillObject) {
@@ -35,7 +29,14 @@ class SkillInventoryManager {
     }
 
     getInventory() {
-        return Array.from(this.skillInventory.values()).map(item => item.details);
+        return Array.from(this.skillInventory.keys()).map(id => skillCardDatabase[id]);
+    }
+    
+    /**
+     * ✨ [추가] 스킬 ID로 스킬 데이터를 반환하는 헬퍼 메서드
+     */
+    getSkillData(skillId) {
+        return skillCardDatabase[skillId];
     }
 
     // 향후 여기에 스킬 획득/폐기/조회 관련 메서드가 추가될 것입니다.

@@ -1,5 +1,8 @@
 import { statEngine } from '../utils/StatEngine.js';
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
+// ✨ [추가] 스킬 관리 매니저들을 import
+import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
+import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -67,11 +70,20 @@ export class UnitDetailDOM {
                 <div class="section-title">스킬 슬롯</div>
                 <div class="skill-grid">`;
 
+        // ✨ [핵심 수정] 장착된 스킬 정보를 가져옵니다.
+        const equippedSkills = ownedSkillsManager.getEquippedSkills(unitData.uniqueId);
+
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
                 const typeClass = `${slotType.toLowerCase()}-slot`;
+                const equippedSkillId = equippedSkills[index];
+                let bgImage = 'url(assets/images/skills/skill-slot.png)';
+                if (equippedSkillId) {
+                    const skillData = skillInventoryManager.getSkillData(equippedSkillId);
+                    if (skillData) bgImage = `url(${skillData.illustrationPath})`;
+                }
                 skillsHTML += `
-                    <div class="skill-slot ${typeClass}" style="background-image: url(assets/images/skills/skill-slot.png);">
+                    <div class="skill-slot ${typeClass}" style="background-image: ${bgImage};">
                         <span class="slot-rank">${index + 1} 순위</span>
                     </div>`;
             });
