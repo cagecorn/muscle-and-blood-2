@@ -827,3 +827,78 @@ body {
     height: 12px;
     margin-right: 2px;
 }
+
+/* --- 스킬 관리 씬 레이아웃 --- */
+.merc-portrait-small {
+    width: 150px;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #888;
+    border-radius: 5px;
+    margin: 0 auto 15px auto; /* 중앙 정렬 및 하단 여백 */
+    cursor: pointer;
+}
+.merc-portrait-small:hover {
+    border-color: #fff;
+}
+
+.merc-skill-slots-container {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 10px;
+}
+
+.merc-skill-slot {
+    width: 80px;
+    height: 80px; /* 정사각형 */
+    /* ... 나머지 스타일은 기존과 유사 */
+}
+
+/* --- 스킬 인벤토리 카드 --- */
+.skill-inventory-card {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #555;
+    border-radius: 4px;
+    float: left;
+    margin: 4px;
+    cursor: grab;
+}
+.skill-inventory-card:hover {
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+/* --- 스킬 툴팁 스타일 --- */
+#skill-tooltip {
+    position: absolute;
+    width: 200px; /* 카드 크기 */
+    height: 280px;
+    z-index: 9999;
+    pointer-events: none; /* 툴팁이 마우스 이벤트를 방해하지 않도록 */
+    display: flex;
+    flex-direction: column;
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    border: 2px solid #888;
+    overflow: hidden;
+}
+
+.skill-card-large.active-card { border-color: #FF8C00; }
+.skill-card-large.buff-card { border-color: #1E90FF; }
+.skill-card-large.debuff-card { border-color: #DC143C; }
+.skill-card-large.passive-card { border-color: #32CD32; }
+
+.skill-illustration-large {
+    width: 100%;
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+}
+
+.skill-info-large { padding: 8px; /* ... */ }
+.skill-name-large { font-size: 18px; /* ... */ }
+/* ... 나머지 툴팁 내부 스타일 ... */

@@ -3,6 +3,9 @@ import { partyEngine } from '../utils/PartyEngine.js';
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
 import { SkillCardManager } from './SkillCardManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
+import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
+import { UnitDetailDOM } from './UnitDetailDOM.js';
+import { SkillTooltipManager } from './SkillTooltipManager.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -93,21 +96,50 @@ export class SkillManagementDOMEngine {
 
     selectMercenary(mercData) {
         this.selectedMercenaryId = mercData.uniqueId;
-        this.mercenaryDetailsContent.innerHTML = ''; // 기존 내용 초기화
+        this.mercenaryDetailsContent.innerHTML = '';
+
+        // --- ✨ 용병 초상화 ---
+        const portrait = document.createElement('div');
+        portrait.className = 'merc-portrait-small';
+        portrait.style.backgroundImage = `url(${mercData.uiImage})`;
+        portrait.onclick = () => {
+            const detailView = UnitDetailDOM.create(mercData);
+            document.body.appendChild(detailView);
+        };
+        this.mercenaryDetailsContent.appendChild(portrait);
 
         const slotsContainer = document.createElement('div');
         slotsContainer.className = 'merc-skill-slots-container';
+        
+        const equippedSkills = ownedSkillsManager.getEquippedSkills(mercData.uniqueId);
 
-        mercData.skillSlots.forEach(slotType => {
+        mercData.skillSlots.forEach((slotType, index) => {
             const slot = document.createElement('div');
             slot.className = 'merc-skill-slot';
-            // skill-slot.png를 배경으로 사용하고, 테두리 색상 클래스 추가
-            slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
             slot.classList.add(`${slotType.toLowerCase()}-slot`);
+            slot.dataset.slotIndex = index;
+            slot.dataset.slotType = slotType;
 
-            const typeName = document.createElement('span');
-            typeName.innerText = `[${SKILL_TYPES[slotType].name}]`;
-            slot.appendChild(typeName);
+            const equippedSkillId = equippedSkills[index];
+            if (equippedSkillId) {
+                const skillData = skillInventoryManager.getSkillData(equippedSkillId);
+                slot.style.backgroundImage = `url(${skillData.illustrationPath})`;
+                slot.dataset.equippedSkillId = equippedSkillId;
+                 // 마우스 이벤트 리스너 추가
+                slot.onmouseenter = (e) => SkillTooltipManager.show(equippedSkillId, e);
+                slot.onmouseleave = () => SkillTooltipManager.hide();
+            } else {
+                slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
+            }
+
+            // 드래그 앤 드롭 이벤트 리스너
+            slot.ondragover = (e) => e.preventDefault();
+            slot.ondrop = (e) => this.onDropOnSlot(e);
+
+            const rank = document.createElement('span');
+            rank.className = 'slot-rank';
+            rank.innerText = `${index + 1} \uC21C\uC704`;
+            slot.appendChild(rank);
 
             slotsContainer.appendChild(slot);
         });
@@ -128,24 +160,44 @@ export class SkillManagementDOMEngine {
         this.skillInventoryContent.innerHTML = '';
         const inventory = skillInventoryManager.getInventory();
         inventory.forEach(skill => {
-            const cardElement = SkillCardManager.createCardElement(skill);
-
-            // 스킬 종류에 따라 테두리 색상 적용 (CSS 클래스 활용)
-            cardElement.classList.add(`${skill.type.toLowerCase()}-card`);
-
-            // 소모 토큰 표시
-            const costContainer = document.createElement('div');
-            costContainer.className = 'skill-cost-container';
-            for (let i = 0; i < skill.cost; i++) {
-                const tokenIcon = document.createElement('img');
-                tokenIcon.src = 'assets/images/battle/token.png';
-                tokenIcon.className = 'token-icon';
-                costContainer.appendChild(tokenIcon);
-            }
-            cardElement.querySelector('.skill-info').appendChild(costContainer);
+            const cardElement = document.createElement('div');
+            cardElement.className = 'skill-inventory-card';
+            cardElement.style.backgroundImage = `url(${skill.illustrationPath})`;
+            cardElement.draggable = true;
+            cardElement.dataset.skillId = skill.id;
+            
+            // 이벤트 리스너 추가
+            cardElement.ondragstart = (e) => e.dataTransfer.setData('skillId', skill.id);
+            cardElement.onmouseenter = (e) => SkillTooltipManager.show(skill.id, e);
+            cardElement.onmouseleave = () => SkillTooltipManager.hide();
 
             this.skillInventoryContent.appendChild(cardElement);
         });
+    }
+
+    onDropOnSlot(event) {
+        event.preventDefault();
+        const skillId = event.dataTransfer.getData('skillId');
+        const skillData = skillInventoryManager.getSkillData(skillId);
+        const slot = event.currentTarget;
+        const slotType = slot.dataset.slotType;
+
+        // 스킬 타입이 슬롯 타입과 맞는지 확인
+        if (skillData && skillData.type === slotType) {
+            const unitId = this.selectedMercenaryId;
+            const slotIndex = parseInt(slot.dataset.slotIndex);
+            
+            // 스킬 장착 및 UI 업데이트
+            ownedSkillsManager.equipSkill(unitId, slotIndex, skillId);
+            slot.style.backgroundImage = `url(${skillData.illustrationPath})`;
+            slot.dataset.equippedSkillId = skillId; // 새로 장착된 스킬 ID 저장
+
+            // 툴팁 이벤트 재설정
+            slot.onmouseenter = (e) => SkillTooltipManager.show(skillId, e);
+            slot.onmouseleave = () => SkillTooltipManager.hide();
+        } else {
+            console.warn("스킬과 슬롯의 타입이 일치하지 않습니다.");
+        }
     }
 
     destroy() {
