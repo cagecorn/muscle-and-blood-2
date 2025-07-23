@@ -1,7 +1,6 @@
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
-import { statEngine } from '../utils/StatEngine.js';
-// SKILL_TYPES를 import하여 색상 정보를 사용합니다.
-import { SKILL_TYPES } from '../utils/SkillEngine.js';
+// ✨ [변경] statEngine 대신 UnitDetailDOM을 import 합니다.
+import { UnitDetailDOM } from './UnitDetailDOM.js';
 
 /**
  * 파티 관리 화면의 DOM 요소를 생성하고 관리하는 엔진
@@ -140,89 +139,7 @@ export class PartyDOMEngine {
     showUnitDetails(unitData) {
         if (this.unitDetailView) this.unitDetailView.remove();
 
-        const finalStats = statEngine.calculateStats(unitData, unitData.baseStats, []);
-
-        this.unitDetailView = document.createElement('div');
-        this.unitDetailView.id = 'unit-detail-overlay';
-        this.unitDetailView.onclick = (e) => {
-            if (e.target.id === 'unit-detail-overlay') {
-                this.hideUnitDetails();
-            }
-        };
-
-        const detailPane = document.createElement('div');
-        detailPane.id = 'unit-detail-pane';
-
-        const instanceName = unitData.instanceName || unitData.name;
-        detailPane.innerHTML += `
-            <div class="detail-header">
-                <span class="unit-name">${instanceName}</span>
-                <span class="unit-class">${unitData.name}</span>
-                <span class="unit-level">Lv. ${unitData.level}</span>
-            </div>
-            <div id="unit-detail-close" onclick="this.closest('#unit-detail-overlay').remove()">X</div>
-        `;
-
-        const detailContent = document.createElement('div');
-        detailContent.className = 'detail-content';
-
-        const leftSection = document.createElement('div');
-        leftSection.className = 'detail-section left';
-        leftSection.innerHTML = `
-            <div class="unit-portrait" style="background-image: url(${unitData.uiImage})"></div>
-            <div class="stats-grid">
-                <div class="section-title">스탯</div>
-                <div class="stat-item"><span>HP</span><span>${finalStats.hp}</span></div>
-                <div class="stat-item"><span>용맹</span><span>${finalStats.valor}</span></div>
-                <div class="stat-item"><span>힘</span><span>${finalStats.strength}</span></div>
-                <div class="stat-item"><span>인내</span><span>${finalStats.endurance}</span></div>
-                <div class="stat-item"><span>민첩</span><span>${finalStats.agility}</span></div>
-                <div class="stat-item"><span>지능</span><span>${finalStats.intelligence}</span></div>
-                <div class="stat-item"><span>지혜</span><span>${finalStats.wisdom}</span></div>
-                <div class="stat-item"><span>행운</span><span>${finalStats.luck}</span></div>
-            </div>
-            <div class="traits-section">
-                <div class="section-title">특성 (미구현)</div>
-                <div class="placeholder-box"></div>
-            </div>
-            <div class="synergy-section">
-                <div class="section-title">시너지 (미구현)</div>
-                <div class="placeholder-box"></div>
-            </div>
-        `;
-
-        const rightSection = document.createElement('div');
-        rightSection.className = 'detail-section right';
-
-        let skillsHTML = `
-            <div class="equipment-grid">
-                <div class="section-title">장비</div>
-                <div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div>
-            </div>
-            <div class="unit-skills">
-                <div class="section-title">스킬</div>
-                <div class="skill-grid">
-        `;
-
-        if (unitData.skillSlots && unitData.skillSlots.length > 0) {
-            unitData.skillSlots.forEach(slotType => {
-                const typeClass = `${slotType.toLowerCase()}-slot`;
-                skillsHTML += `<div class="skill-slot ${typeClass}"></div>`;
-            });
-        } else {
-            skillsHTML += `<div class="skill-slot"></div><div class="skill-slot"></div><div class="skill-slot"></div>`;
-        }
-
-        skillsHTML += `
-                </div>
-            </div>
-        `;
-        rightSection.innerHTML = skillsHTML;
-
-        detailContent.appendChild(leftSection);
-        detailContent.appendChild(rightSection);
-        detailPane.appendChild(detailContent);
-        this.unitDetailView.appendChild(detailPane);
+        this.unitDetailView = UnitDetailDOM.create(unitData);
         this.container.appendChild(this.unitDetailView);
     }
 
