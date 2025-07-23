@@ -33,6 +33,11 @@ class Blackboard {
         // --- 이동 및 공격 관련 신규 정보 ---
         this.set('movementPath', null);
         this.set('isTargetInAttackRange', false);
+
+        // --- 턴 진행 플래그 ---
+        this.set('hasMovedThisTurn', false);
+        this.set('usedSkillsThisTurn', new Set());
+        this.set('currentTargetSkill', null);
     }
 
     set(key, value) {
