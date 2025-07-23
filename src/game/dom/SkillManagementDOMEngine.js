@@ -17,8 +17,8 @@ export class SkillManagementDOMEngine {
             document.getElementById('app').appendChild(this.container);
         }
 
-        // 선택된 용병의 ID를 추적
-        this.selectedMercenaryId = null;
+        // ✨ 선택된 용병의 전체 데이터를 저장
+        this.selectedMercenaryData = null;
 
         this.createView();
         this.populateSkillInventory();
@@ -95,7 +95,8 @@ export class SkillManagementDOMEngine {
     }
 
     selectMercenary(mercData) {
-        this.selectedMercenaryId = mercData.uniqueId;
+        // ✨ 선택된 용병 정보 저장
+        this.selectedMercenaryData = mercData;
         this.mercenaryDetailsContent.innerHTML = '';
 
         // --- ✨ 용병 초상화 ---
@@ -171,6 +172,15 @@ export class SkillManagementDOMEngine {
             cardElement.onmouseenter = (e) => SkillTooltipManager.show(skill.id, e);
             cardElement.onmouseleave = () => SkillTooltipManager.hide();
 
+            // ✨ 클래스 전용 태그 추가
+            if (skill.requiredClass) {
+                const tag = document.createElement('div');
+                tag.className = 'skill-class-tag';
+                const className = skill.requiredClass === 'warrior' ? '전사' : skill.requiredClass;
+                tag.textContent = `[${className}]`;
+                cardElement.appendChild(tag);
+            }
+
             this.skillInventoryContent.appendChild(cardElement);
         });
     }
@@ -182,9 +192,20 @@ export class SkillManagementDOMEngine {
         const slot = event.currentTarget;
         const slotType = slot.dataset.slotType;
 
+        if (!this.selectedMercenaryData) {
+            console.warn("스킬을 장착할 용병을 먼저 선택해주세요.");
+            return;
+        }
+
+        // ✨ 클래스 요구사항 확인
+        if (skillData.requiredClass && this.selectedMercenaryData.id !== skillData.requiredClass) {
+            alert(`[${skillData.name}] 스킬은 [${skillData.requiredClass}] 클래스 전용입니다.`);
+            return;
+        }
+
         // 스킬 타입이 슬롯 타입과 맞는지 확인
         if (skillData && skillData.type === slotType) {
-            const unitId = this.selectedMercenaryId;
+            const unitId = this.selectedMercenaryData.uniqueId;
             const slotIndex = parseInt(slot.dataset.slotIndex);
             
             // 스킬 장착 및 UI 업데이트

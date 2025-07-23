@@ -680,6 +680,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    pointer-events: auto; /* ✨ 마우스 이벤트 활성화 */
 }
 
 #skill-list-panel { flex-basis: 20%; }
@@ -866,10 +867,25 @@ body {
     float: left;
     margin: 4px;
     cursor: grab;
+    position: relative; /* ✨ 태그 위치 기준 */
 }
 .skill-inventory-card:hover {
     border-color: #fff;
     transform: scale(1.05);
+}
+
+/* ✨ 스킬 클래스 태그 스타일 */
+.skill-class-tag {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffc107;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 1px 3px;
+    border-radius: 2px;
+    line-height: 1;
 }
 
 /* --- 스킬 툴팁 스타일 --- */
