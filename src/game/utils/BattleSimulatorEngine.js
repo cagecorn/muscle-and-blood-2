@@ -15,6 +15,8 @@ import { visionManager } from './VisionManager.js'; // VisionManager를 import�
 import { turnOrderManager } from './TurnOrderManager.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { delayEngine } from './DelayEngine.js';
+// --- ✨ TokenEngine을 import 합니다. ---
+import { tokenEngine } from './TokenEngine.js';
 
 
 export class BattleSimulatorEngine {
@@ -44,6 +46,8 @@ export class BattleSimulatorEngine {
 
         this.turnQueue = [];
         this.currentTurnIndex = 0;
+        // --- ✨ 전체 턴 수를 추적하는 변수 ---
+        this.currentTurnNumber = 1;
     }
 
     start(allies, enemies) {
@@ -53,6 +57,8 @@ export class BattleSimulatorEngine {
         aiManager.clear();
 
         const allUnits = [...allies, ...enemies];
+        // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
+        tokenEngine.initializeUnits(allUnits);
         allies.forEach(u => u.team = 'ally');
         enemies.forEach(u => u.team = 'enemy');
 
@@ -75,6 +81,13 @@ export class BattleSimulatorEngine {
 
         this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
         this.currentTurnIndex = 0;
+        this.currentTurnNumber = 1; // 턴 번호 초기화
+
+        // --- ✨ 첫 턴 시작 시 토큰 지급 ---
+        tokenEngine.addTokensForNewTurn(this.currentTurnNumber);
+
+        // 첫 턴 시작 직후 모든 유닛의 토큰 UI를 업데이트합니다.
+        allUnits.forEach(unit => this.vfxManager.updateTokenDisplay(unit.uniqueId));
 
         this.gameLoop(); // 수정된 루프 시작
     }
@@ -83,7 +96,8 @@ export class BattleSimulatorEngine {
         units.forEach(unit => {
             if (!unit.sprite) return;
 
-            // 유닛 스프라이트에 팀 정보를 명시적으로 저장합니다.
+            // --- ✨ unitId를 스프라이트에 먼저 설정 ---
+            unit.sprite.setData('unitId', unit.uniqueId);
             unit.sprite.setData('team', unit.team);
 
             unit.currentHp = unit.finalStats.hp;
@@ -98,6 +112,10 @@ export class BattleSimulatorEngine {
             const healthBar = this.vfxManager.createHealthBar(unit.sprite);
             unit.healthBar = healthBar;
 
+            // --- ✨ 이름표 생성 후 토큰 UI 생성 ---
+            this.vfxManager.createTokenDisplay(unit.sprite, nameLabel);
+
+            // 바인딩은 가장 마지막에 수행
             this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground]);
         });
     }
@@ -122,9 +140,17 @@ export class BattleSimulatorEngine {
             this.currentTurnIndex++;
             if (this.currentTurnIndex >= this.turnQueue.length) {
                 this.currentTurnIndex = 0;
+                this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
+
+                // 새로운 턴이 시작되었으므로 토큰을 지급합니다.
+                tokenEngine.addTokensForNewTurn(this.currentTurnNumber);
             }
 
-            await delayEngine.hold(1000); // 다음 턴까지 잠시 대기
+            // --- ✨ 매 행동 후 모든 유닛의 토큰 UI 업데이트 ---
+            // (spendTokens가 호출될 수 있으므로 매번 업데이트)
+            this.turnQueue.forEach(unit => this.vfxManager.updateTokenDisplay(unit.uniqueId));
+
+            await delayEngine.hold(1000);
         }
 
         if (!this.isRunning) return;

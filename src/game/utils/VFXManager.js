@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+// TokenEngine을 import하여 토큰 정보를 가져옵니다.
+import { tokenEngine } from './TokenEngine.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -9,7 +11,51 @@ export class VFXManager {
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
         this.vfxLayer = this.scene.add.layer();
         this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
+        // --- ✨ 토큰 UI를 관리할 객체 ---
+        this.tokenDisplays = new Map();
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
+    }
+
+    /**
+     * 유닛의 이름표 위에 토큰 UI를 생성합니다.
+     * @param {Phaser.GameObjects.Sprite} parentSprite - 토큰 UI가 따라다닐 유닛 스프라이트
+     * @param {Phaser.GameObjects.Text} nameLabel - 위치의 기준이 될 이름표
+     */
+    createTokenDisplay(parentSprite, nameLabel) {
+        const unitId = parentSprite.getData('unitId');
+        if (!unitId) return;
+
+        // 토큰 아이콘들을 담을 컨테이너 생성
+        const container = this.scene.add.container(nameLabel.x, nameLabel.y - 10);
+        this.vfxLayer.add(container);
+
+        const tokenImages = [];
+        for (let i = 0; i < tokenEngine.maxTokens; i++) {
+            const tokenImage = this.scene.add.image(i * 10, 0, 'token').setScale(0.5).setVisible(false);
+            container.add(tokenImage);
+            tokenImages.push(tokenImage);
+        }
+
+        // 컨테이너의 원점을 중앙 하단으로 설정하여 이름표 위에 정렬
+        container.setX(nameLabel.x - (tokenImages.length * 10 * 0.5) / 2);
+        container.setY(nameLabel.y - 12);
+
+        this.tokenDisplays.set(unitId, { container, tokenImages });
+        debugLogEngine.log('VFXManager', `유닛(ID:${unitId})의 토큰 UI 생성 완료.`);
+    }
+
+    /**
+     * 특정 유닛의 토큰 UI를 최신 상태로 업데이트합니다.
+     * @param {number} unitId - 업데이트할 유닛의 고유 ID
+     */
+    updateTokenDisplay(unitId) {
+        const display = this.tokenDisplays.get(unitId);
+        if (!display) return;
+
+        const currentTokens = tokenEngine.getTokens(unitId);
+        display.tokenImages.forEach((token, index) => {
+            token.setVisible(index < currentTokens);
+        });
     }
 
     /**
@@ -141,6 +187,8 @@ export class VFXManager {
      */
     shutdown() {
         this.vfxLayer.destroy();
+        // --- ✨ 토큰 UI 데이터 초기화 ---
+        this.tokenDisplays.clear();
         debugLogEngine.log('VFXManager', 'VFX 매니저를 종료합니다.');
     }
 }
