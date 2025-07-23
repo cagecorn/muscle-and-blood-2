@@ -86,6 +86,11 @@ export class Preloader extends Scene
         this.load.image('dungeon-scene', 'images/territory/dungeon-scene.png');
         this.load.image('cursed-forest', 'images/territory/cursed-forest.png');
         this.load.image('formation-icon', 'images/territory/formation-icon.png');
+        // --- 스킬 관리 아이콘 및 씬 배경 로드 ---
+        this.load.image('skills-icon', 'images/territory/skills-icon.png');
+        this.load.image('skills-scene-background', 'images/territory/skills-scene.png');
+        // 공통 패널 배경 이미지
+        this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');
         this.load.image('battle-stage-cursed-forest', 'images/battle/battle-stage-cursed-forest.png');
 
