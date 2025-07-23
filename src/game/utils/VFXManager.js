@@ -1,18 +1,27 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 // TokenEngine을 import하여 토큰 정보를 가져옵니다.
 import { tokenEngine } from './TokenEngine.js';
+import { IconManager } from './IconManager.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
  */
 export class VFXManager {
-    constructor(scene) {
+    constructor(scene, textEngine, bindingManager) {
         this.scene = scene;
+        this.textEngine = textEngine;
+        this.bindingManager = bindingManager;
+
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
         this.vfxLayer = this.scene.add.layer();
         this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
-        // --- ✨ 토큰 UI를 관리할 객체 ---
+
+        // --- 토큰 UI를 관리할 객체 ---
         this.tokenDisplays = new Map();
+
+        // --- 상태 아이콘 매니저 ---
+        this.iconManager = new IconManager(scene, this.vfxLayer);
+
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
 
@@ -59,6 +68,26 @@ export class VFXManager {
         display.tokenImages.forEach((token, index) => {
             token.setVisible(index < currentTokens);
         });
+    }
+
+    // 상태 효과 아이콘을 일괄 업데이트합니다.
+    updateAllStatusIcons() {
+        this.iconManager.updateAllIcons();
+    }
+
+    // 유닛의 UI 요소를 한 번에 생성하고 바인딩합니다.
+    setupUnitVFX(unit) {
+        if (!unit.sprite) return;
+
+        const color = (unit.team === 'ally') ? '#63b1ff' : '#ff6363';
+        const nameLabel = this.textEngine.createLabel(unit.sprite, unit.instanceName, color);
+        const healthBar = this.createHealthBar(unit.sprite);
+        unit.healthBar = healthBar;
+
+        const tokenContainer = this.createTokenDisplay(unit.sprite, nameLabel);
+        const iconContainer = this.iconManager.createIconDisplay(unit.sprite, healthBar);
+
+        this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground, tokenContainer, iconContainer]);
     }
 
     /**
@@ -169,6 +198,32 @@ export class VFXManager {
         debugLogEngine.log('VFXManager', `${damage} 데미지 숫자를 생성했습니다.`);
     }
 
+    // 스킬 이름을 머리 위에 표시하는 효과를 보여줍니다.
+    showSkillName(parentSprite, skillName, color = '#ffffff') {
+        const style = {
+            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontSize: '24px',
+            color: color,
+            stroke: '#000000',
+            strokeThickness: 4,
+        };
+
+        const skillText = this.scene.add.text(parentSprite.x, parentSprite.y - 40, skillName, style)
+            .setOrigin(0.5, 0.5);
+        this.vfxLayer.add(skillText);
+
+        this.scene.tweens.add({
+            targets: skillText,
+            y: skillText.y - 30,
+            alpha: 0,
+            duration: 1500,
+            ease: 'Cubic.easeOut',
+            onComplete: () => {
+                skillText.destroy();
+            }
+        });
+    }
+
     /**
      * 유닛의 체력바를 갱신합니다.
      * @param {object} healthBar - 갱신할 체력바 객체 { background, foreground }
@@ -192,6 +247,7 @@ export class VFXManager {
         this.vfxLayer.destroy();
         // --- ✨ 토큰 UI 데이터 초기화 ---
         this.tokenDisplays.clear();
+        this.iconManager.shutdown();
         debugLogEngine.log('VFXManager', 'VFX 매니저를 종료합니다.');
     }
 }

@@ -10,6 +10,7 @@ export const mercenaryData = {
             idle: 'warrior',
             attack: 'warrior-attack',
             hitted: 'warrior-hitted',
+            cast: 'warrior-cast',
         },
         description: '"그는 단 한 사람을 지키기 위해 검을 든다."',
         baseStats: {

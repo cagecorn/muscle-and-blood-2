@@ -30,7 +30,7 @@ export class BattleSimulatorEngine {
         this.animationEngine = new AnimationEngine(scene);
         this.textEngine = new OffscreenTextEngine(scene);
         this.bindingManager = new BindingManager(scene);
-        this.vfxManager = new VFXManager(scene);
+        this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
         this.terminationManager = new TerminationManager(scene);
         
         // AI 노드에 주입할 엔진 패키지
@@ -111,16 +111,7 @@ export class BattleSimulatorEngine {
                 unit.gridY = cell.row;
             }
 
-            const color = (unit.team === 'ally') ? '#63b1ff' : '#ff6363';
-            const nameLabel = this.textEngine.createLabel(unit.sprite, unit.instanceName, color);
-            const healthBar = this.vfxManager.createHealthBar(unit.sprite);
-            unit.healthBar = healthBar;
-
-            // --- ✨ 이름표 생성 후 토큰 UI 생성 ---
-            const tokenContainer = this.vfxManager.createTokenDisplay(unit.sprite, nameLabel);
-
-            // 바인딩은 가장 마지막에 수행
-            this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground, tokenContainer]);
+            this.vfxManager.setupUnitVFX(unit);
         });
     }
 
@@ -157,6 +148,7 @@ export class BattleSimulatorEngine {
                     this.vfxManager.updateTokenDisplay(unit.uniqueId);
                 }
             });
+            this.vfxManager.updateAllStatusIcons();
 
             await delayEngine.hold(1000);
         }

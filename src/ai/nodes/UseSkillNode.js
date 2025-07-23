@@ -1,11 +1,13 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
-import { skillEngine } from '../../game/utils/SkillEngine.js';
+import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
+import { spriteEngine } from '../../game/utils/SpriteEngine.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, skillEngine: se } = {}) {
         super();
+        this.vfxManager = vfxManager;
         this.animationEngine = animationEngine;
         this.delayEngine = delayEngine;
         this.skillEngine = se || skillEngine;
@@ -40,9 +42,12 @@ class UseSkillNode extends Node {
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);
 
-        if (skillData.targetType === 'self') {
-            // 자신에게 사용하는 모션이 존재한다면 여기서 처리 가능
-            // await this.animationEngine.cast(unit.sprite);
+        // 스킬 이름 표시
+        const skillColor = SKILL_TYPES[skillData.type].color;
+        this.vfxManager.showSkillName(unit.sprite, skillData.name, skillColor);
+
+        if (skillData.type === 'BUFF' || skillData.type === 'DEBUFF') {
+            spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         } else {
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
         }
@@ -55,7 +60,7 @@ class UseSkillNode extends Node {
 
         blackboard.set('currentTargetSkill', null);
 
-        await this.delayEngine.hold(200);
+        await this.delayEngine.hold(500);
 
         debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
