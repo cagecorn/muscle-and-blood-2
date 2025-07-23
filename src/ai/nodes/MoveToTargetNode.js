@@ -49,6 +49,9 @@ class MoveToTargetNode extends Node {
             finalCell.sprite = unit.sprite;
         }
 
+        // 이동 완료 플래그 설정
+        blackboard.set('hasMovedThisTurn', true);
+
         debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
     }

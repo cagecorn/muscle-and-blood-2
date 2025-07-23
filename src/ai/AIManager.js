@@ -46,6 +46,10 @@ class AIManager {
         const data = this.unitData.get(unit.uniqueId);
         if (!data) return;
 
+        // 턴 시작 시 블랙보드 플래그 초기화
+        data.behaviorTree.blackboard.set('hasMovedThisTurn', false);
+        data.behaviorTree.blackboard.set('usedSkillsThisTurn', new Set());
+
         console.group(`[AIManager] --- ${data.instance.instanceName} (ID: ${unit.uniqueId}) 턴 시작 ---`);
 
         await data.behaviorTree.execute(unit, allUnits, enemyUnits);
