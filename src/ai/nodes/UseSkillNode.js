@@ -1,6 +1,7 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { skillEngine } from '../../game/utils/SkillEngine.js';
+import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, skillEngine: se } = {}) {
@@ -29,6 +30,10 @@ class UseSkillNode extends Node {
         blackboard.set('usedSkillsThisTurn', usedSkills);
 
         await this.animationEngine.attack(unit.sprite, target.sprite);
+
+        if (skillData.effect) {
+            statusEffectManager.addEffect(target, skillData);
+        }
 
         console.log(`[AI] ${unit.instanceName}이(가) ${target.instanceName}에게 스킬 [${skillData.name}] 사용!`);
 

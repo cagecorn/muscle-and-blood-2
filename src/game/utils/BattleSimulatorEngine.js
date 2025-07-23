@@ -18,6 +18,7 @@ import { delayEngine } from './DelayEngine.js';
 // --- ✨ TokenEngine을 import 합니다. ---
 import { tokenEngine } from './TokenEngine.js';
 import { skillEngine } from './SkillEngine.js';
+import { statusEffectManager } from './StatusEffectManager.js';
 
 
 export class BattleSimulatorEngine {
@@ -145,9 +146,8 @@ export class BattleSimulatorEngine {
                 this.currentTurnIndex = 0;
                 this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
 
-                // 새로운 턴이 시작되었으므로 토큰을 1개씩 지급합니다.
+                statusEffectManager.onTurnEnd();
                 tokenEngine.addOneTokenPerTurn();
-                // 스킬 사용 기록 초기화
                 skillEngine.resetTurnActions();
             }
 
