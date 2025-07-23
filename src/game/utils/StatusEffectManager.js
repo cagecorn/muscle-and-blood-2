@@ -1,5 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { debugStatusEffectManager } from '../debug/DebugStatusEffectManager.js';
+import { statusEffects } from '../data/status-effects.js';
 
 // 효과의 종류를 명확히 구분하기 위한 상수
 export const EFFECT_TYPES = {
@@ -16,7 +17,13 @@ class StatusEffectManager {
         // key: unitId, value: Array of active effects
         this.activeEffects = new Map();
         this.nextEffectInstanceId = 1;
+        this.battleSimulator = null;
         debugLogEngine.log('StatusEffectManager', '상태 효과 매니저가 초기화되었습니다.');
+    }
+
+    /** BattleSimulatorEngine과 연동하여 유닛 검색에 사용할 참조를 설정합니다. */
+    setBattleSimulator(simulator) {
+        this.battleSimulator = simulator;
     }
 
     /**
@@ -30,6 +37,11 @@ class StatusEffectManager {
                 if (effect.duration > 0) {
                     remainingEffects.push(effect);
                 } else {
+                    const effectDefinition = statusEffects[effect.id];
+                    if (effectDefinition && effectDefinition.onRemove) {
+                        const unit = this.findUnitById(unitId);
+                        if (unit) effectDefinition.onRemove(unit);
+                    }
                     debugStatusEffectManager.logEffectExpired(unitId, effect);
                 }
             }
@@ -44,6 +56,13 @@ class StatusEffectManager {
      */
     addEffect(targetUnit, sourceSkill) {
         if (!sourceSkill.effect) return;
+        const effectId = sourceSkill.effect.id;
+        const effectDefinition = statusEffects[effectId];
+
+        if (!effectDefinition) {
+            debugLogEngine.warn('StatusEffectManager', `정의되지 않은 효과 ID: ${effectId}`);
+            return;
+        }
 
         const newEffect = {
             instanceId: this.nextEffectInstanceId++,
@@ -56,7 +75,16 @@ class StatusEffectManager {
         }
         this.activeEffects.get(targetUnit.uniqueId).push(newEffect);
 
+        if (effectDefinition.onApply) {
+            effectDefinition.onApply(targetUnit);
+        }
+
         debugStatusEffectManager.logEffectApplied(targetUnit, newEffect);
+    }
+
+    findUnitById(unitId) {
+        if (!this.battleSimulator) return null;
+        return this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId) || null;
     }
 
     /**

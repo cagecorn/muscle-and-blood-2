@@ -1,6 +1,7 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
+import { statusEffects } from '../data/status-effects.js';
 
 /**
  * 상태 효과 아이콘을 생성하고 관리하는 엔진
@@ -57,14 +58,16 @@ export class IconManager {
 
         // 활성 효과를 기반으로 아이콘을 추가하거나 업데이트합니다.
         activeEffects.forEach((effect, index) => {
+            const effectDef = statusEffects[effect.id];
             const skillData = skillCardDatabase[effect.sourceSkillName];
-            if (!skillData) return;
+            const iconKey = effectDef ? effectDef.id : (skillData ? skillData.id : null);
+            if (!iconKey) return;
 
             let iconData = display.icons.get(effect.instanceId);
 
             if (!iconData) { // 새로운 아이콘 생성
                 const iconContainer = this.scene.add.container(0, 0);
-                const icon = this.scene.add.image(0, 0, skillData.id).setScale(0.2);
+                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.2);
                 const turnText = this.scene.add.text(0, 8, effect.duration, {
                     fontSize: '12px',
                     color: '#fff',
@@ -76,6 +79,11 @@ export class IconManager {
                 display.container.add(iconContainer);
                 iconData = { icon: iconContainer, text: turnText };
                 display.icons.set(effect.instanceId, iconData);
+            } else {
+                const image = iconData.icon.list[0];
+                if (image.texture.key !== iconKey) {
+                    image.setTexture(iconKey);
+                }
             }
 
             // 턴 수 업데이트 및 위치 조정

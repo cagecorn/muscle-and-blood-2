@@ -1,6 +1,7 @@
 import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { imageSizeManager } from '../utils/ImageSizeManager.js';
+import { statusEffects } from '../data/status-effects.js';
 
 export class Preloader extends Scene
 {
@@ -102,6 +103,12 @@ export class Preloader extends Scene
 
         // --- 추가된 토큰 이미지 로드 ---
         this.load.image('token', 'images/battle/token.png');
+
+        // 상태 효과 아이콘 로드
+        Object.values(statusEffects).forEach(e => {
+            const path = e.iconPath.replace(/^assets\//, '');
+            this.load.image(e.id, path);
+        });
     }
 
     create ()
