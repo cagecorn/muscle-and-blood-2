@@ -721,14 +721,20 @@ body {
 .merc-skill-slot {
     width: 80px;
     height: 80px;
-    background-size: contain;
-    background-repeat: no-repeat;
+    background-size: cover;
     background-position: center;
+    border: 3px solid #888;
+    border-radius: 5px;
     position: relative;
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    cursor: pointer;
 }
+.merc-skill-slot.active-slot { border-color: #FF8C00; }
+.merc-skill-slot.buff-slot { border-color: #1E90FF; }
+.merc-skill-slot.debuff-slot { border-color: #DC143C; }
+.merc-skill-slot.passive-slot { border-color: #32CD32; }
 .merc-skill-slot span {
     background-color: rgba(0,0,0,0.7);
     width: 100%;
@@ -850,11 +856,6 @@ body {
     padding-top: 10px;
 }
 
-.merc-skill-slot {
-    width: 80px;
-    height: 80px; /* 정사각형 */
-    /* ... 나머지 스타일은 기존과 유사 */
-}
 
 /* --- 스킬 인벤토리 카드 --- */
 .skill-inventory-card {
@@ -862,17 +863,22 @@ body {
     height: 60px;
     background-size: cover;
     background-position: center;
-    border: 2px solid #555;
+    border: 3px solid #555;
     border-radius: 4px;
     float: left;
     margin: 4px;
     cursor: grab;
-    position: relative; /* ✨ 태그 위치 기준 */
+    position: relative;
+    box-sizing: border-box;
 }
 .skill-inventory-card:hover {
     border-color: #fff;
     transform: scale(1.05);
 }
+.skill-inventory-card.active-card { border-color: #FF8C00; }
+.skill-inventory-card.buff-card { border-color: #1E90FF; }
+.skill-inventory-card.debuff-card { border-color: #DC143C; }
+.skill-inventory-card.passive-card { border-color: #32CD32; }
 
 /* ✨ 스킬 클래스 태그 스타일 */
 .skill-class-tag {
@@ -918,3 +924,14 @@ body {
 .skill-info-large { padding: 8px; /* ... */ }
 .skill-name-large { font-size: 18px; /* ... */ }
 /* ... 나머지 툴팁 내부 스타일 ... */
+.skill-cost-container-large {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+
+.token-icon-large {
+    width: 12px;
+    height: 12px;
+}
