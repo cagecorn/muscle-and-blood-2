@@ -48,6 +48,19 @@ class TargetManager {
             .filter(enemy => enemy.currentHp > 0)
             .sort((a, b) => a.currentHp - b.currentHp)[0] || null;
     }
+
+    /**
+     * 현재 체력이 가장 높은 적을 찾습니다.
+     * @param {Array<object>} enemyList - 탐색 대상이 되는 적 유닛 목록
+     * @returns {object|null} - 찾은 적 유닛 또는 null
+     */
+    findHighestHealthEnemy(enemyList) {
+        if (!enemyList || enemyList.length === 0) return null;
+
+        return enemyList
+            .filter(enemy => enemy.currentHp > 0)
+            .sort((a, b) => b.currentHp - a.currentHp)[0] || null;
+    }
 }
 
 // 싱글턴으로 관리
