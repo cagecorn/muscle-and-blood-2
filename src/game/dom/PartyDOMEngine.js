@@ -1,5 +1,7 @@
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { statEngine } from '../utils/StatEngine.js';
+// SKILL_TYPES를 import하여 색상 정보를 사용합니다.
+import { SKILL_TYPES } from '../utils/SkillEngine.js';
 
 /**
  * 파티 관리 화면의 DOM 요소를 생성하고 관리하는 엔진
@@ -191,24 +193,31 @@ export class PartyDOMEngine {
 
         const rightSection = document.createElement('div');
         rightSection.className = 'detail-section right';
-        rightSection.innerHTML = `
+
+        let skillsHTML = `
             <div class="equipment-grid">
                 <div class="section-title">장비</div>
-                <div class="equip-slot"></div>
-                <div class="equip-slot"></div>
-                <div class="equip-slot"></div>
-                <div class="equip-slot"></div>
-                <div class="equip-slot"></div>
+                <div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div><div class="equip-slot"></div>
             </div>
             <div class="unit-skills">
                 <div class="section-title">스킬</div>
                 <div class="skill-grid">
-                    <div class="skill-slot"></div>
-                    <div class="skill-slot"></div>
-                    <div class="skill-slot"></div>
+        `;
+
+        if (unitData.skillSlots && unitData.skillSlots.length > 0) {
+            unitData.skillSlots.forEach(slotType => {
+                const typeClass = `${slotType.toLowerCase()}-slot`;
+                skillsHTML += `<div class="skill-slot ${typeClass}"></div>`;
+            });
+        } else {
+            skillsHTML += `<div class="skill-slot"></div><div class="skill-slot"></div><div class="skill-slot"></div>`;
+        }
+
+        skillsHTML += `
                 </div>
             </div>
         `;
+        rightSection.innerHTML = skillsHTML;
 
         detailContent.appendChild(leftSection);
         detailContent.appendChild(rightSection);
