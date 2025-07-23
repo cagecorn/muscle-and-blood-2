@@ -1,5 +1,6 @@
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
+import { tokenEngine } from './TokenEngine.js'; // 토큰 엔진 import
 
 // 스킬 종류와 해당 색상, 이름을 상수로 정의합니다.
 export const SKILL_TYPES = {
@@ -10,12 +11,71 @@ export const SKILL_TYPES = {
 };
 
 /**
- * 용병의 스킬 슬롯 생성 등 스킬 관련 로직을 총괄하는 엔진
+ * 용병의 스킬 사용, 우선순위 결정 등 스킬 관련 로직을 총괄하는 엔진
  */
 class SkillEngine {
     constructor() {
         this.skillTypes = Object.keys(SKILL_TYPES);
+        // ✨ 한 턴에 사용된 스킬을 추적하는 Set
+        this.usedSkillsThisTurn = new Set();
+        // ✨ 한 턴에 스킬을 사용한 횟수를 추적하는 Map
+        this.skillUsesThisTurn = new Map();
         debugLogEngine.log('SkillEngine', '스킬 엔진이 초기화되었습니다.');
+    }
+
+    /**
+     * 새로운 턴이 시작될 때 스킬 사용 기록을 초기화합니다.
+     */
+    resetTurnActions() {
+        this.usedSkillsThisTurn.clear();
+        this.skillUsesThisTurn.clear();
+        debugLogEngine.log('SkillEngine', '턴 시작, 스킬 사용 기록 초기화 완료.');
+    }
+
+    /**
+     * 용병이 특정 스킬을 사용할 수 있는지 확인합니다.
+     * @param {object} unit - 스킬을 사용하려는 유닛
+     * @param {object} skill - 사용하려는 스킬 데이터
+     * @returns {boolean} - 스킬 사용 가능 여부
+     */
+    canUseSkill(unit, skill) {
+        // 1. 토큰이 충분한가?
+        const currentTokens = tokenEngine.getTokens(unit.uniqueId);
+        if (currentTokens < skill.cost) {
+            return false;
+        }
+
+        // 2. 이번 턴에 이미 사용한 스킬인가?
+        if (this.usedSkillsThisTurn.has(skill.id)) {
+            return false;
+        }
+
+        // 3. 이번 턴에 스킬을 3번 초과하여 사용했는가?
+        const uses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
+        if (uses >= 3) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 용병이 스킬을 사용하는 것을 기록합니다.
+     * @param {object} unit - 스킬을 사용한 유닛
+     * @param {object} skill - 사용한 스킬 데이터
+     */
+    recordSkillUse(unit, skill) {
+        if (!this.canUseSkill(unit, skill)) return;
+
+        // 토큰 소모
+        tokenEngine.spendTokens(unit.uniqueId, skill.cost);
+
+        // 사용 기록
+        this.usedSkillsThisTurn.add(skill.id);
+        const currentUses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
+        this.skillUsesThisTurn.set(unit.uniqueId, currentUses + 1);
+
+        debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost} 소모).`);
     }
 
     /**
