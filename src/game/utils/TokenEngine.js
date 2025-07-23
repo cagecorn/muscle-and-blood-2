@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { debugTokenManager } from '../debug/DebugTokenManager.js';
 
 /**
  * 전투 중 유닛의 토큰(자원)을 관리하는 엔진 (싱글턴)
@@ -17,23 +18,25 @@ class TokenEngine {
     initializeUnits(units) {
         this.tokenData.clear();
         units.forEach(unit => {
-            this.tokenData.set(unit.uniqueId, { currentTokens: 0 });
+            this.tokenData.set(unit.uniqueId, {
+                currentTokens: 0,
+                unitName: unit.instanceName
+            });
         });
+        debugTokenManager.logInitialization(units.length);
         debugLogEngine.log('TokenEngine', `${units.length}명의 유닛 토큰 정보 초기화 완료.`);
     }
 
     /**
-     * 새로운 턴이 시작될 때 모든 유닛에게 토큰을 지급합니다.
-     * @param {number} turnNumber - 현재 턴 번호 (1턴부터 시작)
+     * 새로운 턴이 시작될 때 모든 유닛에게 토큰을 1개씩 지급합니다.
      */
-    addTokensForNewTurn(turnNumber) {
-        if (turnNumber <= 0) return;
-
+    addOneTokenPerTurn() {
         for (const [unitId, data] of this.tokenData.entries()) {
-            const newTokens = Math.min(this.maxTokens, data.currentTokens + turnNumber);
-            this.tokenData.set(unitId, { currentTokens: newTokens });
+            if (data.currentTokens < this.maxTokens) {
+                data.currentTokens += 1;
+                debugTokenManager.logTokenChange(unitId, data.unitName, '턴 시작', 1, data.currentTokens);
+            }
         }
-        debugLogEngine.log('TokenEngine', `${turnNumber}턴 시작: 모든 유닛에게 ${turnNumber}개의 토큰 지급 시도.`);
     }
 
     /**
@@ -46,7 +49,7 @@ class TokenEngine {
         const data = this.tokenData.get(unitId);
         if (data && data.currentTokens >= amount) {
             data.currentTokens -= amount;
-            debugLogEngine.log('TokenEngine', `유닛(ID:${unitId})이 토큰 ${amount}개를 사용. 남은 토큰: ${data.currentTokens}`);
+            debugTokenManager.logTokenChange(unitId, data.unitName, '스킬 사용', -amount, data.currentTokens);
             return true;
         }
         debugLogEngine.warn('TokenEngine', `유닛(ID:${unitId}) 토큰 부족으로 ${amount}개 사용 실패.`);
