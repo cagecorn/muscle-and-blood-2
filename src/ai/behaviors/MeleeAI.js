@@ -25,11 +25,11 @@ function createMeleeAI(engines = {}) {
             new FindPreferredTargetNode(engines),
         ]),
 
-        // [2단계] 주 행동 페이즈
+        // [2단계] 주 행동 페이즈 (✨ 원래의 범용 스킬 사용 로직으로 복원)
         new SelectorNode([
-            // (A) 제자리 스킬 사용
+            // (A) 제자리에서 사용 가능한 첫 번째 스킬 사용
             new SequenceNode([
-                new FindBestSkillNode(engines),
+                new FindBestSkillNode(engines), // 1, 2, 3순위 순서대로 체크
                 new IsSkillInRangeNode(engines),
                 new UseSkillNode(engines),
             ]),
@@ -60,7 +60,7 @@ function createMeleeAI(engines = {}) {
                 new CanExtraMoveNode(engines),
                 new SpendTokenForExtraMoveNode(engines),
                 new SelectorNode([
-                    // (A) 아직 사용 안한 다른 스킬 사용
+                    // (A) 아직 사용 안한 다른 스킬 사용 (2, 3순위 스킬)
                     new SequenceNode([
                         new FindBestSkillNode(engines),
                         new FindPathToSkillRangeNode(engines),

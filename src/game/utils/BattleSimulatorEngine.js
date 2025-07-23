@@ -59,6 +59,7 @@ export class BattleSimulatorEngine {
 
         aiManager.clear();
         cooldownManager.reset();
+        statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
@@ -122,7 +123,7 @@ export class BattleSimulatorEngine {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
-            if (currentUnit && currentUnit.currentHp > 0) {
+            if (currentUnit && currentUnit.currentHp > 0 && !currentUnit.isStunned) {
                 this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
                 await delayEngine.hold(500);
 
@@ -133,6 +134,9 @@ export class BattleSimulatorEngine {
                     await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
                 }
 
+                cooldownManager.reduceCooldowns(currentUnit.uniqueId);
+            } else if (currentUnit && currentUnit.isStunned) {
+                console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
                 cooldownManager.reduceCooldowns(currentUnit.uniqueId);
             }
 
