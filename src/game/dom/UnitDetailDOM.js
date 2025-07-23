@@ -68,13 +68,16 @@ export class UnitDetailDOM {
                 <div class="skill-grid">`;
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
-            unitData.skillSlots.forEach(slotType => {
+            unitData.skillSlots.forEach((slotType, index) => {
                 const typeClass = `${slotType.toLowerCase()}-slot`;
-                skillsHTML += `<div class="skill-slot ${typeClass}" style="background-image: url(assets/images/skills/skill-slot.png);"></div>`;
+                skillsHTML += `
+                    <div class="skill-slot ${typeClass}" style="background-image: url(assets/images/skills/skill-slot.png);">
+                        <span class="slot-rank">${index + 1} 순위</span>
+                    </div>`;
             });
         } else {
             for(let i = 0; i < 3; i++) {
-                skillsHTML += `<div class="skill-slot" style="background-image: url(assets/images/skills/skill-slot.png);"></div>`;
+                skillsHTML += `<div class="skill-slot" style="background-image: url(assets/images/skills/skill-slot.png);"><span class="slot-rank">${i + 1} 순위</span></div>`;
             }
         }
         

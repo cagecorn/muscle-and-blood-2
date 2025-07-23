@@ -443,16 +443,38 @@ body {
 .unit-skills {
     flex-grow: 1;
 }
-.skill-grid {
+.unit-skills .skill-grid {
     display: flex;
     gap: 10px;
+    margin-top: 10px;
 }
-.skill-slot {
-    flex: 1;
+.unit-skills .skill-slot {
+    width: 60px;
     height: 60px;
-    background-color: rgba(0,0,0,0.3);
-    border: 1px solid #444;
-    border-radius: 4px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border: 2px solid transparent;
+}
+.unit-skills .skill-slot.active-slot { border-color: #FF8C00; }
+.unit-skills .skill-slot.buff-slot { border-color: #1E90FF; }
+.unit-skills .skill-slot.debuff-slot { border-color: #DC143C; }
+.unit-skills .skill-slot.passive-slot { border-color: #32CD32; }
+
+.skill-slot .slot-rank {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #aaa;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 2px 5px;
+    border-radius: 3px;
 }
 
 /* --- 용병 고용 모달에 버튼 스타일 추가 --- */
@@ -628,19 +650,6 @@ body {
     pointer-events: auto;
 }
 
-/* --- 스킬 슬롯 테두리 색상 스타일 --- */
-.skill-slot.active-slot {
-    border: 3px solid #FF8C00; /* 주황색 */
-}
-.skill-slot.buff-slot {
-    border: 3px solid #1E90FF; /* 파랑색 */
-}
-.skill-slot.debuff-slot {
-    border: 3px solid #DC143C; /* 빨강색 */
-}
-.skill-slot.passive-slot {
-    border: 3px solid #32CD32; /* 초록색 */
-}
 
 /* --- 스킬 관리 씬 스타일 --- */
 #skill-management-container {
@@ -799,4 +808,22 @@ body {
 .skill-description {
     margin-top: 4px;
     flex-grow: 1;
+}
+
+/* --- 스킬 카드 추가 스타일 --- */
+.skill-card.active-card { border-top: 5px solid #FF8C00; }
+.skill-card.buff-card { border-top: 5px solid #1E90FF; }
+.skill-card.debuff-card { border-top: 5px solid #DC143C; }
+.skill-card.passive-card { border-top: 5px solid #32CD32; }
+
+.skill-cost-container {
+    display: flex;
+    align-items: center;
+    margin-top: 2px;
+}
+
+.token-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 2px;
 }
