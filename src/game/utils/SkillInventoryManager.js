@@ -3,43 +3,64 @@ import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
 
 /**
  * 플레이어가 획득한 모든 스킬 카드의 인벤토리를 관리하는 엔진
+ * 각 스킬 카드는 고유 instanceId로 관리됩니다.
  */
 class SkillInventoryManager {
     constructor() {
-        this.skillInventory = new Map();
+        /** 인벤토리 안에 있는 스킬 인스턴스 목록 */
+        this.skillInventory = [];
+        /** 모든 인스턴스의 매핑을 보존 */
+        this.instanceMap = new Map();
+        this.nextInstanceId = 1;
         debugLogEngine.log('SkillInventoryManager', '스킬 인벤토리 매니저가 초기화되었습니다.');
         this.initializeSkillCards();
     }
 
+    /**
+     * 게임 시작 시 기본 스킬 카드를 지급합니다.
+     */
     initializeSkillCards() {
-        this.addSkillCards(skillCardDatabase);
-    }
-
-    addSkillCards(skillObject) {
-        for (const skillId in skillObject) {
-            if (skillObject.hasOwnProperty(skillId)) {
-                const skillData = skillObject[skillId];
-                this.skillInventory.set(
-                    skillId,
-                    { details: skillData, count: (this.skillInventory.get(skillId)?.count || 0) + 1 }
-                );
+        for (const skillId in skillCardDatabase) {
+            if (skillCardDatabase.hasOwnProperty(skillId)) {
+                this.addSkillById(skillId);
+                this.addSkillById(skillId);
             }
         }
-        debugLogEngine.log('SkillInventoryManager', '초기 스킬 카드 로드 완료.');
+        debugLogEngine.log('SkillInventoryManager', `초기 스킬 카드 ${this.skillInventory.length}장 생성 완료.`);
     }
 
-    getInventory() {
-        return Array.from(this.skillInventory.keys()).map(id => skillCardDatabase[id]);
-    }
-    
     /**
-     * ✨ [추가] 스킬 ID로 스킬 데이터를 반환하는 헬퍼 메서드
+     * 스킬 ID를 기반으로 새로운 스킬 인스턴스를 생성해 인벤토리에 추가합니다.
+     * @param {string} skillId
      */
+    addSkillById(skillId) {
+        const instance = { instanceId: this.nextInstanceId++, skillId };
+        this.skillInventory.push(instance);
+        this.instanceMap.set(instance.instanceId, skillId);
+    }
+
+    /**
+     * 인벤토리에서 특정 인스턴스를 제거합니다.
+     * @param {number} instanceId
+     */
+    removeSkillByInstanceId(instanceId) {
+        this.skillInventory = this.skillInventory.filter(s => s.instanceId !== instanceId);
+    }
+
+    /** 현재 인벤토리에 있는 스킬 인스턴스 배열을 반환 */
+    getInventory() {
+        return this.skillInventory;
+    }
+
+    /** 스킬 ID로 스킬 데이터 조회 */
     getSkillData(skillId) {
         return skillCardDatabase[skillId];
     }
 
-    // 향후 여기에 스킬 획득/폐기/조회 관련 메서드가 추가될 것입니다.
+    /** 인스턴스 ID로 스킬 ID 조회 */
+    getSkillIdByInstance(instanceId) {
+        return this.instanceMap.get(instanceId);
+    }
 }
 
 export const skillInventoryManager = new SkillInventoryManager();

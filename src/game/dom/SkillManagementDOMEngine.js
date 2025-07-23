@@ -1,7 +1,5 @@
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
-import { SKILL_TYPES } from '../utils/SkillEngine.js';
-import { SkillCardManager } from './SkillCardManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { UnitDetailDOM } from './UnitDetailDOM.js';
@@ -17,46 +15,42 @@ export class SkillManagementDOMEngine {
             document.getElementById('app').appendChild(this.container);
         }
 
-        // ✨ 선택된 용병의 전체 데이터를 저장
         this.selectedMercenaryData = null;
+        this.draggedData = null;
 
         this.createView();
-        this.populateSkillInventory();
     }
 
     createView() {
         this.container.style.display = 'block';
         this.container.style.backgroundImage = 'url(assets/images/territory/skills-scene.png)';
 
-        // 메인 레이아웃 생성
         const mainLayout = document.createElement('div');
         mainLayout.id = 'skill-main-layout';
         this.container.appendChild(mainLayout);
-        
-        // 1. 용병 리스트 패널
+
         const listPanel = this.createPanel('skill-list-panel', '출정 용병');
         mainLayout.appendChild(listPanel);
         this.mercenaryListContent = listPanel.querySelector('.panel-content');
 
-        // 2. 용병 상세 정보 패널
         const detailsPanel = this.createPanel('skill-details-panel', '용병 스킬 슬롯');
         mainLayout.appendChild(detailsPanel);
         this.mercenaryDetailsContent = detailsPanel.querySelector('.panel-content');
 
-        // 3. 스킬 인벤토리 패널
         const inventoryPanel = this.createPanel('skill-inventory-panel', '스킬 카드 인벤토리');
         mainLayout.appendChild(inventoryPanel);
         this.skillInventoryContent = inventoryPanel.querySelector('.panel-content');
 
-        this.populateMercenaryList();
+        this.skillInventoryContent.ondragover = e => e.preventDefault();
+        this.skillInventoryContent.ondrop = e => this.onDropOnInventory(e);
 
-        // 뒤로가기 버튼 추가
+        this.populateMercenaryList();
+        this.refreshSkillInventory();
+
         const backButton = document.createElement('div');
         backButton.id = 'skill-back-button';
         backButton.innerText = '← 영지로';
-        backButton.onclick = () => {
-            this.scene.scene.start('TerritoryScene');
-        };
+        backButton.onclick = () => this.scene.scene.start('TerritoryScene');
         this.container.appendChild(backButton);
     }
 
@@ -64,16 +58,8 @@ export class SkillManagementDOMEngine {
         const panel = document.createElement('div');
         panel.id = id;
         panel.className = 'skill-panel';
-
-        const titleBar = document.createElement('div');
-        titleBar.className = 'panel-title';
-        titleBar.innerText = title;
-        panel.appendChild(titleBar);
-
-        const content = document.createElement('div');
-        content.className = 'panel-content';
-        panel.appendChild(content);
-
+        panel.appendChild(Object.assign(document.createElement('div'), { className: 'panel-title', innerText: title }));
+        panel.appendChild(Object.assign(document.createElement('div'), { className: 'panel-content' }));
         return panel;
     }
 
@@ -85,140 +71,183 @@ export class SkillManagementDOMEngine {
         partyMembers.forEach(id => {
             const merc = allMercs.find(m => m.uniqueId === id);
             if (merc) {
-                const mercItem = document.createElement('div');
-                mercItem.className = 'merc-list-item';
-                mercItem.innerText = merc.instanceName;
-                mercItem.onclick = () => this.selectMercenary(merc);
-                this.mercenaryListContent.appendChild(mercItem);
+                const item = document.createElement('div');
+                item.className = 'merc-list-item';
+                item.innerText = merc.instanceName;
+                item.dataset.mercId = merc.uniqueId;
+                item.onclick = () => this.selectMercenary(merc);
+                this.mercenaryListContent.appendChild(item);
             }
         });
+
+        if (partyMembers.length > 0) {
+            const first = allMercs.find(m => m.uniqueId === partyMembers[0]);
+            if (first) this.selectMercenary(first);
+        }
     }
 
     selectMercenary(mercData) {
-        // ✨ 선택된 용병 정보 저장
         this.selectedMercenaryData = mercData;
+
+        const selected = this.mercenaryListContent.querySelector('.selected');
+        if (selected) selected.classList.remove('selected');
+        const newSelected = this.mercenaryListContent.querySelector(`[data-merc-id='${mercData.uniqueId}']`);
+        if (newSelected) newSelected.classList.add('selected');
+
+        this.refreshMercenaryDetails();
+    }
+
+    refreshMercenaryDetails() {
+        if (!this.selectedMercenaryData) {
+            this.mercenaryDetailsContent.innerHTML = '<p>용병을 선택하세요.</p>';
+            return;
+        }
+
+        const mercData = this.selectedMercenaryData;
         this.mercenaryDetailsContent.innerHTML = '';
 
-        // --- ✨ 용병 초상화 ---
         const portrait = document.createElement('div');
         portrait.className = 'merc-portrait-small';
         portrait.style.backgroundImage = `url(${mercData.uiImage})`;
-        portrait.onclick = () => {
-            const detailView = UnitDetailDOM.create(mercData);
-            document.body.appendChild(detailView);
-        };
+        portrait.onclick = () => document.body.appendChild(UnitDetailDOM.create(mercData));
         this.mercenaryDetailsContent.appendChild(portrait);
 
         const slotsContainer = document.createElement('div');
         slotsContainer.className = 'merc-skill-slots-container';
-        
-        const equippedSkills = ownedSkillsManager.getEquippedSkills(mercData.uniqueId);
 
-        mercData.skillSlots.forEach((slotType, index) => {
-            const slot = document.createElement('div');
-            slot.className = 'merc-skill-slot';
-            slot.classList.add(`${slotType.toLowerCase()}-slot`);
-            slot.dataset.slotIndex = index;
-            slot.dataset.slotType = slotType;
+        const equipped = ownedSkillsManager.getEquippedSkills(mercData.uniqueId);
 
-            const equippedSkillId = equippedSkills[index];
-            if (equippedSkillId) {
-                const skillData = skillInventoryManager.getSkillData(equippedSkillId);
-                slot.style.backgroundImage = `url(${skillData.illustrationPath})`;
-                slot.dataset.equippedSkillId = equippedSkillId;
-                 // 마우스 이벤트 리스너 추가
-                slot.onmouseenter = (e) => SkillTooltipManager.show(equippedSkillId, e);
-                slot.onmouseleave = () => SkillTooltipManager.hide();
-            } else {
-                slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
-            }
-
-            // 드래그 앤 드롭 이벤트 리스너
-            slot.ondragover = (e) => e.preventDefault();
-            slot.ondrop = (e) => this.onDropOnSlot(e);
-
-            const rank = document.createElement('span');
-            rank.className = 'slot-rank';
-            rank.innerText = `${index + 1} \uC21C\uC704`;
-            slot.appendChild(rank);
-
+        mercData.skillSlots.forEach((slotType, idx) => {
+            const slot = this.createSkillSlotElement(slotType, idx, equipped[idx]);
             slotsContainer.appendChild(slot);
         });
-        
+
         this.mercenaryDetailsContent.appendChild(slotsContainer);
     }
 
-    createSkillInventoryGrid() {
-        this.skillInventoryContent.innerHTML = '';
-        for (let i = 0; i < 40; i++) { // 5x8 그리드
-            const cell = document.createElement('div');
-            cell.className = 'skill-inventory-cell';
-            this.skillInventoryContent.appendChild(cell);
+    createSkillSlotElement(slotType, index, instanceId) {
+        const slot = document.createElement('div');
+        slot.className = `merc-skill-slot ${slotType.toLowerCase()}-slot`;
+        slot.dataset.slotIndex = index;
+        slot.dataset.slotType = slotType;
+
+        if (instanceId) {
+            const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
+            const data = skillInventoryManager.getSkillData(skillId);
+            slot.style.backgroundImage = `url(${data.illustrationPath})`;
+            slot.dataset.instanceId = instanceId;
+            slot.draggable = true;
+            slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId, slotIndex: index });
+            slot.onmouseenter = e => SkillTooltipManager.show(skillId, e);
+            slot.onmouseleave = () => SkillTooltipManager.hide();
+        } else {
+            slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
         }
+
+        slot.ondragover = e => e.preventDefault();
+        slot.ondrop = e => this.onDropOnSlot(e);
+
+        const rank = document.createElement('span');
+        rank.innerText = `${index + 1} 순위`;
+        slot.appendChild(rank);
+
+        return slot;
     }
 
-    populateSkillInventory() {
+    refreshSkillInventory() {
         this.skillInventoryContent.innerHTML = '';
-        const inventory = skillInventoryManager.getInventory();
-        inventory.forEach(skill => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'skill-inventory-card';
-            cardElement.style.backgroundImage = `url(${skill.illustrationPath})`;
-            cardElement.draggable = true;
-            cardElement.dataset.skillId = skill.id;
-            
-            // 이벤트 리스너 추가
-            cardElement.ondragstart = (e) => e.dataTransfer.setData('skillId', skill.id);
-            cardElement.onmouseenter = (e) => SkillTooltipManager.show(skill.id, e);
-            cardElement.onmouseleave = () => SkillTooltipManager.hide();
+        skillInventoryManager.getInventory().forEach(instance => {
+            const data = skillInventoryManager.getSkillData(instance.skillId);
+            const card = document.createElement('div');
+            card.className = `skill-inventory-card ${data.type.toLowerCase()}-card`;
+            card.style.backgroundImage = `url(${data.illustrationPath})`;
+            card.draggable = true;
+            card.dataset.instanceId = instance.instanceId;
+            card.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: instance.instanceId });
+            card.onmouseenter = e => SkillTooltipManager.show(instance.skillId, e);
+            card.onmouseleave = () => SkillTooltipManager.hide();
 
-            // ✨ 클래스 전용 태그 추가
-            if (skill.requiredClass) {
+            if (data.requiredClass) {
                 const tag = document.createElement('div');
                 tag.className = 'skill-class-tag';
-                const className = skill.requiredClass === 'warrior' ? '전사' : skill.requiredClass;
-                tag.textContent = `[${className}]`;
-                cardElement.appendChild(tag);
+                const className = data.requiredClass === 'warrior' ? '전사' : data.requiredClass;
+                tag.innerText = `[${className}]`;
+                card.appendChild(tag);
             }
-
-            this.skillInventoryContent.appendChild(cardElement);
+            this.skillInventoryContent.appendChild(card);
         });
+    }
+
+    onDragStart(event, data) {
+        this.draggedData = data;
+        event.dataTransfer.setData('text/plain', data.instanceId);
     }
 
     onDropOnSlot(event) {
         event.preventDefault();
-        const skillId = event.dataTransfer.getData('skillId');
-        const skillData = skillInventoryManager.getSkillData(skillId);
-        const slot = event.currentTarget;
-        const slotType = slot.dataset.slotType;
+        if (!this.selectedMercenaryData || !this.draggedData) return;
 
-        if (!this.selectedMercenaryData) {
-            console.warn("스킬을 장착할 용병을 먼저 선택해주세요.");
+        const targetSlot = event.currentTarget;
+        const targetSlotIndex = parseInt(targetSlot.dataset.slotIndex);
+        const targetSlotType = targetSlot.dataset.slotType;
+        const targetInstanceId = targetSlot.dataset.instanceId ? parseInt(targetSlot.dataset.instanceId) : null;
+
+        const unitId = this.selectedMercenaryData.uniqueId;
+        const draggedInstanceId = this.draggedData.instanceId;
+        const draggedSkillId = skillInventoryManager.getSkillIdByInstance(draggedInstanceId);
+        const draggedSkillData = skillInventoryManager.getSkillData(draggedSkillId);
+
+        if (draggedSkillData.requiredClass && this.selectedMercenaryData.id !== draggedSkillData.requiredClass) {
+            alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
+            return;
+        }
+        if (draggedSkillData.type !== targetSlotType) {
+            alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
             return;
         }
 
-        // ✨ 클래스 요구사항 확인
-        if (skillData.requiredClass && this.selectedMercenaryData.id !== skillData.requiredClass) {
-            alert(`[${skillData.name}] 스킬은 [${skillData.requiredClass}] 클래스 전용입니다.`);
-            return;
+        if (this.draggedData.source === 'inventory') {
+            ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
+            skillInventoryManager.removeSkillByInstanceId(draggedInstanceId);
+            if (targetInstanceId) {
+                ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
+                this.addSkillToInventory(targetInstanceId);
+            }
+        } else if (this.draggedData.source === 'slot') {
+            const sourceSlotIndex = this.draggedData.slotIndex;
+            ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
+            ownedSkillsManager.equipSkill(unitId, sourceSlotIndex, targetInstanceId);
         }
 
-        // 스킬 타입이 슬롯 타입과 맞는지 확인
-        if (skillData && skillData.type === slotType) {
-            const unitId = this.selectedMercenaryData.uniqueId;
-            const slotIndex = parseInt(slot.dataset.slotIndex);
-            
-            // 스킬 장착 및 UI 업데이트
-            ownedSkillsManager.equipSkill(unitId, slotIndex, skillId);
-            slot.style.backgroundImage = `url(${skillData.illustrationPath})`;
-            slot.dataset.equippedSkillId = skillId; // 새로 장착된 스킬 ID 저장
+        this.refreshAll();
+    }
 
-            // 툴팁 이벤트 재설정
-            slot.onmouseenter = (e) => SkillTooltipManager.show(skillId, e);
-            slot.onmouseleave = () => SkillTooltipManager.hide();
-        } else {
-            console.warn("스킬과 슬롯의 타입이 일치하지 않습니다.");
+    onDropOnInventory(event) {
+        event.preventDefault();
+        if (!this.selectedMercenaryData || !this.draggedData || this.draggedData.source !== 'slot') return;
+
+        const unitId = this.selectedMercenaryData.uniqueId;
+        const sourceSlotIndex = this.draggedData.slotIndex;
+        const instanceId = this.draggedData.instanceId;
+
+        ownedSkillsManager.unequipSkill(unitId, sourceSlotIndex);
+        this.addSkillToInventory(instanceId);
+
+        this.refreshAll();
+    }
+
+    addSkillToInventory(instanceId) {
+        const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
+        if (skillId) {
+            skillInventoryManager.skillInventory.push({ instanceId, skillId });
+            skillInventoryManager.skillInventory.sort((a, b) => a.instanceId - b.instanceId);
         }
+    }
+
+    refreshAll() {
+        this.refreshMercenaryDetails();
+        this.refreshSkillInventory();
+        this.draggedData = null;
     }
 
     destroy() {

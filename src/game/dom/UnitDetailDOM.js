@@ -76,10 +76,11 @@ export class UnitDetailDOM {
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
                 const typeClass = `${slotType.toLowerCase()}-slot`;
-                const equippedSkillId = equippedSkills[index];
+                const instanceId = equippedSkills[index];
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
-                if (equippedSkillId) {
-                    const skillData = skillInventoryManager.getSkillData(equippedSkillId);
+                if (instanceId) {
+                    const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
+                    const skillData = skillInventoryManager.getSkillData(skillId);
                     if (skillData) bgImage = `url(${skillData.illustrationPath})`;
                 }
                 skillsHTML += `
