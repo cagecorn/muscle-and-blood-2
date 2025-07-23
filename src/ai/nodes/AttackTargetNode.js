@@ -43,7 +43,8 @@ class AttackTargetNode extends Node {
         spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
 
         // 데미지 계산 및 적용
-        const damage = this.combatEngine.calculateDamage(unit, target);
+        // ✨ 데미지 계산 시 스킬 정보 전달
+        const damage = this.combatEngine.calculateDamage(unit, target, attackSkill);
         target.currentHp -= damage;
 
         // 시각 효과

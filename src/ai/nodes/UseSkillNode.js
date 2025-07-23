@@ -3,6 +3,8 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
+// ✨ CombatCalculationEngine import
+import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngine.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, skillEngine: se } = {}) {
@@ -11,6 +13,8 @@ class UseSkillNode extends Node {
         this.animationEngine = animationEngine;
         this.delayEngine = delayEngine;
         this.skillEngine = se || skillEngine;
+        // ✨ combatCalculationEngine 추가
+        this.combatEngine = combatCalculationEngine;
     }
 
     async evaluate(unit, blackboard) {
@@ -30,14 +34,24 @@ class UseSkillNode extends Node {
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);
 
-        // 스킬 이름 표시
         const skillColor = SKILL_TYPES[skillData.type].color;
         this.vfxManager.showSkillName(unit.sprite, skillData.name, skillColor);
 
-        if (skillData.type === 'BUFF' || skillData.type === 'DEBUFF') {
-            spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
-        } else {
+        // ✨ 스킬 애니메이션 및 효과 적용 로직 수정
+        if (skillData.type === 'ACTIVE') {
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
+            const damage = this.combatEngine.calculateDamage(unit, skillTarget, skillData);
+            skillTarget.currentHp -= damage;
+
+            this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
+            this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
+            this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
+
+            if (skillTarget.currentHp <= 0) {
+                this.terminationManager.handleUnitDeath(skillTarget);
+            }
+        } else {
+            spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 
         if (skillData.effect) {

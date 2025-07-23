@@ -21,11 +21,11 @@ export const activeSkills = {
         type: 'ACTIVE',
         cost: 2,
         // 적에게 돌진하여 데미지를 주고 2턴간 기절시키는 스킬
-        description: '적에게 돌진하여 120%의 데미지를 주고 2턴간 기절시킵니다. (쿨타임 2턴)',
+        description: '적을 120%의 데미지로 공격하고, 2턴간 기절 시킵니다. (쿨타임 3턴)',
         illustrationPath: 'assets/images/skills/charge.png',
         requiredClass: 'warrior',
         damageMultiplier: 1.2,
-        cooldown: 2,
+        cooldown: 3,
         range: 1,
         effect: {
             type: EFFECT_TYPES.STATUS_EFFECT,
