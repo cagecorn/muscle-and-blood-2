@@ -20,28 +20,31 @@ export class VFXManager {
      * 유닛의 이름표 위에 토큰 UI를 생성합니다.
      * @param {Phaser.GameObjects.Sprite} parentSprite - 토큰 UI가 따라다닐 유닛 스프라이트
      * @param {Phaser.GameObjects.Text} nameLabel - 위치의 기준이 될 이름표
+     * @returns {Phaser.GameObjects.Container} 생성된 토큰 컨테이너 (바인딩용)
      */
     createTokenDisplay(parentSprite, nameLabel) {
         const unitId = parentSprite.getData('unitId');
-        if (!unitId) return;
+        if (!unitId) return null;
 
-        // 토큰 아이콘들을 담을 컨테이너 생성
-        const container = this.scene.add.container(nameLabel.x, nameLabel.y - 10);
+        const container = this.scene.add.container(nameLabel.x, nameLabel.y - 12);
         this.vfxLayer.add(container);
 
         const tokenImages = [];
+        const tokenSpacing = 8;
+        const tokenScale = 0.05;
+
         for (let i = 0; i < tokenEngine.maxTokens; i++) {
-            const tokenImage = this.scene.add.image(i * 10, 0, 'token').setScale(0.5).setVisible(false);
+            const tokenImage = this.scene.add.image(i * tokenSpacing, 0, 'token').setScale(tokenScale).setVisible(false);
             container.add(tokenImage);
             tokenImages.push(tokenImage);
         }
 
-        // 컨테이너의 원점을 중앙 하단으로 설정하여 이름표 위에 정렬
-        container.setX(nameLabel.x - (tokenImages.length * 10 * 0.5) / 2);
-        container.setY(nameLabel.y - 12);
+        const totalWidth = (tokenEngine.maxTokens - 1) * tokenSpacing;
+        container.setX(nameLabel.x - totalWidth / 2);
 
         this.tokenDisplays.set(unitId, { container, tokenImages });
-        debugLogEngine.log('VFXManager', `유닛(ID:${unitId})의 토큰 UI 생성 완료.`);
+
+        return container;
     }
 
     /**
