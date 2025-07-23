@@ -15,10 +15,13 @@ class DebugSkillManager {
         
         const styledSlots = skillSlots.map(slotKey => {
             const skillInfo = SKILL_TYPES[slotKey];
-            return `%c${skillInfo.name}`;
+            return skillInfo ? `%c${skillInfo.name}` : '%c비어 있음';
         }).join(' - ');
 
-        const styles = skillSlots.map(slotKey => `color: ${SKILL_TYPES[slotKey].color}; font-weight: bold;`);
+        const styles = skillSlots.map(slotKey => {
+            const skillInfo = SKILL_TYPES[slotKey];
+            return skillInfo ? `color: ${skillInfo.color}; font-weight: bold;` : 'color: #9ca3af; font-style: italic;';
+        });
         
         console.log(styledSlots, ...styles);
         console.groupEnd();
