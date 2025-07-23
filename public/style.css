@@ -627,3 +627,17 @@ body {
     cursor: pointer;
     pointer-events: auto;
 }
+
+/* --- 스킬 슬롯 테두리 색상 스타일 --- */
+.skill-slot.active-slot {
+    border: 3px solid #FF8C00; /* 주황색 */
+}
+.skill-slot.buff-slot {
+    border: 3px solid #1E90FF; /* 파랑색 */
+}
+.skill-slot.debuff-slot {
+    border: 3px solid #DC143C; /* 빨강색 */
+}
+.skill-slot.passive-slot {
+    border: 3px solid #32CD32; /* 초록색 */
+}

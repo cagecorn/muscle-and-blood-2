@@ -3,6 +3,8 @@ import { birthReportManager } from '../debug/BirthReportManager.js';
 // PartyEngine을 불러옵니다.
 import { partyEngine } from './PartyEngine.js';
 import { uniqueIDManager } from './UniqueIDManager.js';
+// 스킬 엔진을 불러옵니다.
+import { skillEngine } from './SkillEngine.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -31,7 +33,9 @@ class MercenaryEngine {
             instanceName: randomName,
             level: 1,
             exp: 0,
-            equippedItems: []
+            equippedItems: [],
+            // 무작위 스킬 슬롯을 생성하여 저장합니다.
+            skillSlots: skillEngine.generateRandomSkillSlots()
         };
         
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
