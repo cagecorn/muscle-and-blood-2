@@ -53,11 +53,8 @@ class SkillEngine {
             return false;
         }
 
-        // 3. 이번 턴에 스킬을 3번 초과하여 사용했는가?
-        const uses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
-        if (uses >= 3) {
-            return false;
-        }
+        // 3. 이번 턴에 다른 스킬을 이미 사용했더라도 토큰이 남아 있다면 추가 행동이 가능하다
+        //    단, 같은 스킬은 한 번만 사용할 수 있도록 위에서 체크했다.
 
         // 4. 쿨타임이 지났는가?
         if (!cooldownManager.isReady(unit.uniqueId, skill.id)) {

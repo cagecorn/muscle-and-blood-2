@@ -1,7 +1,7 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
-import { skillEngine } from '../../game/utils/SkillEngine.js';
+import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { skillCardDatabase } from '../../game/data/skills/SkillCardDatabase.js';
 
 class AttackTargetNode extends Node {
@@ -29,6 +29,10 @@ class AttackTargetNode extends Node {
             return NodeState.FAILURE;
         }
         skillEngine.recordSkillUse(unit, attackSkill);
+
+        // 스킬 이름을 보여줍니다.
+        const skillColor = SKILL_TYPES[attackSkill.type].color;
+        this.vfxManager.showSkillName(unit.sprite, attackSkill.name, skillColor);
 
         // 공격 스프라이트로 일시 변경
         if (unit.sprite.scene && !spriteEngine.scene) {
@@ -60,6 +64,8 @@ class AttackTargetNode extends Node {
             this.terminationManager.handleUnitDeath(target);
             blackboard.set('currentTargetUnit', null); // 타겟이 죽었으므로 초기화
         }
+
+        console.log(`[AI] ${unit.instanceName}이(가) ${target.instanceName}에게 스킬 [${attackSkill.name}] 사용!`);
 
         debugAIManager.logNodeResult(NodeState.SUCCESS);
         return NodeState.SUCCESS;
