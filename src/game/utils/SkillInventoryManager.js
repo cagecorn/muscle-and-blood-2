@@ -29,6 +29,8 @@ class SkillInventoryManager {
                 this.addSkillById('stoneSkin', grade);
                 this.addSkillById('shieldBreak', grade);
                 this.addSkillById('ironWill', grade);
+                // ✨ 넉백샷 카드 추가
+                this.addSkillById('knockbackShot', grade);
             }
         });
 

@@ -171,11 +171,10 @@ class FormationEngine {
      * @param {object} unit - 이동할 유닛 객체 (gridX, gridY, sprite 포함)
      * @param {object} newGridPos - 새로운 그리드 좌표 { col, row }
      * @param {AnimationEngine} animationEngine - 애니메이션을 실행할 엔진
-     * @param {BindingManager} bindingManager - 바인딩된 요소들을 함께 움직일 매니저
      * @param {number} duration - 이동 시간 (밀리초)
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>} - 이동 성공 여부
      */
-    async moveUnitOnGrid(unit, newGridPos, animationEngine, bindingManager, duration = 500) {
+    async moveUnitOnGrid(unit, newGridPos, animationEngine, duration = 500) {
         if (!this.grid || !unit || !unit.sprite) return false;
 
         const targetCell = this.grid.getCell(newGridPos.col, newGridPos.row);
@@ -201,6 +200,49 @@ class FormationEngine {
 
         debugLogEngine.log('FormationEngine', `유닛을 (${newGridPos.col}, ${newGridPos.row})로 이동 완료.`);
         return true;
+    }
+
+    /**
+     * 특정 유닛을 공격자로부터 멀어지는 방향으로 밀어냅니다.
+     * @param {object} targetUnit - 밀려날 대상 유닛
+     * @param {object} attackerUnit - 공격자 유닛 (방향 기준)
+     * @param {number} distance - 밀려날 거리 (칸 수)
+     * @param {AnimationEngine} animationEngine - 애니메이션 엔진
+     * @returns {Promise<void>}
+     */
+    async pushUnit(targetUnit, attackerUnit, distance, animationEngine) {
+        if (!targetUnit || !attackerUnit) return;
+
+        const dx = targetUnit.gridX - attackerUnit.gridX;
+        const dy = targetUnit.gridY - attackerUnit.gridY;
+
+        let pushDir = { col: 0, row: 0 };
+        if (Math.abs(dx) > Math.abs(dy)) {
+            pushDir.col = Math.sign(dx);
+        } else {
+            pushDir.row = Math.sign(dy);
+        }
+
+        let currentPos = { col: targetUnit.gridX, row: targetUnit.gridY };
+        for (let i = 0; i < distance; i++) {
+            const nextPos = {
+                col: currentPos.col + pushDir.col,
+                row: currentPos.row + pushDir.row
+            };
+
+            const targetCell = this.grid.getCell(nextPos.col, nextPos.row);
+            if (targetCell && !targetCell.isOccupied) {
+                const success = await this.moveUnitOnGrid(targetUnit, nextPos, animationEngine, 200);
+                if (success) {
+                    currentPos = nextPos;
+                } else {
+                    break;
+                }
+            } else {
+                debugLogEngine.log('FormationEngine', `넉백 실패: 목표 지점(${nextPos.col}, ${nextPos.row})이 막혀있습니다.`);
+                break;
+            }
+        }
     }
 }
 

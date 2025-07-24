@@ -125,4 +125,58 @@ export const activeSkills = {
             },
         }
     },
+    knockbackShot: {
+        NORMAL: {
+            id: 'knockbackShot',
+            name: '넉백샷',
+            type: 'ACTIVE',
+            cost: 2,
+            description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 2턴)',
+            illustrationPath: 'assets/images/skills/knock-back-shot.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 0.8,
+            cooldown: 2,
+            range: 3,
+            push: 1
+        },
+        RARE: {
+            id: 'knockbackShot',
+            name: '넉백샷 [R]',
+            type: 'ACTIVE',
+            cost: 2,
+            description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 1턴)',
+            illustrationPath: 'assets/images/skills/knock-back-shot.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 0.8,
+            cooldown: 1,
+            range: 3,
+            push: 1
+        },
+        EPIC: {
+            id: 'knockbackShot',
+            name: '넉백샷 [E]',
+            type: 'ACTIVE',
+            cost: 1,
+            description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 1턴)',
+            illustrationPath: 'assets/images/skills/knock-back-shot.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 0.8,
+            cooldown: 1,
+            range: 3,
+            push: 1
+        },
+        LEGENDARY: {
+            id: 'knockbackShot',
+            name: '넉백샷 [L]',
+            type: 'ACTIVE',
+            cost: 1,
+            description: '적에게 {{damage}}% 데미지를 주고 뒤로 2칸 밀쳐냅니다. (쿨타임 1턴)',
+            illustrationPath: 'assets/images/skills/knock-back-shot.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 0.8,
+            cooldown: 1,
+            range: 3,
+            push: 2
+        }
+    }
 };
