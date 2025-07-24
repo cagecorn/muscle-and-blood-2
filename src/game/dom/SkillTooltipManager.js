@@ -14,8 +14,9 @@ export class SkillTooltipManager {
         tooltip.className = `skill-card-large ${skillData.type.toLowerCase()}-card grade-${grade.toLowerCase()}`;
         
         let description = skillData.description;
+        // skillData.damageMultiplier가 존재하면 '{{damage}}%' 자리만 실제 숫자로 교체
         if (skillData.damageMultiplier) {
-            description = description.replace(/\d+%/g, `${Math.round(skillData.damageMultiplier * 100)}%`);
+            description = description.replace('{{damage}}%', `${Math.round(skillData.damageMultiplier * 100)}%`);
         }
 
         tooltip.innerHTML = `
