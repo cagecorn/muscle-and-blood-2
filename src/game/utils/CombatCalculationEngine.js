@@ -42,7 +42,13 @@ class CombatCalculationEngine {
 
         if (damageReductionPercent > 0 || damageIncreasePercent > 0) {
             const effects = (statusEffectManager.activeEffects.get(defender.uniqueId) || [])
-                .filter(e => e.modifiers && (e.modifiers.stat === 'damageReduction' || e.modifiers.stat === 'damageIncrease'));
+                .filter(e => {
+                    if (!e.modifiers) return false;
+                    if (Array.isArray(e.modifiers)) {
+                        return e.modifiers.some(m => m.stat === 'damageReduction' || m.stat === 'damageIncrease');
+                    }
+                    return e.modifiers.stat === 'damageReduction' || e.modifiers.stat === 'damageIncrease';
+                });
             debugStatusEffectManager.logDamageModification(defender, initialDamage, finalDamage, effects);
         }
 
