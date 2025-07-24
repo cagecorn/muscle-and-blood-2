@@ -10,7 +10,7 @@ class FindTargetBySkillTypeNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const skillData = blackboard.get('currentSkillData');
-        const enemyUnits = blackboard.get('enemyUnits');
+        const enemyUnits = blackboard.get('enemyUnits')?.filter(e => e.currentHp > 0);
 
         if (!skillData || !enemyUnits || enemyUnits.length === 0) {
             debugAIManager.logNodeResult(NodeState.FAILURE, "스킬 데이터 또는 적 유닛 없음");
@@ -20,7 +20,16 @@ class FindTargetBySkillTypeNode extends Node {
         let target = null;
         switch (skillData.type) {
             case 'ACTIVE':
-                target = this.targetManager.findLowestHealthEnemy(enemyUnits);
+                const skillRange = skillData.range || unit.finalStats.attackRange || 1;
+                const inRangeEnemies = enemyUnits.filter(e =>
+                    Math.abs(unit.gridX - e.gridX) + Math.abs(unit.gridY - e.gridY) <= skillRange
+                );
+
+                if (inRangeEnemies.length > 0) {
+                    target = inRangeEnemies.sort((a, b) => a.currentHp - b.currentHp)[0];
+                } else {
+                    target = this.targetManager.findNearestEnemy(unit, enemyUnits);
+                }
                 break;
             case 'DEBUFF':
                 target = this.targetManager.findHighestHealthEnemy(enemyUnits);
