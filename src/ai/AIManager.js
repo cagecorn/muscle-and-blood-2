@@ -58,18 +58,14 @@ class AIManager {
         while (tokenEngine.getTokens(unit.uniqueId) > 0) {
             const prevTokens = tokenEngine.getTokens(unit.uniqueId);
             const prevSkillCount = data.behaviorTree.blackboard.get('usedSkillsThisTurn').size;
-            const prevMoved = data.behaviorTree.blackboard.get('hasMovedThisTurn');
 
             await data.behaviorTree.execute(unit, allUnits, enemyUnits);
 
             const tokensAfter = tokenEngine.getTokens(unit.uniqueId);
             const skillsAfter = data.behaviorTree.blackboard.get('usedSkillsThisTurn').size;
-            const movedAfter = data.behaviorTree.blackboard.get('hasMovedThisTurn');
 
-            // 토큰, 스킬 사용, 이동 중 아무 변화도 없었다면 더 이상 할 행동이 없다고 판단
-            if (tokensAfter === prevTokens &&
-                skillsAfter === prevSkillCount &&
-                movedAfter === prevMoved) {
+            // 행동 결과 토큰 소모나 스킬 사용이 없었다면 더 이상 할 수 있는 행동이 없다고 판단
+            if (tokensAfter === prevTokens && skillsAfter === prevSkillCount) {
                 break;
             }
 
