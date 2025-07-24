@@ -997,6 +997,7 @@ body {
 }
 
 /* --- 전투 중 활성 유닛 UI --- */
+/* --- 전투 중 활성 유닛 UI (수정) --- */
 #combat-ui-container {
     position: absolute;
     bottom: 20px;
@@ -1019,11 +1020,13 @@ body {
 
 .combat-info-panel {
     height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: flex-start;
     color: #e0e0e0;
     font-family: sans-serif;
+    gap: 8px; /* 요소간 간격 추가 */
 }
 
 .unit-name-level {
@@ -1033,21 +1036,69 @@ body {
 }
 
 .unit-stats {
-    font-size: 18px;
+    font-size: 16px;
     color: #f0e68c;
 }
+
+/* 체력바 스타일 */
+.combat-health-bar-container {
+    width: 100%;
+    height: 10px;
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+}
+
+.combat-health-bar {
+    height: 100%;
+    background-color: #22c55e; /* 녹색 */
+    border-radius: 4px;
+    transition: width 0.2s ease-in-out;
+}
+
+/* 토큰 컨테이너 스타일 */
+.combat-token-container {
+    display: flex;
+    gap: 4px;
+}
+
+.combat-token-icon {
+    width: 20px;
+    height: 20px;
+}
+
 
 .unit-effects {
     display: flex;
     gap: 8px;
     align-items: center;
+    margin-top: auto; /* info-panel 하단에 붙도록 */
+}
+
+.effect-icon-wrapper {
+    position: relative;
+    width: 32px;
+    height: 32px;
 }
 
 .effect-icon {
-    width: 32px;
-    height: 32px;
+    width: 100%;
+    height: 100%;
     border: 1px solid #666;
     border-radius: 4px;
+}
+
+.effect-duration {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background-color: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 3px;
+    line-height: 1;
 }
 
 .combat-portrait-panel {
@@ -1057,6 +1108,7 @@ body {
     background-position: center;
     border: 2px solid #888;
     border-radius: 5px;
-    /* 1/4 크기로 보이도록 background-size 조정 (원본 400px 가정) */
     background-size: 200%; 
+    margin-left: 20px; /* 좌측 패널과의 간격 */
 }
+

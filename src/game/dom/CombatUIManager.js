@@ -36,13 +36,36 @@ export class CombatUIManager {
 
         const name = `${unit.instanceName} - Lv. ${unit.level}`;
         const hp = `체력: ${Math.max(0, unit.currentHp)} / ${unit.finalStats.hp}`;
-        const tokens = `토큰: ${tokenEngine.getTokens(unit.uniqueId)}`;
+        
+        // 체력바
+        const healthBarContainer = document.createElement('div');
+        healthBarContainer.className = 'combat-health-bar-container';
+        const healthBar = document.createElement('div');
+        healthBar.className = 'combat-health-bar';
+        const healthPercentage = (unit.currentHp / unit.finalStats.hp) * 100;
+        healthBar.style.width = `${Math.max(0, healthPercentage)}%`;
+        healthBarContainer.appendChild(healthBar);
 
         infoPanel.innerHTML = `
             <div class="unit-name-level">${name}</div>
-            <div class="unit-stats">${hp} | ${tokens}</div>
-            <div class="unit-effects"></div>
+            <div class="unit-stats">${hp}</div>
         `;
+        infoPanel.appendChild(healthBarContainer);
+
+        // 토큰
+        const tokenContainer = document.createElement('div');
+        tokenContainer.className = 'combat-token-container';
+        const currentTokens = tokenEngine.getTokens(unit.uniqueId);
+        for(let i = 0; i < currentTokens; i++) {
+            const tokenImg = document.createElement('img');
+            tokenImg.src = 'assets/images/battle/token.png';
+            tokenImg.className = 'combat-token-icon';
+            tokenContainer.appendChild(tokenImg);
+        }
+        infoPanel.appendChild(tokenContainer);
+
+        infoPanel.innerHTML += `<div class="unit-effects"></div>`;
+
 
         // 2. 오른쪽 초상화 패널
         const portraitPanel = document.createElement('div');
@@ -50,7 +73,6 @@ export class CombatUIManager {
         if (unit.uiImage) {
             portraitPanel.style.backgroundImage = `url(${unit.uiImage})`;
         } else {
-            // 좀비 등 초상화가 없을 경우 Placeholder
             portraitPanel.innerText = '?';
             portraitPanel.style.backgroundColor = '#333';
             portraitPanel.style.textAlign = 'center';
@@ -87,7 +109,11 @@ export class CombatUIManager {
         activeEffects.forEach(effect => {
             const effectDef = statusEffects[effect.id];
             if (effectDef) {
-                const icon = this.createEffectIcon(effectDef.iconPath, `${effectDef.name} (${effect.duration}턴 남음)`);
+                const icon = this.createEffectIcon(
+                    effectDef.iconPath, 
+                    `${effectDef.name} (${effect.duration}턴 남음)`,
+                    effect.duration
+                );
                 effectsContainer.appendChild(icon);
             }
         });
@@ -105,12 +131,23 @@ export class CombatUIManager {
         });
     }
 
-    createEffectIcon(path, tooltipText) {
+    createEffectIcon(path, tooltipText, duration = null) {
+        const iconWrapper = document.createElement('div');
+        iconWrapper.className = 'effect-icon-wrapper';
+        iconWrapper.title = tooltipText; 
+
         const icon = document.createElement('img');
         icon.className = 'effect-icon';
         icon.src = path;
-        icon.title = tooltipText; // 마우스 오버 시 간단한 설명 표시
-        return icon;
+        iconWrapper.appendChild(icon);
+
+        if (duration !== null) {
+            const durationText = document.createElement('span');
+            durationText.className = 'effect-duration';
+            durationText.innerText = duration;
+            iconWrapper.appendChild(durationText);
+        }
+        return iconWrapper;
     }
 
     /**

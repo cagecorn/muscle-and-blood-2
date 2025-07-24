@@ -1,7 +1,4 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-// TokenEngine을 import하여 토큰 정보를 가져옵니다.
-import { tokenEngine } from './TokenEngine.js';
-import { IconManager } from './IconManager.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -16,114 +13,17 @@ export class VFXManager {
         this.vfxLayer = this.scene.add.layer();
         this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
 
-        // --- 토큰 UI를 관리할 객체 ---
-        this.tokenDisplays = new Map();
-
-        // --- 상태 아이콘 매니저 ---
-        this.iconManager = new IconManager(scene, this.vfxLayer);
-
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
-
     /**
-     * 유닛의 이름표 위에 토큰 UI를 생성합니다.
-     * @param {Phaser.GameObjects.Sprite} parentSprite - 토큰 UI가 따라다닐 유닛 스프라이트
-     * @param {Phaser.GameObjects.Text} nameLabel - 위치의 기준이 될 이름표
-     * @returns {Phaser.GameObjects.Container} 생성된 토큰 컨테이너 (바인딩용)
+     * 유닛의 UI 요소 생성은 CombatUIManager에서 처리합니다.
+     * 현재 이 메서드는 플로팅 텍스트 등을 필요 시 직접 생성하도록 비워둡니다.
      */
-    createTokenDisplay(parentSprite, nameLabel) {
-        const unitId = parentSprite.getData('unitId');
-        if (!unitId) return null;
-
-        const container = this.scene.add.container(nameLabel.x, nameLabel.y - 12);
-        this.vfxLayer.add(container);
-
-        const tokenImages = [];
-        const tokenSpacing = 8;
-        const tokenScale = 0.05;
-
-        for (let i = 0; i < tokenEngine.maxTokens; i++) {
-            const tokenImage = this.scene.add.image(i * tokenSpacing, 0, 'token').setScale(tokenScale).setVisible(false);
-            container.add(tokenImage);
-            tokenImages.push(tokenImage);
-        }
-
-        const totalWidth = (tokenEngine.maxTokens - 1) * tokenSpacing;
-        container.setX(nameLabel.x - totalWidth / 2);
-
-        this.tokenDisplays.set(unitId, { container, tokenImages });
-
-        return container;
-    }
-
-    /**
-     * 특정 유닛의 토큰 UI를 최신 상태로 업데이트합니다.
-     * @param {number} unitId - 업데이트할 유닛의 고유 ID
-     */
-    updateTokenDisplay(unitId) {
-        const display = this.tokenDisplays.get(unitId);
-        if (!display) return;
-
-        const currentTokens = tokenEngine.getTokens(unitId);
-        display.tokenImages.forEach((token, index) => {
-            token.setVisible(index < currentTokens);
-        });
-    }
-
-    // 상태 효과 아이콘을 일괄 업데이트합니다.
-    updateAllStatusIcons() {
-        this.iconManager.updateAllIcons();
-    }
-
-    // 유닛의 UI 요소를 한 번에 생성하고 바인딩합니다.
     setupUnitVFX(unit) {
-        if (!unit.sprite) return;
-
-        const color = (unit.team === 'ally') ? '#63b1ff' : '#ff6363';
-        const nameLabel = this.textEngine.createLabel(unit.sprite, unit.instanceName, color);
-        const healthBar = this.createHealthBar(unit.sprite);
-        unit.healthBar = healthBar;
-
-        const tokenContainer = this.createTokenDisplay(unit.sprite, nameLabel);
-        const iconContainer = this.iconManager.createIconDisplay(unit.sprite, healthBar);
-
-        this.bindingManager.bind(unit.sprite, [nameLabel, healthBar.background, healthBar.foreground, tokenContainer, iconContainer]);
+        // intentionally left blank
     }
 
-    /**
-     * 유닛의 머리 위에 체력바를 생성합니다.
-     * @param {Phaser.GameObjects.Sprite} parentSprite - 체력바가 따라다닐 유닛 스프라이트
-     * @returns {{background: Phaser.GameObjects.Rectangle, foreground: Phaser.GameObjects.Rectangle}} - 생성된 체력바 객체
-     */
-    createHealthBar(parentSprite) {
-        const barWidth = parentSprite.displayWidth * 0.8;
-        const barHeight = 8;
-        const offsetX = 0;
-        const offsetY = -(parentSprite.displayHeight / 2) - barHeight;
 
-        // 체력바 배경
-        const bg = this.scene.add.rectangle(
-            parentSprite.x + offsetX,
-            parentSprite.y + offsetY,
-            barWidth,
-            barHeight,
-            0x000000
-        ).setOrigin(0.5);
-
-        // 실제 체력을 나타내는 전경
-        const fg = this.scene.add.rectangle(
-            bg.x - barWidth / 2,
-            bg.y,
-            barWidth,
-            barHeight,
-            0x00ff00
-        ).setOrigin(0, 0.5);
-
-        this.vfxLayer.add([bg, fg]);
-        debugLogEngine.log('VFXManager', '체력바를 생성했습니다.');
-
-        return { background: bg, foreground: fg };
-    }
 
     /**
      * 지정된 위치에 핏방울 파티클 효과를 생성합니다.
@@ -254,31 +154,11 @@ export class VFXManager {
             }
         });
     }
-
-    /**
-     * 유닛의 체력바를 갱신합니다.
-     * @param {object} healthBar - 갱신할 체력바 객체 { background, foreground }
-     * @param {number} currentHp - 현재 체력
-     * @param {number} maxHp - 최대 체력
-     */
-    updateHealthBar(healthBar, currentHp, maxHp) {
-        const percentage = Math.max(0, currentHp / maxHp);
-        this.scene.tweens.add({
-            targets: healthBar.foreground,
-            width: healthBar.background.width * percentage,
-            duration: 200,
-            ease: 'Linear'
-        });
-    }
-
     /**
      * 매니저와 관련된 모든 리소스를 정리합니다.
      */
     shutdown() {
         this.vfxLayer.destroy();
-        // --- ✨ 토큰 UI 데이터 초기화 ---
-        this.tokenDisplays.clear();
-        this.iconManager.shutdown();
-        debugLogEngine.log('VFXManager', 'VFX 매니저를 종료합니다.');
+        debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
