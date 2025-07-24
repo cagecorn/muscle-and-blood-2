@@ -12,6 +12,7 @@ class UseSkillNode extends Node {
         this.vfxManager = vfxManager;
         this.animationEngine = animationEngine;
         this.delayEngine = delayEngine;
+        this.terminationManager = terminationManager; // ✨ terminationManager 추가
         this.skillEngine = se || skillEngine;
         // ✨ combatCalculationEngine 추가
         this.combatEngine = combatCalculationEngine;

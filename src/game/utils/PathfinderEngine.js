@@ -49,8 +49,12 @@ class PathfinderEngine {
                 const cell = grid.getCell(neighbor.col, neighbor.row);
 
                 // ✨ [수정된 부분]
-                // 적군과 아군을 모두 포함하여, 점유된 셀은 경로에서 제외합니다.
-                if (closedSet.has(key) || (cell && cell.isOccupied)) {
+                // 목표 지점(endNode)이 아니라면, 점유된 셀은 경로에서 제외합니다.
+                // 이를 통해 목표 바로 옆까지는 이동할 수 있게 됩니다.
+                const isOccupied = cell && cell.isOccupied;
+                const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
+
+                if (closedSet.has(key) || (isOccupied && !isEndNode)) {
                     return;
                 }
 
