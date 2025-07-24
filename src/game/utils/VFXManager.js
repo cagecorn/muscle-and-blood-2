@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { IconManager } from './IconManager.js';
+import { tokenEngine } from './TokenEngine.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -9,9 +11,14 @@ export class VFXManager {
         this.textEngine = textEngine;
         this.bindingManager = bindingManager;
 
+        this.tokenDisplays = new Map();
+
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
         this.vfxLayer = this.scene.add.layer();
         this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
+
+        // 상태 효과 아이콘 매니저 초기화
+        this.iconManager = new IconManager(scene, this.vfxLayer);
 
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
@@ -20,7 +27,28 @@ export class VFXManager {
      * 현재 이 메서드는 플로팅 텍스트 등을 필요 시 직접 생성하도록 비워둡니다.
      */
     setupUnitVFX(unit) {
-        // intentionally left blank
+        if (!unit || !unit.sprite) return;
+
+        const barWidth = 40;
+        const barHeight = 6;
+        const offsetY = -unit.sprite.displayHeight / 2 - 10;
+
+        const background = this.scene.add.rectangle(unit.sprite.x, unit.sprite.y + offsetY, barWidth, barHeight, 0x000000, 0.7).setOrigin(0.5);
+        const fill = this.scene.add.rectangle(unit.sprite.x - barWidth / 2, unit.sprite.y + offsetY, barWidth, barHeight, 0xff4d4d).setOrigin(0, 0.5);
+
+        this.vfxLayer.add([background, fill]);
+        this.bindingManager.bind(unit.sprite, [background, fill]);
+
+        unit.healthBar = { background, fill };
+        this.updateHealthBar(unit.healthBar, unit.currentHp, unit.finalStats.hp);
+
+        const tokenContainer = this.scene.add.container(unit.sprite.x, background.y - 10);
+        this.vfxLayer.add(tokenContainer);
+        this.bindingManager.bind(unit.sprite, [tokenContainer]);
+        this.tokenDisplays.set(unit.uniqueId, tokenContainer);
+        this.updateTokenDisplay(unit.uniqueId);
+
+        this.iconManager.createIconDisplay(unit.sprite, unit.healthBar);
     }
 
 
@@ -154,10 +182,44 @@ export class VFXManager {
             }
         });
     }
+
+    /**
+     * 체력바의 길이를 현재 체력에 맞춰 갱신합니다.
+     */
+    updateHealthBar(healthBar, currentHp, maxHp) {
+        if (!healthBar || !healthBar.fill || !healthBar.background) return;
+        const percent = Math.max(0, Math.min(currentHp / maxHp, 1));
+        healthBar.fill.displayWidth = healthBar.background.displayWidth * percent;
+    }
+
+    /**
+     * 특정 유닛의 토큰 표시를 업데이트합니다.
+     * 단순히 현재 토큰 개수만큼 아이콘을 다시 그립니다.
+     */
+    updateTokenDisplay(unitId) {
+        const container = this.tokenDisplays.get(unitId);
+        if (!container) return;
+        container.removeAll(true);
+        const count = tokenEngine.getTokens(unitId);
+        for (let i = 0; i < count; i++) {
+            const icon = this.scene.add.image(i * 8, 0, 'token').setScale(0.4);
+            container.add(icon);
+        }
+    }
+
+    /**
+     * 모든 유닛의 상태 아이콘을 갱신합니다.
+     */
+    updateAllStatusIcons() {
+        this.iconManager.updateAllIcons();
+    }
     /**
      * 매니저와 관련된 모든 리소스를 정리합니다.
      */
     shutdown() {
+        this.tokenDisplays.forEach(c => c.destroy());
+        this.tokenDisplays.clear();
+        this.iconManager.shutdown();
         this.vfxLayer.destroy();
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
