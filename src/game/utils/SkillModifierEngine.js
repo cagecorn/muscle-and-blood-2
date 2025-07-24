@@ -10,7 +10,9 @@ class SkillModifierEngine {
             'charge': [1.5, 1.2, 1.0, 0.8],
             'attack': [1.3, 1.2, 1.1, 1.0],
             // 'stoneSkin' 스킬의 순위별 데미지 감소율
-            'stoneSkin': [0.24, 0.21, 0.18, 0.15]
+            'stoneSkin': [0.24, 0.21, 0.18, 0.15],
+            // ✨ 쉴드 브레이크의 순위별 '받는 데미지 증가' 효과 수치
+            'shieldBreak': [0.24, 0.21, 0.18, 0.15]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -44,6 +46,22 @@ class SkillModifierEngine {
                     }
                 } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'damageReduction') {
                     modifiedSkill.effect.modifiers.value = reductionModifiers[rankIndex];
+                }
+            }
+        }
+
+        // ✨ 'shieldBreak' 스킬의 '받는 데미지 증가' 효과 보정
+        if (baseSkillData.id === 'shieldBreak' && modifiedSkill.effect) {
+            const increaseModifiers = this.rankModifiers['shieldBreak'];
+            if (increaseModifiers && increaseModifiers[rankIndex] !== undefined) {
+                // modifiers가 배열인지 단일 객체인지 확인하여 처리
+                if (Array.isArray(modifiedSkill.effect.modifiers)) {
+                    const increaseMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'damageIncrease');
+                    if (increaseMod) {
+                        increaseMod.value = increaseModifiers[rankIndex];
+                    }
+                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'damageIncrease') {
+                    modifiedSkill.effect.modifiers.value = increaseModifiers[rankIndex];
                 }
             }
         }

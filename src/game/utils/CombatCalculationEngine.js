@@ -17,7 +17,12 @@ class CombatCalculationEngine {
      */
     calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
-        const baseDefense = defender.finalStats?.physicalDefense || 0;
+
+        // ✨ 방어자의 방어력 감소/증가 효과 적용
+        const defenseReductionPercent = statusEffectManager.getModifierValue(defender, 'physicalDefense');
+        const initialDefense = defender.finalStats?.physicalDefense || 0;
+        // 방어력 보정치 적용 (예: -0.1이면 10% 감소)
+        const finalDefense = initialDefense * (1 + defenseReductionPercent);
 
         let finalSkill = skill;
         if (instanceId) {
@@ -31,7 +36,7 @@ class CombatCalculationEngine {
         const damageMultiplier = finalSkill.damageMultiplier || 1.0;
         const skillDamage = baseAttack * damageMultiplier;
 
-        const initialDamage = Math.max(1, skillDamage - baseDefense);
+        const initialDamage = Math.max(1, skillDamage - finalDefense);
 
         // ✨ 방어자의 받는 데미지 증가/감소 효과 적용
         const damageReductionPercent = statusEffectManager.getModifierValue(defender, 'damageReduction');
@@ -52,7 +57,8 @@ class CombatCalculationEngine {
             debugStatusEffectManager.logDamageModification(defender, initialDamage, finalDamage, effects);
         }
 
-        debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage);
+        // 디버그 로그에 finalDefense 사용하도록 수정
+        debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage, finalDefense);
         return Math.round(finalDamage);
     }
 }
