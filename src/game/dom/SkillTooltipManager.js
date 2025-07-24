@@ -13,11 +13,8 @@ export class SkillTooltipManager {
         tooltip.id = 'skill-tooltip';
         tooltip.className = `skill-card-large ${skillData.type.toLowerCase()}-card grade-${grade.toLowerCase()}`;
         
+        // ✨ skillModifierEngine에서 이미 수정한 설명을 그대로 사용합니다.
         let description = skillData.description;
-        // skillData.damageMultiplier가 존재하면 '{{damage}}%' 자리만 실제 숫자로 교체
-        if (skillData.damageMultiplier) {
-            description = description.replace('{{damage}}%', `${Math.round(skillData.damageMultiplier * 100)}%`);
-        }
 
         // 스킬 이름 옆에 클래스 전용 여부를 표시
         let skillNameHTML = skillData.name;

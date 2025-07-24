@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+// 아이언 윌 데이터를 직접 참조하기 위해 import 합니다.
+import { passiveSkills } from '../data/skills/passive.js';
 
 /**
  * 스킬의 슬롯 순위에 따라 최종 능력치를 계산하는 엔진
@@ -71,6 +73,31 @@ class SkillModifierEngine {
             modifiedSkill.effect.duration = (rank === 1)
                 ? 1
                 : (grade === 'LEGENDARY' ? 2 : 1);
+        }
+
+        // --- ✨ 새로운 설명 동적 생성 로직 ---
+
+        if (modifiedSkill.description) {
+            // 1. 데미지 계수 치환
+            if (modifiedSkill.damageMultiplier) {
+                const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
+                modifiedSkill.description = modifiedSkill.description.replace('{{damage}}', damagePercent);
+            }
+            // 2. 스톤 스킨 감소율 치환
+            if (baseSkillData.id === 'stoneSkin') {
+                const reductionValue = (this.rankModifiers.stoneSkin[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{reduction}}', reductionValue.toFixed(0));
+            }
+            // 3. 쉴드 브레이크 증가율 치환
+            if (baseSkillData.id === 'shieldBreak') {
+                const increaseValue = (this.rankModifiers.shieldBreak[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{increase}}', increaseValue.toFixed(0));
+            }
+            // 4. 아이언 윌 최대 감소율 치환
+            if (baseSkillData.id === 'ironWill') {
+                const maxReductionValue = (passiveSkills.ironWill.rankModifiers[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}', maxReductionValue.toFixed(0));
+            }
         }
 
         return modifiedSkill;
