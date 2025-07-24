@@ -14,6 +14,8 @@ export const buffSkills = {
         requiredClass: 'warrior', // ✨ 전사 전용 설정
         cooldown: 3,
         effect: {
+            // ✨ [수정] 효과 ID를 명시적으로 추가하여 오류를 해결합니다.
+            id: 'stoneSkin',
             type: EFFECT_TYPES.BUFF,
             duration: 4,
             modifiers: {
