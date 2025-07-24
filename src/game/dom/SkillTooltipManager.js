@@ -1,20 +1,23 @@
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
-import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
 
 /**
  * 스킬 카드 위에 마우스를 올렸을 때 TCG 스타일의 큰 툴팁을 표시하는 매니저
  */
 export class SkillTooltipManager {
-    static show(skillId, event) {
-        this.hide(); // 기존 툴팁이 있다면 제거
+    static show(skillData, event, grade = 'NORMAL') {
+        this.hide();
 
-        const skillData = skillCardDatabase[skillId];
         if (!skillData) return;
 
         const tooltip = document.createElement('div');
         tooltip.id = 'skill-tooltip';
-        tooltip.className = `skill-card-large ${skillData.type.toLowerCase()}-card`;
+        tooltip.className = `skill-card-large ${skillData.type.toLowerCase()}-card grade-${grade.toLowerCase()}`;
         
+        let description = skillData.description;
+        if (skillData.damageMultiplier) {
+            description = description.replace(/\d+%/g, `${Math.round(skillData.damageMultiplier * 100)}%`);
+        }
+
         tooltip.innerHTML = `
             <div class="skill-illustration-large" style="background-image: url(${skillData.illustrationPath})"></div>
             <div class="skill-info-large">
@@ -22,7 +25,7 @@ export class SkillTooltipManager {
                 <div class="skill-type-cost-large">
                     <span style="color: ${SKILL_TYPES[skillData.type].color};">[${SKILL_TYPES[skillData.type].name}]</span>
                 </div>
-                <div class="skill-description-large">${skillData.description}</div>
+                <div class="skill-description-large">${description}</div>
                 <div class="skill-cost-container-large"></div>
             </div>
         `;

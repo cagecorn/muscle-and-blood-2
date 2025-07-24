@@ -19,8 +19,8 @@ class FindBestSkillNode extends Node {
         for (const instanceId of equippedSkillInstances) {
             if (!instanceId || usedSkills.has(instanceId)) continue;
 
-            const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
-            const skillData = skillInventoryManager.getSkillData(skillId);
+            const instData = skillInventoryManager.getInstanceData(instanceId);
+            const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
 
             if (this.skillEngine.canUseSkill(unit, skillData)) {
                 blackboard.set('currentTargetSkill', { skillData, instanceId });

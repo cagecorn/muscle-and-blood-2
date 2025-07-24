@@ -3,8 +3,11 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
-// ✨ CombatCalculationEngine import
 import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngine.js';
+import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
+import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
+import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
+import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, skillEngine: se } = {}) {
@@ -21,27 +24,39 @@ class UseSkillNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const skillTarget = blackboard.get('skillTarget');
-        const skillData = blackboard.get('currentSkillData');
         const instanceId = blackboard.get('currentSkillInstanceId');
 
-        if (!skillData || !skillTarget) {
-            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 데이터 또는 대상 없음');
+        if (!instanceId || !skillTarget) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 인스턴스 또는 대상 없음');
             return NodeState.FAILURE;
         }
 
-        this.skillEngine.recordSkillUse(unit, skillData);
+        const instanceData = skillInventoryManager.getInstanceData(instanceId);
+        const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
+
+        const equippedSkills = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
+        const rank = equippedSkills.indexOf(instanceId) + 1;
+        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, rank);
+        if (!modifiedSkill) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 데이터 처리 오류');
+            return NodeState.FAILURE;
+        }
+
+        debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, rank, instanceData.grade);
+
+        this.skillEngine.recordSkillUse(unit, modifiedSkill); // 보정된 데이터로 기록
 
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
         usedSkills.add(instanceId);
         blackboard.set('usedSkillsThisTurn', usedSkills);
 
-        const skillColor = SKILL_TYPES[skillData.type].color;
-        this.vfxManager.showSkillName(unit.sprite, skillData.name, skillColor);
+        const skillColor = SKILL_TYPES[modifiedSkill.type].color;
+        this.vfxManager.showSkillName(unit.sprite, modifiedSkill.name, skillColor);
 
         // ✨ 스킬 애니메이션 및 효과 적용 로직 수정
-        if (skillData.type === 'ACTIVE') {
+        if (modifiedSkill.type === 'ACTIVE') {
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
-            const damage = this.combatEngine.calculateDamage(unit, skillTarget, skillData);
+            const damage = this.combatEngine.calculateDamage(unit, skillTarget, baseSkillData, instanceId);
             skillTarget.currentHp -= damage;
 
             this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
@@ -58,11 +73,11 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 
-        if (skillData.effect) {
-            statusEffectManager.addEffect(skillTarget, skillData);
+        if (modifiedSkill.effect) {
+            statusEffectManager.addEffect(skillTarget, modifiedSkill);
         }
 
-        console.log(`[AI] ${unit.instanceName}이(가) ${skillTarget.instanceName}에게 스킬 [${skillData.name}] 사용!`);
+        console.log(`[AI] ${unit.instanceName}이(가) ${skillTarget.instanceName}에게 스킬 [${modifiedSkill.name}] 사용!`);
 
         blackboard.set('currentSkillData', null);
         blackboard.set('currentSkillInstanceId', null);

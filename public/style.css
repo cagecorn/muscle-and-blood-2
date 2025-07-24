@@ -945,3 +945,24 @@ body {
     height: 24px;
     margin-top: 4px;
 }
+
+/* --- 스킬 등급 오오라 --- */
+.grade-rare {
+    box-shadow: 0 0 10px #3498db, 0 0 5px #3498db inset;
+}
+.grade-epic {
+    box-shadow: 0 0 12px #9b59b6, 0 0 7px #9b59b6 inset;
+}
+.grade-legendary {
+    box-shadow: 0 0 15px #f1c40f, 0 0 10px #f1c40f inset;
+    animation: legendary-glow 2s infinite alternate;
+}
+
+@keyframes legendary-glow {
+    from {
+        box-shadow: 0 0 15px #f1c40f, 0 0 10px #f1c40f inset;
+    }
+    to {
+        box-shadow: 0 0 25px #f39c12, 0 0 15px #f39c12 inset;
+    }
+}

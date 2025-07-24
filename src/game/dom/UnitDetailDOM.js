@@ -84,11 +84,11 @@ export class UnitDetailDOM {
 
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
-                    const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
-                    const skillData = skillInventoryManager.getSkillData(skillId);
+                    const instData = skillInventoryManager.getInstanceData(instanceId);
+                    const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
                     if (skillData) {
                         bgImage = `url(${skillData.illustrationPath})`;
-                        slot.onmouseenter = (e) => SkillTooltipManager.show(skillId, e);
+                        slot.onmouseenter = (e) => SkillTooltipManager.show(skillData, e, instData.grade);
                         slot.onmouseleave = () => SkillTooltipManager.hide();
                     }
                 }

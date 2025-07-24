@@ -4,6 +4,7 @@ import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { SkillTooltipManager } from './SkillTooltipManager.js';
+import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -132,13 +133,15 @@ export class SkillManagementDOMEngine {
         slot.dataset.slotType = slotType;
 
         if (instanceId) {
-            const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
-            const data = skillInventoryManager.getSkillData(skillId);
-            slot.style.backgroundImage = `url(${data.illustrationPath})`;
+            const instanceData = skillInventoryManager.getInstanceData(instanceId);
+            const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
+            const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1);
+
+            slot.style.backgroundImage = `url(${modifiedSkill.illustrationPath})`;
             slot.dataset.instanceId = instanceId;
             slot.draggable = true;
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId, slotIndex: index });
-            slot.onmouseenter = e => SkillTooltipManager.show(skillId, e);
+            slot.onmouseenter = e => SkillTooltipManager.show(modifiedSkill, e, instanceData.grade);
             slot.onmouseleave = () => SkillTooltipManager.hide();
         } else {
             slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
@@ -157,14 +160,14 @@ export class SkillManagementDOMEngine {
     refreshSkillInventory() {
         this.skillInventoryContent.innerHTML = '';
         skillInventoryManager.getInventory().forEach(instance => {
-            const data = skillInventoryManager.getSkillData(instance.skillId);
+            const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
             const card = document.createElement('div');
-            card.className = `skill-inventory-card ${data.type.toLowerCase()}-card`;
+            card.className = `skill-inventory-card ${data.type.toLowerCase()}-card grade-${instance.grade.toLowerCase()}`;
             card.style.backgroundImage = `url(${data.illustrationPath})`;
             card.draggable = true;
             card.dataset.instanceId = instance.instanceId;
             card.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: instance.instanceId });
-            card.onmouseenter = e => SkillTooltipManager.show(instance.skillId, e);
+            card.onmouseenter = e => SkillTooltipManager.show(data, e, instance.grade);
             card.onmouseleave = () => SkillTooltipManager.hide();
 
             if (data.requiredClass) {
@@ -194,8 +197,8 @@ export class SkillManagementDOMEngine {
 
         const unitId = this.selectedMercenaryData.uniqueId;
         const draggedInstanceId = this.draggedData.instanceId;
-        const draggedSkillId = skillInventoryManager.getSkillIdByInstance(draggedInstanceId);
-        const draggedSkillData = skillInventoryManager.getSkillData(draggedSkillId);
+        const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
+        const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
         if (draggedSkillData.requiredClass && this.selectedMercenaryData.id !== draggedSkillData.requiredClass) {
             alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
@@ -237,9 +240,9 @@ export class SkillManagementDOMEngine {
     }
 
     addSkillToInventory(instanceId) {
-        const skillId = skillInventoryManager.getSkillIdByInstance(instanceId);
-        if (skillId) {
-            skillInventoryManager.skillInventory.push({ instanceId, skillId });
+        const inst = skillInventoryManager.getInstanceData(instanceId);
+        if (inst) {
+            skillInventoryManager.skillInventory.push({ instanceId, skillId: inst.skillId, grade: inst.grade });
             skillInventoryManager.skillInventory.sort((a, b) => a.instanceId - b.instanceId);
         }
     }
