@@ -33,7 +33,7 @@ class SkillModifierEngine {
         const rankIndex = rank - 1;
 
         const damageModifiers = this.rankModifiers[baseSkillData.id];
-        if (damageModifiers && damageModifiers[rankIndex] && modifiedSkill.damageMultiplier) {
+        if (damageModifiers && damageModifiers[rankIndex] !== undefined && modifiedSkill.damageMultiplier) {
             modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
         }
 
@@ -78,25 +78,26 @@ class SkillModifierEngine {
         // --- ✨ 새로운 설명 동적 생성 로직 ---
 
         if (modifiedSkill.description) {
-            // 1. 데미지 계수 치환
+            // 1. 데미지 계수 치환 (차지, 공격 스킬 등)
             if (modifiedSkill.damageMultiplier) {
                 const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
-                modifiedSkill.description = modifiedSkill.description.replace('{{damage}}', damagePercent);
+                // '{{damage}}%' 패턴을 찾아 '수치%'로 변경합니다.
+                modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${damagePercent}%`);
             }
             // 2. 스톤 스킨 감소율 치환
             if (baseSkillData.id === 'stoneSkin') {
                 const reductionValue = (this.rankModifiers.stoneSkin[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{reduction}}', reductionValue.toFixed(0));
+                modifiedSkill.description = modifiedSkill.description.replace('{{reduction}}%', `${reductionValue.toFixed(0)}%`);
             }
             // 3. 쉴드 브레이크 증가율 치환
             if (baseSkillData.id === 'shieldBreak') {
                 const increaseValue = (this.rankModifiers.shieldBreak[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{increase}}', increaseValue.toFixed(0));
+                modifiedSkill.description = modifiedSkill.description.replace('{{increase}}%', `${increaseValue.toFixed(0)}%`);
             }
             // 4. 아이언 윌 최대 감소율 치환
             if (baseSkillData.id === 'ironWill') {
                 const maxReductionValue = (passiveSkills.ironWill.rankModifiers[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}', maxReductionValue.toFixed(0));
+                modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}%', `${maxReductionValue.toFixed(0)}%`);
             }
         }
 
