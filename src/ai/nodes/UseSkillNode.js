@@ -68,11 +68,11 @@ class UseSkillNode extends Node {
                 );
                 skillTarget.currentHp -= damage;
 
-                this.vfxManager.updateHealthBar(
-                    skillTarget.healthBar,
-                    skillTarget.currentHp,
-                    skillTarget.finalStats.hp
-                );
+                // this.vfxManager.updateHealthBar(
+                //     skillTarget.healthBar,
+                //     skillTarget.currentHp,
+                //     skillTarget.finalStats.hp
+                // );
                 this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
                 this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
 
