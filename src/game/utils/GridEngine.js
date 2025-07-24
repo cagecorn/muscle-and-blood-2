@@ -25,6 +25,9 @@ export class GridEngine {
         // 디버깅 목적으로 그리드를 시각적으로 표시할 그래픽스 객체
         this.graphics = this.scene.add.graphics({ lineStyle: { width: 2, color: 0x00ff00, alpha: 0.5 } });
 
+        this.cols = cols;
+        this.rows = rows;
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 const cellX = x + col * cellWidth;
