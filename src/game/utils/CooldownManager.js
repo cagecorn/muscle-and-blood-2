@@ -56,6 +56,17 @@ class CooldownManager {
         const remainingTurns = this.cooldowns.get(unitId).get(skillId) || 0;
         return remainingTurns <= 0;
     }
+
+    /**
+     * 남은 쿨타임 턴 수를 조회합니다.
+     * @param {number} unitId
+     * @param {string} skillId
+     * @returns {number} 남은 턴 수 (없으면 0)
+     */
+    getRemaining(unitId, skillId) {
+        if (!this.cooldowns.has(unitId)) return 0;
+        return this.cooldowns.get(unitId).get(skillId) || 0;
+    }
 }
 
 export const cooldownManager = new CooldownManager();
