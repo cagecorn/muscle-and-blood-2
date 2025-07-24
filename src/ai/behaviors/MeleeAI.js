@@ -14,8 +14,6 @@ import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 // ✨ HasNotMovedNode를 import합니다.
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
-// ✨ 수정: 더 지능적인 타겟팅을 위해 FindPreferredTargetNode를 import합니다.
-import FindPreferredTargetNode from '../nodes/FindPreferredTargetNode.js';
 
 /**
  * 근접 유닛(전사)을 위한 행동 트리를 재구성합니다.
@@ -66,8 +64,7 @@ function createMeleeAI(engines = {}) {
         // 우선순위 4: 4번 슬롯 스킬 사용 시도 (보통 일반 공격)
         new SequenceNode([
             new CanUseSkillBySlotNode(3),
-            // ✨ 수정: 비효율적인 타겟팅 노드를 더 스마트한 노드로 교체
-            new FindPreferredTargetNode(engines),
+            new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
 
