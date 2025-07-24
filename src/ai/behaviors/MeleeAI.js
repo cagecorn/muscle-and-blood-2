@@ -12,6 +12,8 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+// ✨ HasNotMovedNode를 import합니다.
+import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 
 /**
  * 근접 유닛(전사)을 위한 행동 트리를 재구성합니다.
@@ -31,6 +33,8 @@ function createMeleeAI(engines = {}) {
         ]),
         // B. 이동 후 사용
         new SequenceNode([
+            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
+            new HasNotMovedNode(),
             new FindPathToSkillRangeNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines), // 이동 후 사거리 재확인
@@ -66,6 +70,8 @@ function createMeleeAI(engines = {}) {
 
         // 우선순위 5: 사용할 스킬이 없을 경우, 이동만 실행
         new SequenceNode([
+            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
+            new HasNotMovedNode(),
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)

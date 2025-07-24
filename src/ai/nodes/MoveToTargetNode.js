@@ -13,9 +13,15 @@ class MoveToTargetNode extends Node {
         const path = blackboard.get('movementPath');
         const movementRange = unit.finalStats.movement || 3;
 
-        if (!path || path.length === 0) {
-            debugAIManager.logNodeResult(NodeState.FAILURE);
+        // ✨ [수정] 경로가 없는 경우(null)와 이미 도착한 경우(빈 배열)를 분리해서 처리합니다.
+        if (!path) { // 경로 탐색 실패
+            debugAIManager.logNodeResult(NodeState.FAILURE, '경로가 없음');
             return NodeState.FAILURE;
+        }
+
+        if (path.length === 0) { // 이미 목표 위치에 도달함
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음');
+            return NodeState.SUCCESS;
         }
 
         // 이동력만큼만 경로를 잘라냅니다.
