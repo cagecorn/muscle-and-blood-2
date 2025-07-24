@@ -31,6 +31,18 @@ export class SkillTooltipManager {
             </div>
         `;
 
+        // 별 생성 로직 추가
+        const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
+        const starsContainer = document.createElement('div');
+        starsContainer.className = 'grade-stars-large';
+        const starCount = gradeMap[grade] || 1;
+        for (let i = 0; i < starCount; i++) {
+            const starImg = document.createElement('img');
+            starImg.src = 'assets/images/territory/skill-card-star.png';
+            starsContainer.appendChild(starImg);
+        }
+        tooltip.appendChild(starsContainer);
+
         // 토큰 아이콘 추가
         const costContainer = tooltip.querySelector('.skill-cost-container-large');
         for (let i = 0; i < skillData.cost; i++) {

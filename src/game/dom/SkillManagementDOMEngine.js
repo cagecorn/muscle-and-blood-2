@@ -159,6 +159,8 @@ export class SkillManagementDOMEngine {
 
     refreshSkillInventory() {
         this.skillInventoryContent.innerHTML = '';
+        const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
+
         skillInventoryManager.getInventory().forEach(instance => {
             const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
             const card = document.createElement('div');
@@ -169,6 +171,17 @@ export class SkillManagementDOMEngine {
             card.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: instance.instanceId });
             card.onmouseenter = e => SkillTooltipManager.show(data, e, instance.grade);
             card.onmouseleave = () => SkillTooltipManager.hide();
+
+            // 별 생성 컨테이너
+            const starsContainer = document.createElement('div');
+            starsContainer.className = 'grade-stars';
+            const starCount = gradeMap[instance.grade] || 1;
+            for (let i = 0; i < starCount; i++) {
+                const starImg = document.createElement('img');
+                starImg.src = 'assets/images/territory/skill-card-star.png';
+                starsContainer.appendChild(starImg);
+            }
+            card.appendChild(starsContainer);
 
             if (data.requiredClass) {
                 const tag = document.createElement('div');
