@@ -16,6 +16,8 @@ import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+// ✨ HasNotMovedNode를 import합니다.
+import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 
 /**
  * 원거리 유닛(거너)을 위한 행동 트리를 재구성합니다.
@@ -38,6 +40,8 @@ function createRangedAI(engines = {}) {
         ]),
         // B. 이동 후 사용 (카이팅 AI는 적에게 다가갈 때도 사용)
         new SequenceNode([
+            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
+            new HasNotMovedNode(),
             new FindPathToSkillRangeNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines), // 이동 후 사거리 재확인
@@ -76,6 +80,8 @@ function createRangedAI(engines = {}) {
     const rootNode = new SelectorNode([
         // 최우선 순위 1: 생존 - 적이 너무 가까우면 카이팅부터 실행
         new SequenceNode([
+            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
+            new HasNotMovedNode(),
             new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }), // 위험 거리 설정
             new FindKitingPositionNode(engines),
             new MoveToTargetNode(engines),
@@ -91,6 +97,8 @@ function createRangedAI(engines = {}) {
 
         // 우선순위 3: 이동 - 공격할 스킬이 없다면, 다음 턴을 위해 이동만 실행
         new SequenceNode([
+            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
+            new HasNotMovedNode(),
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
