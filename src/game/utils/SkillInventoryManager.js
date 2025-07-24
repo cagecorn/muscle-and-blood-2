@@ -74,9 +74,17 @@ class SkillInventoryManager {
         return this.skillInventory;
     }
 
-    /** 스킬 ID로 스킬 데이터 조회 */
+    /** 스킬 ID와 등급으로 스킬 데이터 조회
+     *  일부 스킬은 등급 구분 없이 정의되어 있으므로
+     *  해당 경우에는 등급과 관계없이 기본 데이터를 반환합니다.
+     */
     getSkillData(skillId, grade = 'NORMAL') {
-        return skillCardDatabase[skillId] ? skillCardDatabase[skillId][grade] : null;
+        const entry = skillCardDatabase[skillId];
+        if (!entry) return null;
+        // 등급별 데이터가 존재하면 사용
+        if (entry[grade]) return entry[grade];
+        // 등급 없이 정의된 경우 전체 객체를 그대로 반환
+        return entry;
     }
 
     getInstanceData(instanceId) {
