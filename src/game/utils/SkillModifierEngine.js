@@ -14,7 +14,9 @@ class SkillModifierEngine {
             // 'stoneSkin' 스킬의 순위별 데미지 감소율
             'stoneSkin': [0.24, 0.21, 0.18, 0.15],
             // ✨ 쉴드 브레이크의 순위별 '받는 데미지 증가' 효과 수치
-            'shieldBreak': [0.24, 0.21, 0.18, 0.15]
+            'shieldBreak': [0.24, 0.21, 0.18, 0.15],
+            // ✨ 넉백샷 순위별 데미지 계수 추가
+            'knockbackShot': [1.4, 1.2, 1.0, 0.8]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -80,6 +82,7 @@ class SkillModifierEngine {
         if (modifiedSkill.description) {
             // 1. 데미지 계수 치환 (차지, 공격 스킬 등)
             if (modifiedSkill.damageMultiplier) {
+                // ✨ 넉백샷도 이 로직을 공유하게 됩니다.
                 const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
                 // '{{damage}}%' 패턴을 찾아 '수치%'로 변경합니다.
                 modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${damagePercent}%`);

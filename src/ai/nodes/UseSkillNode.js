@@ -4,6 +4,8 @@ import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
 import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngine.js';
+// ✨ formationEngine을 import합니다.
+import { formationEngine } from '../../game/utils/FormationEngine.js'; 
 import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
 import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
@@ -85,6 +87,11 @@ class UseSkillNode extends Node {
                             `${modifiedSkill.name} 효과`
                         );
                     }
+                }
+
+                // ✨ 넉백(push) 효과 처리
+                if (modifiedSkill.push && modifiedSkill.push > 0) {
+                    await formationEngine.pushUnit(skillTarget, unit, modifiedSkill.push, this.animationEngine);
                 }
 
                 if (skillTarget.currentHp <= 0) {
