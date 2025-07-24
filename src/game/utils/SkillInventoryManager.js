@@ -18,17 +18,18 @@ class SkillInventoryManager {
      * 게임 시작 시 기본 스킬 카드를 지급합니다.
      */
     initializeSkillCards() {
-        // 등급별 차지 스킬 2장씩 지급
+        // 등급별 기본 스킬 지급
         const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
         grades.forEach(grade => {
             for (let i = 0; i < 2; i++) {
                 this.addSkillById('charge', grade);
+                this.addSkillById('attack', grade); // 공격 스킬도 각 등급별 2장 지급
             }
         });
 
         // 나머지 스킬은 노멀 등급으로 10장씩 생성
         for (const skillId in skillCardDatabase) {
-            if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge') {
+            if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge' && skillId !== 'attack') {
                 for (let i = 0; i < 10; i++) {
                     this.addSkillById(skillId, 'NORMAL');
                 }
