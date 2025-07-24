@@ -95,17 +95,19 @@ class PathfinderEngine {
     _getNeighbors(node) {
         const neighbors = [];
         const { col, row } = node;
+        const directions = [
+            { x: 0, y: -1 }, // Up
+            { x: 0, y: 1 },  // Down
+            { x: -1, y: 0 }, // Left
+            { x: 1, y: 0 }   // Right
+        ];
 
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                if (x === 0 && y === 0) continue;
-                const checkCol = col + x;
-                const checkRow = row + y;
-
-                const neighborNode = this._getNodeFromGrid(checkCol, checkRow);
-                if (neighborNode) {
-                    neighbors.push(neighborNode);
-                }
+        for (const dir of directions) {
+            const checkCol = col + dir.x;
+            const checkRow = row + dir.y;
+            const neighborNode = this._getNodeFromGrid(checkCol, checkRow);
+            if (neighborNode) {
+                neighbors.push(neighborNode);
             }
         }
         return neighbors;
@@ -114,7 +116,7 @@ class PathfinderEngine {
     _getDistance(nodeA, nodeB) {
         const dstX = Math.abs(nodeA.col - nodeB.col);
         const dstY = Math.abs(nodeA.row - nodeB.row);
-        return 14 * Math.min(dstX, dstY) + 10 * Math.abs(dstX - dstY);
+        return (dstX + dstY) * 10;
     }
 }
 
