@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+// tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
+import { tokenEngine } from './TokenEngine.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -13,6 +15,9 @@ export class VFXManager {
         this.vfxLayer = this.scene.add.layer();
         this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
 
+        // 각 유닛의 토큰 UI를 관리하기 위한 Map을 추가합니다.
+        this.activeTokenDisplays = new Map();
+
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
     /**
@@ -21,6 +26,51 @@ export class VFXManager {
      */
     setupUnitVFX(unit) {
         // intentionally left blank
+    }
+
+    /**
+     * [✨ 신규 추가]
+     * 특정 유닛의 토큰 개수에 맞춰 화면에 토큰 아이콘을 업데이트합니다.
+     * @param {object} unit - 대상 유닛
+     */
+    updateTokenDisplay(unit) {
+        if (!unit || !unit.sprite || !unit.sprite.active) return;
+
+        const unitId = unit.uniqueId;
+        let display = this.activeTokenDisplays.get(unitId);
+
+        // 유닛의 토큰 UI가 없다면 새로 생성합니다.
+        if (!display) {
+            const yOffset = (unit.sprite.displayHeight / 2) + 15; // 유닛 발밑
+            const container = this.scene.add.container(unit.sprite.x, unit.sprite.y + yOffset);
+            this.vfxLayer.add(container);
+
+            // 생성된 컨테이너가 유닛 스프라이트를 따라다니도록 바인딩합니다.
+            this.bindingManager.bind(unit.sprite, [container]);
+
+            display = { container, tokens: [] };
+            this.activeTokenDisplays.set(unitId, display);
+        }
+
+        const tokenCount = tokenEngine.getTokens(unitId);
+
+        // 토큰 개수에 변화가 없으면 업데이트하지 않습니다.
+        if (display.tokens.length === tokenCount) return;
+
+        // 기존 토큰 아이콘들을 모두 제거합니다.
+        display.tokens.forEach(token => token.destroy());
+        display.tokens = [];
+
+        const tokenSpacing = 12; // 토큰 아이콘 간격
+        const totalWidth = (tokenCount - 1) * tokenSpacing;
+        const startX = -totalWidth / 2; // 중앙 정렬을 위한 시작 X 좌표
+
+        // 현재 토큰 개수만큼 아이콘을 새로 생성합니다.
+        for (let i = 0; i < tokenCount; i++) {
+            const tokenImage = this.scene.add.image(startX + i * tokenSpacing, 0, 'token').setScale(0.04);
+            display.container.add(tokenImage);
+            display.tokens.push(tokenImage);
+        }
     }
 
 
