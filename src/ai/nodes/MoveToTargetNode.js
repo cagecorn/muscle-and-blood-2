@@ -3,9 +3,10 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
 
 class MoveToTargetNode extends Node {
-    constructor({ animationEngine }) {
+    constructor({ animationEngine, cameraControl }) {
         super();
         this.animationEngine = animationEngine;
+        this.cameraControl = cameraControl;
     }
 
     async evaluate(unit, blackboard) {
@@ -41,7 +42,17 @@ class MoveToTargetNode extends Node {
         for (const step of movePath) {
             const targetCell = formationEngine.grid.getCell(step.col, step.row);
             if (targetCell) {
-                await this.animationEngine.moveTo(unit.sprite, targetCell.x, targetCell.y, 200);
+                await this.animationEngine.moveTo(
+                    unit.sprite,
+                    targetCell.x,
+                    targetCell.y,
+                    200,
+                    () => {
+                        if (this.cameraControl && unit.sprite.active) {
+                            this.cameraControl.panTo(unit.sprite.x, unit.sprite.y, 0);
+                        }
+                    }
+                );
                 unit.gridX = step.col;
                 unit.gridY = step.row;
             }

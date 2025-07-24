@@ -55,28 +55,41 @@ class UseSkillNode extends Node {
         this.vfxManager.showSkillName(unit.sprite, modifiedSkill.name, skillColor);
 
         // ✨ 스킬 애니메이션 및 효과 적용 로직 수정
-        if (modifiedSkill.type === 'ACTIVE') {
+        if (modifiedSkill.type === 'ACTIVE' || modifiedSkill.type === 'DEBUFF') {
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
-            const damage = this.combatEngine.calculateDamage(unit, skillTarget, baseSkillData, instanceId, instanceData.grade);
-            skillTarget.currentHp -= damage;
 
-            this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
-            this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
-            this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
+            if (modifiedSkill.type === 'ACTIVE') {
+                const damage = this.combatEngine.calculateDamage(
+                    unit,
+                    skillTarget,
+                    baseSkillData,
+                    instanceId,
+                    instanceData.grade
+                );
+                skillTarget.currentHp -= damage;
 
-            // 토큰 생성 효과 처리
-            if (modifiedSkill.generatesToken) {
-                if (Math.random() < modifiedSkill.generatesToken.chance) {
-                    tokenEngine.addTokens(
-                        unit.uniqueId,
-                        modifiedSkill.generatesToken.amount,
-                        `${modifiedSkill.name} 효과`
-                    );
+                this.vfxManager.updateHealthBar(
+                    skillTarget.healthBar,
+                    skillTarget.currentHp,
+                    skillTarget.finalStats.hp
+                );
+                this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
+                this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
+
+                // 토큰 생성 효과 처리
+                if (modifiedSkill.generatesToken) {
+                    if (Math.random() < modifiedSkill.generatesToken.chance) {
+                        tokenEngine.addTokens(
+                            unit.uniqueId,
+                            modifiedSkill.generatesToken.amount,
+                            `${modifiedSkill.name} 효과`
+                        );
+                    }
                 }
-            }
 
-            if (skillTarget.currentHp <= 0) {
-                this.terminationManager.handleUnitDeath(skillTarget);
+                if (skillTarget.currentHp <= 0) {
+                    this.terminationManager.handleUnitDeath(skillTarget);
+                }
             }
         } else {
             if (unit.sprite.scene && !spriteEngine.scene) {

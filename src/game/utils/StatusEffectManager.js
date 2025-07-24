@@ -120,6 +120,12 @@ class StatusEffectManager {
             effectDefinition.onApply(targetUnit);
         }
 
+        // 상태 효과 이름 표시
+        if (this.battleSimulator && this.battleSimulator.vfxManager && effectDefinition.name) {
+            const color = newEffect.type === EFFECT_TYPES.BUFF ? '#22c55e' : '#ef4444';
+            this.battleSimulator.vfxManager.showEffectName(targetUnit.sprite, effectDefinition.name, color);
+        }
+
         debugStatusEffectManager.logEffectApplied(targetUnit, newEffect);
     }
 
