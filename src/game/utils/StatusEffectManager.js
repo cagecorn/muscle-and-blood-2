@@ -1,6 +1,10 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { debugStatusEffectManager } from '../debug/DebugStatusEffectManager.js';
 import { statusEffects } from '../data/status-effects.js';
+// ✨ 아이언 윌 로직에 필요한 모듈 추가
+import { ownedSkillsManager } from './OwnedSkillsManager.js';
+import { skillInventoryManager } from './SkillInventoryManager.js';
+import { passiveSkills } from '../data/skills/passive.js';
 
 // 효과의 종류를 명확히 구분하기 위한 상수
 export const EFFECT_TYPES = {
@@ -47,6 +51,43 @@ class StatusEffectManager {
             }
             this.activeEffects.set(unitId, remainingEffects);
         }
+
+        // ✨ 아이언 윌 체력 회복 로직 추가
+        if (this.battleSimulator) {
+            this.battleSimulator.turnQueue.forEach(unit => {
+                if (unit.currentHp > 0) {
+                    this.applyIronWillRegen(unit);
+                }
+            });
+        }
+    }
+
+    /**
+     * ✨ '아이언 윌'의 등급별 체력 회복 효과를 적용하는 새로운 메소드
+     * @param {object} unit - 대상 유닛
+     */
+    applyIronWillRegen(unit) {
+        const equipped = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
+        equipped.forEach(instId => {
+            if (!instId) return;
+            const inst = skillInventoryManager.getInstanceData(instId);
+            if (inst && inst.skillId === 'ironWill') {
+                const skillData = passiveSkills.ironWill;
+                const gradeData = skillData[inst.grade];
+
+                if (gradeData && gradeData.hpRegen > 0) {
+                    const healAmount = Math.round(unit.finalStats.hp * gradeData.hpRegen);
+                    unit.currentHp = Math.min(unit.finalStats.hp, unit.currentHp + healAmount);
+
+                    // VFX 매니저가 있다면 체력바 업데이트 및 회복량 표시
+                    if (this.battleSimulator && this.battleSimulator.vfxManager) {
+                        this.battleSimulator.vfxManager.updateHealthBar(unit.healthBar, unit.currentHp, unit.finalStats.hp);
+                        this.battleSimulator.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y - 20, `+${healAmount}`, '#22c55e');
+                    }
+                    debugLogEngine.log('StatusEffectManager', `${unit.instanceName}이(가) '아이언 윌' 효과로 HP ${healAmount} 회복.`);
+                }
+            }
+        });
     }
 
     /**
