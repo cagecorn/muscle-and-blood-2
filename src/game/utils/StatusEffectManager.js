@@ -100,8 +100,16 @@ class StatusEffectManager {
         const relevantEffects = [];
 
         for (const effect of effects) {
-            if (effect.modifiers && effect.modifiers.stat === modifierType) {
-                totalValue += effect.modifiers.value;
+            const mods = effect.modifiers;
+            if (Array.isArray(mods)) {
+                for (const m of mods) {
+                    if (m.stat === modifierType) {
+                        totalValue += m.value;
+                        relevantEffects.push(effect);
+                    }
+                }
+            } else if (mods && mods.stat === modifierType) {
+                totalValue += mods.value;
                 relevantEffects.push(effect);
             }
         }
