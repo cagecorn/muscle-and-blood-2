@@ -4,12 +4,14 @@ import SequenceNode from '../nodes/SequenceNode.js';
 import IsTargetValidNode from '../nodes/IsTargetValidNode.js';
 import FindPreferredTargetNode from '../nodes/FindPreferredTargetNode.js';
 import IsTargetInRangeNode from '../nodes/IsTargetInRangeNode.js';
-import AttackTargetNode from '../nodes/AttackTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import SuccessNode from '../nodes/SuccessNode.js';
+// ✨ [추가] '공격' 스킬을 사용하기 위해 필요한 노드들을 import합니다.
+import FindBestSkillNode from '../nodes/FindBestSkillNode.js';
+import UseSkillNode from '../nodes/UseSkillNode.js';
 
 /**
  * 원거리 유닛(거너)을 위한 카이팅 행동 트리를 생성합니다.
@@ -21,6 +23,12 @@ import SuccessNode from '../nodes/SuccessNode.js';
  * @returns {BehaviorTree}
  */
 function createRangedAI(engines) {
+    // ✨ '공격' 스킬을 찾아 사용하는 시퀀스를 정의합니다.
+    const attackWithSkill = new SequenceNode([
+        new FindBestSkillNode(engines), // '공격' 스킬을 찾습니다.
+        new UseSkillNode(engines),      // 찾은 스킬로 공격합니다.
+    ]);
+
     const rootNode = new SequenceNode([
         // 단계 1: 유효한 타겟 설정 (사거리 내의 체력이 낮은 적을 우선)
         new SelectorNode([
@@ -37,7 +45,8 @@ function createRangedAI(engines) {
                 new SelectorNode([
                     new SequenceNode([
                         new IsTargetInRangeNode(),
-                        new AttackTargetNode(engines),
+                        // ✨ [수정] AttackTargetNode 대신 새로운 공격 시퀀스 사용
+                        attackWithSkill,
                     ]),
                     new SuccessNode(),
                 ]),
@@ -45,7 +54,8 @@ function createRangedAI(engines) {
             // 2b. 공격: 사거리 내에 있으면 즉시 공격
             new SequenceNode([
                 new IsTargetInRangeNode(),
-                new AttackTargetNode(engines),
+                // ✨ [수정] AttackTargetNode 대신 새로운 공격 시퀀스 사용
+                attackWithSkill,
             ]),
             // 2c. 이동 후 공격: 사거리 밖이면 적절한 위치로 이동 후 공격
             new SequenceNode([
@@ -54,7 +64,8 @@ function createRangedAI(engines) {
                 new SelectorNode([
                     new SequenceNode([
                         new IsTargetInRangeNode(),
-                        new AttackTargetNode(engines),
+                        // ✨ [수정] AttackTargetNode 대신 새로운 공격 시퀀스 사용
+                        attackWithSkill,
                     ]),
                     new SuccessNode(),
                 ]),
