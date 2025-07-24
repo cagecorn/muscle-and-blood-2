@@ -7,9 +7,7 @@ import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
  */
 class SkillInventoryManager {
     constructor() {
-        /** 인벤토리 안에 있는 스킬 인스턴스 목록 */
         this.skillInventory = [];
-        /** 모든 인스턴스의 매핑을 보존 */
         this.instanceMap = new Map();
         this.nextInstanceId = 1;
         debugLogEngine.log('SkillInventoryManager', '스킬 인벤토리 매니저가 초기화되었습니다.');
@@ -20,11 +18,19 @@ class SkillInventoryManager {
      * 게임 시작 시 기본 스킬 카드를 지급합니다.
      */
     initializeSkillCards() {
-        // ✨ 각 스킬을 넉넉하게 10장씩 생성하도록 변경
+        // 등급별 차지 스킬 2장씩 지급
+        const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
+        grades.forEach(grade => {
+            for (let i = 0; i < 2; i++) {
+                this.addSkillById('charge', grade);
+            }
+        });
+
+        // 나머지 스킬은 노멀 등급으로 10장씩 생성
         for (const skillId in skillCardDatabase) {
-            if (skillCardDatabase.hasOwnProperty(skillId)) {
+            if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge') {
                 for (let i = 0; i < 10; i++) {
-                    this.addSkillById(skillId);
+                    this.addSkillById(skillId, 'NORMAL');
                 }
             }
         }
@@ -35,10 +41,10 @@ class SkillInventoryManager {
      * 스킬 ID를 기반으로 새로운 스킬 인스턴스를 생성해 인벤토리에 추가합니다.
      * @param {string} skillId
      */
-    addSkillById(skillId) {
-        const instance = { instanceId: this.nextInstanceId++, skillId };
+    addSkillById(skillId, grade = 'NORMAL') {
+        const instance = { instanceId: this.nextInstanceId++, skillId, grade };
         this.skillInventory.push(instance);
-        this.instanceMap.set(instance.instanceId, skillId);
+        this.instanceMap.set(instance.instanceId, { skillId, grade });
     }
 
     /**
@@ -54,13 +60,11 @@ class SkillInventoryManager {
      * @param {string} skillId - 찾을 스킬의 ID (예: 'attack')
      * @returns {object|null} - 찾은 스킬 인스턴스 또는 null
      */
-    findAndRemoveInstanceOfSkill(skillId) {
-        const index = this.skillInventory.findIndex(s => s.skillId === skillId);
+    findAndRemoveInstanceOfSkill(skillId, grade = 'NORMAL') {
+        const index = this.skillInventory.findIndex(s => s.skillId === skillId && s.grade === grade);
         if (index !== -1) {
-            const instance = this.skillInventory.splice(index, 1)[0];
-            return instance;
+            return this.skillInventory.splice(index, 1)[0];
         }
-        console.warn(`[SkillInventoryManager] 인벤토리에서 '${skillId}' 스킬을 찾을 수 없습니다.`);
         return null;
     }
 
@@ -70,12 +74,11 @@ class SkillInventoryManager {
     }
 
     /** 스킬 ID로 스킬 데이터 조회 */
-    getSkillData(skillId) {
-        return skillCardDatabase[skillId];
+    getSkillData(skillId, grade = 'NORMAL') {
+        return skillCardDatabase[skillId] ? skillCardDatabase[skillId][grade] : null;
     }
 
-    /** 인스턴스 ID로 스킬 ID 조회 */
-    getSkillIdByInstance(instanceId) {
+    getInstanceData(instanceId) {
         return this.instanceMap.get(instanceId);
     }
 }

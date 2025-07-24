@@ -1,6 +1,8 @@
 import { debugCombatLogManager } from '../debug/DebugCombatLogManager.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { debugStatusEffectManager } from '../debug/DebugStatusEffectManager.js';
+import { skillModifierEngine } from './SkillModifierEngine.js';
+import { ownedSkillsManager } from './OwnedSkillsManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -13,12 +15,20 @@ class CombatCalculationEngine {
      * @param {object} skill - 사용된 스킬 데이터 (기본 공격 포함)
      * @returns {number} 최종 적용될 데미지
      */
-    calculateDamage(attacker = {}, defender = {}, skill = {}) {
+    calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId) {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
         const baseDefense = defender.finalStats?.physicalDefense || 0;
 
-        // ✨ 스킬의 데미지 배율 적용
-        const damageMultiplier = skill.damageMultiplier || 1.0;
+        let finalSkill = skill;
+        if (instanceId) {
+            const equippedSkills = ownedSkillsManager.getEquippedSkills(attacker.uniqueId);
+            const rank = equippedSkills.indexOf(instanceId) + 1;
+            if (rank > 0) {
+                finalSkill = skillModifierEngine.getModifiedSkill(skill, rank);
+            }
+        }
+
+        const damageMultiplier = finalSkill.damageMultiplier || 1.0;
         const skillDamage = baseAttack * damageMultiplier;
 
         const initialDamage = Math.max(1, skillDamage - baseDefense);
