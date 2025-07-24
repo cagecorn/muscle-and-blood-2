@@ -14,6 +14,7 @@ export const buffSkills = {
         requiredClass: 'warrior', // ✨ 전사 전용 설정
         cooldown: 3,
         effect: {
+            id: 'stoneSkin',
             type: EFFECT_TYPES.BUFF,
             duration: 4,
             modifiers: {
