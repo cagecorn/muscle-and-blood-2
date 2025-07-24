@@ -4,6 +4,7 @@ import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 // ✨ 스킬 툴팁 매니저를 import하여 슬롯에 마우스 오버 기능을 제공합니다.
 import { SkillTooltipManager } from './SkillTooltipManager.js';
+import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -85,10 +86,11 @@ export class UnitDetailDOM {
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
                     const instData = skillInventoryManager.getInstanceData(instanceId);
-                    const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
-                    if (skillData) {
-                        bgImage = `url(${skillData.illustrationPath})`;
-                        slot.onmouseenter = (e) => SkillTooltipManager.show(skillData, e, instData.grade);
+                    const baseSkillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
+                    if (baseSkillData) {
+                        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1, instData.grade);
+                        bgImage = `url(${modifiedSkill.illustrationPath})`;
+                        slot.onmouseenter = (e) => SkillTooltipManager.show(modifiedSkill, e, instData.grade);
                         slot.onmouseleave = () => SkillTooltipManager.hide();
                     }
                 }

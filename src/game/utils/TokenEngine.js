@@ -28,6 +28,24 @@ class TokenEngine {
     }
 
     /**
+     * 특정 유닛에게 토큰을 추가합니다.
+     * @param {number} unitId - 토큰을 받을 유닛의 고유 ID
+     * @param {number} amount - 추가할 토큰의 양
+     * @param {string} reason - 토큰 추가 사유
+     */
+    addTokens(unitId, amount, reason = '스킬 효과') {
+        const data = this.tokenData.get(unitId);
+        if (data && amount > 0) {
+            const newTotal = Math.min(this.maxTokens, data.currentTokens + amount);
+            const actualAmount = newTotal - data.currentTokens;
+            if (actualAmount > 0) {
+                data.currentTokens = newTotal;
+                debugTokenManager.logTokenChange(unitId, data.unitName, reason, actualAmount, data.currentTokens);
+            }
+        }
+    }
+
+    /**
      * 새로운 턴이 시작될 때 모든 유닛의 토큰을 3으로 재설정합니다.
      * 이전 턴에 남아 있던 토큰은 모두 사라집니다.
      */

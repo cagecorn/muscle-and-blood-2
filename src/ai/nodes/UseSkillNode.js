@@ -7,6 +7,7 @@ import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngin
 import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
 import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
+import { tokenEngine } from '../../game/utils/TokenEngine.js';
 import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
 
 class UseSkillNode extends Node {
@@ -36,7 +37,7 @@ class UseSkillNode extends Node {
 
         const equippedSkills = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
         const rank = equippedSkills.indexOf(instanceId) + 1;
-        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, rank);
+        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, rank, instanceData.grade);
         if (!modifiedSkill) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 데이터 처리 오류');
             return NodeState.FAILURE;
@@ -56,12 +57,23 @@ class UseSkillNode extends Node {
         // ✨ 스킬 애니메이션 및 효과 적용 로직 수정
         if (modifiedSkill.type === 'ACTIVE') {
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
-            const damage = this.combatEngine.calculateDamage(unit, skillTarget, baseSkillData, instanceId);
+            const damage = this.combatEngine.calculateDamage(unit, skillTarget, baseSkillData, instanceId, instanceData.grade);
             skillTarget.currentHp -= damage;
 
             this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
             this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
             this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
+
+            // 토큰 생성 효과 처리
+            if (modifiedSkill.generatesToken) {
+                if (Math.random() < modifiedSkill.generatesToken.chance) {
+                    tokenEngine.addTokens(
+                        unit.uniqueId,
+                        modifiedSkill.generatesToken.amount,
+                        `${modifiedSkill.name} 효과`
+                    );
+                }
+            }
 
             if (skillTarget.currentHp <= 0) {
                 this.terminationManager.handleUnitDeath(skillTarget);
