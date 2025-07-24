@@ -225,6 +225,37 @@ export class VFXManager {
     }
 
     /**
+     * 상태 효과 이름을 머리 위에 표시합니다.
+     * @param {Phaser.GameObjects.Sprite} parentSprite
+     * @param {string} effectName
+     * @param {string} color
+     */
+    showEffectName(parentSprite, effectName, color = '#ff4d4d') {
+        const style = {
+            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontSize: '22px',
+            color: color,
+            stroke: '#000000',
+            strokeThickness: 4,
+        };
+
+        const effectText = this.scene.add.text(parentSprite.x, parentSprite.y - 70, effectName, style)
+            .setOrigin(0.5, 0.5);
+        this.vfxLayer.add(effectText);
+
+        this.scene.tweens.add({
+            targets: effectText,
+            y: effectText.y - 30,
+            alpha: 0,
+            duration: 1500,
+            ease: 'Cubic.easeOut',
+            onComplete: () => {
+                effectText.destroy();
+            }
+        });
+    }
+
+    /**
      * 유닛의 체력바를 갱신합니다.
      * @param {object} healthBar - 갱신할 체력바 객체 { background, foreground }
      * @param {number} currentHp - 현재 체력

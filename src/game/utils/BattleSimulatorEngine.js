@@ -45,6 +45,7 @@ export class BattleSimulatorEngine {
             vfxManager: this.vfxManager,
             terminationManager: this.terminationManager,
             visionManager, // visionManager를 엔진 패키지에 추가합니다.
+            cameraControl: this.scene.cameraControl,
         };
 
         this.turnQueue = [];

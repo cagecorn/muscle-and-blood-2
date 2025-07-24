@@ -57,69 +57,69 @@ export class IconManager {
 
         const activeEffects = statusEffectManager.activeEffects.get(unitId) || [];
         const existingIconIds = new Set(display.icons.keys());
-        let iconIndex = 0;
+        const iconSpacing = 22;
 
-        // 1. 지속시간이 있는 활성 효과 아이콘 처리
-        activeEffects.forEach(effect => {
-            const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            const iconKey = effectDef ? effectDef.id : null;
-            if (!iconKey) return;
+        // 1. 효과를 액티브(버프/디버프)와 패시브로 분리
+        const passiveEffects = [];
+        const otherEffects = activeEffects;
 
-            let iconData = display.icons.get(effect.instanceId);
-
-            if (!iconData) { // 새로운 아이콘 생성
-                const iconContainer = this.scene.add.container(0, 0);
-                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.04);
-                const turnText = this.scene.add.text(0, 8, effect.duration, {
-                    fontSize: '12px',
-                    color: '#fff',
-                    stroke: '#000',
-                    strokeThickness: 2
-                }).setOrigin(0.5);
-
-                iconContainer.add([icon, turnText]);
-                display.container.add(iconContainer);
-                iconData = { icon: iconContainer, text: turnText };
-                display.icons.set(effect.instanceId, iconData);
-            } else {
-                const image = iconData.icon.list[0];
-                if (image.texture.key !== iconKey) {
-                    image.setTexture(iconKey);
-                }
-            }
-
-            // 턴 수 업데이트 및 위치 조정
-            iconData.text.setText(effect.duration);
-            iconData.icon.setX(iconIndex * 22);
-            existingIconIds.delete(effect.instanceId);
-            iconIndex++; // 아이콘 위치를 위해 인덱스 증가
-        });
-
-        // ✨ 2. 패시브 스킬 아이콘 처리 (아이언 윌)
         const equipped = ownedSkillsManager.getEquippedSkills(unitId);
         equipped.forEach(instId => {
             if (!instId) return;
             const inst = skillInventoryManager.getInstanceData(instId);
             if (inst && inst.skillId === 'ironWill') {
-                const passiveId = `passive_${inst.skillId}`; // 고유 키 생성
-                let iconData = display.icons.get(passiveId);
-
-                if (!iconData) { // 패시브 아이콘이 없으면 새로 생성
-                    const iconContainer = this.scene.add.container(0, 0);
-                    const icon = this.scene.add.image(0, 0, inst.skillId).setScale(0.04);
-                    iconContainer.add(icon);
-                    display.container.add(iconContainer);
-                    iconData = { icon: iconContainer, text: null }; // 텍스트 없음
-                    display.icons.set(passiveId, iconData);
-                }
-
-                iconData.icon.setX(iconIndex * 22);
-                existingIconIds.delete(passiveId);
-                iconIndex++;
+                passiveEffects.push({
+                    instanceId: `passive_${inst.skillId}`,
+                    id: inst.skillId
+                });
             }
         });
 
-        // 3. 만료된 아이콘 제거
+        // 2. 액티브 효과 아이콘 처리 (왼쪽 정렬)
+        const totalActiveWidth = otherEffects.length > 0 ? (otherEffects.length - 1) * iconSpacing : 0;
+        const activeStartX = -totalActiveWidth / 2;
+
+        otherEffects.forEach((effect, index) => {
+            const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
+            const iconKey = effectDef ? effectDef.id : null;
+            if (!iconKey) return;
+
+            let iconData = display.icons.get(effect.instanceId);
+            if (!iconData) {
+                const iconContainer = this.scene.add.container(0, 0);
+                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.04);
+                const turnText = this.scene.add.text(0, 8, effect.duration, { fontSize: '12px', color: '#fff', stroke: '#000', strokeThickness: 2 }).setOrigin(0.5);
+                iconContainer.add([icon, turnText]);
+                display.container.add(iconContainer);
+                iconData = { icon: iconContainer, text: turnText };
+                display.icons.set(effect.instanceId, iconData);
+            } else {
+                if (iconData.icon.list[0].texture.key !== iconKey) iconData.icon.list[0].setTexture(iconKey);
+            }
+            iconData.text.setText(effect.duration);
+            iconData.icon.setX(activeStartX + index * iconSpacing);
+            existingIconIds.delete(effect.instanceId);
+        });
+
+        // 3. 패시브 스킬 아이콘 처리 (오른쪽 정렬)
+        const totalPassiveWidth = passiveEffects.length > 0 ? (passiveEffects.length - 1) * iconSpacing : 0;
+        const passiveStartX = totalActiveWidth > 0 ? totalActiveWidth / 2 + iconSpacing : -totalPassiveWidth / 2;
+
+        passiveEffects.forEach((effect, index) => {
+            let iconData = display.icons.get(effect.instanceId);
+            if (!iconData) {
+                const iconContainer = this.scene.add.container(0, 0);
+                const icon = this.scene.add.image(0, 0, effect.id).setScale(0.04);
+                iconContainer.add(icon);
+                display.container.add(iconContainer);
+                iconData = { icon: iconContainer, text: null };
+                display.icons.set(effect.instanceId, iconData);
+            }
+            iconData.icon.setX(passiveStartX + index * iconSpacing);
+            existingIconIds.delete(effect.instanceId);
+        });
+
+        // 4. 만료된 아이콘 제거
         existingIconIds.forEach(instanceId => {
             const iconData = display.icons.get(instanceId);
             if (iconData) {
