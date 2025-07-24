@@ -13,6 +13,7 @@ export class CombatUIManager {
         if (!this.container) {
             this.container = document.createElement('div');
             this.container.id = 'combat-ui-container';
+            // #app이나 다른 루트 컨테이너에 추가한다. 기본적으로 ui-container를 사용한다.
             document.getElementById('ui-container').appendChild(this.container);
         }
         this.container.style.display = 'none'; // 초기에는 숨김
@@ -64,7 +65,10 @@ export class CombatUIManager {
         }
         infoPanel.appendChild(tokenContainer);
 
-        infoPanel.innerHTML += `<div class="unit-effects"></div>`;
+        // 효과 아이콘들을 담을 컨테이너 추가
+        const effectsContainer = document.createElement('div');
+        effectsContainer.className = 'unit-effects';
+        infoPanel.appendChild(effectsContainer);
 
 
         // 2. 오른쪽 초상화 패널

@@ -115,11 +115,11 @@ export class VFXManager {
      * @param {number} y - 생성 위치 y
      * @param {number|string} damage - 표시할 데미지 숫자
      */
-    createDamageNumber(x, y, damage) {
+    createDamageNumber(x, y, damage, color = '#ff4d4d') {
         const style = {
             fontFamily: '"Arial Black", Arial, sans-serif',
             fontSize: '32px',
-            color: '#ff4d4d',
+            color: color,
             stroke: '#000000',
             strokeThickness: 4,
         };
@@ -209,6 +209,10 @@ export class VFXManager {
      */
     shutdown() {
         this.vfxLayer.destroy();
+        this.activeTokenDisplays.forEach(display => {
+            display.container.destroy();
+        });
+        this.activeTokenDisplays.clear();
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
