@@ -17,8 +17,9 @@ export const SKILL_TYPES = {
 class SkillEngine {
     constructor() {
         this.skillTypes = Object.keys(SKILL_TYPES);
-        // ✨ 한 턴에 사용된 스킬을 추적하는 Set
-        this.usedSkillsThisTurn = new Set();
+        // ✨ 한 턴 동안 유닛별로 사용한 스킬을 추적합니다
+        // key: unitId => Set<skillId>
+        this.usedSkillsThisTurn = new Map();
         // ✨ 한 턴에 스킬을 사용한 횟수를 추적하는 Map
         this.skillUsesThisTurn = new Map();
         debugLogEngine.log('SkillEngine', '스킬 엔진이 초기화되었습니다.');
@@ -46,8 +47,9 @@ class SkillEngine {
             return false;
         }
 
-        // 2. 이번 턴에 이미 사용한 스킬인가?
-        if (this.usedSkillsThisTurn.has(skill.id)) {
+        // 2. 이번 턴에 해당 유닛이 이미 사용한 스킬인가?
+        const unitUsed = this.usedSkillsThisTurn.get(unit.uniqueId);
+        if (unitUsed && unitUsed.has(skill.id)) {
             return false;
         }
 
@@ -77,7 +79,13 @@ class SkillEngine {
         tokenEngine.spendTokens(unit.uniqueId, skill.cost);
 
         // 사용 기록
-        this.usedSkillsThisTurn.add(skill.id);
+        let unitUsed = this.usedSkillsThisTurn.get(unit.uniqueId);
+        if (!unitUsed) {
+            unitUsed = new Set();
+            this.usedSkillsThisTurn.set(unit.uniqueId, unitUsed);
+        }
+        unitUsed.add(skill.id);
+
         const currentUses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
         this.skillUsesThisTurn.set(unit.uniqueId, currentUses + 1);
 
