@@ -20,6 +20,8 @@ import { tokenEngine } from './TokenEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { cooldownManager } from './CooldownManager.js';
+// 전투 중 하단 UI를 관리하는 매니저
+import { CombatUIManager } from '../dom/CombatUIManager.js';
 
 
 export class BattleSimulatorEngine {
@@ -33,6 +35,8 @@ export class BattleSimulatorEngine {
         this.bindingManager = new BindingManager(scene);
         this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
         this.terminationManager = new TerminationManager(scene);
+        // 전투 중 유닛 정보를 표시할 UI 매니저
+        this.combatUI = new CombatUIManager();
         
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
@@ -124,6 +128,9 @@ export class BattleSimulatorEngine {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
+            // 현재 턴을 진행하는 유닛 정보를 하단 UI에 표시
+            this.combatUI.show(currentUnit);
+
             if (currentUnit && currentUnit.currentHp > 0 && !currentUnit.isStunned) {
                 this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
                 await delayEngine.hold(500);
@@ -158,12 +165,16 @@ export class BattleSimulatorEngine {
                 }
             });
             this.vfxManager.updateAllStatusIcons();
+            // 다음 턴의 유닛 정보를 미리 갱신
+            this.combatUI.show(this.turnQueue[this.currentTurnIndex]);
 
             await delayEngine.hold(1000);
         }
 
         if (!this.isRunning) return;
-        
+
+        // 전투 종료 시 UI 숨김 처리
+        this.combatUI.hide();
         console.log('전투 종료!');
     }
 
@@ -176,5 +187,8 @@ export class BattleSimulatorEngine {
     shutdown() {
         this.isRunning = false;
         // 모든 매니저 종료 처리...
+        if (this.combatUI) {
+            this.combatUI.destroy();
+        }
     }
 }
