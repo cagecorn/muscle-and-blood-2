@@ -41,7 +41,8 @@ export class VFXManager {
 
         // 유닛의 토큰 UI가 없다면 새로 생성합니다.
         if (!display) {
-            const yOffset = (unit.sprite.displayHeight / 2) + 15; // 유닛 발밑
+            // ✨ [수정] yOffset을 음수 값으로 변경하여 유닛의 머리 위로 이동시킵니다.
+            const yOffset = -(unit.sprite.displayHeight / 2) - 15; // 유닛 머리 위
             const container = this.scene.add.container(unit.sprite.x, unit.sprite.y + yOffset);
             this.vfxLayer.add(container);
 
