@@ -768,6 +768,7 @@ body {
     color: #fff;
     cursor: pointer;
     pointer-events: auto;
+    z-index: 100;
 }
 
 /* --- 스킬 카드 스타일 --- */

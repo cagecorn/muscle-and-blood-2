@@ -24,6 +24,7 @@ export class SkillTooltipManager {
                 <div class="skill-name-large">${skillData.name}</div>
                 <div class="skill-type-cost-large">
                     <span style="color: ${SKILL_TYPES[skillData.type].color};">[${SKILL_TYPES[skillData.type].name}]</span>
+                    <span>쿨타임 ${skillData.cooldown || 0}</span>
                 </div>
                 <div class="skill-description-large">${description}</div>
                 <div class="skill-cost-container-large"></div>

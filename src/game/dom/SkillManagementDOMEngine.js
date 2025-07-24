@@ -135,7 +135,7 @@ export class SkillManagementDOMEngine {
         if (instanceId) {
             const instanceData = skillInventoryManager.getInstanceData(instanceId);
             const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
-            const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1);
+            const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1, instanceData.grade);
 
             slot.style.backgroundImage = `url(${modifiedSkill.illustrationPath})`;
             slot.dataset.instanceId = instanceId;

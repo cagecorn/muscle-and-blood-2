@@ -15,7 +15,7 @@ class CombatCalculationEngine {
      * @param {object} skill - 사용된 스킬 데이터 (기본 공격 포함)
      * @returns {number} 최종 적용될 데미지
      */
-    calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId) {
+    calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
         const baseDefense = defender.finalStats?.physicalDefense || 0;
 
@@ -24,7 +24,7 @@ class CombatCalculationEngine {
             const equippedSkills = ownedSkillsManager.getEquippedSkills(attacker.uniqueId);
             const rank = equippedSkills.indexOf(instanceId) + 1;
             if (rank > 0) {
-                finalSkill = skillModifierEngine.getModifiedSkill(skill, rank);
+                finalSkill = skillModifierEngine.getModifiedSkill(skill, rank, grade);
             }
         }
 
