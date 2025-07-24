@@ -3,6 +3,7 @@ import { tokenEngine } from '../utils/TokenEngine.js';
 import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
+import { cooldownManager } from '../utils/CooldownManager.js';
 
 /**
  * 전투 중 활성화된 유닛의 상세 정보를 표시하는 하단 UI 매니저
@@ -35,9 +36,17 @@ export class CombatUIManager {
         const infoPanel = document.createElement('div');
         infoPanel.className = 'combat-info-panel';
 
-        const name = `${unit.instanceName} - Lv. ${unit.level}`;
-        const hp = `체력: ${Math.max(0, unit.currentHp)} / ${unit.finalStats.hp}`;
-        
+        const name = `${unit.instanceName} - Lv. ${unit.level}`; 
+        const hpText = `${Math.max(0, unit.currentHp)} / ${unit.finalStats.hp}`;
+
+        // 상단 행 : 이름, 체력바, 효과 아이콘
+        const topRow = document.createElement('div');
+        topRow.className = 'combat-top-row';
+
+        const nameElem = document.createElement('div');
+        nameElem.className = 'unit-name-level';
+        nameElem.innerText = name;
+
         // 체력바
         const healthBarContainer = document.createElement('div');
         healthBarContainer.className = 'combat-health-bar-container';
@@ -45,30 +54,41 @@ export class CombatUIManager {
         healthBar.className = 'combat-health-bar';
         const healthPercentage = (unit.currentHp / unit.finalStats.hp) * 100;
         healthBar.style.width = `${Math.max(0, healthPercentage)}%`;
+        const hpLabel = document.createElement('span');
+        hpLabel.className = 'unit-stats';
+        hpLabel.innerText = hpText;
         healthBarContainer.appendChild(healthBar);
+        healthBarContainer.appendChild(hpLabel);
 
-        infoPanel.innerHTML = `
-            <div class="unit-name-level">${name}</div>
-            <div class="unit-stats">${hp}</div>
-        `;
-        infoPanel.appendChild(healthBarContainer);
+        const effectsContainer = document.createElement('div');
+        effectsContainer.className = 'unit-effects';
 
-        // 토큰
+        topRow.appendChild(nameElem);
+        topRow.appendChild(healthBarContainer);
+        topRow.appendChild(effectsContainer);
+
+        // 하단 행 : 토큰 및 스킬
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'combat-bottom-row';
+
         const tokenContainer = document.createElement('div');
         tokenContainer.className = 'combat-token-container';
         const currentTokens = tokenEngine.getTokens(unit.uniqueId);
-        for(let i = 0; i < currentTokens; i++) {
+        for (let i = 0; i < currentTokens; i++) {
             const tokenImg = document.createElement('img');
             tokenImg.src = 'assets/images/battle/token.png';
             tokenImg.className = 'combat-token-icon';
             tokenContainer.appendChild(tokenImg);
         }
-        infoPanel.appendChild(tokenContainer);
 
-        // 효과 아이콘들을 담을 컨테이너 추가
-        const effectsContainer = document.createElement('div');
-        effectsContainer.className = 'unit-effects';
-        infoPanel.appendChild(effectsContainer);
+        const skillContainer = document.createElement('div');
+        skillContainer.className = 'combat-skill-container';
+
+        bottomRow.appendChild(tokenContainer);
+        bottomRow.appendChild(skillContainer);
+
+        infoPanel.appendChild(topRow);
+        infoPanel.appendChild(bottomRow);
 
 
         // 2. 오른쪽 초상화 패널
@@ -86,8 +106,9 @@ export class CombatUIManager {
 
         this.container.appendChild(infoPanel);
         this.container.appendChild(portraitPanel);
-        
+
         this.updateEffects(unit); // 버프/디버프 아이콘 업데이트
+        this.updateSkills(unit); // 스킬 아이콘 및 쿨타임 표시
 
         this.container.style.display = 'flex';
     }
@@ -132,6 +153,37 @@ export class CombatUIManager {
                 const icon = this.createEffectIcon(skillData.illustrationPath, `${skillData.name} (패시브)`);
                 effectsContainer.appendChild(icon);
             }
+        });
+    }
+
+    /**
+     * 유닛의 스킬 아이콘과 쿨타임을 업데이트합니다.
+     * @param {object} unit
+     */
+    updateSkills(unit) {
+        const skillContainer = this.container.querySelector('.combat-skill-container');
+        if (!skillContainer) return;
+        skillContainer.innerHTML = '';
+
+        const equipped = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
+        equipped.forEach(instId => {
+            if (!instId) return;
+            const inst = skillInventoryManager.getInstanceData(instId);
+            const skillData = skillInventoryManager.getSkillData(inst.skillId, inst.grade);
+            if (!skillData) return;
+
+            const icon = document.createElement('div');
+            icon.className = 'combat-skill-icon';
+            icon.style.backgroundImage = `url(${skillData.illustrationPath})`;
+
+            const remaining = cooldownManager.getRemaining(unit.uniqueId, skillData.id);
+            if (remaining > 0) {
+                const overlay = document.createElement('div');
+                overlay.className = 'skill-cooldown-overlay';
+                overlay.innerText = remaining;
+                icon.appendChild(overlay);
+            }
+            skillContainer.appendChild(icon);
         });
     }
 
