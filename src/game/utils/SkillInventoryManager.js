@@ -97,8 +97,15 @@ class SkillInventoryManager {
     getSkillData(skillId, grade = 'NORMAL') {
         const entry = skillCardDatabase[skillId];
         if (!entry) return null;
-        // 등급별 데이터가 존재하면 사용
-        if (entry[grade]) return entry[grade];
+        // 등급별 데이터가 존재하면 기본 데이터와 병합하여 반환합니다.
+        if (entry[grade]) {
+            const baseData = { ...entry };
+            delete baseData.NORMAL;
+            delete baseData.RARE;
+            delete baseData.EPIC;
+            delete baseData.LEGENDARY;
+            return { ...baseData, ...entry[grade] };
+        }
         // 등급 없이 정의된 경우 전체 객체를 그대로 반환
         return entry;
     }
