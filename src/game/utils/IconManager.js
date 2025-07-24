@@ -2,6 +2,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
 import { statusEffects } from '../data/status-effects.js';
+import { ownedSkillsManager } from './OwnedSkillsManager.js';
+import { skillInventoryManager } from './SkillInventoryManager.js';
 
 /**
  * 상태 효과 아이콘을 생성하고 관리하는 엔진
@@ -55,9 +57,10 @@ export class IconManager {
 
         const activeEffects = statusEffectManager.activeEffects.get(unitId) || [];
         const existingIconIds = new Set(display.icons.keys());
+        let iconIndex = 0;
 
-        // 활성 효과를 기반으로 아이콘을 추가하거나 업데이트합니다.
-        activeEffects.forEach((effect, index) => {
+        // 1. 지속시간이 있는 활성 효과 아이콘 처리
+        activeEffects.forEach(effect => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
             const iconKey = effectDef ? effectDef.id : null;
             if (!iconKey) return;
@@ -87,14 +90,42 @@ export class IconManager {
 
             // 턴 수 업데이트 및 위치 조정
             iconData.text.setText(effect.duration);
-            iconData.icon.setX(index * 22); // 아이콘 간 간격 조정
+            iconData.icon.setX(iconIndex * 22);
             existingIconIds.delete(effect.instanceId);
+            iconIndex++; // 아이콘 위치를 위해 인덱스 증가
         });
 
-        // 만료된 아이콘 제거
+        // ✨ 2. 패시브 스킬 아이콘 처리 (아이언 윌)
+        const equipped = ownedSkillsManager.getEquippedSkills(unitId);
+        equipped.forEach(instId => {
+            if (!instId) return;
+            const inst = skillInventoryManager.getInstanceData(instId);
+            if (inst && inst.skillId === 'ironWill') {
+                const passiveId = `passive_${inst.skillId}`; // 고유 키 생성
+                let iconData = display.icons.get(passiveId);
+
+                if (!iconData) { // 패시브 아이콘이 없으면 새로 생성
+                    const iconContainer = this.scene.add.container(0, 0);
+                    const icon = this.scene.add.image(0, 0, inst.skillId).setScale(0.04);
+                    iconContainer.add(icon);
+                    display.container.add(iconContainer);
+                    iconData = { icon: iconContainer, text: null }; // 텍스트 없음
+                    display.icons.set(passiveId, iconData);
+                }
+
+                iconData.icon.setX(iconIndex * 22);
+                existingIconIds.delete(passiveId);
+                iconIndex++;
+            }
+        });
+
+        // 3. 만료된 아이콘 제거
         existingIconIds.forEach(instanceId => {
-            display.icons.get(instanceId).icon.destroy();
-            display.icons.delete(instanceId);
+            const iconData = display.icons.get(instanceId);
+            if (iconData) {
+                iconData.icon.destroy();
+                display.icons.delete(instanceId);
+            }
         });
     }
 

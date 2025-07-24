@@ -28,5 +28,11 @@ export const statusEffects = {
         id: 'shieldBreak',
         name: '쉴드 브레이크',
         iconPath: 'assets/images/skills/shield-break.png',
+    },
+    // ✨ 아이언 윌 효과 추가
+    ironWill: {
+        id: 'ironWill',
+        name: '아이언 윌',
+        iconPath: 'assets/images/skills/iron_will.png',
     }
 };
