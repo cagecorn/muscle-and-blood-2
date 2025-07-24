@@ -17,22 +17,5 @@ export class Game extends Scene {
         
         // 게임 시작 시, 카메라의 초기 상태를 로그로 남깁니다.
         debugCameraLogManager.logInitialState(this.cameras.main, this.sys.game.config);
-
-        // 예시용 9-Slice UI 패널 생성
-        const helpPanel = this.add.nineslice(
-            this.cameras.main.centerX,
-            this.cameras.main.centerY,
-            400,
-            300,
-            'ui-panel',
-            null,
-            60,
-            60
-        );
-
-        this.add.text(helpPanel.x, helpPanel.y, 'Hello 9-Slice!', {
-            fontSize: '32px',
-            color: '#ffffff'
-        }).setOrigin(0.5);
     }
 }
