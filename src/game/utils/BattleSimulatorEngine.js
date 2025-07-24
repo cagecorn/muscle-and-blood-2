@@ -120,7 +120,9 @@ export class BattleSimulatorEngine {
                 unit.gridY = cell.row;
             }
 
-            this.vfxManager.setupUnitVFX(unit);
+            // 머리 위 이름표만 생성한다.
+            const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName);
+            this.bindingManager.bind(unit.sprite, [nameTag]);
         });
     }
 
@@ -148,6 +150,10 @@ export class BattleSimulatorEngine {
                 console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
                 cooldownManager.reduceCooldowns(currentUnit.uniqueId);
             }
+
+            // 행동이 끝난 후 UI를 다시 업데이트하여 변경된 체력 등을 즉시 반영합니다.
+            this.combatUI.show(currentUnit);
+            await delayEngine.hold(500); // 변경된 상태를 잠시 보여줍니다.
 
             this.currentTurnIndex++;
             if (this.currentTurnIndex >= this.turnQueue.length) {
@@ -187,7 +193,12 @@ export class BattleSimulatorEngine {
 
     shutdown() {
         this.isRunning = false;
-        // 모든 매니저 종료 처리...
+        if (this.vfxManager) {
+            this.vfxManager.shutdown();
+        }
+        if (this.textEngine) {
+            this.textEngine.shutdown();
+        }
         if (this.combatUI) {
             this.combatUI.destroy();
         }
