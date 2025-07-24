@@ -24,6 +24,11 @@ class SkillInventoryManager {
             for (let i = 0; i < 2; i++) {
                 this.addSkillById('charge', grade);
                 this.addSkillById('attack', grade); // 공격 스킬도 각 등급별 2장 지급
+
+                // ✨ 추가 기본 스킬 카드 지급
+                this.addSkillById('stoneSkin', grade);
+                this.addSkillById('shieldBreak', grade);
+                this.addSkillById('ironWill', grade);
             }
         });
 
