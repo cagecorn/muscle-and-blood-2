@@ -166,7 +166,6 @@ export class BattleSimulatorEngine {
                     this.vfxManager.updateTokenDisplay(unit);
                 }
             });
-            this.vfxManager.updateAllStatusIcons();
             // 다음 턴의 유닛 정보를 미리 갱신
             this.combatUI.show(this.turnQueue[this.currentTurnIndex]);
 
