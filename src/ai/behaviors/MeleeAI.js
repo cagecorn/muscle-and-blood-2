@@ -2,13 +2,10 @@ import BehaviorTree from '../BehaviorTree.js';
 import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
+import SuccessNode from '../nodes/SuccessNode.js';
 
-// ✨ [추가] 턴 당 행동을 반복하고, 이동 가능 여부를 체크하는 새 노드를 import합니다.
-import RepeaterNode from '../nodes/RepeaterNode.js';
-import CanMoveNode from '../nodes/CanMoveNode.js';
-
-// 기존 노드 import
-import FindBestSkillNode from '../nodes/FindBestSkillNode.js';
+// 신규 노드 및 재사용 노드 import
+import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
@@ -25,40 +22,58 @@ import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
  */
 function createMeleeAI(engines = {}) {
 
-    // 한 턴에 수행할 수 있는 단일 행동(스킬 사용 또는 이동)을 정의하는 서브트리입니다.
-    const takeOneAction = new SelectorNode([
-        // 우선순위 1: 사용 가능한 스킬(공격, 버프 등)을 찾아 실행합니다.
+    // 스킬 하나를 실행하는 공통 로직 (이동 포함)
+    const executeSkillBranch = new SelectorNode([
+        // A. 제자리에서 즉시 사용
         new SequenceNode([
-            new FindBestSkillNode(engines),
-            new FindTargetBySkillTypeNode(engines),
-            new SelectorNode([
-                // A. 제자리에서 즉시 사용
-                new SequenceNode([
-                    new IsSkillInRangeNode(engines),
-                    new UseSkillNode(engines)
-                ]),
-                // B. 이동 후 사용 (아직 이동하지 않았을 경우에만)
-                new SequenceNode([
-                    new CanMoveNode(),
-                    new FindPathToSkillRangeNode(engines),
-                    new MoveToTargetNode(engines),
-                    new IsSkillInRangeNode(engines),
-                    new UseSkillNode(engines)
-                ])
-            ])
+            new IsSkillInRangeNode(engines),
+            new UseSkillNode(engines)
         ]),
-
-        // 우선순위 2: 사용할 스킬이 없을 때, 이동만 합니다. (아직 이동하지 않았을 경우에만)
+        // B. 이동 후 사용
         new SequenceNode([
-            new CanMoveNode(),
-            new FindMeleeStrategicTargetNode(engines),
-            new FindPathToTargetNode(engines),
-            new MoveToTargetNode(engines)
+            new FindPathToSkillRangeNode(engines),
+            new MoveToTargetNode(engines),
+            new IsSkillInRangeNode(engines), // 이동 후 사거리 재확인
+            new UseSkillNode(engines)
         ])
     ]);
 
-    // 루트 노드는 Repeater로, takeOneAction을 계속 반복 실행합니다.
-    const rootNode = new RepeaterNode(takeOneAction);
+    const rootNode = new SelectorNode([
+        // 우선순위 1: 1번 슬롯 스킬 사용 시도
+        new SequenceNode([
+            new CanUseSkillBySlotNode(0),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        // 우선순위 2: 2번 슬롯 스킬 사용 시도
+        new SequenceNode([
+            new CanUseSkillBySlotNode(1),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        // 우선순위 3: 3번 슬롯 스킬 사용 시도
+        new SequenceNode([
+            new CanUseSkillBySlotNode(2),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        // 우선순위 4: 4번 슬롯 스킬 사용 시도 (보통 일반 공격)
+        new SequenceNode([
+            new CanUseSkillBySlotNode(3),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+
+        // 우선순위 5: 사용할 스킬이 없을 경우, 이동만 실행
+        new SequenceNode([
+            new FindMeleeStrategicTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+
+        // 최후의 보루: 아무것도 할 수 없을 때 성공으로 턴 종료
+        new SuccessNode(),
+    ]);
 
     return new BehaviorTree(rootNode);
 }
