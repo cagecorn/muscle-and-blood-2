@@ -120,8 +120,9 @@ export class BattleSimulatorEngine {
                 unit.gridY = cell.row;
             }
 
-            // 머리 위 이름표만 생성한다.
-            const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName);
+            // ✨ [수정] 팀에 따라 이름표 색상을 다르게 설정합니다.
+            const nameColor = unit.team === 'ally' ? '#60a5fa' : '#f87171'; // 아군: 파랑, 적군: 빨강
+            const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName, nameColor);
             this.bindingManager.bind(unit.sprite, [nameTag]);
         });
     }
