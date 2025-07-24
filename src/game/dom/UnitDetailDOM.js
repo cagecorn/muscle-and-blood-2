@@ -74,6 +74,7 @@ export class UnitDetailDOM {
         skillGrid.className = 'skill-grid';
 
         const equippedSkills = ownedSkillsManager.getEquippedSkills(unitData.uniqueId);
+        const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
@@ -92,11 +93,23 @@ export class UnitDetailDOM {
                         bgImage = `url(${modifiedSkill.illustrationPath})`;
                         slot.onmouseenter = (e) => SkillTooltipManager.show(modifiedSkill, e, instData.grade);
                         slot.onmouseleave = () => SkillTooltipManager.hide();
+
+                        // 등급 표시를 위한 클래스와 별 이미지 추가
+                        slot.classList.add(`grade-${instData.grade.toLowerCase()}`);
+                        const starsContainer = document.createElement('div');
+                        starsContainer.className = 'grade-stars';
+                        const starCount = gradeMap[instData.grade] || 1;
+                        for (let i = 0; i < starCount; i++) {
+                            const starImg = document.createElement('img');
+                            starImg.src = 'assets/images/territory/skill-card-star.png';
+                            starsContainer.appendChild(starImg);
+                        }
+                        slot.appendChild(starsContainer);
                     }
                 }
                 slot.style.backgroundImage = bgImage;
 
-                slot.innerHTML = `<span class="slot-rank">${index + 1} 순위</span>`;
+                slot.innerHTML += `<span class="slot-rank">${index + 1} 순위</span>`;
                 skillGrid.appendChild(slot);
             });
         }

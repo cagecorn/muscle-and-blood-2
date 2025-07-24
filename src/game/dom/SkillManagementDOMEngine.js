@@ -137,12 +137,27 @@ export class SkillManagementDOMEngine {
             const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
             const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1, instanceData.grade);
 
+            // 등급별 테두리 클래스를 부여합니다.
+            slot.classList.add(`grade-${instanceData.grade.toLowerCase()}`);
+
             slot.style.backgroundImage = `url(${modifiedSkill.illustrationPath})`;
             slot.dataset.instanceId = instanceId;
             slot.draggable = true;
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId, slotIndex: index });
             slot.onmouseenter = e => SkillTooltipManager.show(modifiedSkill, e, instanceData.grade);
             slot.onmouseleave = () => SkillTooltipManager.hide();
+
+            // 등급에 따른 별 표시
+            const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
+            const starsContainer = document.createElement('div');
+            starsContainer.className = 'grade-stars';
+            const starCount = gradeMap[instanceData.grade] || 1;
+            for (let i = 0; i < starCount; i++) {
+                const starImg = document.createElement('img');
+                starImg.src = 'assets/images/territory/skill-card-star.png';
+                starsContainer.appendChild(starImg);
+            }
+            slot.appendChild(starsContainer);
         } else {
             slot.style.backgroundImage = 'url(assets/images/skills/skill-slot.png)';
         }
@@ -183,13 +198,7 @@ export class SkillManagementDOMEngine {
             }
             card.appendChild(starsContainer);
 
-            if (data.requiredClass) {
-                const tag = document.createElement('div');
-                tag.className = 'skill-class-tag';
-                const className = data.requiredClass === 'warrior' ? '전사' : data.requiredClass;
-                tag.innerText = `[${className}]`;
-                card.appendChild(tag);
-            }
+            // 인벤토리 카드에서는 클래스 태그를 표시하지 않습니다.
             this.skillInventoryContent.appendChild(card);
         });
     }

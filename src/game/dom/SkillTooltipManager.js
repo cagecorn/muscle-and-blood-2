@@ -19,10 +19,17 @@ export class SkillTooltipManager {
             description = description.replace('{{damage}}%', `${Math.round(skillData.damageMultiplier * 100)}%`);
         }
 
+        // 스킬 이름 옆에 클래스 전용 여부를 표시
+        let skillNameHTML = skillData.name;
+        if (skillData.requiredClass) {
+            const className = skillData.requiredClass === 'warrior' ? '전사' : skillData.requiredClass;
+            skillNameHTML += ` <span style="font-size: 14px; color: #ffc107;">[${className} 전용]</span>`;
+        }
+
         tooltip.innerHTML = `
             <div class="skill-illustration-large" style="background-image: url(${skillData.illustrationPath})"></div>
             <div class="skill-info-large">
-                <div class="skill-name-large">${skillData.name}</div>
+                <div class="skill-name-large">${skillNameHTML}</div>
                 <div class="skill-type-cost-large">
                     <span style="color: ${SKILL_TYPES[skillData.type].color};">[${SKILL_TYPES[skillData.type].name}]</span>
                     <span>쿨타임 ${skillData.cooldown || 0}</span>
