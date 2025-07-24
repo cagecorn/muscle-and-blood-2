@@ -95,8 +95,8 @@ export class Preloader extends Scene
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
-        // 9-Slice 패널 이미지 로드 (모서리 두께 60px)
-        this.load.nineslice('ui-panel', 'images/ui-panel.png', 60);
+        // 9-Slice 패널은 일반 이미지로 로드합니다.
+        this.load.image('ui-panel', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');
         this.load.image('battle-stage-cursed-forest', 'images/battle/battle-stage-cursed-forest.png');
 
