@@ -40,31 +40,47 @@ class SkillInventoryManager {
 
     /**
      * 스킬 ID를 기반으로 새로운 스킬 인스턴스를 생성해 인벤토리에 추가합니다.
+     *
      * @param {string} skillId
+     * @returns {object} 생성된 스킬 인스턴스
      */
     addSkillById(skillId, grade = 'NORMAL') {
         const instance = { instanceId: this.nextInstanceId++, skillId, grade };
         this.skillInventory.push(instance);
         this.instanceMap.set(instance.instanceId, { skillId, grade });
+        return instance;
     }
 
     /**
-     * 인벤토리에서 특정 인스턴스를 제거합니다.
+     * 인벤토리에서 특정 인스턴스를 제거합니다. (맵에서도 제거)
      * @param {number} instanceId
      */
     removeSkillByInstanceId(instanceId) {
         this.skillInventory = this.skillInventory.filter(s => s.instanceId !== instanceId);
+        this.instanceMap.delete(instanceId);
     }
 
     /**
-     * ✨ [새 메서드] 인벤토리에서 특정 skillId를 가진 첫 번째 인스턴스를 찾아 제거하고 반환합니다.
+     * 인벤토리 '목록'에서만 특정 인스턴스를 제거합니다.
+     * instanceMap에는 데이터를 남겨둬 다른 시스템이 스킬 정보를 조회할 수 있습니다.
+     * @param {number} instanceId
+     */
+    removeSkillFromInventoryList(instanceId) {
+        this.skillInventory = this.skillInventory.filter(s => s.instanceId !== instanceId);
+    }
+
+    /**
+     * ✨ [기존 메서드 수정] 인벤토리에서 특정 skillId를 가진 첫 번째 인스턴스를 찾아 제거하고 반환합니다.
      * @param {string} skillId - 찾을 스킬의 ID (예: 'attack')
      * @returns {object|null} - 찾은 스킬 인스턴스 또는 null
      */
     findAndRemoveInstanceOfSkill(skillId, grade = 'NORMAL') {
         const index = this.skillInventory.findIndex(s => s.skillId === skillId && s.grade === grade);
         if (index !== -1) {
-            return this.skillInventory.splice(index, 1)[0];
+            const instance = this.skillInventory.splice(index, 1)[0];
+            // ✨ 인벤토리에서 완전히 제거되므로 instanceMap에서도 삭제합니다.
+            this.instanceMap.delete(instance.instanceId);
+            return instance;
         }
         return null;
     }

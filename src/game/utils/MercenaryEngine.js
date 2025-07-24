@@ -45,11 +45,14 @@ class MercenaryEngine {
             // 4번째 슬롯을 'ACTIVE' 타입으로 고정
             newInstance.skillSlots.push('ACTIVE');
 
-            // 인벤토리에서 'attack' 스킬 인스턴스를 찾아 장착
-            const attackInstance = skillInventoryManager.findAndRemoveInstanceOfSkill('attack');
-            if (attackInstance) {
+            // 인벤토리에서 'attack' 스킬 인스턴스를 소비하고, 동일한 스킬을 새로 생성하여 장착합니다.
+            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('attack');
+            if (consumed) {
+                const attackInstance = skillInventoryManager.addSkillById('attack', consumed.grade);
                 // 4번 슬롯(인덱스 3)에 장착
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
+                // 새로 생성된 인스턴스는 용병 전용이므로 인벤토리 목록에서는 제거합니다.
+                skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
         } else {
             // 다른 클래스는 4번째 슬롯을 빈 슬롯(null)으로 추가

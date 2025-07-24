@@ -224,7 +224,8 @@ export class SkillManagementDOMEngine {
 
         if (this.draggedData.source === 'inventory') {
             ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
-            skillInventoryManager.removeSkillByInstanceId(draggedInstanceId);
+            // 인벤토리 목록에서만 제거하여 장착 후에도 스킬 데이터를 참조할 수 있게 합니다.
+            skillInventoryManager.removeSkillFromInventoryList(draggedInstanceId);
             if (targetInstanceId) {
                 ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
                 this.addSkillToInventory(targetInstanceId);
