@@ -39,5 +39,27 @@ export const mercenaryData = {
             agility: 15, intelligence: 8, wisdom: 10, luck: 12,
             attackRange: 3
         }
+    },
+    // --- ▼ [신규] 메딕 클래스 데이터 추가 ▼ ---
+    medic: {
+        id: 'medic',
+        name: '메딕',
+        hireImage: 'assets/images/territory/medic-hire.png',
+        uiImage: 'assets/images/territory/medic-ui.png',
+        battleSprite: 'medic',
+        sprites: {
+            idle: 'medic',
+            attack: 'medic-attack',
+            hitted: 'medic-hitted',
+            cast: 'medic-cast',
+            'status-effects': 'medic-status-effects',
+        },
+        description: '"치유의 빛으로 아군을 보호하고, 적에게는 심판을 내린다."',
+        baseStats: {
+            hp: 90, valor: 8, strength: 6, endurance: 8,
+            agility: 10, intelligence: 12, wisdom: 15, luck: 9,
+            attackRange: 2
+        }
     }
+    // --- ▲ [신규] 메딕 클래스 데이터 추가 ▲ ---
 };
