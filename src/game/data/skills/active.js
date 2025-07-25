@@ -178,5 +178,59 @@ export const activeSkills = {
             range: 3,
             push: 2
         }
+    },
+
+    // ✨ [신규] 원거리 공격 스킬 추가
+    rangedAttack: {
+        NORMAL: {
+            id: 'rangedAttack',
+            name: '원거리 공격',
+            type: 'ACTIVE',
+            cost: 1,
+            description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
+            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 3,
+        },
+        RARE: {
+            id: 'rangedAttack',
+            name: '원거리 공격 [R]',
+            type: 'ACTIVE',
+            cost: 0,
+            description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
+            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 3,
+        },
+        EPIC: {
+            id: 'rangedAttack',
+            name: '원거리 공격 [E]',
+            type: 'ACTIVE',
+            cost: 0,
+            description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
+            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 3,
+            generatesToken: { chance: 0.5, amount: 1 }
+        },
+        LEGENDARY: {
+            id: 'rangedAttack',
+            name: '원거리 공격 [L]',
+            type: 'ACTIVE',
+            cost: 0,
+            description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
+            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
+            requiredClass: 'gunner',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 3,
+            generatesToken: { chance: 1.0, amount: 1 }
+        }
     }
 };
