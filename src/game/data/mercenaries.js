@@ -5,12 +5,13 @@ export const mercenaryData = {
         hireImage: 'assets/images/territory/warrior-hire.png',
         uiImage: 'assets/images/territory/warrior-ui.png',
         battleSprite: 'warrior',
-        // 유닛의 행동별 스프라이트 키를 정의합니다.
+        // ✨ 전사 스프라이트 정보 업데이트
         sprites: {
             idle: 'warrior',
             attack: 'warrior-attack',
             hitted: 'warrior-hitted',
             cast: 'warrior-cast',
+            'status-effects': 'warrior-status-effects', // 상태이상 이미지 키 추가
         },
         description: '"그는 단 한 사람을 지키기 위해 검을 든다."',
         baseStats: {
@@ -24,10 +25,13 @@ export const mercenaryData = {
         hireImage: 'assets/images/territory/gunner-hire.png',
         uiImage: 'assets/images/territory/gunner-ui.png',
         battleSprite: 'gunner',
+        // ✨ 거너 스프라이트 정보 업데이트
         sprites: {
             idle: 'gunner',
             attack: 'gunner-attack',
             hitted: 'gunner-hitted',
+            cast: 'gunner-cast', // 버프(시전) 이미지 키 추가
+            'status-effects': 'gunner-status-effects', // 상태이상 이미지 키 추가
         },
         description: '"한 발, 한 발. 신중하게, 그리고 차갑게."',
         baseStats: {
