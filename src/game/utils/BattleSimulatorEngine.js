@@ -23,6 +23,9 @@ import { cooldownManager } from './CooldownManager.js';
 // 전투 중 하단 UI를 관리하는 매니저
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 
+// 그림자 생성을 담당하는 매니저
+import { ShadowManager } from './ShadowManager.js';
+
 
 export class BattleSimulatorEngine {
     constructor(scene) {
@@ -33,6 +36,8 @@ export class BattleSimulatorEngine {
         this.animationEngine = new AnimationEngine(scene);
         this.textEngine = new OffscreenTextEngine(scene);
         this.bindingManager = new BindingManager(scene);
+        // 그림자 생성용 매니저 초기화
+        this.shadowManager = new ShadowManager(scene);
         this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
         this.terminationManager = new TerminationManager(scene);
         // 전투 중 유닛 정보를 표시할 UI 매니저
@@ -121,9 +126,13 @@ export class BattleSimulatorEngine {
             }
 
             // ✨ [수정] 팀에 따라 이름표 색상을 다르게 설정합니다.
-            const nameColor = unit.team === 'ally' ? '#60a5fa' : '#f87171'; // 아군: 파랑, 적군: 빨강
+            const nameColor = unit.team === 'ally' ? '#60a5fa' : '#f87171';
             const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName, nameColor);
-            this.bindingManager.bind(unit.sprite, [nameTag]);
+
+            // 그림자 생성 후 원본 스프라이트와 함께 이동하도록 바인딩합니다.
+            const shadow = this.shadowManager.createShadow(unit.sprite);
+
+            this.bindingManager.bind(unit.sprite, [nameTag, shadow]);
         });
     }
 
@@ -199,6 +208,9 @@ export class BattleSimulatorEngine {
         }
         if (this.textEngine) {
             this.textEngine.shutdown();
+        }
+        if (this.shadowManager) {
+            this.shadowManager.shutdown();
         }
         if (this.combatUI) {
             this.combatUI.destroy();
