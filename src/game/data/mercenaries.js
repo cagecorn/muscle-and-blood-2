@@ -17,7 +17,8 @@ export const mercenaryData = {
         baseStats: {
             hp: 120, valor: 10, strength: 15, endurance: 12,
             agility: 8, intelligence: 5, wisdom: 5, luck: 7,
-            movement: 3 // 전사의 기본 이동력
+            movement: 3,
+            weight: 10 // ✨ 전사 무게 추가
         }
     },
     gunner: {
@@ -39,7 +40,8 @@ export const mercenaryData = {
             hp: 80, valor: 5, strength: 7, endurance: 6,
             agility: 15, intelligence: 8, wisdom: 10, luck: 12,
             attackRange: 3,
-            movement: 3 // 거너의 기본 이동력
+            movement: 3,
+            weight: 12 // ✨ 거너 무게 추가
         }
     },
     // --- ▼ [신규] 메딕 클래스 데이터 추가 ▼ ---
@@ -61,7 +63,8 @@ export const mercenaryData = {
             hp: 90, valor: 8, strength: 6, endurance: 8,
             agility: 10, intelligence: 12, wisdom: 15, luck: 9,
             attackRange: 2,
-            movement: 2 // 메딕의 기본 이동력
+            movement: 2,
+            weight: 18 // ✨ 메딕 무게 추가
         }
     }
     // --- ▲ [신규] 메딕 클래스 데이터 추가 ▲ ---
