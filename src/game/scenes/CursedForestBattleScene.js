@@ -22,8 +22,16 @@ export class CursedForestBattleScene extends Scene {
             if (el) el.style.display = 'none';
         });
 
+        // ✨ 스테이지 구성을 정의합니다. (나중에 별도 파일로 분리 가능)
+        const stageConfig = {
+            background: 'battle-stage-cursed-forest',
+            monsters: [
+                { id: 'zombie', count: 5 }
+            ]
+        };
+
         this.stageManager = new BattleStageManager(this);
-        this.stageManager.createStage('battle-stage-cursed-forest');
+        this.stageManager.createStage(stageConfig.background);
         this.cameraControl = new CameraControlEngine(this);
 
         // 전투가 시작되면 기본 카메라 줌을 2배로 고정합니다.
@@ -33,16 +41,16 @@ export class CursedForestBattleScene extends Scene {
         this.battleSimulator = new BattleSimulatorEngine(this);
 
         // 파티 유닛과 몬스터 데이터를 준비합니다.
-        const partyIds = partyEngine.getPartyMembers().filter(id => id !== undefined);
-        const allMercs = mercenaryEngine.getAllAlliedMercenaries();
-        const partyUnits = allMercs.filter(m => partyIds.includes(m.uniqueId));
+        const partyUnits = partyEngine.getDeployedMercenaries();
         this.partyUnits = partyUnits; // 추적을 위해 저장
 
         const monsters = [];
-        const zombieBase = getMonsterBase('zombie');
-        for (let i = 0; i < 5; i++) {
-            monsters.push(monsterEngine.spawnMonster(zombieBase, 'enemy'));
-        }
+        stageConfig.monsters.forEach(monsterInfo => {
+            const monsterBase = getMonsterBase(monsterInfo.id);
+            for (let i = 0; i < monsterInfo.count; i++) {
+                monsters.push(monsterEngine.spawnMonster(monsterBase, 'enemy'));
+            }
+        });
 
         // BattleSimulatorEngine을 통해 전투를 시작합니다.
         this.battleSimulator.start(partyUnits, monsters);
