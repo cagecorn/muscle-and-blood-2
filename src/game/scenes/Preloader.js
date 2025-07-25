@@ -75,6 +75,16 @@ export class Preloader extends Scene
         this.load.image('gunner-cast', 'images/unit/gunner-cast.png');
         this.load.image('gunner-status-effects', 'images/unit/gunner-status-effects.png');
 
+        // --- ▼ [신규] 메딕 관련 이미지 로드 추가 ▼ ---
+        this.load.image('medic', 'images/unit/medic.png');
+        this.load.image('medic-attack', 'images/unit/medic-attack.png');
+        this.load.image('medic-hitted', 'images/unit/medic-hitted.png');
+        this.load.image('medic-cast', 'images/unit/medic-cast.png');
+        this.load.image('medic-status-effects', 'images/unit/medic-status-effects.png');
+        this.load.image('medic-hire', 'images/territory/medic-hire.png');
+        this.load.image('medic-ui', 'images/territory/medic-ui.png');
+        // --- ▲ [신규] 메딕 관련 이미지 로드 추가 ▲ ---
+
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
 
