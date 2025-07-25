@@ -116,7 +116,7 @@ export class VFXManager {
      * @param {number} y - 생성 위치 y
      * @param {number|string} damage - 표시할 데미지 숫자
      */
-    createDamageNumber(x, y, damage, color = '#ff4d4d') {
+    createDamageNumber(x, y, value, color = '#ff4d4d') {
         const style = {
             fontFamily: '"Arial Black", Arial, sans-serif',
             fontSize: '32px',
@@ -125,28 +125,39 @@ export class VFXManager {
             strokeThickness: 4,
         };
 
-        const damageText = this.scene.add
-            .text(x, y, damage.toString(), style)
+        const numberText = this.scene.add
+            .text(x, y, value.toString(), style)
             .setOrigin(0.5, 0.5);
-        this.scene.physics.add.existing(damageText);
+        this.scene.physics.add.existing(numberText);
 
-        const randomX = Math.random() * 200 - 100; // -100 ~ 100
-        const randomY = -(Math.random() * 150 + 150); // -150 ~ -300
-        damageText.body.setVelocity(randomX, randomY);
-        damageText.body.setGravityY(400);
-        damageText.body.setAngularVelocity(Math.random() * 200 - 100);
+        // value가 '+'로 시작하면 회복 텍스트로 간주합니다.
+        const isHealing = value.toString().startsWith('+');
+
+        // 회복이면 왼쪽, 데미지면 오른쪽으로 날아가도록 속도를 설정합니다.
+        const randomX = isHealing
+            ? -(Math.random() * 100 + 50)  // 왼쪽 방향 (-150 ~ -50)
+            : (Math.random() * 100 + 50);  // 오른쪽 방향 (50 ~ 150)
+
+        const randomY = -(Math.random() * 150 + 150); // 위로 솟구치는 Y축 속도
+
+        numberText.body.setVelocity(randomX, randomY);
+        numberText.body.setGravityY(400); // 중력 적용
+        numberText.body.setAngularVelocity(Math.random() * 200 - 100); // 회전
 
         this.scene.tweens.add({
-            targets: damageText,
+            targets: numberText,
             alpha: 0,
             duration: 800,
             ease: 'Cubic.easeIn',
             onComplete: () => {
-                damageText.destroy();
+                numberText.destroy();
             },
         });
 
-        debugLogEngine.log('VFXManager', `${damage} 데미지 숫자를 생성했습니다.`);
+        const logMessage = isHealing
+            ? `${value} 회복 숫자를 생성했습니다.`
+            : `${value} 데미지 숫자를 생성했습니다.`;
+        debugLogEngine.log('VFXManager', logMessage);
     }
 
     // 스킬 이름을 머리 위에 표시하는 효과를 보여줍니다.
