@@ -96,13 +96,14 @@ class SkillEngine {
     }
 
     /**
-     * 3개의 무작위 스킬 슬롯 타입을 생성하여 반환합니다.
+     * ✨ [수정] 3개의 무작위 스킬 슬롯 타입을 생성하여 반환합니다.
+     * @param {Array<string>} [allowedTypes=this.skillTypes] - 무작위로 선택될 스킬 타입 배열
      * @returns {Array<string>} - 3개의 스킬 타입 문자열 배열 (예: ['ACTIVE', 'PASSIVE', 'BUFF'])
      */
-    generateRandomSkillSlots() {
+    generateRandomSkillSlots(allowedTypes = this.skillTypes) {
         const slots = [];
         for (let i = 0; i < 3; i++) {
-            const randomType = diceEngine.getRandomElement(this.skillTypes);
+            const randomType = diceEngine.getRandomElement(allowedTypes);
             slots.push(randomType);
         }
         return slots;

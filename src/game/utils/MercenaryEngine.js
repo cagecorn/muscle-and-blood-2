@@ -36,12 +36,16 @@ class MercenaryEngine {
             level: 1,
             exp: 0,
             equippedItems: [],
-            // ✨ 1. 먼저 3개의 무작위 스킬 슬롯을 생성합니다.
-            skillSlots: skillEngine.generateRandomSkillSlots()
+            // ✨ 1. 스킬 슬롯 생성을 클래스별로 분기 처리하기 위해 초기화 위치를 변경합니다.
+            skillSlots: []
         };
+        
+        // ✨ 2. '전사', '거너', '메딕' 클래스에 대한 특별 처리
+        // 전사와 거너의 랜덤 스킬 풀에서 'AID'를 제외합니다.
+        const nonAidSkillTypes = ['ACTIVE', 'BUFF', 'DEBUFF', 'PASSIVE'];
 
-        // ✨ 2. '전사' 및 '거너' 클래스에 대한 특별 처리
         if (newInstance.id === 'warrior') {
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
             // 4번째 슬롯을 'ACTIVE' 타입으로 고정
             newInstance.skillSlots.push('ACTIVE');
 
@@ -55,7 +59,8 @@ class MercenaryEngine {
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
         } else if (newInstance.id === 'gunner') {
-            // ✨ [신규] 거너를 위한 4번째 슬롯 처리
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
+            // 거너를 위한 4번째 슬롯 처리
             newInstance.skillSlots.push('ACTIVE');
 
             const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('rangedAttack');
@@ -64,7 +69,10 @@ class MercenaryEngine {
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
-        } else if (newInstance.id === 'medic') { // ✨ [신규] 메딕 처리
+        } else if (newInstance.id === 'medic') { 
+            // ✨ [핵심 변경] 메딕의 랜덤 슬롯은 AID, BUFF, PASSIVE 중에서만 생성합니다.
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(['AID', 'BUFF', 'PASSIVE']);
+            // 4번째 슬롯을 'AID'로 고정합니다.
             newInstance.skillSlots.push('AID');
             const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('heal');
             if (consumed) {
@@ -73,7 +81,9 @@ class MercenaryEngine {
                 skillInventoryManager.removeSkillFromInventoryList(instance.instanceId);
             }
         } else {
-            // 다른 클래스는 4번째 슬롯을 빈 슬롯(null)으로 추가
+            // 다른 클래스는 기본 규칙을 따릅니다.
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots();
+            // 4번째 슬롯을 빈 슬롯(null)으로 추가
             newInstance.skillSlots.push(null);
         }
         
