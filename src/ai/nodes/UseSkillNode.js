@@ -4,8 +4,7 @@ import { skillEngine, SKILL_TYPES } from '../../game/utils/SkillEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 import { spriteEngine } from '../../game/utils/SpriteEngine.js';
 import { combatCalculationEngine } from '../../game/utils/CombatCalculationEngine.js';
-// ✨ formationEngine을 import합니다.
-import { formationEngine } from '../../game/utils/FormationEngine.js'; 
+import { formationEngine } from '../../game/utils/FormationEngine.js';
 import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
 import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
@@ -18,9 +17,8 @@ class UseSkillNode extends Node {
         this.vfxManager = vfxManager;
         this.animationEngine = animationEngine;
         this.delayEngine = delayEngine;
-        this.terminationManager = terminationManager; // ✨ terminationManager 추가
+        this.terminationManager = terminationManager;
         this.skillEngine = se || skillEngine;
-        // ✨ combatCalculationEngine 추가
         this.combatEngine = combatCalculationEngine;
     }
 
@@ -56,9 +54,14 @@ class UseSkillNode extends Node {
         const skillColor = SKILL_TYPES[modifiedSkill.type].color;
         this.vfxManager.showSkillName(unit.sprite, modifiedSkill.name, skillColor);
 
-        // ✨ 스킬 애니메이션 및 효과 적용 로직 수정
+        // 스킬 애니메이션 및 효과 적용 로직
         if (modifiedSkill.type === 'ACTIVE' || modifiedSkill.type === 'DEBUFF') {
+            // ✨ 1. 공격 스프라이트로 변경
+            spriteEngine.changeSpriteForDuration(unit, 'attack', 600);
             await this.animationEngine.attack(unit.sprite, skillTarget.sprite);
+
+            // ✨ 2. 피격 스프라이트로 변경
+            spriteEngine.changeSpriteForDuration(skillTarget, 'hitted', 300);
 
             if (modifiedSkill.type === 'ACTIVE') {
                 const damage = this.combatEngine.calculateDamage(
@@ -70,11 +73,6 @@ class UseSkillNode extends Node {
                 );
                 skillTarget.currentHp -= damage;
 
-                // this.vfxManager.updateHealthBar(
-                //     skillTarget.healthBar,
-                //     skillTarget.currentHp,
-                //     skillTarget.finalStats.hp
-                // );
                 this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
                 this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
 
@@ -99,9 +97,7 @@ class UseSkillNode extends Node {
                 }
             }
         } else {
-            if (unit.sprite.scene && !spriteEngine.scene) {
-                spriteEngine.setScene(unit.sprite.scene);
-            }
+            // ✨ 3. 캐스트 스프라이트 변경 (기존 로직 유지)
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 
@@ -109,9 +105,6 @@ class UseSkillNode extends Node {
         if (modifiedSkill.type === 'AID') {
             const healAmount = Math.round(unit.finalStats.wisdom * (modifiedSkill.healMultiplier || 0));
             skillTarget.currentHp = Math.min(skillTarget.finalStats.hp, skillTarget.currentHp + healAmount);
-            if (this.vfxManager.updateHealthBar) {
-                this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
-            }
             this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, `+${healAmount}`, '#22c55e');
             if (modifiedSkill.removesDebuff && Math.random() < modifiedSkill.removesDebuff.chance) {
                 statusEffectManager.removeOneDebuff(skillTarget);
