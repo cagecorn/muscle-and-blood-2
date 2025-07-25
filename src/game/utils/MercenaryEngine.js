@@ -40,7 +40,7 @@ class MercenaryEngine {
             skillSlots: skillEngine.generateRandomSkillSlots()
         };
 
-        // ✨ 2. '전사' 클래스에 대한 특별 처리
+        // ✨ 2. '전사' 및 '거너' 클래스에 대한 특별 처리
         if (newInstance.id === 'warrior') {
             // 4번째 슬롯을 'ACTIVE' 타입으로 고정
             newInstance.skillSlots.push('ACTIVE');
@@ -52,6 +52,16 @@ class MercenaryEngine {
                 // 4번 슬롯(인덱스 3)에 장착
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 // 새로 생성된 인스턴스는 용병 전용이므로 인벤토리 목록에서는 제거합니다.
+                skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
+            }
+        } else if (newInstance.id === 'gunner') {
+            // ✨ [신규] 거너를 위한 4번째 슬롯 처리
+            newInstance.skillSlots.push('ACTIVE');
+
+            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('rangedAttack');
+            if (consumed) {
+                const attackInstance = skillInventoryManager.addSkillById('rangedAttack', consumed.grade);
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
         } else {

@@ -16,7 +16,9 @@ class SkillModifierEngine {
             // ✨ 쉴드 브레이크의 순위별 '받는 데미지 증가' 효과 수치
             'shieldBreak': [0.24, 0.21, 0.18, 0.15],
             // ✨ 넉백샷 순위별 데미지 계수 추가
-            'knockbackShot': [1.4, 1.2, 1.0, 0.8]
+            'knockbackShot': [1.4, 1.2, 1.0, 0.8],
+            // ✨ [신규] 원거리 공격 순위별 데미지 계수 추가
+            'rangedAttack': [1.3, 1.2, 1.1, 1.0]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
