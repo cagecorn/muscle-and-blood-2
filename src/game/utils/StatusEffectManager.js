@@ -5,6 +5,8 @@ import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from './OwnedSkillsManager.js';
 import { skillInventoryManager } from './SkillInventoryManager.js';
 import { passiveSkills } from '../data/skills/passive.js';
+// 상태이상 시 스프라이트 교체에 사용
+import { spriteEngine } from './SpriteEngine.js';
 
 // 효과의 종류를 명확히 구분하기 위한 상수
 export const EFFECT_TYPES = {
@@ -124,6 +126,11 @@ class StatusEffectManager {
         if (this.battleSimulator && this.battleSimulator.vfxManager && effectDefinition.name) {
             const color = newEffect.type === EFFECT_TYPES.BUFF ? '#22c55e' : '#ef4444';
             this.battleSimulator.vfxManager.showEffectName(targetUnit.sprite, effectDefinition.name, color);
+        }
+
+        // 버프가 아니라면 상태이상 스프라이트를 잠시 적용
+        if (newEffect.type !== EFFECT_TYPES.BUFF) {
+            spriteEngine.changeSpriteForDuration(targetUnit, 'status-effects', 1000);
         }
 
         debugStatusEffectManager.logEffectApplied(targetUnit, newEffect);
