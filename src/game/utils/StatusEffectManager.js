@@ -171,6 +171,22 @@ class StatusEffectManager {
         // 값의 변화 로그는 CombatCalculationEngine에서 처리합니다.
         return totalValue;
     }
+
+    // ✨ [신규] 해로운 효과 1개를 제거합니다.
+    removeOneDebuff(unit) {
+        const effects = this.activeEffects.get(unit.uniqueId);
+        if (!effects || effects.length === 0) return false;
+        const index = effects.findIndex(e => e.type !== EFFECT_TYPES.BUFF);
+        if (index === -1) return false;
+
+        const [removed] = effects.splice(index, 1);
+        const def = statusEffects[removed.id];
+        if (def && def.onRemove) {
+            def.onRemove(unit);
+        }
+        debugStatusEffectManager.logEffectExpired(unit.uniqueId, removed);
+        return true;
+    }
 }
 
 export const statusEffectManager = new StatusEffectManager();

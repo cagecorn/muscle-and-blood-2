@@ -105,6 +105,19 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 
+        // ✨ AID 타입 스킬 처리 - 회복 및 디버프 제거
+        if (modifiedSkill.type === 'AID') {
+            const healAmount = Math.round(unit.finalStats.wisdom * (modifiedSkill.healMultiplier || 0));
+            skillTarget.currentHp = Math.min(skillTarget.finalStats.hp, skillTarget.currentHp + healAmount);
+            if (this.vfxManager.updateHealthBar) {
+                this.vfxManager.updateHealthBar(skillTarget.healthBar, skillTarget.currentHp, skillTarget.finalStats.hp);
+            }
+            this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, `+${healAmount}`, '#22c55e');
+            if (modifiedSkill.removesDebuff && Math.random() < modifiedSkill.removesDebuff.chance) {
+                statusEffectManager.removeOneDebuff(skillTarget);
+            }
+        }
+
         if (modifiedSkill.effect) {
             statusEffectManager.addEffect(skillTarget, modifiedSkill);
         }

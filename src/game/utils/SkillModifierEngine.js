@@ -18,7 +18,9 @@ class SkillModifierEngine {
             // ✨ 넉백샷 순위별 데미지 계수 추가
             'knockbackShot': [1.4, 1.2, 1.0, 0.8],
             // ✨ [신규] 원거리 공격 순위별 데미지 계수 추가
-            'rangedAttack': [1.3, 1.2, 1.1, 1.0]
+            'rangedAttack': [1.3, 1.2, 1.1, 1.0],
+            // ✨ [신규] 힐 순위별 회복 계수 추가
+            'heal': [1.3, 1.2, 1.1, 1.0],
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -37,8 +39,14 @@ class SkillModifierEngine {
         const rankIndex = rank - 1;
 
         const damageModifiers = this.rankModifiers[baseSkillData.id];
-        if (damageModifiers && damageModifiers[rankIndex] !== undefined && modifiedSkill.damageMultiplier) {
-            modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
+        if (damageModifiers && damageModifiers[rankIndex] !== undefined) {
+            if (modifiedSkill.damageMultiplier) {
+                modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
+            }
+            // ✨ [신규] 회복 계수 보정
+            if (modifiedSkill.healMultiplier) {
+                modifiedSkill.healMultiplier = damageModifiers[rankIndex];
+            }
         }
 
         // 'stoneSkin' 스킬의 데미지 감소 효과 보정
@@ -103,6 +111,11 @@ class SkillModifierEngine {
             if (baseSkillData.id === 'ironWill') {
                 const maxReductionValue = (passiveSkills.ironWill.rankModifiers[rankIndex] || 0) * 100;
                 modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}%', `${maxReductionValue.toFixed(0)}%`);
+            }
+            // ✨ [신규] 힐 스킬 설명 치환
+            if (modifiedSkill.healMultiplier) {
+                const healAmount = `지혜 * ${modifiedSkill.healMultiplier.toFixed(2)}`;
+                modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', healAmount);
             }
         }
 
