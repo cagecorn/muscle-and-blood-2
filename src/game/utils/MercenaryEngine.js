@@ -64,6 +64,14 @@ class MercenaryEngine {
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
+        } else if (newInstance.id === 'medic') { // ✨ [신규] 메딕 처리
+            newInstance.skillSlots.push('AID');
+            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('heal');
+            if (consumed) {
+                const instance = skillInventoryManager.addSkillById('heal', consumed.grade);
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, instance.instanceId);
+                skillInventoryManager.removeSkillFromInventoryList(instance.instanceId);
+            }
         } else {
             // 다른 클래스는 4번째 슬롯을 빈 슬롯(null)으로 추가
             newInstance.skillSlots.push(null);
