@@ -24,6 +24,7 @@ class Blackboard {
         this.set('isThreatened', false);
         this.set('squadAdvantage', 0);
         this.set('enemyHealerUnit', null);
+        this.set('threateningUnit', null);
 
         // --- 🤖 AI 자신의 상태 정보 ---
         this.set('canUseSkill_1', false);

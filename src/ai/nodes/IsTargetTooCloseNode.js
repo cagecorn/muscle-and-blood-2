@@ -24,10 +24,15 @@ class IsTargetTooCloseNode extends Node {
         const distance = Math.abs(unit.gridX - nearestEnemy.gridX) + Math.abs(unit.gridY - nearestEnemy.gridY);
 
         if (distance <= this.dangerZone) {
+            // ✨ [핵심 변경] 어떤 적이 위협적인지 블랙보드에 기록합니다.
+            // FindKitingPositionNode가 이 정보를 사용하여 "누구로부터" 도망칠지 결정합니다.
+            blackboard.set('threateningUnit', nearestEnemy);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `가장 가까운 적 '${nearestEnemy.instanceName}'이 위험거리(${this.dangerZone}) 내에 있음!`);
             return NodeState.SUCCESS; // 너무 가까움!
         }
-        
+
+        // 위협적인 적이 없으므로 정보를 초기화합니다.
+        blackboard.set('threateningUnit', null);
         debugAIManager.logNodeResult(NodeState.FAILURE, `가장 가까운 적 '${nearestEnemy.instanceName}'과의 거리가 안전함`);
         return NodeState.FAILURE; // 안전함
     }
