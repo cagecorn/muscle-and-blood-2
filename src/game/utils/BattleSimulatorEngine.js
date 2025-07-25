@@ -146,29 +146,32 @@ export class BattleSimulatorEngine {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
-            // 현재 턴을 진행하는 유닛 정보를 하단 UI에 표시
-            this.combatUI.show(currentUnit);
+            // 턴을 처리하기 전에 유닛이 살아있는지 확인하여 죽은 유닛의 턴을 건너뜁니다.
+            if (currentUnit && currentUnit.currentHp > 0) {
+                // 현재 턴을 진행하는 유닛 정보를 하단 UI에 표시
+                this.combatUI.show(currentUnit);
 
-            if (currentUnit && currentUnit.currentHp > 0 && !currentUnit.isStunned) {
-                this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
-                await delayEngine.hold(500);
+                if (!currentUnit.isStunned) {
+                    this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
+                    await delayEngine.hold(500);
 
-                if (aiManager.unitData.has(currentUnit.uniqueId)) {
-                    const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
-                    const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
+                    if (aiManager.unitData.has(currentUnit.uniqueId)) {
+                        const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
+                        const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
 
-                    await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                        await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                    }
+                } else {
+                    console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
                 }
 
+                // 살아있는 유닛은 기절 여부와 관계없이 쿨다운이 감소해야 합니다.
                 cooldownManager.reduceCooldowns(currentUnit.uniqueId);
-            } else if (currentUnit && currentUnit.isStunned) {
-                console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
-                cooldownManager.reduceCooldowns(currentUnit.uniqueId);
-            }
 
-            // 행동이 끝난 후 UI를 다시 업데이트하여 변경된 체력 등을 즉시 반영합니다.
-            this.combatUI.show(currentUnit);
-            await delayEngine.hold(500); // 변경된 상태를 잠시 보여줍니다.
+                // 행동이 끝난 후 UI를 다시 업데이트하여 변경된 체력 등을 즉시 반영합니다.
+                this.combatUI.show(currentUnit);
+                await delayEngine.hold(500); // 변경된 상태를 잠시 보여줍니다.
+            }
 
             this.currentTurnIndex++;
             if (this.currentTurnIndex >= this.turnQueue.length) {
@@ -187,8 +190,16 @@ export class BattleSimulatorEngine {
                     this.vfxManager.updateTokenDisplay(unit);
                 }
             });
-            // 다음 턴의 유닛 정보를 미리 갱신
-            this.combatUI.show(this.turnQueue[this.currentTurnIndex]);
+
+            // 다음 턴의 유닛 정보를 미리 갱신합니다.
+            const nextUnit = this.turnQueue[this.currentTurnIndex];
+            // 다음 턴의 유닛이 살아있을 때만 UI를 업데이트합니다.
+            if (nextUnit && nextUnit.currentHp > 0) {
+                this.combatUI.show(nextUnit);
+            } else if (!this.isBattleOver()) {
+                // 전투가 끝나지 않았는데 다음 유닛이 유효하지 않으면 UI를 숨깁니다.
+                this.combatUI.hide();
+            }
 
             await delayEngine.hold(1000);
         }
