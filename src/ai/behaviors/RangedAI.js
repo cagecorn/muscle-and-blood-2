@@ -9,11 +9,11 @@ import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
-import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
+// ✨ FindPathToSkillRangeNode 대신 FindKitingPositionNode를 공격 이동에도 사용합니다.
+import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 
 // 기존 Ranged AI의 핵심 로직 노드들
 import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
-import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 // ✨ HasNotMovedNode를 import합니다.
@@ -26,7 +26,7 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
  * 1. (생존) 가장 가까운 적이 너무 가까우면, 먼저 안전한 위치로 이동(카이팅)합니다.
  *    - 이동 후, 그 자리에서 사용할 수 있는 가장 우선순위 높은 스킬을 사용합니다.
  * 2. (공격) 위협적이지 않다면, 1~4순위 스킬을 순서대로 확인하여 가장 먼저 사용 가능한 스킬을 사용합니다.
- *    - 필요하다면 적에게 다가가서 스킬을 사용합니다.
+ *    - ✨ [변경] 이때, 이동이 필요하다면 단순 접근이 아닌 '안전한 공격 위치'를 탐색합니다.
  * 3. (이동) 사용할 스킬이 없다면, 다음 턴을 위해 전략적으로 유리한 위치로 이동만 합니다.
  */
 function createRangedAI(engines = {}) {
@@ -38,11 +38,12 @@ function createRangedAI(engines = {}) {
             new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
         ]),
-        // B. 이동 후 사용 (카이팅 AI는 적에게 다가갈 때도 사용)
+        // B. 이동 후 사용
         new SequenceNode([
-            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
             new HasNotMovedNode(),
-            new FindPathToSkillRangeNode(engines),
+            // ✨ [핵심 변경] 공격을 위한 이동 시, 단순 경로 탐색이 아닌
+            // 주변 모든 위협을 고려하는 '카이팅 위치'를 탐색하도록 변경합니다.
+            new FindKitingPositionNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines), // 이동 후 사거리 재확인
             new UseSkillNode(engines)

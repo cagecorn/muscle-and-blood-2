@@ -13,7 +13,11 @@ class FindKitingPositionNode extends Node {
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
-        const target = blackboard.get('currentTargetUnit');
+        // ✨ [핵심 변경] 카이팅의 기준이 될 대상을 결정합니다.
+        // 1순위: IsTargetTooCloseNode가 설정한 '위협적인 적'
+        // 2순위: 현재 공격하려는 '스킬 대상'
+        // 3순위: AI가 정한 '일반 공격 대상'
+        const target = blackboard.get('threateningUnit') || blackboard.get('skillTarget') || blackboard.get('currentTargetUnit');
         const enemyUnits = blackboard.get('enemyUnits');
 
         if (!target) {
