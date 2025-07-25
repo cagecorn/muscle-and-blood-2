@@ -8,7 +8,9 @@ export const SKILL_TYPES = {
     ACTIVE: { name: '액티브', color: '#FF8C00' }, // 주황색
     BUFF:   { name: '버프',   color: '#1E90FF' }, // 파랑색
     DEBUFF: { name: '디버프', color: '#DC143C' }, // 빨강색
-    PASSIVE:{ name: '패시브', color: '#32CD32' }  // 초록색
+    PASSIVE:{ name: '패시브', color: '#32CD32' },  // 초록색
+    // ✨ [신규] AID 타입을 추가합니다.
+    AID:    { name: '지원',   color: '#FFD700' }  // 금색
 };
 
 /**
