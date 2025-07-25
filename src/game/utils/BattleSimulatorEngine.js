@@ -4,6 +4,8 @@ import { BindingManager } from './BindingManager.js';
 import { VFXManager } from './VFXManager.js';
 import { AnimationEngine } from './AnimationEngine.js';
 import { TerminationManager } from './TerminationManager.js';
+// ✨ SummoningEngine을 새로 import 합니다.
+import { SummoningEngine } from './SummoningEngine.js';
 
 import { aiManager } from '../../ai/AIManager.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
@@ -42,6 +44,9 @@ export class BattleSimulatorEngine {
         this.shadowManager = new ShadowManager(scene);
         this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
         this.terminationManager = new TerminationManager(scene);
+        // ✨ 소환 기능을 담당하는 SummoningEngine 인스턴스를 생성합니다.
+        // scene과 battle simulator 참조를 전달합니다.
+        this.summoningEngine = new SummoningEngine(scene, this);
         // 전투 중 유닛 정보를 표시할 UI 매니저
         this.combatUI = new CombatUIManager();
         
@@ -57,6 +62,8 @@ export class BattleSimulatorEngine {
             terminationManager: this.terminationManager,
             visionManager, // visionManager를 엔진 패키지에 추가합니다.
             cameraControl: this.scene.cameraControl,
+            // ✨ AI가 소환 엔진을 사용할 수 있도록 패키지에 포함합니다.
+            summoningEngine: this.summoningEngine,
         };
 
         this.turnQueue = [];
