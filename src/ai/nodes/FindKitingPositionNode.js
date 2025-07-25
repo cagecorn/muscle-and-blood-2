@@ -26,7 +26,10 @@ class FindKitingPositionNode extends Node {
         }
 
         const attackRange = unit.finalStats.attackRange || 3;
-        const dangerZone = 2; // 이 거리 안으로는 어떤 적도 들어오면 안 됨
+        // ✨ 이 노드 자체의 dangerZone 하드코딩을 제거했습니다.
+        // 이제 이 노드는 "안전한 공격 위치"를 찾는 데 집중하고,
+        // "위험 여부" 판단은 IsTargetTooCloseNode가 전담합니다.
+        const dangerZoneFromBlackboard = blackboard.get('threateningUnit') ? 2 : 0; // 위협적인 유닛이 있을 때만 안전거리 고려
         const sightRange = unit.finalStats.sightRange || 10; // 유닛의 시야 범위
         const start = { col: unit.gridX, row: unit.gridY };
 
@@ -49,7 +52,7 @@ class FindKitingPositionNode extends Node {
             // **조건 1: 주변의 "모든" 적으로부터 안전한가?**
             const isSafeFromAllEnemies = enemiesInSight.every(enemy => {
                 const distanceToEnemy = Math.abs(cell.col - enemy.gridX) + Math.abs(cell.row - enemy.gridY);
-                return distanceToEnemy > dangerZone;
+                return distanceToEnemy > dangerZoneFromBlackboard;
             });
 
             if (isSafeFromAllEnemies) {
