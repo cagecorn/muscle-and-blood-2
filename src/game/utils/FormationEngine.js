@@ -167,6 +167,45 @@ class FormationEngine {
     }
 
     /**
+     * 주어진 좌표에 단일 유닛을 배치합니다.
+     * @param {Phaser.Scene} scene
+     * @param {object} unit
+     * @param {number} col
+     * @param {number} row
+     * @returns {Phaser.GameObjects.Image|null}
+     */
+    placeUnitAt(scene, unit, col, row) {
+        if (!this.grid) return null;
+        const cell = this.grid.getCell(col, row);
+        if (!cell || cell.isOccupied) {
+            debugLogEngine.warn('FormationEngine', '지정한 셀에 유닛을 배치할 수 없습니다.');
+            return null;
+        }
+
+        cell.isOccupied = true;
+        const spriteKey = unit.spriteKey || unit.battleSprite || unit.id || unit.name;
+        const sprite = scene.add.image(cell.x, cell.y, spriteKey);
+        sprite.setData('unitId', unit.uniqueId);
+        const texture = scene.textures.get(spriteKey);
+        if (texture && texture.source[0]) {
+            const scale = Math.min(
+                cell.width / texture.source[0].width,
+                cell.height / texture.source[0].height
+            );
+            sprite.setScale(scale);
+        } else {
+            sprite.setDisplaySize(cell.width, cell.height);
+        }
+
+        unit.sprite = sprite;
+        cell.sprite = sprite;
+        unit.gridX = col;
+        unit.gridY = row;
+
+        return sprite;
+    }
+
+    /**
      * 유닛을 그리드 상의 새로운 위치로 이동시키고, 애니메이션을 재생합니다.
      * @param {object} unit - 이동할 유닛 객체 (gridX, gridY, sprite 포함)
      * @param {object} newGridPos - 새로운 그리드 좌표 { col, row }
