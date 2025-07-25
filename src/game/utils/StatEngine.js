@@ -48,7 +48,7 @@ class WeightEngine {
      * @returns {number} - \uD569\uC0B0\uB41C \uCD1D \uBB34\uAC8C
      */
     calculateTotalWeight(unitData = {}, equippedItems = []) {
-        let totalWeight = unitData.baseWeight || 0;
+        let totalWeight = unitData.weight || 0;
         for (const item of equippedItems) {
             totalWeight += item.weight || 0;
         }
@@ -100,13 +100,19 @@ class StatEngine {
             luck: baseStats.luck || 0,
             attackRange: baseStats.attackRange || 1,
             movement: baseStats.movement || 0,
+            weight: baseStats.weight || 0, // ✨ baseStats에서 weight를 직접 읽습니다.
         });
 
         // 2. \uC804\uBB38 \uC5D4\uC9C4\uC744 \uD1B5\uD574 \uD30C\uC9C0 \uC2A4\uD0EF\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
         calculated.barrier = this.valorEngine.calculateInitialBarrier(calculated.valor);
         calculated.damageAmplification = this.valorEngine.calculateDamageAmplification(calculated.barrier, calculated.barrier);
-        calculated.totalWeight = this.weightEngine.calculateTotalWeight(unitData, equippedItems);
-        calculated.turnValue = this.weightEngine.getTurnValue(calculated.totalWeight);
+        // ✨ WeightEngine 로직을 직접 처리하여 기본 무게와 장비 무게를 합산합니다.
+        let totalWeight = calculated.weight;
+        for (const item of equippedItems) {
+            totalWeight += item.weight || 0;
+        }
+        calculated.totalWeight = totalWeight;
+        calculated.turnValue = totalWeight; // 현재는 totalWeight를 그대로 사용
 
         // 3. \uC8FC\uC6A9 \uC804\uD22C \uB2A5\uB825\uCE58\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
         calculated.physicalAttack = (calculated.strength || 0) * 1.5;

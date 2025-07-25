@@ -7,7 +7,11 @@ export const monsterData = {
         // ✨ 클래스를 '전사(임시)'로 설정
         className: '전사(임시)',
         battleSprite: 'zombie',
-        baseStats: { hp: 50, valor: 0, strength: 5, endurance: 3, agility: 1, intelligence: 0, wisdom: 0, luck: 0 },
+        baseStats: { 
+            hp: 50, valor: 0, strength: 5, endurance: 3, 
+            agility: 1, intelligence: 0, wisdom: 0, luck: 0,
+            weight: 15 // ✨ 좀비 무게 추가
+        },
         // ✨ 좀비 생성 시 실행될 초기화 함수 수정
         onSpawn: (unit) => {
             // 좀비를 위한 고유 'attack' 스킬 인스턴스를 생성하고 장착합니다.

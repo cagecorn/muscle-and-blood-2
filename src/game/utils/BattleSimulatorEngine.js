@@ -8,6 +8,8 @@ import { TerminationManager } from './TerminationManager.js';
 import { aiManager } from '../../ai/AIManager.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 import { createRangedAI } from '../../ai/behaviors/RangedAI.js';
+// ✨ 메딕을 위한 Healer AI를 import 합니다.
+import { createHealerAI } from '../../ai/behaviors/createHealerAI.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
@@ -91,6 +93,9 @@ export class BattleSimulatorEngine {
                 aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
             } else if (unit.name === '전사' || unit.name === '좀비') {
                 aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
+            } else if (unit.name === '메딕') {
+                // ✨ 메딕 AI 등록 로직 추가
+                aiManager.registerUnit(unit, createHealerAI(this.aiEngines));
             }
         });
 
