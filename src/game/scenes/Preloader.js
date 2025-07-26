@@ -105,6 +105,9 @@ export class Preloader extends Scene
         // --- 스킬 관리 아이콘 및 씬 배경 로드 ---
         this.load.image('skills-icon', 'images/territory/skills-icon.png');
         this.load.image('skills-scene-background', 'images/territory/skills-scene.png');
+        // --- ✨ [신규] 선조 소환 아이콘 및 씬 배경 로드 ---
+        this.load.image('summon-icon', 'images/territory/summon-icon.png');
+        this.load.image('summon-scene-background', 'images/territory/summon-scene.png');
         // --- ✨ [추가] 스킬 슬롯 이미지를 로드합니다. ---
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
         // 공통 패널 배경 이미지
