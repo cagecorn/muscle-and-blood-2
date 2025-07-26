@@ -77,12 +77,20 @@ export class UnitDetailDOM {
         const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
+            // ✨ [변경] 루프를 0부터 시작하여 모든 슬롯을 렌더링
             unitData.skillSlots.forEach((slotType, index) => {
+                if (!slotType) return; // 빈 슬롯 타입은 건너뜀
+
                 const typeClass = `${slotType.toLowerCase()}-slot`;
                 const instanceId = equippedSkills[index];
 
                 const slot = document.createElement('div');
                 slot.className = `skill-slot ${typeClass}`;
+
+                // ✨ [변경] 0번 슬롯(이동)에 특별한 스타일링 추가
+                if (index === 0) {
+                    slot.style.borderColor = '#cccccc';
+                }
 
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
@@ -109,7 +117,9 @@ export class UnitDetailDOM {
                 }
                 slot.style.backgroundImage = bgImage;
 
-                slot.innerHTML += `<span class="slot-rank">${index + 1} 순위</span>`;
+                // ✨ [변경] 0번 슬롯은 '이동', 나머지는 'n순위'로 표시
+                const rankText = index === 0 ? '이동' : `${index} 순위`;
+                slot.innerHTML += `<span class="slot-rank">${rankText}</span>`;
                 skillGrid.appendChild(slot);
             });
         }

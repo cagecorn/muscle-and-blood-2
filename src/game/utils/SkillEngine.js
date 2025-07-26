@@ -1,6 +1,8 @@
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 import { tokenEngine } from './TokenEngine.js';
+// ✨ [신규] ActionPowerEngine을 import 합니다.
+import { actionPowerEngine } from './ActionPowerEngine.js';
 import { cooldownManager } from './CooldownManager.js';
 
 // 스킬 종류와 해당 색상, 이름을 상수로 정의합니다.
@@ -47,7 +49,12 @@ class SkillEngine {
     canUseSkill(unit, skill) {
         // 1. 토큰이 충분한가?
         const currentTokens = tokenEngine.getTokens(unit.uniqueId);
-        if (currentTokens < skill.cost) {
+        // ✨ [변경] 행동력도 함께 확인합니다.
+        const currentActionPower = actionPowerEngine.getActionPower(unit.uniqueId);
+        if (currentTokens < (skill.cost || 0)) {
+            return false;
+        }
+        if (currentActionPower < (skill.actionPowerCost || 0)) {
             return false;
         }
 
@@ -76,8 +83,9 @@ class SkillEngine {
     recordSkillUse(unit, skill) {
         if (!this.canUseSkill(unit, skill)) return;
 
-        // 토큰 소모
-        tokenEngine.spendTokens(unit.uniqueId, skill.cost);
+        // ✨ [변경] 토큰과 행동력 소모
+        tokenEngine.spendTokens(unit.uniqueId, skill.cost || 0);
+        actionPowerEngine.spend(unit.uniqueId, skill.actionPowerCost || 0);
 
         // 사용 기록
         let unitUsed = this.usedSkillsThisTurn.get(unit.uniqueId);
@@ -94,7 +102,7 @@ class SkillEngine {
             cooldownManager.setCooldown(unit.uniqueId, skill.id, skill.cooldown);
         }
 
-        debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost} 소모).`);
+        debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost || 0}, 행동력 ${skill.actionPowerCost || 0} 소모).`);
     }
 
     /**

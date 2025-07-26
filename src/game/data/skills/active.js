@@ -2,6 +2,18 @@ import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
 
 // 액티브 스킬 데이터 정의
 export const activeSkills = {
+    // ✨ [신규] 모든 유닛이 사용할 공용 이동 스킬
+    move: {
+        id: 'move',
+        name: '이동',
+        type: 'ACTIVE',
+        cost: 0, // 토큰 소모 없음
+        actionPowerCost: 1, // 행동력 1 소모
+        description: '행동력 1을 소모하여 유닛의 이동력만큼 이동합니다.',
+        illustrationPath: 'assets/images/skills/move.png',
+        cooldown: 0,
+        range: 0, // 이동 자체는 range가 없음
+    },
     // 기본 공격 스킬
     attack: {
         NORMAL: {
