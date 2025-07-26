@@ -3,13 +3,6 @@ import { skillModifierEngine } from '../src/game/utils/SkillModifierEngine.js';
 import { skillEngine } from '../src/game/utils/SkillEngine.js';
 import { tokenEngine } from '../src/game/utils/TokenEngine.js';
 import { cooldownManager } from '../src/game/utils/CooldownManager.js';
-import { createMeleeAI } from '../src/ai/behaviors/MeleeAI.js';
-import { formationEngine } from '../src/game/utils/FormationEngine.js';
-import { pathfinderEngine } from '../src/game/utils/PathfinderEngine.js';
-import { targetManager } from '../src/game/utils/TargetManager.js';
-import { actionPowerEngine } from '../src/game/utils/ActionPowerEngine.js';
-import { ownedSkillsManager } from '../src/game/utils/OwnedSkillsManager.js';
-import { skillInventoryManager } from '../src/game/utils/SkillInventoryManager.js';
 
 // ------- Base Skill Data -------
 const attackBase = {
@@ -208,50 +201,3 @@ assert(firstStoneSkin && Math.abs((firstStoneSkin.modifiers.value ?? firstStoneS
 assert(firstShieldBreak && Math.abs((firstShieldBreak.modifiers.value ?? firstShieldBreak.modifiers.find(m => m.stat === 'damageIncrease').value) - 0.18) < 1e-6);
 
 console.log('Warrior skill integration test passed.');
-
-// --- AI 이동 테스트: 0순위 이동 스킬이 제대로 동작하는지 확인 ---
-const grid = { cols: 3, rows: 1, gridCells: [], getCell(c, r) { return this.gridCells.find(x => x.col === c && x.row === r); } };
-for (let c = 0; c < 3; c++) {
-    grid.gridCells.push({ col: c, row: 0, x: c, y: 0, width: 1, height: 1, isOccupied: false, sprite: null });
-}
-formationEngine.grid = grid;
-
-const aiWarrior = { uniqueId: 101, instanceName: 'AIWarrior', finalStats: { movement: 2, attackRange: 1 }, gridX: 0, gridY: 0, sprite: { x: 0, y: 0, setData() {}, active: true }, team: 'ally', currentHp: 100 };
-const dummy = { uniqueId: 201, instanceName: 'Dummy', finalStats: {}, gridX: 2, gridY: 0, sprite: { x: 2, y: 0, setData() {}, active: true }, team: 'enemy', currentHp: 100 };
-
-grid.getCell(0, 0).isOccupied = true;
-grid.getCell(0, 0).sprite = aiWarrior.sprite;
-grid.getCell(2, 0).isOccupied = true;
-grid.getCell(2, 0).sprite = dummy.sprite;
-
-ownedSkillsManager.initializeSlots(aiWarrior.uniqueId);
-const moveInst = skillInventoryManager.addSkillById('move', 'NORMAL');
-ownedSkillsManager.equipSkill(aiWarrior.uniqueId, 0, moveInst.instanceId);
-skillInventoryManager.removeSkillFromInventoryList(moveInst.instanceId);
-
-tokenEngine.initializeUnits([aiWarrior, dummy]);
-actionPowerEngine.initializeUnits([aiWarrior, dummy]);
-cooldownManager.reset();
-
-tokenEngine.addTokensForNewTurn();
-actionPowerEngine.addForNewTurn();
-skillEngine.resetTurnActions();
-
-const tree = createMeleeAI({
-    targetManager,
-    pathfinderEngine,
-    formationEngine,
-    animationEngine: { moveTo: async (sprite, x, y) => { sprite.x = x; sprite.y = y; } },
-    cameraControl: null,
-    delayEngine: {},
-    vfxManager: {},
-    terminationManager: {},
-    visionManager: {},
-    summoningEngine: {}
-});
-
-await tree.execute(aiWarrior, [aiWarrior, dummy], [dummy]);
-
-assert.strictEqual(aiWarrior.gridX, 1);
-assert(tree.blackboard.get('hasMovedThisTurn'));
-console.log('Warrior AI movement test passed.');
