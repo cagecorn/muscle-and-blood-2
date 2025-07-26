@@ -78,20 +78,10 @@ export class UnitDetailDOM {
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
-                const slot = document.createElement('div');
-
-                if (slotType === 'MOVE') {
-                    slot.className = 'skill-slot move-slot';
-                    slot.style.backgroundImage = 'url(assets/images/skills/move.png)';
-                    slot.draggable = false;
-                    slot.innerHTML = `<span class="slot-rank">0 순위</span>`;
-                    skillGrid.appendChild(slot);
-                    return;
-                }
-
                 const typeClass = `${slotType.toLowerCase()}-slot`;
                 const instanceId = equippedSkills[index];
 
+                const slot = document.createElement('div');
                 slot.className = `skill-slot ${typeClass}`;
 
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
@@ -99,11 +89,12 @@ export class UnitDetailDOM {
                     const instData = skillInventoryManager.getInstanceData(instanceId);
                     const baseSkillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
                     if (baseSkillData) {
-                        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index, instData.grade);
+                        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1, instData.grade);
                         bgImage = `url(${modifiedSkill.illustrationPath})`;
                         slot.onmouseenter = (e) => SkillTooltipManager.show(modifiedSkill, e, instData.grade);
                         slot.onmouseleave = () => SkillTooltipManager.hide();
 
+                        // 등급 표시를 위한 클래스와 별 이미지 추가
                         slot.classList.add(`grade-${instData.grade.toLowerCase()}`);
                         const starsContainer = document.createElement('div');
                         starsContainer.className = 'grade-stars';
@@ -118,7 +109,7 @@ export class UnitDetailDOM {
                 }
                 slot.style.backgroundImage = bgImage;
 
-                slot.innerHTML += `<span class="slot-rank">${index} 순위</span>`;
+                slot.innerHTML += `<span class="slot-rank">${index + 1} 순위</span>`;
                 skillGrid.appendChild(slot);
             });
         }

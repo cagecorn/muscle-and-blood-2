@@ -4,7 +4,6 @@ import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 import { cooldownManager } from '../utils/CooldownManager.js';
-import { actionPointEngine } from '../utils/ActionPointEngine.js';
 
 /**
  * 전투 중 활성화된 유닛의 상세 정보를 표시하는 하단 UI 매니저 (최적화 버전)
@@ -65,16 +64,12 @@ export class CombatUIManager {
         const bottomRow = document.createElement('div');
         bottomRow.className = 'combat-bottom-row';
 
-        this.apContainer = document.createElement('div');
-        this.apContainer.className = 'combat-ap-container';
-
         this.tokenContainer = document.createElement('div');
         this.tokenContainer.className = 'combat-token-container';
         
         this.skillContainer = document.createElement('div');
         this.skillContainer.className = 'combat-skill-container';
 
-        bottomRow.appendChild(this.apContainer);
         bottomRow.appendChild(this.tokenContainer);
         bottomRow.appendChild(this.skillContainer);
 
@@ -119,7 +114,6 @@ export class CombatUIManager {
         // 매번 업데이트가 필요한 정보들
         this.updateHealth(unit);
         this.updateTokens(unit);
-        this.updateActionPoints(unit);
         this.updateEffects(unit);
         this.updateSkills(unit); // 쿨타임 등 업데이트
 
@@ -161,23 +155,6 @@ export class CombatUIManager {
                 tokenImg.src = 'assets/images/battle/token.png';
                 tokenImg.className = 'combat-token-icon';
                 this.tokenContainer.appendChild(tokenImg);
-            }
-        }
-    }
-
-    /**
-     * 유닛의 행동력 아이콘을 업데이트합니다.
-     * @param {object} unit
-     */
-    updateActionPoints(unit) {
-        const currentPoints = actionPointEngine.getPoints(unit.uniqueId);
-        if (this.apContainer.children.length !== currentPoints) {
-            this.apContainer.innerHTML = '';
-            for (let i = 0; i < currentPoints; i++) {
-                const apImg = document.createElement('img');
-                apImg.src = 'assets/images/battle/AP.png';
-                apImg.className = 'combat-ap-icon';
-                this.apContainer.appendChild(apImg);
             }
         }
     }
