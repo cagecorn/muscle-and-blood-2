@@ -1,10 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
-// ✨ [신규] DebugMoveManager를 import 합니다.
-import { debugMoveManager } from '../../game/debug/DebugMoveManager.js';
-import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
-import { skillEngine } from '../../game/utils/SkillEngine.js';
 
 class MoveToTargetNode extends Node {
     constructor({ animationEngine, cameraControl }) {
@@ -34,11 +30,6 @@ class MoveToTargetNode extends Node {
         if (movePath.length === 0) {
             return NodeState.SUCCESS;
         }
-
-        // ✨ [신규] 이동 실행 전 이동 스킬(0번 슬롯)을 사용 처리합니다.
-        // 이 노드는 0번 슬롯 스킬의 결과로 실행되므로, 여기서 자원을 소모하는 것이 타당합니다.
-        const skillData = skillInventoryManager.getSkillData('move');
-        skillEngine.recordSkillUse(unit, skillData);
 
         // 현재 위치의 점유 상태를 해제합니다.
         const originalCell = formationEngine.grid.getCell(unit.gridX, unit.gridY);
@@ -74,9 +65,6 @@ class MoveToTargetNode extends Node {
             finalCell.isOccupied = true;
             finalCell.sprite = unit.sprite;
         }
-
-        // ✨ [신규] 이동 완료 후 로그를 기록합니다.
-        debugMoveManager.logMoveAction(unit, movePath);
 
         // 이동 완료 플래그 설정
         blackboard.set('hasMovedThisTurn', true);
