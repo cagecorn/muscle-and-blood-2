@@ -81,10 +81,18 @@ function createMeleeAI(engines = {}) {
         new SuccessNode()
     ]);
 
+    // 여러 번의 스킬 사용을 위해 스킬 단계를 반복합니다.
     const rootNode = new SelectorNode([
         new SequenceNode([
             movementPhase,
-            skillPhase
+            new SelectorNode([
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                new SuccessNode()
+            ])
         ])
     ]);
 

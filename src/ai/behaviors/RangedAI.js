@@ -84,10 +84,18 @@ function createRangedAI(engines = {}) {
         new SuccessNode()
     ]);
 
+    // 여러 스킬을 연속으로 사용하기 위해 스킬 단계를 반복합니다.
     const rootNode = new SelectorNode([
         new SequenceNode([
             movementPhase,
-            skillPhase
+            new SelectorNode([
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                new SuccessNode()
+            ])
         ])
     ]);
 
