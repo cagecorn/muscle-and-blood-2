@@ -32,6 +32,8 @@ export class TerritoryDOMEngine {
         this.addFormationButton(0, 1);
         // --- 스킬 관리 버튼 추가 ---
         this.addSkillManagementButton(1, 1);
+        // --- ✨ [신규] 선조 소환 관리 버튼 추가 ---
+        this.addSummonManagementButton(2, 1); // 스킬 관리 옆에 배치
     }
 
     createGrid() {
@@ -131,6 +133,23 @@ export class TerritoryDOMEngine {
         button.addEventListener('click', () => {
             this.container.style.display = 'none';
             this.scene.scene.start('SkillManagementScene');
+        });
+        this.grid.appendChild(button);
+    }
+
+    // ✨ 새로운 버튼 추가 메서드를 만듭니다.
+    addSummonManagementButton(col, row) {
+        const button = document.createElement('div');
+        button.className = 'building-icon';
+        button.style.backgroundImage = `url(assets/images/territory/summon-icon.png)`; // 새 아이콘 이미지
+        button.style.gridColumnStart = col + 1;
+        button.style.gridRowStart = row + 1;
+        button.addEventListener('mouseover', (event) => this.domEngine.showTooltip(event.clientX, event.clientY, '[선조 소환]'));
+        button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
+        button.addEventListener('click', () => {
+            this.container.style.display = 'none';
+            // ✨ SummonManagementScene을 시작합니다.
+            this.scene.scene.start('SummonManagementScene');
         });
         this.grid.appendChild(button);
     }
