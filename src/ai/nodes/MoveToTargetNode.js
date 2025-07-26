@@ -17,48 +17,31 @@ class MoveToTargetNode extends Node {
         const path = blackboard.get('movementPath');
         const movementRange = unit.finalStats.movement || 3;
 
-        // ✨ [핵심 수정] 블랙보드에서 현재 스킬 정보를 미리 가져옵니다.
-        const skillData = blackboard.get('currentSkillData');
-        const instanceId = blackboard.get('currentSkillInstanceId');
-
         if (!path) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '경로가 없음');
             return NodeState.FAILURE;
         }
 
-        // --- ✨ [핵심 로직 수정] ---
-        // 이동 경로가 없더라도(제자리에 있더라도), 이동 '행동' 자체는 수행한 것으로 간주하고
-        // 관련된 자원(행동력 등)을 소모하고 턴 플래그를 설정합니다.
-        // 이것이 "이동 안 한 전사가 힐링포션을 쓰는" 로직의 핵심입니다.
         if (path.length === 0) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음 (행동력은 소모)');
-            // 스킬 사용 기록 (행동력 소모)
-            if (skillData) {
-                skillEngine.recordSkillUse(unit, skillData);
-            }
-            // 블랙보드에 스킬 사용 기록
-            if (instanceId) {
-                const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
-                usedSkills.add(instanceId);
-                blackboard.set('usedSkillsThisTurn', usedSkills);
-            }
-            // 이동 완료 플래그 설정
-            blackboard.set('hasMovedThisTurn', true);
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음');
             return NodeState.SUCCESS;
         }
-        // --- 수정 끝 ---
 
         const movePath = path.slice(0, movementRange);
         if (movePath.length === 0) {
             return NodeState.SUCCESS;
         }
 
+        // ✨ [핵심 수정] 블랙보드에서 현재 스킬 정보를 가져옵니다.
+        const skillData = blackboard.get('currentSkillData');
+        const instanceId = blackboard.get('currentSkillInstanceId');
+
         // 스킬 사용을 SkillEngine에 기록합니다 (자원 소모 등).
         if (skillData) {
             skillEngine.recordSkillUse(unit, skillData);
         }
 
-        // AIManager가 알 수 있도록 블랙보드에도 스킬 사용을 기록합니다.
+        // ✨ [핵심 추가] AIManager가 알 수 있도록 블랙보드에도 스킬 사용을 기록합니다.
         if (instanceId) {
             const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
             usedSkills.add(instanceId);
