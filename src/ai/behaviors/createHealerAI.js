@@ -30,7 +30,6 @@ function createHealerAI(engines = {}) {
             new UseSkillNode(engines)
         ]),
         new SequenceNode([
-            new HasNotMovedNode(engines),
             new FindSafeHealingPositionNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
