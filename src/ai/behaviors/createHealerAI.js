@@ -30,24 +30,20 @@ function createHealerAI(engines = {}) {
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeHealingPositionNode(engines),
-            // ✨ 이동 전 행동력 소모
-            new SpendActionPointNode(),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
         ])
     ]);
 
-    // ✨ 이동 페이즈 수정: 안전 확보(카이팅)를 최우선으로 고려하고, 이동 결정 후 AP 소모
     const movementPhase = new SelectorNode([
         new SequenceNode([
             new ShouldHealerMoveNode(),
-            // 안전 위치 탐색을 우선
+            new SpendActionPointNode(),
             new SelectorNode([
-                new FindKitingPositionNode(engines), // 위협적일 때
-                new FindSafeHealingPositionNode(engines) // 아군을 치유해야 할 때
+                new FindKitingPositionNode(engines),
+                new FindSafeHealingPositionNode(engines)
             ]),
-            new SpendActionPointNode(), // 경로 확보 후 AP 소모
             new MoveToTargetNode(engines)
         ]),
         new SuccessNode()
@@ -82,16 +78,18 @@ function createHealerAI(engines = {}) {
         new SuccessNode()
     ]);
 
-    // ✨ 루트 노드 수정: 이동 후 스킬 페이즈를 여러 번 반복
-    const rootNode = new SequenceNode([
-        movementPhase,
-        new SelectorNode([
-            skillPhase,
-            skillPhase,
-            skillPhase,
-            skillPhase,
-            skillPhase,
-            new SuccessNode()
+    // 토큰이 남아 있다면 여러 스킬을 연속으로 사용할 수 있도록 스킬 단계를 반복합니다.
+    const rootNode = new SelectorNode([
+        new SequenceNode([
+            movementPhase,
+            new SelectorNode([
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                skillPhase,
+                new SuccessNode()
+            ])
         ])
     ]);
 
