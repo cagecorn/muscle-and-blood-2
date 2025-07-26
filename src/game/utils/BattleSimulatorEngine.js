@@ -126,9 +126,12 @@ export class BattleSimulatorEngine {
         // 스킬 사용 기록 초기화
         skillEngine.resetTurnActions();
 
-        // [✨ 수정] 첫 턴 시작 직후 모든 유닛의 토큰 UI를 업데이트합니다.
+        // [✨ 수정] 첫 턴 시작 직후 모든 유닛의 토큰 및 행동력 UI를 업데이트합니다.
         // unit.uniqueId 대신 unit 객체 전체를 전달합니다.
-        allUnits.forEach(unit => this.vfxManager.updateTokenDisplay(unit));
+        allUnits.forEach(unit => {
+            this.vfxManager.updateTokenDisplay(unit);
+            this.vfxManager.updateActionPowerDisplay(unit);
+        });
 
         this.gameLoop(); // 수정된 루프 시작
     }
@@ -210,11 +213,11 @@ export class BattleSimulatorEngine {
             this.turnQueue.forEach((u, idx) => u.isTurnActive = (idx === this.currentTurnIndex));
             this.turnOrderUI.update(this.turnQueue);
 
-            // --- ✨ 매 행동 후 모든 유닛의 토큰 UI 업데이트 ---
-            // unit.uniqueId 대신 unit 객체 전체를 전달합니다.
+            // --- ✨ 매 행동 후 모든 유닛의 토큰 및 행동력 UI 업데이트 ---
             this.turnQueue.forEach(unit => {
                 if (unit.sprite && unit.sprite.active) {
                     this.vfxManager.updateTokenDisplay(unit);
+                    this.vfxManager.updateActionPowerDisplay(unit);
                 }
             });
 
