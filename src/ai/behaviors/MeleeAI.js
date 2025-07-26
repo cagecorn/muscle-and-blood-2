@@ -28,7 +28,6 @@ function createMeleeAI(engines = {}) {
             new UseSkillNode(engines)
         ]),
         new SequenceNode([
-            new HasNotMovedNode(engines),
             new FindPathToSkillRangeNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
