@@ -11,13 +11,19 @@ class FindTargetBySkillTypeNode extends Node {
         debugAIManager.logNodeEvaluation(this, unit);
         const skillData = blackboard.get('currentSkillData');
         const enemyUnits = blackboard.get('enemyUnits')?.filter(e => e.currentHp > 0);
-        // ✨ 아군 유닛 목록을 블랙보드에서 가져옵니다.
         const allUnits = blackboard.get('allUnits');
         const alliedUnits = allUnits?.filter(u => u.team === unit.team && u.currentHp > 0);
 
         if (!skillData) {
             debugAIManager.logNodeResult(NodeState.FAILURE, "스킬 데이터 없음");
             return NodeState.FAILURE;
+        }
+
+        // ✨ [수정] 스킬의 targetType을 먼저 확인하여 'self'인 경우 자신을 즉시 타겟으로 설정합니다.
+        if (skillData.targetType === 'self') {
+            blackboard.set('skillTarget', unit);
+            debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skillData.name}]의 대상 (자신) 설정`);
+            return NodeState.SUCCESS;
         }
 
         let target = null;
@@ -45,7 +51,7 @@ class FindTargetBySkillTypeNode extends Node {
                 }
                 target = this.targetManager.findHighestHealthEnemy(enemyUnits);
                 break;
-            // ✨ [수정] 'BUFF'와 'AID' 타입을 함께 처리합니다.
+            // ✨ [수정] 'BUFF' 타입을 별도로 처리하고, 'self'가 아닌 경우에만 아군을 찾도록 남겨둡니다.
             case 'BUFF':
             case 'AID':
                 if (!alliedUnits || alliedUnits.length === 0) {
