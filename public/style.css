@@ -1189,3 +1189,52 @@ body {
     margin-left: 20px; /* 좌측 패널과의 간격 */
 }
 
+
+/* --- 턴 순서 패널 스타일 --- */
+#turn-order-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 200px;
+    max-height: 90vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    z-index: 150;
+    pointer-events: none;
+}
+
+.turn-order-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.turn-order-entry.active-turn {
+    background-color: rgba(255, 215, 0, 0.3);
+    border: 1px solid rgba(255, 215, 0, 0.7);
+}
+
+.turn-order-portrait {
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    border: 2px solid #666;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.turn-order-name {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}

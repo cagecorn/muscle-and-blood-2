@@ -26,6 +26,7 @@ import { statusEffectManager } from './StatusEffectManager.js';
 import { cooldownManager } from './CooldownManager.js';
 // 전투 중 하단 UI를 관리하는 매니저
 import { CombatUIManager } from '../dom/CombatUIManager.js';
+import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -49,6 +50,8 @@ export class BattleSimulatorEngine {
         this.terminationManager = new TerminationManager(scene, this.summoningEngine, this);
         // 전투 중 유닛 정보를 표시할 UI 매니저
         this.combatUI = new CombatUIManager();
+        // 턴 순서 UI 매니저
+        this.turnOrderUI = new TurnOrderUIManager();
         
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
@@ -111,6 +114,9 @@ export class BattleSimulatorEngine {
         this.currentTurnIndex = 0;
         this.currentTurnNumber = 1; // 턴 번호 초기화
 
+        // 턴 순서 UI 초기화
+        this.turnOrderUI.show(this.turnQueue);
+
         // --- ✨ 첫 턴 시작 시 토큰 지급 ---
         tokenEngine.addTokensForNewTurn();
         // 스킬 사용 기록 초기화
@@ -154,6 +160,10 @@ export class BattleSimulatorEngine {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
+            // 현재 턴 표시를 위해 턴 순서 UI 업데이트
+            this.turnQueue.forEach((u, index) => u.isTurnActive = (index === this.currentTurnIndex));
+            this.turnOrderUI.update(this.turnQueue);
+
             // 턴을 처리하기 전에 유닛이 살아있는지 확인하여 죽은 유닛의 턴을 건너뜁니다.
             if (currentUnit && currentUnit.currentHp > 0) {
                 // 현재 턴을 진행하는 유닛 정보를 하단 UI에 표시
@@ -191,6 +201,10 @@ export class BattleSimulatorEngine {
                 skillEngine.resetTurnActions();
             }
 
+            // 다음 턴을 위해 턴 순서 UI 갱신
+            this.turnQueue.forEach((u, idx) => u.isTurnActive = (idx === this.currentTurnIndex));
+            this.turnOrderUI.update(this.turnQueue);
+
             // --- ✨ 매 행동 후 모든 유닛의 토큰 UI 업데이트 ---
             // unit.uniqueId 대신 unit 객체 전체를 전달합니다.
             this.turnQueue.forEach(unit => {
@@ -216,6 +230,7 @@ export class BattleSimulatorEngine {
 
         // 전투 종료 시 UI 숨김 처리
         this.combatUI.hide();
+        this.turnOrderUI.hide();
         console.log('전투 종료!');
     }
 
@@ -238,6 +253,9 @@ export class BattleSimulatorEngine {
         }
         if (this.combatUI) {
             this.combatUI.destroy();
+        }
+        if (this.turnOrderUI) {
+            this.turnOrderUI.destroy();
         }
     }
 }
