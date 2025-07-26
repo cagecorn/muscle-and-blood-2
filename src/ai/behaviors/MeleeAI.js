@@ -35,21 +35,24 @@ function createMeleeAI(engines = {}) {
         new SequenceNode([
             new HasNotMovedNode(),
             new FindPathToSkillRangeNode(engines),
+            // ✨ 이동 전 행동력 소모
+            new SpendActionPointNode(),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
         ])
     ]);
 
+    // ✨ 이동 페이즈 수정: 이동 경로가 있을 때만 AP를 소모하도록 구조 변경
     const movementPhase = new SelectorNode([
         new SequenceNode([
             new HasNotMovedNode(),
-            new SpendActionPointNode(),
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
+            new SpendActionPointNode(), // 경로 확정 후 AP 소모
             new MoveToTargetNode(engines)
         ]),
-        new SuccessNode()
+        new SuccessNode() // 이동할 필요가 없거나 이동할 수 없어도 페이즈는 성공
     ]);
 
     const skillPhase = new SelectorNode([
@@ -78,21 +81,20 @@ function createMeleeAI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        new SuccessNode()
+        // 모든 스킬 사용 시도 후에도 성공/실패 여부와 관계없이 다음으로 진행
+        new SuccessNode() 
     ]);
 
-    // 여러 번의 스킬 사용을 위해 스킬 단계를 반복합니다.
-    const rootNode = new SelectorNode([
-        new SequenceNode([
-            movementPhase,
-            new SelectorNode([
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                new SuccessNode()
-            ])
+    // ✨ 루트 노드 수정: 이동 후 스킬 페이즈를 여러 번 반복
+    const rootNode = new SequenceNode([
+        movementPhase,
+        new SelectorNode([ // Selector를 사용해 스킬을 쓸 수 있을 때까지 계속 시도
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            new SuccessNode() // 모든 시도가 끝나면 턴 종료
         ])
     ]);
 
