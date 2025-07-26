@@ -31,19 +31,8 @@ class MoveToTargetNode extends Node {
         // 관련된 자원(행동력 등)을 소모하고 턴 플래그를 설정합니다.
         // 이것이 "이동 안 한 전사가 힐링포션을 쓰는" 로직의 핵심입니다.
         if (path.length === 0) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음 (행동력은 소모)');
-            // 스킬 사용 기록 (행동력 소모)
-            if (skillData) {
-                skillEngine.recordSkillUse(unit, skillData);
-            }
-            // 블랙보드에 스킬 사용 기록
-            if (instanceId) {
-                const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
-                usedSkills.add(instanceId);
-                blackboard.set('usedSkillsThisTurn', usedSkills);
-            }
-            // 이동 완료 플래그 설정
-            blackboard.set('hasMovedThisTurn', true);
+            // 이동이 실제로 발생하지 않았으므로 자원 소모 없이 종료합니다.
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음 (이동 생략)');
             return NodeState.SUCCESS;
         }
         // --- 수정 끝 ---
