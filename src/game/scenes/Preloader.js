@@ -117,6 +117,8 @@ export class Preloader extends Scene
 
         // 몬스터 스프라이트 로드
         this.load.image('zombie', 'images/unit/zombie.png');
+        // 소환수 스프라이트 로드
+        this.load.image('ancestor-peor', 'images/summon/ancestor-peor.png');
 
         // --- 추가된 토큰 이미지 로드 ---
         this.load.image('token', 'images/battle/token.png');
@@ -132,7 +134,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'zombie',
+            'warrior', 'gunner', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

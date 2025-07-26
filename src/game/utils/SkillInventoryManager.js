@@ -37,6 +37,11 @@ class SkillInventoryManager {
             }
         });
 
+        // "선조 페오르 소환" 스킬 카드 5장 지급 (NORMAL 등급)
+        for (let i = 0; i < 5; i++) {
+            this.addSkillById('summonAncestorPeor', 'NORMAL');
+        }
+
         // 나머지 스킬은 노멀 등급으로 10장씩 생성
         for (const skillId in skillCardDatabase) {
             if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge' && skillId !== 'attack') {

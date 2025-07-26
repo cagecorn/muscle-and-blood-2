@@ -2,6 +2,7 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { monsterEngine } from './MonsterEngine.js';
 import { formationEngine } from './FormationEngine.js';
 import { getMonsterBase } from '../data/monster.js';
+import { getSummonBase } from '../data/summon.js';
 
 /**
  * 전투 중 유닛 소환을 담당하는 엔진
@@ -37,7 +38,10 @@ class SummoningEngine {
         }
 
         // 2. 소환수 데이터 생성
-        const monsterBase = getMonsterBase(summonSkillData.creatureId);
+        let monsterBase = getMonsterBase(summonSkillData.creatureId);
+        if (!monsterBase) {
+            monsterBase = getSummonBase(summonSkillData.creatureId);
+        }
         if (!monsterBase) {
             debugLogEngine.error('SummoningEngine', `몬스터 데이터베이스에서 '${summonSkillData.creatureId}'를 찾을 수 없습니다.`);
             return null;
