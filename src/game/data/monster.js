@@ -28,6 +28,8 @@ export const monsterData = {
             // 3. 이 스킬은 몬스터 전용이므로, 플레이어의 인벤토리 목록에서는 제거합니다.
             // (하지만 다른 시스템이 참조할 수 있도록 instanceMap에는 남겨둡니다.)
             skillInventoryManager.removeSkillFromInventoryList(newInstance.instanceId);
+            // 4. 소환 스킬 전용 슬롯을 추가합니다.
+            unit.skillSlots.push('SUMMON');
         }
     }
 };

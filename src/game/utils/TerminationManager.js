@@ -1,12 +1,14 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-import { formationEngine } from './FormationEngine.js'; // formationEngine을 직접 가져옵니다.
+import { formationEngine } from './FormationEngine.js';
 
 /**
  * 유닛 사망 등 특정 로직의 '종료'와 관련된 후처리를 담당하는 매니저
  */
 class TerminationManager {
-    constructor(scene) {
+    constructor(scene, summoningEngine, battleSimulator) {
         this.scene = scene;
+        this.summoningEngine = summoningEngine;
+        this.battleSimulator = battleSimulator;
         debugLogEngine.log('TerminationManager', '종료 매니저가 초기화되었습니다.');
     }
 
@@ -26,6 +28,18 @@ class TerminationManager {
             cell.isOccupied = false;
             cell.sprite = null;
             debugLogEngine.log('TerminationManager', `그리드 (${deadUnit.gridX}, ${deadUnit.gridY})의 점유 상태를 해제했습니다.`);
+        }
+
+        // 소환사가 사망한 경우 해당 소환수들도 정리합니다.
+        const summons = this.summoningEngine.getSummons(deadUnit.uniqueId);
+        if (summons && summons.size > 0) {
+            debugLogEngine.log('TerminationManager', `${deadUnit.instanceName}의 소환수들을 함께 제거합니다.`);
+            summons.forEach(id => {
+                const summon = this.battleSimulator.turnQueue.find(u => u.uniqueId === id);
+                if (summon && summon.currentHp > 0) {
+                    this.handleUnitDeath(summon);
+                }
+            });
         }
         
         // 2. 시각적 처리 (애니메이션)

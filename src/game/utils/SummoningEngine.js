@@ -11,7 +11,16 @@ class SummoningEngine {
     constructor(scene, battleSimulator) {
         this.scene = scene;
         this.battleSimulator = battleSimulator; // 전투 시뮬레이터 참조
+        // 소환사와 소환수의 관계를 추적합니다.
+        this.summonerToSummonsMap = new Map();
         debugLogEngine.log('SummoningEngine', '소환 엔진이 초기화되었습니다.');
+    }
+
+    /**
+     * 전투 시작 시 호출하여 모든 소환 관계를 초기화합니다.
+     */
+    reset() {
+        this.summonerToSummonsMap.clear();
     }
 
     /**
@@ -69,6 +78,12 @@ class SummoningEngine {
         // 6. 전투 턴 큐에 소환수 추가
         this.battleSimulator.turnQueue.push(summonedUnit);
 
+        // 7. 소환 관계 기록
+        if (!this.summonerToSummonsMap.has(summoner.uniqueId)) {
+            this.summonerToSummonsMap.set(summoner.uniqueId, new Set());
+        }
+        this.summonerToSummonsMap.get(summoner.uniqueId).add(summonedUnit.uniqueId);
+
         debugLogEngine.log('SummoningEngine', `${summoner.instanceName}이(가) ${summonedUnit.instanceName}을(를) (${summonCell.col}, ${summonCell.row})에 소환했습니다.`);
 
         return summonedUnit;
@@ -104,6 +119,15 @@ class SummoningEngine {
         }
 
         return null; // 주변에 빈 칸이 없음
+    }
+
+    /**
+     * 특정 소환사가 소유한 소환수들의 ID 집합을 반환합니다.
+     * @param {number} summonerId
+     * @returns {Set<number>|undefined}
+     */
+    getSummons(summonerId) {
+        return this.summonerToSummonsMap.get(summonerId);
     }
 }
 

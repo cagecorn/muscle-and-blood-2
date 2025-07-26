@@ -43,10 +43,10 @@ export class BattleSimulatorEngine {
         // 그림자 생성용 매니저 초기화
         this.shadowManager = new ShadowManager(scene);
         this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
-        this.terminationManager = new TerminationManager(scene);
-        // ✨ 소환 기능을 담당하는 SummoningEngine 인스턴스를 생성합니다.
-        // scene과 battle simulator 참조를 전달합니다.
+        // 소환 엔진을 먼저 생성합니다.
         this.summoningEngine = new SummoningEngine(scene, this);
+        // 소환 엔진을 참조하는 종료 매니저를 초기화합니다.
+        this.terminationManager = new TerminationManager(scene, this.summoningEngine, this);
         // 전투 중 유닛 정보를 표시할 UI 매니저
         this.combatUI = new CombatUIManager();
         
@@ -78,6 +78,7 @@ export class BattleSimulatorEngine {
 
         aiManager.clear();
         cooldownManager.reset();
+        this.summoningEngine.reset();
         statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];
