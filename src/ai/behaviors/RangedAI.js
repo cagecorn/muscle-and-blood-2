@@ -23,9 +23,9 @@ import SpendActionPointNode from '../nodes/SpendActionPointNode.js';
  *
  * 행동 우선순위:
  * 1. (생존) 가장 가까운 적이 너무 가까우면, 먼저 안전한 위치로 이동(카이팅)합니다.
- *    - 이동 후, 그 자리에서 사용할 수 있는 가장 우선순위 높은 스킬을 사용합니다.
+ * - 이동 후, 그 자리에서 사용할 수 있는 가장 우선순위 높은 스킬을 사용합니다.
  * 2. (공격) 위협적이지 않다면, 1~4순위 스킬을 순서대로 확인하여 가장 먼저 사용 가능한 스킬을 사용합니다.
- *    - ✨ [변경] 이때, 이동이 필요하다면 단순 접근이 아닌 '안전한 공격 위치'를 탐색합니다.
+ * - ✨ [변경] 이때, 이동이 필요하다면 단순 접근이 아닌 '안전한 공격 위치'를 탐색합니다.
  * 3. (이동) 사용할 스킬이 없다면, 다음 턴을 위해 전략적으로 유리한 위치로 이동만 합니다.
  */
 function createRangedAI(engines = {}) {
@@ -39,17 +39,20 @@ function createRangedAI(engines = {}) {
         new SequenceNode([
             new HasNotMovedNode(),
             new FindKitingPositionNode(engines),
+             // ✨ 이동 전 행동력 소모
+            new SpendActionPointNode(),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
         ])
     ]);
 
+    // ✨ 이동 페이즈 수정: 이동이 필요하다고 판단될 때만 AP를 소모하도록 변경
     const movementPhase = new SelectorNode([
         new SequenceNode([
             new ShouldRangedUnitMoveNode(),
-            new SpendActionPointNode(),
             new FindKitingPositionNode(engines),
+            new SpendActionPointNode(), // 이동 결정 및 경로 확보 후 AP 소모
             new MoveToTargetNode(engines)
         ]),
         new SuccessNode()
@@ -84,18 +87,16 @@ function createRangedAI(engines = {}) {
         new SuccessNode()
     ]);
 
-    // 여러 스킬을 연속으로 사용하기 위해 스킬 단계를 반복합니다.
-    const rootNode = new SelectorNode([
-        new SequenceNode([
-            movementPhase,
-            new SelectorNode([
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                new SuccessNode()
-            ])
+    // ✨ 루트 노드 수정: 이동 후 스킬 페이즈를 여러 번 반복
+    const rootNode = new SequenceNode([
+        movementPhase,
+        new SelectorNode([
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            skillPhase,
+            new SuccessNode()
         ])
     ]);
 
