@@ -99,6 +99,20 @@ class StatusEffectManager {
      */
     addEffect(targetUnit, sourceSkill) {
         if (!sourceSkill.effect) return;
+
+        // ✨ [신규] isGlobal 효과 처리
+        if (sourceSkill.effect.isGlobal) {
+            const allies = this.battleSimulator.turnQueue.filter(u => u.team === targetUnit.team && u.currentHp > 0);
+            allies.forEach(ally => {
+                this.applySingleEffect(ally, sourceSkill);
+            });
+        } else {
+            this.applySingleEffect(targetUnit, sourceSkill);
+        }
+    }
+
+    // ✨ 기존 addEffect 로직을 별도 함수로 분리
+    applySingleEffect(targetUnit, sourceSkill) {
         const effectId = sourceSkill.effect.id;
         const effectDefinition = statusEffects[effectId];
 

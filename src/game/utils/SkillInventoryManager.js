@@ -42,6 +42,11 @@ class SkillInventoryManager {
             this.addSkillById('summonAncestorPeor', 'NORMAL');
         }
 
+        // ✨ [신규] '돌격 명령' 전략 카드 3장 지급
+        for (let i = 0; i < 3; i++) {
+            this.addSkillById('chargeOrder', 'NORMAL');
+        }
+
         // 나머지 스킬은 노멀 등급으로 10장씩 생성
         for (const skillId in skillCardDatabase) {
             if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge' && skillId !== 'attack') {
