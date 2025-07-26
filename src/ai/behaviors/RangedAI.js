@@ -34,6 +34,7 @@ function createRangedAI(engines = {}) {
             new UseSkillNode(engines)
         ]),
         new SequenceNode([
+            new HasNotMovedNode(engines),
             new FindKitingPositionNode(engines),
             new MoveToTargetNode(engines),
             new IsSkillInRangeNode(engines),
