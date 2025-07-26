@@ -14,8 +14,7 @@ import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 
 // 힐러 전용 이동 노드
 import FindSafeHealingPositionNode from '../nodes/FindSafeHealingPositionNode.js';
-import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
-import ShouldHealerMoveNode from '../nodes/ShouldHealerMoveNode.js';
+import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 
 /**
  * 힐러 유닛을 위한 행동 트리를 생성합니다.
@@ -38,12 +37,9 @@ function createHealerAI(engines = {}) {
 
     const movementPhase = new SelectorNode([
         new SequenceNode([
-            new ShouldHealerMoveNode(),
+            new HasNotMovedNode(),
             new SpendActionPointNode(),
-            new SelectorNode([
-                new FindKitingPositionNode(engines),
-                new FindSafeHealingPositionNode(engines)
-            ]),
+            new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
         ]),
         new SuccessNode()
