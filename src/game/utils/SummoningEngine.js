@@ -69,10 +69,21 @@ class SummoningEngine {
         const penalty = Math.round(summoner.finalStats.hp * (summonSkillData.healthCostPercent || 0.1)); // 기본 10%
         summoner.currentHp -= penalty;
 
-        // VFX 매니저를 통해 시각 효과 업데이트
-        if (this.battleSimulator.vfxManager) {
-            this.battleSimulator.vfxManager.createDamageNumber(summoner.sprite.x, summoner.sprite.y, `-${penalty}`, '#9333ea');
-            this.battleSimulator.vfxManager.updateHealthBar(summoner.healthBar, summoner.currentHp, summoner.finalStats.hp);
+        // ✨ [수정] VFX 및 UI 업데이트 로직 수정
+        if (this.battleSimulator) {
+            // 데미지 숫자는 VFX 매니저로 생성
+            if (this.battleSimulator.vfxManager) {
+                this.battleSimulator.vfxManager.createDamageNumber(
+                    summoner.sprite.x,
+                    summoner.sprite.y,
+                    `-${penalty}`,
+                    '#9333ea'
+                );
+            }
+            // 체력바 업데이트는 Combat UI 매니저로 수행
+            if (this.battleSimulator.combatUI) {
+                this.battleSimulator.combatUI.updateHealth(summoner);
+            }
         }
 
         // 6. 전투 턴 큐에 소환수 추가
