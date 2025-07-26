@@ -3,6 +3,9 @@ import { monsterEngine } from './MonsterEngine.js';
 import { formationEngine } from './FormationEngine.js';
 import { getMonsterBase } from '../data/monster.js';
 import { getSummonBase } from '../data/summon.js';
+// AI 매니저와 근접 AI를 불러와 소환된 유닛을 즉시 등록할 수 있도록 합니다.
+import { aiManager } from '../../ai/AIManager.js';
+import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 
 /**
  * 전투 중 유닛 소환을 담당하는 엔진
@@ -65,7 +68,12 @@ class SummoningEngine {
         // BattleSimulatorEngine의 유닛 설정 로직을 재활용합니다.
         this.battleSimulator._setupUnits([summonedUnit]);
 
-        // 5. 소환사에게 체력 페널티 적용
+        // 5. AI 매니저에 새 유닛을 등록하여 즉시 행동 트리를 갖게 합니다.
+        if (summonedUnit.className === '전사') {
+            aiManager.registerUnit(summonedUnit, createMeleeAI(this.battleSimulator.aiEngines));
+        }
+
+        // 6. 소환사에게 체력 페널티 적용
         const penalty = Math.round(summoner.finalStats.hp * (summonSkillData.healthCostPercent || 0.1)); // 기본 10%
         summoner.currentHp -= penalty;
 
@@ -86,10 +94,11 @@ class SummoningEngine {
             }
         }
 
-        // 6. 전투 턴 큐에 소환수 추가
+        // 7. 전투 턴 큐에 소환수 추가
         this.battleSimulator.turnQueue.push(summonedUnit);
+        aiManager.updateBlackboard(this.battleSimulator.turnQueue);
 
-        // 7. 소환 관계 기록
+        // 8. 소환 관계 기록
         if (!this.summonerToSummonsMap.has(summoner.uniqueId)) {
             this.summonerToSummonsMap.set(summoner.uniqueId, new Set());
         }

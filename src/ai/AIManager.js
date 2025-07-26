@@ -39,6 +39,22 @@ class AIManager {
     }
 
     /**
+     * 전장의 모든 유닛 정보를 모든 AI의 블랙보드에 갱신합니다.
+     * 유닛이 새로 등장하거나 사라질 때 호출하세요.
+     * @param {Array<object>} allUnits
+     */
+    updateBlackboard(allUnits) {
+        for (const data of this.unitData.values()) {
+            const allies = allUnits.filter(u => u.team === data.instance.team && u.currentHp > 0);
+            const enemies = allUnits.filter(u => u.team !== data.instance.team && u.currentHp > 0);
+
+            data.behaviorTree.blackboard.set('allUnits', allUnits);
+            data.behaviorTree.blackboard.set('enemyUnits', enemies);
+            data.behaviorTree.blackboard.set('allyUnits', allies);
+        }
+    }
+
+    /**
      * 특정 유닛의 턴을 실행합니다.
      * @param {object} unit - 턴을 실행할 유닛
      * @param {Array<object>} allUnits - 전장의 모든 유닛
