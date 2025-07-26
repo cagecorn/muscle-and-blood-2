@@ -21,6 +21,8 @@ import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { delayEngine } from './DelayEngine.js';
 // --- ✨ TokenEngine을 import 합니다. ---
 import { tokenEngine } from './TokenEngine.js';
+// ✨ [신규] ActionPowerEngine을 import 합니다.
+import { actionPowerEngine } from './ActionPowerEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { cooldownManager } from './CooldownManager.js';
@@ -85,8 +87,9 @@ export class BattleSimulatorEngine {
         statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];
-        // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
+        // --- ✨ 전투 시작 시 토큰 및 행동력 엔진 초기화 ---
         tokenEngine.initializeUnits(allUnits);
+        actionPowerEngine.initializeUnits(allUnits);
         allies.forEach(u => u.team = 'ally');
         enemies.forEach(u => u.team = 'enemy');
 
@@ -117,8 +120,9 @@ export class BattleSimulatorEngine {
         // 턴 순서 UI 초기화
         this.turnOrderUI.show(this.turnQueue);
 
-        // --- ✨ 첫 턴 시작 시 토큰 지급 ---
+        // --- ✨ 첫 턴 시작 시 토큰 및 행동력 지급 ---
         tokenEngine.addTokensForNewTurn();
+        actionPowerEngine.addForNewTurn();
         // 스킬 사용 기록 초기화
         skillEngine.resetTurnActions();
 
@@ -198,6 +202,7 @@ export class BattleSimulatorEngine {
 
                 statusEffectManager.onTurnEnd();
                 tokenEngine.addTokensForNewTurn();
+                actionPowerEngine.addForNewTurn();
                 skillEngine.resetTurnActions();
             }
 
