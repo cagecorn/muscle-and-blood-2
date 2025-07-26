@@ -36,61 +36,59 @@ class MercenaryEngine {
             level: 1,
             exp: 0,
             equippedItems: [],
-            // ✨ [변경] 6개의 슬롯을 가집니다.
-            skillSlots: new Array(6)
+            // ✨ 1. 스킬 슬롯 생성을 클래스별로 분기 처리하기 위해 초기화 위치를 변경합니다.
+            skillSlots: []
         };
-
-        // ✨ [신규] 0번 슬롯은 '이동'으로 고정
-        newInstance.skillSlots[0] = 'ACTIVE';
-        const moveInstance = skillInventoryManager.addSkillById('move', 'NORMAL');
-        ownedSkillsManager.equipSkill(newInstance.uniqueId, 0, moveInstance.instanceId);
-        skillInventoryManager.removeSkillFromInventoryList(moveInstance.instanceId);
-
+        
+        // ✨ 2. '전사', '거너', '메딕' 클래스에 대한 특별 처리
+        // 전사와 거너의 랜덤 스킬 풀에서 'AID'를 제외합니다.
         const nonAidSkillTypes = ['ACTIVE', 'BUFF', 'DEBUFF', 'PASSIVE'];
 
-        // ✨ [변경] 슬롯 인덱스를 1부터 시작하도록 수정
         if (newInstance.id === 'warrior') {
-            const randomSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
-            newInstance.skillSlots[1] = randomSlots[0];
-            newInstance.skillSlots[2] = randomSlots[1];
-            newInstance.skillSlots[3] = randomSlots[2];
-            newInstance.skillSlots[4] = 'ACTIVE'; // 4번 슬롯 (기존 3번)
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
+            // 4번째 슬롯을 'ACTIVE' 타입으로 고정
+            newInstance.skillSlots.push('ACTIVE');
 
+            // 인벤토리에서 'attack' 스킬 인스턴스를 소비하고, 동일한 스킬을 새로 생성하여 장착합니다.
             const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('attack');
             if (consumed) {
                 const attackInstance = skillInventoryManager.addSkillById('attack', consumed.grade);
-                ownedSkillsManager.equipSkill(newInstance.uniqueId, 4, attackInstance.instanceId);
+                // 4번 슬롯(인덱스 3)에 장착
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
+                // 새로 생성된 인스턴스는 용병 전용이므로 인벤토리 목록에서는 제거합니다.
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
         } else if (newInstance.id === 'gunner') {
-            const randomSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
-            newInstance.skillSlots[1] = randomSlots[0];
-            newInstance.skillSlots[2] = randomSlots[1];
-            newInstance.skillSlots[3] = randomSlots[2];
-            newInstance.skillSlots[4] = 'ACTIVE';
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
+            // 거너를 위한 4번째 슬롯 처리
+            newInstance.skillSlots.push('ACTIVE');
 
             const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('rangedAttack');
             if (consumed) {
                 const attackInstance = skillInventoryManager.addSkillById('rangedAttack', consumed.grade);
-                ownedSkillsManager.equipSkill(newInstance.uniqueId, 4, attackInstance.instanceId);
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
         } else if (newInstance.id === 'medic') { 
-            const randomSlots = skillEngine.generateRandomSkillSlots(['AID', 'BUFF', 'PASSIVE']);
-            newInstance.skillSlots[1] = randomSlots[0];
-            newInstance.skillSlots[2] = randomSlots[1];
-            newInstance.skillSlots[3] = randomSlots[2];
-            newInstance.skillSlots[4] = 'AID';
+            // ✨ [핵심 변경] 메딕의 랜덤 슬롯은 AID, BUFF, PASSIVE 중에서만 생성합니다.
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots(['AID', 'BUFF', 'PASSIVE']);
+            // 4번째 슬롯을 'AID'로 고정합니다.
+            newInstance.skillSlots.push('AID');
             const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('heal');
             if (consumed) {
                 const instance = skillInventoryManager.addSkillById('heal', consumed.grade);
-                ownedSkillsManager.equipSkill(newInstance.uniqueId, 4, instance.instanceId);
+                ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, instance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(instance.instanceId);
             }
+        } else {
+            // 다른 클래스는 기본 규칙을 따릅니다.
+            newInstance.skillSlots = skillEngine.generateRandomSkillSlots();
+            // 4번째 슬롯을 빈 슬롯(null)으로 추가
+            newInstance.skillSlots.push(null);
         }
 
-        // ✨ [변경] 5번 슬롯은 소환 전용
-        newInstance.skillSlots[5] = 'SUMMON';
+        // ✨ [신규] 5번째 슬롯은 소환 스킬 전용으로 고정합니다.
+        newInstance.skillSlots.push('SUMMON');
 
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
 
