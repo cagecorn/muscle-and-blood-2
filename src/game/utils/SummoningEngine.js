@@ -6,6 +6,8 @@ import { getSummonBase } from '../data/summon.js';
 // AI 매니저와 근접 AI를 불러와 소환된 유닛을 즉시 등록할 수 있도록 합니다.
 import { aiManager } from '../../ai/AIManager.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
+// 소환된 유닛을 토큰 시스템에 등록하기 위해 토큰 엔진을 불러옵니다.
+import { tokenEngine } from './TokenEngine.js';
 
 /**
  * 전투 중 유닛 소환을 담당하는 엔진
@@ -60,6 +62,9 @@ class SummoningEngine {
         }
         // 소환수는 소환사와 같은 팀으로 생성됩니다.
         const summonedUnit = monsterEngine.spawnMonster(monsterBase, summoner.team);
+
+        // 생성 직후 토큰 엔진에 등록하여 바로 행동할 수 있게 합니다.
+        tokenEngine.registerUnit(summonedUnit);
 
         // 3. 소환수 전장 배치
         formationEngine.placeUnitAt(this.scene, summonedUnit, summonCell.col, summonCell.row);
