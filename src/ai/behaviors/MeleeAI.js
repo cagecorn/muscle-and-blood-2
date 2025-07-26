@@ -11,13 +11,14 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 
 /**
  * 근접 유닛(전사)을 위한 행동 트리를 재구성합니다.
  *
- * 행동 우선순위:
- * 1. 스킬 사용: 1~4순위 스킬을 순서대로 확인하여 사용 가능한 스킬이 있다면, 이동해서라도 사용합니다.
- * 2. 이동만 하기: 사용할 스킬이 없다면, 전략적 목표를 향해 이동하고 턴을 마칩니다.
+ * 행동 우선순위 (사용자님의 원래 의도대로 복원):
+ * 1. 이동: (아직 이동 안 했으면) 0순위 이동 스킬을 사용해 전략적 목표를 향해 이동합니다.
+ * 2. 스킬 사용: 1~5순위 스킬을 순서대로 확인하여 사용 가능한 스킬이 있다면 사용합니다.
  */
 function createMeleeAI(engines = {}) {
 
@@ -35,15 +36,17 @@ function createMeleeAI(engines = {}) {
     ]);
 
     const rootNode = new SelectorNode([
-        // ✨ [신규] 최우선 순위 0: 이동 스킬 사용 시도
+        // ✨ 최우선 순위 0: 이동 (단, 턴에 한 번만 실행되도록 수정)
         new SequenceNode([
+            // ✨ [핵심 수정] 이 노드가 이동을 한 번만 하도록 막아주는 관문 역할을 합니다.
+            new HasNotMovedNode(engines),
             new CanUseSkillBySlotNode(0),
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
         ]),
 
-        // ✨ [변경] 기존 스킬 순위 +1
+        // 우선순위 1~5: 공격, 버프, 디버프 등 주요 스킬 사용 시도
         new SequenceNode([ new CanUseSkillBySlotNode(1), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
         new SequenceNode([ new CanUseSkillBySlotNode(2), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
         new SequenceNode([ new CanUseSkillBySlotNode(3), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
