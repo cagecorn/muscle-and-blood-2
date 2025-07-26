@@ -28,6 +28,22 @@ class TokenEngine {
     }
 
     /**
+     * 전투 중 새로 생성된 단일 유닛의 토큰 정보를 등록합니다.
+     * 소환수 등 전투 도중에 등장한 유닛을 위한 용도입니다.
+     * @param {object} unit - 등록할 유닛 인스턴스
+     */
+    registerUnit(unit) {
+        if (!this.tokenData.has(unit.uniqueId)) {
+            this.tokenData.set(unit.uniqueId, {
+                currentTokens: 3,
+                unitName: unit.instanceName
+            });
+            // 로그를 통해 토큰 지급 내역을 기록합니다.
+            debugTokenManager.logTokenChange(unit.uniqueId, unit.instanceName, '소환됨', 3, 3);
+        }
+    }
+
+    /**
      * 특정 유닛에게 토큰을 추가합니다.
      * @param {number} unitId - 토큰을 받을 유닛의 고유 ID
      * @param {number} amount - 추가할 토큰의 양
