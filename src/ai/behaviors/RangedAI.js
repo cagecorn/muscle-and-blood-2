@@ -10,7 +10,6 @@ import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
-import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 
 import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
