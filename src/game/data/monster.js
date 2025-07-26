@@ -22,14 +22,15 @@ export const monsterData = {
             // 1. 새 인스턴스를 생성하고 ID를 받습니다.
             const newInstance = skillInventoryManager.addSkillById(skillId, grade);
 
-            // 2. 생성된 스킬을 좀비에게 장착합니다. (워리어와 일관성을 위해 4번 슬롯에)
-            ownedSkillsManager.equipSkill(unit.uniqueId, 3, newInstance.instanceId);
+            // 2. 소환 스킬 전용 슬롯을 먼저 추가합니다.
+            unit.skillSlots.push('SUMMON');
 
-            // 3. 이 스킬은 몬스터 전용이므로, 플레이어의 인벤토리 목록에서는 제거합니다.
+            // 3. 생성된 스킬을 좀비에게 장착합니다. (5번 슬롯에 고정)
+            ownedSkillsManager.equipSkill(unit.uniqueId, 4, newInstance.instanceId);
+
+            // 4. 이 스킬은 몬스터 전용이므로, 플레이어의 인벤토리 목록에서는 제거합니다.
             // (하지만 다른 시스템이 참조할 수 있도록 instanceMap에는 남겨둡니다.)
             skillInventoryManager.removeSkillFromInventoryList(newInstance.instanceId);
-            // 4. 소환 스킬 전용 슬롯을 추가합니다.
-            unit.skillSlots.push('SUMMON');
         }
     }
 };
