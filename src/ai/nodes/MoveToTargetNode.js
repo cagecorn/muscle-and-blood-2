@@ -1,7 +1,6 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
-import { movementTrackerManager } from '../../game/utils/MovementTrackerManager.js';
 
 class MoveToTargetNode extends Node {
     constructor({ animationEngine, cameraControl }) {
@@ -67,8 +66,7 @@ class MoveToTargetNode extends Node {
             finalCell.sprite = unit.sprite;
         }
 
-        // 이동 완료 기록 및 플래그 설정
-        movementTrackerManager.recordMovement(unit.uniqueId);
+        // 이동 완료 플래그 설정
         blackboard.set('hasMovedThisTurn', true);
 
         debugAIManager.logNodeResult(NodeState.SUCCESS);
