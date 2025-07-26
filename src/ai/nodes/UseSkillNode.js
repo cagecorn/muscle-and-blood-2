@@ -12,12 +12,13 @@ import { tokenEngine } from '../../game/utils/TokenEngine.js';
 import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
 
 class UseSkillNode extends Node {
-    constructor({ vfxManager, animationEngine, delayEngine, terminationManager, skillEngine: se } = {}) {
+    constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se } = {}) {
         super();
         this.vfxManager = vfxManager;
         this.animationEngine = animationEngine;
         this.delayEngine = delayEngine;
         this.terminationManager = terminationManager;
+        this.summoningEngine = summoningEngine;
         this.skillEngine = se || skillEngine;
         this.combatEngine = combatCalculationEngine;
     }
@@ -96,6 +97,9 @@ class UseSkillNode extends Node {
                     this.terminationManager.handleUnitDeath(skillTarget);
                 }
             }
+        } else if (modifiedSkill.type === 'SUMMON') {
+            spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
+            this.summoningEngine.summon(unit, modifiedSkill);
         } else {
             // ✨ 3. 캐스트 스프라이트 변경 (기존 로직 유지)
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
