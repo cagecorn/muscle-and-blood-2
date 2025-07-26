@@ -1,8 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 // tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
 import { tokenEngine } from './TokenEngine.js';
-// ✨ [신규] actionPowerEngine을 import 합니다.
-import { actionPowerEngine } from './ActionPowerEngine.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -19,8 +17,6 @@ export class VFXManager {
 
         // 각 유닛의 토큰 UI를 관리하기 위한 Map을 추가합니다.
         this.activeTokenDisplays = new Map();
-        // ✨ [신규] 각 유닛의 행동력 UI를 관리하기 위한 Map
-        this.activeAPDisplays = new Map();
 
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
@@ -75,48 +71,6 @@ export class VFXManager {
             const tokenImage = this.scene.add.image(startX + i * tokenSpacing, 0, 'token').setScale(0.04);
             display.container.add(tokenImage);
             display.tokens.push(tokenImage);
-        }
-    }
-
-    /**
-     * ✨ [신규 추가]
-     * 특정 유닛의 행동력 개수에 맞춰 화면에 아이콘을 업데이트합니다.
-     * @param {object} unit - 대상 유닛
-     */
-    updateActionPowerDisplay(unit) {
-        if (!unit || !unit.sprite || !unit.sprite.active) return;
-
-        const unitId = unit.uniqueId;
-        let display = this.activeAPDisplays.get(unitId);
-
-        if (!display) {
-            // 토큰보다 살짝 위에 위치하도록 yOffset 조정
-            const yOffset = -(unit.sprite.displayHeight / 2) - 30;
-            const container = this.scene.add.container(unit.sprite.x, unit.sprite.y + yOffset);
-            this.vfxLayer.add(container);
-
-            this.bindingManager.bind(unit.sprite, [container]);
-
-            display = { container, aps: [] };
-            this.activeAPDisplays.set(unitId, display);
-        }
-
-        const apCount = actionPowerEngine.getActionPower(unitId);
-
-        if (display.aps.length === apCount) return;
-
-        display.aps.forEach(ap => ap.destroy());
-        display.aps = [];
-
-        const apSpacing = 12;
-        const totalWidth = (apCount - 1) * apSpacing;
-        const startX = -totalWidth / 2;
-
-        for (let i = 0; i < apCount; i++) {
-            // ✨ 'ap' 이미지 키 사용 및 4배 축소 (setScale(0.25))
-            const apImage = this.scene.add.image(startX + i * apSpacing, 0, 'ap').setScale(0.25);
-            display.container.add(apImage);
-            display.aps.push(apImage);
         }
     }
 
@@ -271,11 +225,6 @@ export class VFXManager {
             display.container.destroy();
         });
         this.activeTokenDisplays.clear();
-        // ✨ [신규] 행동력 UI도 함께 정리
-        this.activeAPDisplays.forEach(display => {
-            display.container.destroy();
-        });
-        this.activeAPDisplays.clear();
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
