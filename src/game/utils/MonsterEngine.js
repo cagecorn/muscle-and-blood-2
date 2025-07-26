@@ -23,7 +23,7 @@ class MonsterEngine {
             ...baseData,
             uniqueId: id,
             instanceName: baseData.instanceName || baseData.name || `Monster${id}`,
-            skillSlots: [null, null, null, null] // 몬스터를 위한 스킬 슬롯 초기화
+            skillSlots: ['MOVE', null, null, null] // 몬스터를 위한 스킬 슬롯 초기화
         };
 
         instance.finalStats = statEngine.calculateStats(instance, baseData.baseStats || {}, []);

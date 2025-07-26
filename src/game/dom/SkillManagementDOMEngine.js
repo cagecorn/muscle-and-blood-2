@@ -128,6 +128,19 @@ export class SkillManagementDOMEngine {
 
     createSkillSlotElement(slotType, index, instanceId) {
         const slot = document.createElement('div');
+
+        if (slotType === 'MOVE') {
+            slot.className = 'merc-skill-slot move-slot';
+            slot.dataset.slotIndex = index;
+            slot.dataset.slotType = slotType;
+            slot.style.backgroundImage = 'url(assets/images/skills/move.png)';
+            slot.draggable = false;
+            const rank = document.createElement('span');
+            rank.innerText = '0 순위';
+            slot.appendChild(rank);
+            return slot;
+        }
+
         slot.className = `merc-skill-slot ${slotType.toLowerCase()}-slot`;
         slot.dataset.slotIndex = index;
         slot.dataset.slotType = slotType;
@@ -135,7 +148,7 @@ export class SkillManagementDOMEngine {
         if (instanceId) {
             const instanceData = skillInventoryManager.getInstanceData(instanceId);
             const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
-            const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index + 1, instanceData.grade);
+            const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, index, instanceData.grade);
 
             // 등급별 테두리 클래스를 부여합니다.
             slot.classList.add(`grade-${instanceData.grade.toLowerCase()}`);
@@ -166,7 +179,7 @@ export class SkillManagementDOMEngine {
         slot.ondrop = e => this.onDropOnSlot(e);
 
         const rank = document.createElement('span');
-        rank.innerText = `${index + 1} 순위`;
+        rank.innerText = `${index} 순위`;
         slot.appendChild(rank);
 
         return slot;
