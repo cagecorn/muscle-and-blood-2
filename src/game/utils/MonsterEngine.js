@@ -23,6 +23,8 @@ class MonsterEngine {
             ...baseData,
             uniqueId: id,
             instanceName: baseData.instanceName || baseData.name || `Monster${id}`,
+            // 생성된 몬스터가 어느 진영 소속인지 명확히 남겨둔다.
+            team: type,
             skillSlots: [null, null, null, null] // 몬스터를 위한 스킬 슬롯 초기화
         };
 
