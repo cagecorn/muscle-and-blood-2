@@ -746,6 +746,11 @@ body {
 .merc-skill-slot.buff-slot { border-color: #1E90FF; }
 .merc-skill-slot.debuff-slot { border-color: #DC143C; }
 .merc-skill-slot.passive-slot { border-color: #32CD32; }
+/* ✨ [수정] 소환 스킬 슬롯 스타일 */
+.merc-skill-slot.summon-slot {
+    border-color: #9966CC;
+    border-width: 4px;
+}
 .merc-skill-slot span {
     background-color: rgba(0,0,0,0.7);
     width: 100%;

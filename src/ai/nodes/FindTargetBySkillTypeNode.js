@@ -65,6 +65,10 @@ class FindTargetBySkillTypeNode extends Node {
                     return healthRatioA - healthRatioB;
                 })[0];
                 break;
+            // ✨ [신규] 소환 스킬은 임시로 시전자 자신을 대상으로 합니다.
+            case 'SUMMON':
+                target = unit;
+                break;
             default:
                 target = this.targetManager.findNearestEnemy(unit, enemyUnits);
                 break;

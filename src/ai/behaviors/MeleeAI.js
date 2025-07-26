@@ -66,8 +66,14 @@ function createMeleeAI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
+        // ✨ [신규] 우선순위 5: 5번 슬롯(소환) 스킬 사용 시도
+        new SequenceNode([
+            new CanUseSkillBySlotNode(4),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
 
-        // 우선순위 5: 사용할 스킬이 없을 경우, 이동만 실행
+        // 우선순위 6: 사용할 스킬이 없을 경우, 이동만 실행
         new SequenceNode([
             // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
             new HasNotMovedNode(),
