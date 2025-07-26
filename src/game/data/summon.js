@@ -9,6 +9,7 @@ export const summonData = {
         name: '선조 페오르',
         className: '전사',
         battleSprite: 'ancestor-peor',
+        uiImage: 'assets/images/summon/ancestor-peor.png',
         baseStats: {
             hp: 80, valor: 5, strength: 10, endurance: 8,
             agility: 6, intelligence: 3, wisdom: 3, luck: 5,

@@ -69,8 +69,9 @@ class SummoningEngine {
         this.battleSimulator._setupUnits([summonedUnit]);
 
         // 5. AI 매니저에 새 유닛을 등록하여 즉시 행동 트리를 갖게 합니다.
-        if (summonedUnit.className === '전사') {
+        if (summonedUnit.className === '전사' || summonedUnit.name === '선조 페오르') {
             aiManager.registerUnit(summonedUnit, createMeleeAI(this.battleSimulator.aiEngines));
+            debugLogEngine.log('SummoningEngine', `${summonedUnit.instanceName}에게 MeleeAI를 등록했습니다.`);
         }
 
         // 6. 소환사에게 체력 페널티 적용
