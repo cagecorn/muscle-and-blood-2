@@ -86,7 +86,10 @@ class MercenaryEngine {
             // 4번째 슬롯을 빈 슬롯(null)으로 추가
             newInstance.skillSlots.push(null);
         }
-        
+
+        // ✨ [신규] 5번째 슬롯은 소환 스킬 전용으로 고정합니다.
+        newInstance.skillSlots.push('SUMMON');
+
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
 
         if (type === 'ally') {

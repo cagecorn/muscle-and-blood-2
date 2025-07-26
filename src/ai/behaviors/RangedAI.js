@@ -76,6 +76,12 @@ function createRangedAI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
+        // ✨ [신규] 5순위 스킬
+        new SequenceNode([
+            new CanUseSkillBySlotNode(4),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
     ]);
 
     const rootNode = new SelectorNode([
