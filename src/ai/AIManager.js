@@ -70,8 +70,28 @@ class AIManager {
 
         console.group(`[AIManager] --- ${data.instance.instanceName} (ID: ${unit.uniqueId}) 턴 시작 ---`);
 
-        // 행동 트리를 한 번만 실행하여 턴을 처리합니다.
-        await data.behaviorTree.execute(unit, allUnits, enemyUnits);
+        // 반복적으로 행동 트리를 실행하여 남은 토큰이 허용하는 한 여러 번 행동합니다.
+        while (tokenEngine.getTokens(unit.uniqueId) > 0) {
+            const blackboard = data.behaviorTree.blackboard;
+            const prevTokens = tokenEngine.getTokens(unit.uniqueId);
+            const prevSkillsUsedSize = blackboard.get('usedSkillsThisTurn').size;
+            const wasMoved = blackboard.get('hasMovedThisTurn');
+
+            await data.behaviorTree.execute(unit, allUnits, enemyUnits);
+
+            const currentTokens = tokenEngine.getTokens(unit.uniqueId);
+            const currentSkillsUsedSize = blackboard.get('usedSkillsThisTurn').size;
+            const hasMoved = blackboard.get('hasMovedThisTurn');
+
+            const tokenSpent = currentTokens < prevTokens;
+            const skillUsed = currentSkillsUsedSize > prevSkillsUsedSize;
+            const movedThisLoop = !wasMoved && hasMoved;
+
+            // 토큰 소모, 스킬 사용, 이동 중 아무것도 하지 않았다면 루프를 중단합니다.
+            if (!tokenSpent && !skillUsed && !movedThisLoop) {
+                break;
+            }
+        }
 
         console.groupEnd();
     }

@@ -78,18 +78,10 @@ function createHealerAI(engines = {}) {
         new SuccessNode()
     ]);
 
-    // 토큰이 남아 있다면 여러 스킬을 연속으로 사용할 수 있도록 스킬 단계를 반복합니다.
     const rootNode = new SelectorNode([
         new SequenceNode([
             movementPhase,
-            new SelectorNode([
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                skillPhase,
-                new SuccessNode()
-            ])
+            skillPhase
         ])
     ]);
 
