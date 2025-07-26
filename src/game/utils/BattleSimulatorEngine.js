@@ -24,8 +24,6 @@ import { tokenEngine } from './TokenEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { cooldownManager } from './CooldownManager.js';
-import { actionPointEngine } from './ActionPointEngine.js';
-import { movementTrackerManager } from './MovementTrackerManager.js';
 // 전투 중 하단 UI를 관리하는 매니저
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
@@ -87,10 +85,6 @@ export class BattleSimulatorEngine {
         statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];
-
-        // --- ✨ 새 엔진 초기화 로직 추가 ---
-        actionPointEngine.initializeUnits(allUnits);
-        movementTrackerManager.initializeUnits(allUnits);
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
         tokenEngine.initializeUnits(allUnits);
         allies.forEach(u => u.team = 'ally');
@@ -201,10 +195,6 @@ export class BattleSimulatorEngine {
             if (this.currentTurnIndex >= this.turnQueue.length) {
                 this.currentTurnIndex = 0;
                 this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
-
-                // --- ✨ 새 턴 시작 시 엔진 호출 로직 추가 ---
-                actionPointEngine.addPointForNewTurn();
-                movementTrackerManager.resetForNewTurn();
 
                 statusEffectManager.onTurnEnd();
                 tokenEngine.addTokensForNewTurn();
