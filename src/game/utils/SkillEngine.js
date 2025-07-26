@@ -9,8 +9,8 @@ export const SKILL_TYPES = {
     BUFF:   { name: '버프',   color: '#1E90FF' }, // 파랑색
     DEBUFF: { name: '디버프', color: '#DC143C' }, // 빨강색
     PASSIVE:{ name: '패시브', color: '#32CD32' },  // 초록색
-    // ✨ [신규] AID 타입을 추가합니다.
-    AID:    { name: '지원',   color: '#FFD700' }  // 금색
+    // ✨ [변경] AID 타입을 하얀색 계열로 변경합니다.
+    AID:    { name: '지원',   color: '#F5F5F5' }  // 하얀색 (순백색(#FFF) 대신 약간의 회색을 섞어 배경과 구분되도록 함)
 };
 
 /**
