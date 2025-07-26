@@ -11,11 +11,9 @@ import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
 // ✨ FindPathToSkillRangeNode 대신 FindKitingPositionNode를 공격 이동에도 사용합니다.
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
+import ShouldRangedUnitMoveNode from '../nodes/ShouldRangedUnitMoveNode.js';
 
 // 기존 Ranged AI의 핵심 로직 노드들
-import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
-import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
-import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 // ✨ HasNotMovedNode를 import합니다.
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import SpendActionPointNode from '../nodes/SpendActionPointNode.js';
@@ -49,17 +47,9 @@ function createRangedAI(engines = {}) {
 
     const movementPhase = new SelectorNode([
         new SequenceNode([
-            new HasNotMovedNode(),
+            new ShouldRangedUnitMoveNode(),
             new SpendActionPointNode(),
-            new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
             new FindKitingPositionNode(engines),
-            new MoveToTargetNode(engines)
-        ]),
-        new SequenceNode([
-            new HasNotMovedNode(),
-            new SpendActionPointNode(),
-            new FindMeleeStrategicTargetNode(engines),
-            new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
         ]),
         new SuccessNode()
