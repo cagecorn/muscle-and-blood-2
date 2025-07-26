@@ -34,5 +34,11 @@ export const statusEffects = {
         id: 'ironWill',
         name: '아이언 윌',
         iconPath: 'assets/images/skills/iron_will.png',
+    },
+    // ✨ 돌격 명령 버프 추가
+    chargeOrderBuff: {
+        id: 'chargeOrderBuff',
+        name: '돌격 명령',
+        iconPath: 'assets/images/skills/charge-order.png',
     }
 };

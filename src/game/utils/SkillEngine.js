@@ -12,7 +12,9 @@ export const SKILL_TYPES = {
     // ✨ [변경] AID 타입을 하얀색 계열로 변경합니다.
     AID:    { name: '지원',   color: '#F5F5F5' },  // 하얀색 (순백색(#FFF) 대신 약간의 회색을 섞어 배경과 구분되도록 함)
     // ✨ [신규] 소환 스킬 타입 추가
-    SUMMON: { name: '소환',   color: '#9966CC' }   // 보라색 계열
+    SUMMON: { name: '소환',   color: '#9966CC' },   // 보라색 계열
+    // ✨ [신규] 전략 스킬 타입 추가
+    STRATEGY: { name: '전략',  color: '#FFD700' }   // 금색
 };
 
 /**

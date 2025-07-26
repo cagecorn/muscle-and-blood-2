@@ -20,9 +20,9 @@ class FindTargetBySkillTypeNode extends Node {
         }
 
         // ✨ [수정] 스킬의 targetType을 먼저 확인하여 'self'인 경우 자신을 즉시 타겟으로 설정합니다.
-        if (skillData.targetType === 'self') {
+        if (skillData.targetType === 'self' || skillData.type === 'STRATEGY') {
             blackboard.set('skillTarget', unit);
-            debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skillData.name}]의 대상 (자신) 설정`);
+            debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skillData.name}]의 대상 (자신/전략) 설정`);
             return NodeState.SUCCESS;
         }
 
