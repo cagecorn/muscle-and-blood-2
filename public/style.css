@@ -760,12 +760,6 @@ body {
 .merc-skill-slot.buff-slot { border-color: #1E90FF; }
 .merc-skill-slot.debuff-slot { border-color: #DC143C; }
 .merc-skill-slot.passive-slot { border-color: #32CD32; }
-/* 이동 스킬 슬롯 */
-.merc-skill-slot.move-slot,
-.skill-slot.move-slot {
-    border-color: #a0aec0;
-    cursor: default;
-}
 /* ✨ [수정] 소환 스킬 슬롯 스타일 */
 .merc-skill-slot.summon-slot {
     border-color: #9966CC;
@@ -1114,19 +1108,6 @@ body {
 .combat-token-container {
     display: flex;
     gap: 4px;
-}
-
-.combat-ap-container {
-    display: flex;
-    gap: 4px;
-    border-right: 2px solid #555;
-    padding-right: 12px;
-    margin-right: 6px;
-}
-
-.combat-ap-icon {
-    width: 20px;
-    height: 20px;
 }
 
 .combat-token-icon {

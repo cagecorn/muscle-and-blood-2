@@ -1,5 +1,4 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-import { debugAPManager } from '../debug/DebugAPManager.js';
 
 /**
  * \uc720\ub2c8\uc758 \ud560\ub85c\uadf8(AP)\uc744 \uad00\ub9ac\ud558\ub294 \uc5d4\uc9c4 (\uc2f1\uae00\ud134)
@@ -23,7 +22,7 @@ class ActionPointEngine {
                 unitName: unit.instanceName
             });
         });
-        debugAPManager.logInitialization(units.length);
+        debugLogEngine.log('ActionPointEngine', `${units.length}명의 유닛 AP 정보 초기화 완료.`);
     }
 
     /**
@@ -32,7 +31,7 @@ class ActionPointEngine {
     addPointForNewTurn() {
         for (const [unitId, data] of this.apData.entries()) {
             data.currentPoints++;
-            debugAPManager.logAPChange(data.unitName, 1, data.currentPoints, '새 턴 시작');
+            debugLogEngine.log('ActionPointEngine', `${data.unitName} (ID: ${unitId})의 턴 시작, AP 1 획득. 현재 AP: ${data.currentPoints}`);
         }
     }
 
@@ -46,7 +45,7 @@ class ActionPointEngine {
         const data = this.apData.get(unitId);
         if (data && data.currentPoints >= amount) {
             data.currentPoints -= amount;
-            debugAPManager.logAPChange(data.unitName, -amount, data.currentPoints, '행동 소모');
+            debugLogEngine.log('ActionPointEngine', `${data.unitName} (ID: ${unitId})이(가) AP ${amount} 소모. 남은 AP: ${data.currentPoints}`);
             return true;
         }
         debugLogEngine.warn('ActionPointEngine', `유닛(ID:${unitId}) AP 부족으로 ${amount} 사용 실패.`);
