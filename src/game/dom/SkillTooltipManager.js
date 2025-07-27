@@ -13,10 +13,8 @@ export class SkillTooltipManager {
         tooltip.id = 'skill-tooltip';
         tooltip.className = `skill-card-large ${skillData.type.toLowerCase()}-card grade-${grade.toLowerCase()}`;
         
-        // ✨ skillModifierEngine에서 이미 수정한 설명을 그대로 사용합니다.
         let description = skillData.description;
 
-        // 스킬 이름 옆에 클래스 전용 여부를 표시
         let skillNameHTML = skillData.name;
         if (skillData.requiredClass) {
             const className = skillData.requiredClass === 'warrior' ? '전사' : skillData.requiredClass;
@@ -36,7 +34,20 @@ export class SkillTooltipManager {
             </div>
         `;
 
-        // 별 생성 로직 추가
+        // ✨ --- 스킬 태그 표시 로직 추가 --- ✨
+        if (skillData.tags && skillData.tags.length > 0) {
+            const tagsContainer = document.createElement('div');
+            tagsContainer.className = 'skill-tags-container-large';
+            skillData.tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'skill-tag';
+                tagElement.innerText = tag;
+                tagsContainer.appendChild(tagElement);
+            });
+            tooltip.querySelector('.skill-info-large').appendChild(tagsContainer);
+        }
+        // ✨ --- 로직 추가 끝 --- ✨
+
         const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
         const starsContainer = document.createElement('div');
         starsContainer.className = 'grade-stars-large';
@@ -48,7 +59,6 @@ export class SkillTooltipManager {
         }
         tooltip.appendChild(starsContainer);
 
-        // 토큰 아이콘 추가
         const costContainer = tooltip.querySelector('.skill-cost-container-large');
         for (let i = 0; i < skillData.cost; i++) {
             const tokenIcon = document.createElement('img');
@@ -59,7 +69,6 @@ export class SkillTooltipManager {
 
         document.body.appendChild(tooltip);
 
-        // 마우스 커서 옆에 위치하도록 좌표 설정
         tooltip.style.left = `${event.pageX + 15}px`;
         tooltip.style.top = `${event.pageY + 15}px`;
     }

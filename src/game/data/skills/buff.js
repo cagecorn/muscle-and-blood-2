@@ -1,4 +1,5 @@
 import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
+import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 
 // 버프 스킬 데이터 정의
 export const buffSkills = {
@@ -8,6 +9,7 @@ export const buffSkills = {
             id: 'stoneSkin',
             name: '스톤 스킨',
             type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.EARTH],
             cost: 2,
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}% 버프를 겁니다. (쿨타임 3턴)',
@@ -30,6 +32,7 @@ export const buffSkills = {
             id: 'stoneSkin',
             name: '스톤 스킨 [R]',
             type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.EARTH],
             cost: 1,
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}% 버프를 겁니다. (쿨타임 3턴)',
@@ -52,6 +55,7 @@ export const buffSkills = {
             id: 'stoneSkin',
             name: '스톤 스킨 [E]',
             type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.EARTH],
             cost: 1,
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}%, 방어력 상승 10% 버프를 겁니다. (쿨타임 3턴)',
@@ -74,6 +78,7 @@ export const buffSkills = {
             id: 'stoneSkin',
             name: '스톤 스킨 [L]',
             type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.EARTH],
             cost: 1,
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}%, 방어력 상승 15% 버프를 겁니다. (쿨타임 3턴)',

@@ -1238,3 +1238,22 @@ body {
     font-weight: bold;
     text-shadow: 1px 1px 2px #000;
 }
+
+/* --- 스킬 툴팁 태그 스타일 --- */
+.skill-tags-container-large {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.skill-tag {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #ccc;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #555;
+    white-space: nowrap;
+}
