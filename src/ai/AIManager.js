@@ -64,9 +64,18 @@ class AIManager {
         const data = this.unitData.get(unit.uniqueId);
         if (!data) return;
 
+        // ✨ [신규] 턴 시작 시, 전략적 상황을 계산하여 블랙보드에 업데이트
+        const blackboard = data.behaviorTree.blackboard;
+        const allies = allUnits.filter(u => u.team === unit.team && u.currentHp > 0);
+
+        blackboard.set('healthPercentage', unit.currentHp / unit.finalStats.hp);
+        blackboard.set('isLastAllyAlive', allies.length === 1 && allies[0].uniqueId === unit.uniqueId);
+        // (allyDeathCountSinceLastTurn는 BattleSimulatorEngine에서 처리하는 것이 더 정확하므로 일단 0으로 둡니다)
+        blackboard.set('allyDeathCountSinceLastTurn', 0);
+
         // 턴 시작 시 블랙보드 플래그 초기화
-        data.behaviorTree.blackboard.set('hasMovedThisTurn', false);
-        data.behaviorTree.blackboard.set('usedSkillsThisTurn', new Set());
+        blackboard.set('hasMovedThisTurn', false);
+        blackboard.set('usedSkillsThisTurn', new Set());
 
         console.group(`[AIManager] --- ${data.instance.instanceName} (ID: ${unit.uniqueId}) 턴 시작 ---`);
 
