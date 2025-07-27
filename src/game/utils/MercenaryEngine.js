@@ -87,8 +87,8 @@ class MercenaryEngine {
             newInstance.skillSlots.push(null);
         }
 
-        // ✨ [신규] 5번째 슬롯은 소환 스킬 전용으로 고정합니다.
-        newInstance.skillSlots.push('SUMMON');
+        // 5~8번째 특수 스킬 슬롯을 추가합니다. (현재는 비어있음)
+        newInstance.skillSlots.push(null, null, null, null);
 
         newInstance.finalStats = statEngine.calculateStats(newInstance, newInstance.baseStats, newInstance.equippedItems);
 
