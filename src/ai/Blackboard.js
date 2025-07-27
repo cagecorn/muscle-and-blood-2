@@ -25,6 +25,10 @@ class Blackboard {
         this.set('squadAdvantage', 0);
         this.set('enemyHealerUnit', null);
         this.set('threateningUnit', null);
+        // ✨ [신규] 전략적 상황 판단을 위한 키 추가
+        this.set('healthPercentage', 1.0); // 현재 체력 비율 (1.0 = 100%)
+        this.set('isLastAllyAlive', false); // 자신이 마지막 생존자인지 여부
+        this.set('allyDeathCountSinceLastTurn', 0); // 내 마지막 턴 이후 죽은 아군 수
 
         // --- 🤖 AI 자신의 상태 정보 ---
         this.set('canUseSkill_1', false);
