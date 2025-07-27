@@ -2,6 +2,7 @@ import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.es
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { imageSizeManager } from '../utils/ImageSizeManager.js';
 import { statusEffects } from '../data/status-effects.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 export class Preloader extends Scene
 {
@@ -54,6 +55,9 @@ export class Preloader extends Scene
     {
         // 게임에 필요한 모든 애셋을 여기서 로드합니다.
         this.load.setPath('assets');
+
+        // 개발 중 누락된 이미지에 대비한 플레이스홀더를 로드합니다.
+        this.load.image('placeholder', 'images/placeholder.png');
 
         // 로고 이미지를 로드합니다.
         this.load.image('logo', 'logo.png');

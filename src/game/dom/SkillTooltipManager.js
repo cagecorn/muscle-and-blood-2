@@ -1,4 +1,5 @@
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 /**
  * 스킬 카드 위에 마우스를 올렸을 때 TCG 스타일의 큰 툴팁을 표시하는 매니저
@@ -25,6 +26,7 @@ export class SkillTooltipManager {
 
         tooltip.innerHTML = `
             <div class="skill-illustration-large" style="background-image: url(${skillData.illustrationPath})"></div>
+            <div class="skill-illustration-large"></div>
             <div class="skill-info-large">
                 <div class="skill-name-large">${skillNameHTML}</div>
                 <div class="skill-type-cost-large">
@@ -35,6 +37,9 @@ export class SkillTooltipManager {
                 <div class="skill-cost-container-large"></div>
             </div>
         `;
+
+        const illust = tooltip.querySelector('.skill-illustration-large');
+        placeholderManager.setBackgroundImage(illust, skillData.illustrationPath);
 
         // 별 생성 로직 추가
         const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
