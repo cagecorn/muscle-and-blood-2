@@ -1286,3 +1286,42 @@ body {
     border: 1px solid #555;
     white-space: nowrap;
 }
+
+/* --- 공유 자원 패널 스타일 --- */
+#shared-resource-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 150;
+    pointer-events: none;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.resource-name {
+    color: #aaa;
+}
+
+.resource-value {
+    font-weight: bold;
+    color: #f0e68c; /* 밝은 노란색 */
+    min-width: 20px; /* 숫자가 바뀔 때 레이아웃이 흔들리지 않도록 */
+    text-align: left;
+}

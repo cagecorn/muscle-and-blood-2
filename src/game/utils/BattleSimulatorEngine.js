@@ -27,6 +27,8 @@ import { cooldownManager } from './CooldownManager.js';
 // 전투 중 하단 UI를 관리하는 매니저
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
+import { sharedResourceEngine } from './SharedResourceEngine.js';
+import { SharedResourceUIManager } from '../dom/SharedResourceUIManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -52,6 +54,7 @@ export class BattleSimulatorEngine {
         this.combatUI = new CombatUIManager();
         // 턴 순서 UI 매니저
         this.turnOrderUI = new TurnOrderUIManager();
+        this.sharedResourceUI = new SharedResourceUIManager();
         
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
@@ -82,6 +85,7 @@ export class BattleSimulatorEngine {
         aiManager.clear();
         cooldownManager.reset();
         this.summoningEngine.reset();
+        sharedResourceEngine.initialize();
         statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];
@@ -116,6 +120,7 @@ export class BattleSimulatorEngine {
 
         // 턴 순서 UI 초기화
         this.turnOrderUI.show(this.turnQueue);
+        this.sharedResourceUI.show();
 
         // --- ✨ 첫 턴 시작 시 토큰 지급 ---
         tokenEngine.addTokensForNewTurn();
@@ -212,6 +217,7 @@ export class BattleSimulatorEngine {
                     this.vfxManager.updateTokenDisplay(unit);
                 }
             });
+            this.sharedResourceUI.update();
 
             // 다음 턴의 유닛 정보를 미리 갱신합니다.
             const nextUnit = this.turnQueue[this.currentTurnIndex];
@@ -231,6 +237,7 @@ export class BattleSimulatorEngine {
         // 전투 종료 시 UI 숨김 처리
         this.combatUI.hide();
         this.turnOrderUI.hide();
+        this.sharedResourceUI.hide();
         console.log('전투 종료!');
     }
 
@@ -256,6 +263,9 @@ export class BattleSimulatorEngine {
         }
         if (this.turnOrderUI) {
             this.turnOrderUI.destroy();
+        }
+        if (this.sharedResourceUI) {
+            this.sharedResourceUI.destroy();
         }
     }
 }
