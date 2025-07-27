@@ -114,13 +114,32 @@ export class SkillManagementDOMEngine {
         this.mercenaryDetailsContent.appendChild(portrait);
 
         const slotsContainer = document.createElement('div');
-        slotsContainer.className = 'merc-skill-slots-container';
+        slotsContainer.className = 'merc-skill-slots-container-vertical';
+
+        const mainSkillsSection = document.createElement('div');
+        mainSkillsSection.innerHTML = `<div class="section-title-small">주스킬</div>`;
+        const mainSlotsContainer = document.createElement('div');
+        mainSlotsContainer.className = 'merc-skill-slots-container';
+        mainSkillsSection.appendChild(mainSlotsContainer);
+
+        const specialSkillsSection = document.createElement('div');
+        specialSkillsSection.innerHTML = `<div class="section-title-small">특수스킬</div>`;
+        const specialSlotsContainer = document.createElement('div');
+        specialSlotsContainer.className = 'merc-skill-slots-container';
+        specialSkillsSection.appendChild(specialSlotsContainer);
+
+        slotsContainer.appendChild(mainSkillsSection);
+        slotsContainer.appendChild(specialSkillsSection);
 
         const equipped = ownedSkillsManager.getEquippedSkills(mercData.uniqueId);
 
         mercData.skillSlots.forEach((slotType, idx) => {
             const slot = this.createSkillSlotElement(slotType, idx, equipped[idx]);
-            slotsContainer.appendChild(slot);
+            if (idx < 4) {
+                mainSlotsContainer.appendChild(slot);
+            } else {
+                specialSlotsContainer.appendChild(slot);
+            }
         });
 
         this.mercenaryDetailsContent.appendChild(slotsContainer);
@@ -128,7 +147,8 @@ export class SkillManagementDOMEngine {
 
     createSkillSlotElement(slotType, index, instanceId) {
         const slot = document.createElement('div');
-        slot.className = `merc-skill-slot ${slotType.toLowerCase()}-slot`;
+        const typeClass = slotType ? `${slotType.toLowerCase()}-slot` : 'empty-slot';
+        slot.className = `merc-skill-slot ${typeClass}`;
         slot.dataset.slotIndex = index;
         slot.dataset.slotType = slotType;
 
@@ -226,7 +246,8 @@ export class SkillManagementDOMEngine {
             alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
             return;
         }
-        if (draggedSkillData.type !== targetSlotType) {
+        // 특수 스킬 슬롯(index 4 이상)은 타입 검사를 하지 않습니다.
+        if (targetSlotIndex < 4 && draggedSkillData.type !== targetSlotType) {
             alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
             return;
         }

@@ -450,9 +450,17 @@ body {
 .unit-skills {
     flex-grow: 1;
 }
+.unit-skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
 .unit-skills .skill-grid {
     display: flex;
     gap: 10px;
+    justify-content: center;
     margin-top: 10px;
 }
 .unit-skills .skill-slot {
@@ -474,6 +482,7 @@ body {
 
 /* --- ✨ [신규] AID 타입 스타일 추가 --- */
 .unit-skills .skill-slot.aid-slot { border-color: #F5F5F5; }
+.unit-skills .skill-slot.empty-slot { border-color: #555; }
 
 .skill-slot .slot-rank {
     position: absolute;
@@ -743,6 +752,22 @@ body {
     padding-top: 20px;
 }
 
+.merc-skill-slots-container-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-title-small {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #ccc;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
 .merc-skill-slot {
     width: 80px;
     height: 80px;
@@ -764,6 +789,10 @@ body {
 .merc-skill-slot.summon-slot {
     border-color: #9966CC;
     border-width: 4px;
+}
+.merc-skill-slot.empty-slot {
+    border-color: #555;
+    cursor: default;
 }
 .merc-skill-slot span {
     background-color: rgba(0,0,0,0.7);

@@ -66,19 +66,33 @@ export class UnitDetailDOM {
         const rightSection = document.createElement('div');
         rightSection.className = 'detail-section right';
         
+        // --- 스킬 컨테이너 구조 변경 ---
         const skillsContainer = document.createElement('div');
-        skillsContainer.className = 'unit-skills';
-        skillsContainer.innerHTML = `<div class="section-title">스킬 슬롯</div>`;
+        skillsContainer.className = 'unit-skills-container';
 
-        const skillGrid = document.createElement('div');
-        skillGrid.className = 'skill-grid';
+        const mainSkillsSection = document.createElement('div');
+        mainSkillsSection.className = 'unit-skills';
+        mainSkillsSection.innerHTML = `<div class="section-title">주스킬</div>`;
+        const mainSkillGrid = document.createElement('div');
+        mainSkillGrid.className = 'skill-grid';
+        mainSkillsSection.appendChild(mainSkillGrid);
+
+        const specialSkillsSection = document.createElement('div');
+        specialSkillsSection.className = 'unit-skills';
+        specialSkillsSection.innerHTML = `<div class="section-title">특수스킬</div>`;
+        const specialSkillGrid = document.createElement('div');
+        specialSkillGrid.className = 'skill-grid';
+        specialSkillsSection.appendChild(specialSkillGrid);
+
+        skillsContainer.appendChild(mainSkillsSection);
+        skillsContainer.appendChild(specialSkillsSection);
 
         const equippedSkills = ownedSkillsManager.getEquippedSkills(unitData.uniqueId);
         const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
-                const typeClass = `${slotType.toLowerCase()}-slot`;
+                const typeClass = slotType ? `${slotType.toLowerCase()}-slot` : 'empty-slot';
                 const instanceId = equippedSkills[index];
 
                 const slot = document.createElement('div');
@@ -110,11 +124,14 @@ export class UnitDetailDOM {
                 slot.style.backgroundImage = bgImage;
 
                 slot.innerHTML += `<span class="slot-rank">${index + 1} 순위</span>`;
-                skillGrid.appendChild(slot);
+                if (index < 4) {
+                    mainSkillGrid.appendChild(slot);
+                } else {
+                    specialSkillGrid.appendChild(slot);
+                }
             });
         }
 
-        skillsContainer.appendChild(skillGrid);
         rightSection.appendChild(skillsContainer);
 
         detailContent.appendChild(leftSection);

@@ -13,8 +13,8 @@ class OwnedSkillsManager {
 
     initializeSlots(unitId) {
         if (!this.equippedSkills.has(unitId)) {
-            // ✨ [수정] 기본 장착 슬롯을 5개로 확장합니다.
-            this.equippedSkills.set(unitId, [null, null, null, null, null]);
+            // 기본 장착 슬롯을 8개로 확장합니다.
+            this.equippedSkills.set(unitId, [null, null, null, null, null, null, null, null]);
         }
     }
 
