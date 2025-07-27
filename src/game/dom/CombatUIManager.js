@@ -4,7 +4,6 @@ import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 import { cooldownManager } from '../utils/CooldownManager.js';
-import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 /**
  * 전투 중 활성화된 유닛의 상세 정보를 표시하는 하단 UI 매니저 (최적화 버전)
@@ -214,7 +213,6 @@ export class CombatUIManager {
             const icon = document.createElement('div');
             icon.className = 'combat-skill-icon';
             icon.style.backgroundImage = `url(${skillData.illustrationPath})`;
-            placeholderManager.setBackgroundImage(icon, skillData.illustrationPath);
             
             const overlay = document.createElement('div');
             overlay.className = 'skill-cooldown-overlay';
@@ -257,7 +255,6 @@ export class CombatUIManager {
         const icon = document.createElement('img');
         icon.className = 'effect-icon';
         icon.src = path;
-        placeholderManager.setImageSrc(icon, path);
         iconWrapper.appendChild(icon);
 
         if (duration !== null) {
