@@ -84,7 +84,7 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(skillTarget, 'hitted', 300);
 
             if (modifiedSkill.type === 'ACTIVE') {
-                const { damage: totalDamage, hitType } = this.combatEngine.calculateDamage(
+                const { damage: totalDamage, hitType, comboCount } = this.combatEngine.calculateDamage(
                     unit,
                     skillTarget,
                     baseSkillData,
@@ -117,6 +117,7 @@ class UseSkillNode extends Node {
                     );
                 }
 
+                this.vfxManager.showComboCount(comboCount);
                 this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
 
                 // 토큰 생성 효과 처리

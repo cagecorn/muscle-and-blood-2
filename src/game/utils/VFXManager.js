@@ -1,6 +1,7 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 // tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
 import { tokenEngine } from './TokenEngine.js';
+import { comboManager } from './ComboManager.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -42,7 +43,7 @@ export class VFXManager {
         // 유닛의 토큰 UI가 없다면 새로 생성합니다.
         if (!display) {
             // ✨ [수정] yOffset을 음수 값으로 변경하여 유닛의 머리 위로 이동시킵니다.
-            const yOffset = -(unit.sprite.displayHeight / 2) - 15; // 유닛 머리 위
+            const yOffset = -(unit.sprite.displayHeight / 2) - 20; // 유닛 머리 위
             const container = this.scene.add.container(unit.sprite.x, unit.sprite.y + yOffset);
             this.vfxLayer.add(container);
 
@@ -72,6 +73,48 @@ export class VFXManager {
             display.container.add(tokenImage);
             display.tokens.push(tokenImage);
         }
+    }
+
+    /**
+     * 화면 오른쪽에 콤보 카운트 텍스트를 표시합니다.
+     * @param {number} count - 현재 콤보 수
+     */
+    showComboCount(count) {
+        if (count < 2) return; // 2콤보 이상일 때만 표시
+
+        if (comboManager.comboVFX) {
+            comboManager.comboVFX.destroy();
+        }
+
+        const style = {
+            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontSize: '48px',
+            color: '#ffc107',
+            stroke: '#000000',
+            strokeThickness: 6,
+        };
+
+        const { width, height } = this.scene.scale.gameSize;
+        const comboText = this.scene.add
+            .text(width - 150, height / 2, `${count} COMBO!`, style)
+            .setOrigin(0.5, 0.5);
+
+        this.vfxLayer.add(comboText);
+        comboManager.comboVFX = comboText;
+
+        this.scene.tweens.add({
+            targets: comboText,
+            scale: { from: 1.2, to: 1 },
+            alpha: { from: 1, to: 0 },
+            duration: 1500,
+            ease: 'Cubic.easeOut',
+            onComplete: () => {
+                if (comboManager.comboVFX === comboText) {
+                    comboText.destroy();
+                    comboManager.comboVFX = null;
+                }
+            }
+        });
     }
 
 
