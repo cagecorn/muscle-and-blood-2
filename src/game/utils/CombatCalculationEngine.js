@@ -34,6 +34,13 @@ class CombatCalculationEngine {
      * @returns {number} 최종 적용될 데미지
      */
     calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
+        // ✨ --- [신규] 피해 무효화 효과 최우선 처리 --- ✨
+        if (stackManager.hasStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY)) {
+            stackManager.consumeStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY);
+            debugCombatLogManager.logAttackCalculation(attacker, defender, 0, 0, 0);
+            return { damage: 0, hitType: '무효', comboCount: 0 };
+        }
+
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
 
         // 콤보 배율 계산을 위한 정보

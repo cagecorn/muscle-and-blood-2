@@ -46,6 +46,8 @@ class SkillInventoryManager {
                 this.addSkillById('criticalShot', grade);
                 // ✨ [신규] 윌 가드 카드 지급
                 this.addSkillById('willGuard', grade);
+                // ✨ [신규] 마이티 쉴드 카드 지급
+                this.addSkillById('mightyShield', grade);
             }
         });
 

@@ -83,4 +83,21 @@ export const statusEffects = {
         },
     },
     // --- ▲ [신규] 윌 가드 효과 추가 ▲ ---
+
+    // --- ▼ [신규] 마이티 쉴드 효과 추가 ▼ ---
+    mightyShield: {
+        id: 'mightyShield',
+        name: '마이티 쉴드',
+        description: '다음 공격의 피해를 완전히 무효화합니다.',
+        iconPath: 'assets/images/skills/mighty-shield.png',
+        onApply: (unit, effectData) => {
+            if (effectData && effectData.stack) {
+                stackManager.addStack(unit.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY, effectData.stack.amount);
+            }
+        },
+        onRemove: (unit) => {
+            // 스택은 공격받을 때 자동으로 소모되므로 별도 로직 불필요
+        },
+    },
+    // --- ▲ [신규] 마이티 쉴드 효과 추가 ▲ ---
 };

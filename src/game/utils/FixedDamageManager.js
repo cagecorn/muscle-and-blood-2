@@ -12,6 +12,7 @@ export const FIXED_DAMAGE_TYPES = {
     WEAKNESS: 'WEAKNESS',       // 확정 약점 공격
     BLOCK: 'BLOCK',             // 확정 막기
     MITIGATION: 'MITIGATION',   // 확정 완화
+    DAMAGE_IMMUNITY: 'DAMAGE_IMMUNITY', // ✨ [신규] 피해 무효화
 };
 
 // 최종 판정 결과를 상수로 정의합니다. (CombatCalculationEngine과 호환)
