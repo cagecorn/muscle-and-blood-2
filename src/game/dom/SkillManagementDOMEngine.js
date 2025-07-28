@@ -242,11 +242,26 @@ export class SkillManagementDOMEngine {
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
+        // --- 슬롯 장착 규칙 검사 ---
+        const isSpecialSkill = draggedSkillData.tags && draggedSkillData.tags.includes('특수 스킬');
+
+        // 특수 스킬은 5~8번 슬롯에만 장착 가능
+        if (isSpecialSkill && targetSlotIndex < 4) {
+            alert('특수 스킬은 5~8번 슬롯에만 장착할 수 있습니다.');
+            return;
+        }
+
+        // 일반 스킬은 특수 스킬 슬롯에 장착할 수 없음
+        if (!isSpecialSkill && targetSlotIndex >= 4) {
+            alert('일반 스킬은 특수 스킬 슬롯에 장착할 수 없습니다.');
+            return;
+        }
+
         if (draggedSkillData.requiredClass && this.selectedMercenaryData.id !== draggedSkillData.requiredClass) {
             alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
             return;
         }
-        // 특수 스킬 슬롯(index 4 이상)은 타입 검사를 하지 않습니다.
+        // 1~4번 슬롯은 타입이 일치해야 함
         if (targetSlotIndex < 4 && draggedSkillData.type !== targetSlotType) {
             alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
             return;

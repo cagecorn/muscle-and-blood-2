@@ -21,8 +21,7 @@ class SkillModifierEngine {
             'rangedAttack': [1.3, 1.2, 1.1, 1.0],
             // ✨ [신규] 힐 순위별 회복 계수 추가
             'heal': [1.3, 1.2, 1.1, 1.0],
-            'grindstone': [0.25, 0.20, 0.15, 0.10],
-            'throwingAxe': [1.0, 1.2, 1.4, 1.6],
+            'grindstone': [0.25, 0.20, 0.15, 0.10]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }

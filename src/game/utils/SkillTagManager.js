@@ -31,6 +31,7 @@ export const SKILL_TAGS = {
     IRON: '철',
     PRODUCTION: '생산',
     THROWING: '투척',
+    SPECIAL: '특수 스킬',
 };
 
 // 실제 코드에서는 위 객체를 직접 import하여 사용하면 됩니다.

@@ -50,16 +50,16 @@ const grindstoneBase = {
 
 const throwingAxeBase = {
     NORMAL: {
-        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 1, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 1, damageMultiplier: 1.2, resourceCost: { type: 'IRON', amount: 1 }
     },
     RARE: {
-        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.2, resourceCost: { type: 'IRON', amount: 1 }
     },
     EPIC: {
-        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.2 }
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.2, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.2 }
     },
     LEGENDARY: {
-        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.4 }
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.2, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.4 }
     }
 };
 
@@ -174,7 +174,7 @@ for (const grade of grades) {
 }
 
 // Throwing Axe
-const throwingAxeExpected = [1.0, 1.2, 1.4, 1.6];
+const throwingAxeExpected = [1.2, 1.2, 1.2, 1.2];
 for (const grade of grades) {
     for (let rank = 1; rank <= 4; rank++) {
         const skill = skillModifierEngine.getModifiedSkill(throwingAxeBase[grade], rank, grade);
