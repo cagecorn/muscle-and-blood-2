@@ -143,6 +143,9 @@ export class BattleSimulatorEngine {
             unit.sprite.setData('team', unit.team);
 
             unit.currentHp = unit.finalStats.hp;
+            // ✨ 배리어 상태 초기화
+            unit.maxBarrier = unit.finalStats.maxBarrier;
+            unit.currentBarrier = unit.finalStats.currentBarrier;
             const cell = formationEngine.getCellFromSprite(unit.sprite);
             if (cell) {
                 unit.gridX = cell.col;

@@ -21,13 +21,14 @@ class ValorEngine {
      * \uD604\uC7AC \uBC29\uC5B4\uB9C9 \uC0C1\uD0DC\uC5D0 \uB530\uB974\uC5B4 \uD53C\uD574 \uC99D\uD3ED\uB960\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
      * @param {number} currentBarrier - \uD604\uC7AC \uB0A8\uC740 \uBC29\uC5B4\uB9C9 \uC218\uCE58
      * @param {number} maxBarrier - \uCD5C\uB300 \uBC29\uC5B4\uB9C9 \uC218\uCE58
-     * @returns {number} - \uD53C\uD574\uB7C9\uC5D0 \uACE0\uD314\uC62C \uC99D\uD3ED\uB960 (\uC608: 1.0\uC740 100%, 1.2\uB294 120%)
+     * @returns {number} - \uD53C\uD574\uB7C9\uC5D0 \uACE0\uD314\uC62C \uC99D\uD3ED\uB960 (\uC608: 1.0\uC740 100%, 1.3\uB294 130%)
      */
     calculateDamageAmplification(currentBarrier = 0, maxBarrier = 1) {
+        if (maxBarrier <= 0) return 1.0;
         // \uAC1C\uB150: \uBC29\uC5B4\uB9C9\uC774 \uAC00\uB454 \uC218\uB9CE\uC744\uC218\uB85D(1\uC5D0 \uAC00\uAE4C\uC774) \uCD94\uAC00 \uD53C\uD574\uB97C \uC8FC\uACE0,
         // \uBC29\uC5B4\uB9C9\uC774 \uC5C6\uC744\uC218\uB85D(0\uC5D0 \uAC00\uAE4C\uC774) \uCD94\uAC00 \uD53C\uD574\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.
-        // \uD604\uC7AC\uB294 \uCD5C\uB300 20%\uC758 \uCD94\uAC00 \uD53C\uD574\uB97C \uC8FC\uB294 \uAC83\uC73C\uB85C \uC124\uC815\uD569\uB2C8\uB2E4.
-        const amplification = (currentBarrier / maxBarrier) * 0.2;
+        // \uD604\uC7AC\uB294 \uCD5C\uB300 30%\uC758 \uCD94\uAC00 \uD53C\uD574\uB97C \uC8FC\uB294 \uAC83\uC73C\uB85C \uC124\uC815\uD569\uB2C8\uB2E4.
+        const amplification = (currentBarrier / maxBarrier) * 0.3;
         return 1.0 + amplification;
     }
 }
@@ -104,8 +105,8 @@ class StatEngine {
         });
 
         // 2. \uC804\uBB38 \uC5D4\uC9C4\uC744 \uD1B5\uD574 \uD30C\uC9C0 \uC2A4\uD0EF\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-        calculated.barrier = this.valorEngine.calculateInitialBarrier(calculated.valor);
-        calculated.damageAmplification = this.valorEngine.calculateDamageAmplification(calculated.barrier, calculated.barrier);
+        calculated.maxBarrier = this.valorEngine.calculateInitialBarrier(calculated.valor);
+        calculated.currentBarrier = calculated.maxBarrier;
         // ✨ WeightEngine 로직을 직접 처리하여 기본 무게와 장비 무게를 합산합니다.
         let totalWeight = calculated.weight;
         for (const item of equippedItems) {

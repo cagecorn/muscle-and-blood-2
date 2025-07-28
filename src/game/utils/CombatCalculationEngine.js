@@ -6,6 +6,9 @@ import { ownedSkillsManager } from './OwnedSkillsManager.js';
 // ✨ 아이언 윌 로직에 필요한 모듈 추가
 import { skillInventoryManager } from './SkillInventoryManager.js';
 import { passiveSkills } from '../data/skills/passive.js';
+// ✨ ValorEngine과 디버거를 import합니다.
+import { statEngine } from './StatEngine.js';
+import { debugValorManager } from '../debug/DebugValorManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -20,6 +23,13 @@ class CombatCalculationEngine {
      */
     calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
+
+        // ✨ 1. 공격자의 배리어에 의한 데미지 증폭률을 먼저 계산합니다.
+        const amp = statEngine.valorEngine.calculateDamageAmplification(attacker.currentBarrier, attacker.maxBarrier);
+        if (amp > 1.0) {
+            debugValorManager.logDamageAmplification(attacker, amp);
+        }
+        const amplifiedAttack = baseAttack * amp;
 
         // ✨ 방어자의 방어력 감소/증가 효과 적용
         const defenseReductionPercent = statusEffectManager.getModifierValue(defender, 'physicalDefense');
@@ -37,7 +47,8 @@ class CombatCalculationEngine {
         }
 
         const damageMultiplier = finalSkill.damageMultiplier || 1.0;
-        const skillDamage = baseAttack * damageMultiplier;
+        // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
+        const skillDamage = amplifiedAttack * damageMultiplier;
 
         const initialDamage = Math.max(1, skillDamage - finalDefense);
 

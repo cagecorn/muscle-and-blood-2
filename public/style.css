@@ -1119,6 +1119,18 @@ body {
     border-radius: 5px;
 }
 
+/* ✨ [신규] 배리어 바 스타일 */
+.combat-barrier-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #ffd700; /* 노란색 */
+    border-radius: 4px;
+    transition: width 0.2s ease-in-out;
+    z-index: 2; /* 체력바 위에 오도록 설정 */
+}
+
 .combat-health-bar-container .unit-stats {
     position: absolute;
     top: -18px;
@@ -1127,10 +1139,14 @@ body {
 }
 
 .combat-health-bar {
+    position: absolute; /* ✨ 배리어 바와 겹치도록 설정 */
+    top: 0;
+    left: 0;
     height: 100%;
     background-color: #22c55e; /* 녹색 */
     border-radius: 4px;
     transition: width 0.2s ease-in-out;
+    z-index: 1; /* 배리어 바보다 아래에 오도록 설정 */
 }
 
 /* 토큰 컨테이너 스타일 */

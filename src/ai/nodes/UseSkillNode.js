@@ -77,17 +77,38 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(skillTarget, 'hitted', 300);
 
             if (modifiedSkill.type === 'ACTIVE') {
-                const damage = this.combatEngine.calculateDamage(
+                const totalDamage = this.combatEngine.calculateDamage(
                     unit,
                     skillTarget,
                     baseSkillData,
                     instanceId,
                     instanceData.grade
                 );
-                skillTarget.currentHp -= damage;
+
+                // ✨ 배리어 및 체력 데미지 분배 로직
+                const damageToBarrier = Math.min(skillTarget.currentBarrier, totalDamage);
+                const damageToHp = totalDamage - damageToBarrier;
+
+                if (damageToBarrier > 0) {
+                    skillTarget.currentBarrier -= damageToBarrier;
+                    this.vfxManager.createDamageNumber(
+                        skillTarget.sprite.x,
+                        skillTarget.sprite.y - 10,
+                        damageToBarrier,
+                        '#ffd700'
+                    );
+                }
+                if (damageToHp > 0) {
+                    skillTarget.currentHp -= damageToHp;
+                    this.vfxManager.createDamageNumber(
+                        skillTarget.sprite.x,
+                        skillTarget.sprite.y + 10,
+                        damageToHp,
+                        '#ff4d4d'
+                    );
+                }
 
                 this.vfxManager.createBloodSplatter(skillTarget.sprite.x, skillTarget.sprite.y);
-                this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, damage);
 
                 // 토큰 생성 효과 처리
                 if (modifiedSkill.generatesToken) {
