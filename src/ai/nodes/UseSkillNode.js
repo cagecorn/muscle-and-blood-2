@@ -10,6 +10,8 @@ import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 import { skillModifierEngine } from '../../game/utils/SkillModifierEngine.js';
 import { tokenEngine } from '../../game/utils/TokenEngine.js';
 import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
+import { sharedResourceEngine } from '../../game/utils/SharedResourceEngine.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se } = {}) {
@@ -45,6 +47,16 @@ class UseSkillNode extends Node {
         }
 
         debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, rank, instanceData.grade);
+
+        if (!this.skillEngine.canUseSkill(unit, modifiedSkill)) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${modifiedSkill.name}] 사용 조건 미충족`);
+            return NodeState.FAILURE;
+        }
+
+        if (modifiedSkill.resourceCost) {
+            sharedResourceEngine.spendResource(modifiedSkill.resourceCost.type, modifiedSkill.resourceCost.amount);
+            debugLogEngine.log('UseSkillNode', `[${modifiedSkill.resourceCost.type}] ${modifiedSkill.resourceCost.amount} 소모`);
+        }
 
         this.skillEngine.recordSkillUse(unit, modifiedSkill); // 보정된 데이터로 기록
 
@@ -115,8 +127,18 @@ class UseSkillNode extends Node {
             }
         }
 
+        if (modifiedSkill.generatesResource) {
+            sharedResourceEngine.addResource(modifiedSkill.generatesResource.type, modifiedSkill.generatesResource.amount);
+            debugLogEngine.log('UseSkillNode', `[${modifiedSkill.generatesResource.type}] ${modifiedSkill.generatesResource.amount} 생산`);
+        }
+
         if (modifiedSkill.effect) {
-            statusEffectManager.addEffect(skillTarget, modifiedSkill);
+            const roll = Math.random();
+            if (modifiedSkill.effect.chance === undefined || roll < modifiedSkill.effect.chance) {
+                statusEffectManager.addEffect(skillTarget, modifiedSkill);
+            } else {
+                debugLogEngine.log('UseSkillNode', `[${modifiedSkill.name}]의 효과 발동 실패 (확률: ${modifiedSkill.effect.chance}, 주사위: ${roll.toFixed(2)})`);
+            }
         }
 
         console.log(`[AI] ${unit.instanceName}이(가) ${skillTarget.instanceName}에게 스킬 [${modifiedSkill.name}] 사용!`);
