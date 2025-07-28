@@ -24,6 +24,7 @@ export const SKILL_TAGS = {
     KINETIC: '관성',
     WEAKEN: '쇠약',
     HEAL: '치유',
+    DELAY: '지연',
 
     // 원소/개념 속성
     EARTH: '대지',

@@ -34,6 +34,8 @@ class SkillInventoryManager {
                 this.addSkillById('heal', grade);
                 // ✨ 넉백샷 카드 추가
                 this.addSkillById('knockbackShot', grade);
+                // ✨ 제압 사격 카드 추가
+                this.addSkillById('suppressShot', grade);
             }
         });
 

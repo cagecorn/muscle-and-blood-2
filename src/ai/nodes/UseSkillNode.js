@@ -14,9 +14,10 @@ import { sharedResourceEngine } from '../../game/utils/SharedResourceEngine.js';
 import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 // ✨ 1. 새로 만든 BattleTagManager를 import 합니다.
 import { battleTagManager } from '../../game/utils/BattleTagManager.js';
+import { turnOrderManager } from '../../game/utils/TurnOrderManager.js';
 
 class UseSkillNode extends Node {
-    constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se } = {}) {
+    constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se, battleSimulator } = {}) {
         super();
         this.vfxManager = vfxManager;
         this.animationEngine = animationEngine;
@@ -25,6 +26,7 @@ class UseSkillNode extends Node {
         this.summoningEngine = summoningEngine;
         this.skillEngine = se || skillEngine;
         this.combatEngine = combatCalculationEngine;
+        this.battleSimulator = battleSimulator;
     }
 
     async evaluate(unit, blackboard) {
@@ -124,6 +126,10 @@ class UseSkillNode extends Node {
                             `${modifiedSkill.name} 효과`
                         );
                     }
+                }
+
+                if (modifiedSkill.turnOrderEffect === 'pushToBack' && this.battleSimulator) {
+                    this.battleSimulator.turnQueue = turnOrderManager.pushToBack(this.battleSimulator.turnQueue, skillTarget);
                 }
 
                 // ✨ 넉백(push) 효과 처리
