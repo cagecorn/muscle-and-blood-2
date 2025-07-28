@@ -29,6 +29,7 @@ import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
 import { sharedResourceEngine } from './SharedResourceEngine.js';
 import { SharedResourceUIManager } from '../dom/SharedResourceUIManager.js';
+import { comboManager } from './ComboManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -168,6 +169,9 @@ export class BattleSimulatorEngine {
     async gameLoop() {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
+
+            // 턴 시작 시 콤보 정보를 초기화합니다.
+            comboManager.startTurn(currentUnit.uniqueId);
 
             // 현재 턴 표시를 위해 턴 순서 UI 업데이트
             this.turnQueue.forEach((u, index) => u.isTurnActive = (index === this.currentTurnIndex));

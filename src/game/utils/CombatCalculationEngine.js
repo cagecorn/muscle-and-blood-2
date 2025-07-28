@@ -13,6 +13,7 @@ import { debugValorManager } from '../debug/DebugValorManager.js';
 import { gradeManager } from './GradeManager.js';
 import { ATTACK_TYPE } from '../data/classGrades.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
+import { comboManager } from './ComboManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -27,6 +28,14 @@ class CombatCalculationEngine {
      */
     calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
         const baseAttack = attacker.finalStats?.physicalAttack || 0;
+
+        // 콤보 배율 계산을 위한 정보
+        let comboMultiplier = 1.0;
+        let comboCount = 0;
+        if (skill.type === 'ACTIVE') {
+            comboCount = comboManager.recordAttack(attacker.uniqueId, defender.uniqueId);
+            comboMultiplier = comboManager.getDamageMultiplier(comboCount);
+        }
 
         // ✨ 1. 공격자의 배리어에 의한 데미지 증폭률을 먼저 계산합니다.
         const amp = statEngine.valorEngine.calculateDamageAmplification(attacker.currentBarrier, attacker.maxBarrier);
@@ -115,7 +124,7 @@ class CombatCalculationEngine {
         // 모든 데미지 감소/증가 효과를 합산
         const finalDamageMultiplier = 1 - damageReductionPercent - ironWillReduction + damageIncreasePercent;
 
-        const finalDamage = damageAfterGrade * finalDamageMultiplier;
+        const finalDamage = damageAfterGrade * finalDamageMultiplier * comboMultiplier;
 
         if (damageReductionPercent > 0 || damageIncreasePercent > 0 || ironWillReduction > 0) {
             const effects = (statusEffectManager.activeEffects.get(defender.uniqueId) || [])
@@ -131,7 +140,7 @@ class CombatCalculationEngine {
 
         // 디버그 로그에 finalDefense 사용하도록 수정
         debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage, finalDefense);
-        return { damage: Math.round(finalDamage), hitType: hitType };
+        return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
     }
 
     /**

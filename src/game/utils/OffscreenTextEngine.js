@@ -26,13 +26,13 @@ export class OffscreenTextEngine {
             strokeThickness: 5,
         });
 
-        // 이름표가 캐릭터의 발밑에 위치하도록 기준점을 중간 상단으로 설정합니다.
-        label.setOrigin(0.5, 0);
+        // 이름표가 캐릭터의 머리 위에 위치하도록 기준점을 중간 하단으로 설정합니다.
+        label.setOrigin(0.5, 1);
         label.setResolution(2);  // 해상도를 2배로 설정
         label.setScale(0.5);     // \ud06c\uae30\ub97c 0.5\ubc84\ub2e4\ub97c \ucd95\uc18c\ud558\uc5ec \uc120\uba85\ub3c4 \ud655\ub960
 
-        // ✨ [수정] 유닛 발밑과의 여백을 5에서 2로 줄여 더 가깝게 만듭니다.
-        label.y = sprite.y + (sprite.displayHeight / 2) + 2;
+        // ✨ [수정] 유닛 머리 위와의 여백을 조정합니다.
+        label.y = sprite.y - (sprite.displayHeight / 2) - 5;
 
         this.labels.push({ label, sprite });
         return label;
@@ -46,8 +46,8 @@ export class OffscreenTextEngine {
         this.labels.forEach(item => {
             if (item.sprite.active) {
                 item.label.x = item.sprite.x;
-                // ✨ [수정] 여기도 동일하게 여백을 2로 수정합니다.
-                item.label.y = item.sprite.y + (item.sprite.displayHeight / 2) + 2;
+                // ✨ [수정] 여기도 동일하게 머리 위 여백을 조정합니다.
+                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) - 5;
             } else {
                 // \uc2a4\ud504\ub808\uc774\ud2b8\uac00 \ube44\ud65c\uc131\ud654\ub418\uba74 \uc774\ub984\ud3a0\ub3c4 \uc228\uae38\ub9ac\ub2c8\ub2e4.
                 item.label.setVisible(false);
