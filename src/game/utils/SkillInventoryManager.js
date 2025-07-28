@@ -40,6 +40,8 @@ class SkillInventoryManager {
                 this.addSkillById('stigma', grade);
                 // ✨ [신규] 전투의 함성 카드 지급
                 this.addSkillById('battleCry', grade);
+                // ✨ [신규] 사냥꾼의 감각 카드 지급
+                this.addSkillById('huntSense', grade);
             }
         });
 

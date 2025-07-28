@@ -23,7 +23,9 @@ class SkillModifierEngine {
             'heal': [1.3, 1.2, 1.1, 1.0],
             'grindstone': [0.25, 0.20, 0.15, 0.10],
             // ✨ [신규] 전투의 함성 공격력 증가 계수
-            'battleCry': [0.30, 0.25, 0.20, 0.15]
+            'battleCry': [0.30, 0.25, 0.20, 0.15],
+            // ✨ [신규] 사냥꾼의 감각 치명타 확률 계수
+            'huntSense': [0.30, 0.25, 0.20, 0.15]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -103,6 +105,19 @@ class SkillModifierEngine {
             }
         }
 
+        // ✨ '사냥꾼의 감각' 스킬의 치명타 확률 보정
+        if (baseSkillData.id === 'huntSense' && modifiedSkill.effect) {
+            const critModifiers = this.rankModifiers['huntSense'];
+            if (critModifiers && critModifiers[rankIndex] !== undefined) {
+                if (Array.isArray(modifiedSkill.effect.modifiers)) {
+                    const critMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'criticalChance');
+                    if (critMod) critMod.value = critModifiers[rankIndex];
+                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'criticalChance') {
+                    modifiedSkill.effect.modifiers.value = critModifiers[rankIndex];
+                }
+            }
+        }
+
         // 차지 스킬의 경우 슬롯 순위에 따라 기절 턴 수를 보정합니다.
         if (baseSkillData.id === 'charge' && modifiedSkill.effect) {
             modifiedSkill.effect.duration = (rank === 1)
@@ -143,6 +158,11 @@ class SkillModifierEngine {
             if (baseSkillData.id === 'grindstone') {
                 const bonusValue = (this.rankModifiers.grindstone[rankIndex] || 0) * 100;
                 modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
+            }
+            // ✨ [신규] 사냥꾼의 감각 치명타 확률 치환
+            if (baseSkillData.id === 'huntSense') {
+                const critValue = (this.rankModifiers.huntSense[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{critChance}}%', `${critValue.toFixed(0)}%`);
             }
         }
 
