@@ -12,6 +12,8 @@ import { tokenEngine } from '../../game/utils/TokenEngine.js';
 import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecutionManager.js';
 import { sharedResourceEngine } from '../../game/utils/SharedResourceEngine.js';
 import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+// ✨ 1. 새로 만든 BattleTagManager를 import 합니다.
+import { battleTagManager } from '../../game/utils/BattleTagManager.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se } = {}) {
@@ -52,6 +54,9 @@ class UseSkillNode extends Node {
             debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${modifiedSkill.name}] 사용 조건 미충족`);
             return NodeState.FAILURE;
         }
+
+        // ✨ 2. 스킬 사용이 확정된 이 시점에 BattleTagManager에 정보를 기록합니다.
+        battleTagManager.recordSkillUse(unit, skillTarget, modifiedSkill);
 
         if (modifiedSkill.resourceCost) {
             sharedResourceEngine.spendResource(modifiedSkill.resourceCost.type, modifiedSkill.resourceCost.amount);
