@@ -1,4 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+// 디버그용 콤보 매니저를 초기화하여 로그 출력을 활성화합니다.
+import { debugComboManager } from '../debug/DebugComboManager.js';
 
 class ComboManager {
     constructor() {

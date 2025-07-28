@@ -14,6 +14,8 @@ import { gradeManager } from './GradeManager.js';
 import { ATTACK_TYPE } from '../data/classGrades.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { comboManager } from './ComboManager.js';
+// 콤보 계산 과정을 상세히 기록하기 위한 디버그 매니저
+import { debugComboManager } from '../debug/DebugComboManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -123,8 +125,11 @@ class CombatCalculationEngine {
 
         // 모든 데미지 감소/증가 효과를 합산
         const finalDamageMultiplier = 1 - damageReductionPercent - ironWillReduction + damageIncreasePercent;
+        const damageBeforeCombo = damageAfterGrade * finalDamageMultiplier;
+        const finalDamage = damageBeforeCombo * comboMultiplier;
 
-        const finalDamage = damageAfterGrade * finalDamageMultiplier * comboMultiplier;
+        // 콤보 배율 적용 과정을 디버그 로그로 남깁니다.
+        debugComboManager.logComboDamage(comboCount, comboMultiplier, damageBeforeCombo, finalDamage);
 
         if (damageReductionPercent > 0 || damageIncreasePercent > 0 || ironWillReduction > 0) {
             const effects = (statusEffectManager.activeEffects.get(defender.uniqueId) || [])
