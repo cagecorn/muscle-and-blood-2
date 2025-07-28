@@ -47,10 +47,16 @@ export class CombatUIManager {
         
         this.healthBarContainer = document.createElement('div');
         this.healthBarContainer.className = 'combat-health-bar-container';
+
+        // ✨ 배리어 바 추가
+        this.barrierBar = document.createElement('div');
+        this.barrierBar.className = 'combat-barrier-bar';
+
         this.healthBar = document.createElement('div');
         this.healthBar.className = 'combat-health-bar';
         this.hpLabel = document.createElement('span');
         this.hpLabel.className = 'unit-stats';
+        this.healthBarContainer.appendChild(this.barrierBar); // 배리어 바를 먼저 추가
         this.healthBarContainer.appendChild(this.healthBar);
         this.healthBarContainer.appendChild(this.hpLabel);
 
@@ -112,7 +118,7 @@ export class CombatUIManager {
         }
         
         // 매번 업데이트가 필요한 정보들
-        this.updateHealth(unit);
+        this.updateHealthAndBarrier(unit);
         this.updateTokens(unit);
         this.updateEffects(unit);
         this.updateSkills(unit); // 쿨타임 등 업데이트
@@ -134,10 +140,13 @@ export class CombatUIManager {
      * 라벨과 체력바 너비를 새로 계산하여 반영합니다.
      * @param {object} unit
      */
-    updateHealth(unit) {
+    updateHealthAndBarrier(unit) {
         this.hpLabel.innerText = `${Math.max(0, unit.currentHp)} / ${unit.finalStats.hp}`;
         const healthPercentage = (unit.currentHp / unit.finalStats.hp) * 100;
         this.healthBar.style.width = `${Math.max(0, healthPercentage)}%`;
+        
+        const barrierPercentage = (unit.currentBarrier / unit.maxBarrier) * 100;
+        this.barrierBar.style.width = `${Math.max(0, barrierPercentage)}%`;
     }
 
     /**
