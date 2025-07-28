@@ -28,6 +28,9 @@ export const SKILL_TAGS = {
     // 특정 행동이나 상호작용을 금지하는 스킬에 사용
     PROHIBITION: '금지',
 
+    // ✨ [신규] 확정 판정 태그
+    FIXED: '확정',
+
     // 원소/개념 속성
     EARTH: '대지',
     WILL: '의지',
