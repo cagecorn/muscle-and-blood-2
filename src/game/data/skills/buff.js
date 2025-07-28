@@ -96,4 +96,98 @@ export const buffSkills = {
             }
         }
     },
+    grindstone: {
+        NORMAL: {
+            id: 'grindstone',
+            name: '숯돌 갈기',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.IRON, SKILL_TAGS.PRODUCTION],
+            cost: 1,
+            targetType: 'self',
+            description: '날카롭게 벼려낸 칼날이 번뜩입니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 공유 자원 [철]을 1개 생산합니다.',
+            illustrationPath: 'assets/images/skills/grindstone.png',
+            requiredClass: 'warrior',
+            cooldown: 2,
+            generatesResource: { type: 'IRON', amount: 1 },
+            effect: {
+                id: 'grindstoneBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: {
+                    stat: 'physicalAttack',
+                    type: 'percentage',
+                    value: 0.10
+                }
+            }
+        },
+        RARE: {
+            id: 'grindstone',
+            name: '숯돌 갈기 [R]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.IRON, SKILL_TAGS.PRODUCTION],
+            cost: 1,
+            targetType: 'self',
+            description: '숙련된 솜씨로 무기를 손질합니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 1개 생산합니다. (쿨타임 1턴)',
+            illustrationPath: 'assets/images/skills/grindstone.png',
+            requiredClass: 'warrior',
+            cooldown: 1,
+            generatesResource: { type: 'IRON', amount: 1 },
+            effect: {
+                id: 'grindstoneBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: {
+                    stat: 'physicalAttack',
+                    type: 'percentage',
+                    value: 0.10
+                }
+            }
+        },
+        EPIC: {
+            id: 'grindstone',
+            name: '숯돌 갈기 [E]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.IRON, SKILL_TAGS.PRODUCTION],
+            cost: 0,
+            targetType: 'self',
+            description: '순식간에 무기를 최상의 상태로 만듭니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 1개 생산합니다.',
+            illustrationPath: 'assets/images/skills/grindstone.png',
+            requiredClass: 'warrior',
+            cooldown: 1,
+            generatesResource: { type: 'IRON', amount: 1 },
+            effect: {
+                id: 'grindstoneBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: {
+                    stat: 'physicalAttack',
+                    type: 'percentage',
+                    value: 0.10
+                }
+            }
+        },
+        LEGENDARY: {
+            id: 'grindstone',
+            name: '숯돌 갈기 [L]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.IRON, SKILL_TAGS.PRODUCTION],
+            cost: 0,
+            targetType: 'self',
+            description: '장인의 경지에 이른 연마술입니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 2개 생산합니다.',
+            illustrationPath: 'assets/images/skills/grindstone.png',
+            requiredClass: 'warrior',
+            cooldown: 1,
+            generatesResource: { type: 'IRON', amount: 2 },
+            effect: {
+                id: 'grindstoneBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: {
+                    stat: 'physicalAttack',
+                    type: 'percentage',
+                    value: 0.10
+                }
+            }
+        }
+    },
 };

@@ -33,6 +33,36 @@ const shieldBreakBase = {
     LEGENDARY: { id: 'shieldBreak', type: 'DEBUFF', cost: 1, cooldown: 2, effect: { id: 'shieldBreak', type: 'DEBUFF', duration: 3, modifiers: [ { stat: 'damageIncrease', type: 'percentage', value: 0.15 }, { stat: 'physicalDefense', type: 'percentage', value: -0.10 } ] } }
 };
 
+const grindstoneBase = {
+    NORMAL: {
+        id: 'grindstone', type: 'BUFF', cost: 1, cooldown: 2, effect: { id: 'grindstoneBuff', type: 'BUFF', duration: 1, modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.10 } }, generatesResource: { type: 'IRON', amount: 1 }
+    },
+    RARE: {
+        id: 'grindstone', type: 'BUFF', cost: 1, cooldown: 1, effect: { id: 'grindstoneBuff', type: 'BUFF', duration: 1, modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.10 } }, generatesResource: { type: 'IRON', amount: 1 }
+    },
+    EPIC: {
+        id: 'grindstone', type: 'BUFF', cost: 0, cooldown: 1, effect: { id: 'grindstoneBuff', type: 'BUFF', duration: 1, modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.10 } }, generatesResource: { type: 'IRON', amount: 1 }
+    },
+    LEGENDARY: {
+        id: 'grindstone', type: 'BUFF', cost: 0, cooldown: 1, effect: { id: 'grindstoneBuff', type: 'BUFF', duration: 1, modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.10 } }, generatesResource: { type: 'IRON', amount: 2 }
+    }
+};
+
+const throwingAxeBase = {
+    NORMAL: {
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 1, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }
+    },
+    RARE: {
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }
+    },
+    EPIC: {
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.2 }
+    },
+    LEGENDARY: {
+        id: 'throwingAxe', type: 'ACTIVE', cost: 0, cooldown: 0, damageMultiplier: 1.6, resourceCost: { type: 'IRON', amount: 1 }, effect: { type: 'STATUS_EFFECT', id: 'stun', duration: 1, chance: 0.4 }
+    }
+};
+
 const ironWillBase = {
     rankModifiers: [0.39, 0.36, 0.33, 0.30],
     NORMAL: { maxReduction: 0.30, hpRegen: 0 },
@@ -131,6 +161,25 @@ for (let rank = 1; rank <= 4; rank++) {
 
 for (const grade of grades) {
     assert.strictEqual(typeof ironWillBase[grade].hpRegen, 'number');
+}
+
+// Grindstone
+const grindstoneExpected = [0.25, 0.20, 0.15, 0.10];
+for (const grade of grades) {
+    for (let rank = 1; rank <= 4; rank++) {
+        const skill = skillModifierEngine.getModifiedSkill(grindstoneBase[grade], rank, grade);
+        const value = skill.effect.modifiers.value;
+        assert(Math.abs(value - grindstoneExpected[rank - 1]) < 1e-6);
+    }
+}
+
+// Throwing Axe
+const throwingAxeExpected = [1.0, 1.2, 1.4, 1.6];
+for (const grade of grades) {
+    for (let rank = 1; rank <= 4; rank++) {
+        const skill = skillModifierEngine.getModifiedSkill(throwingAxeBase[grade], rank, grade);
+        assert.strictEqual(skill.damageMultiplier, throwingAxeExpected[rank - 1]);
+    }
 }
 
 // ------- Skill Usage Integration Test -------

@@ -21,6 +21,8 @@ class SkillModifierEngine {
             'rangedAttack': [1.3, 1.2, 1.1, 1.0],
             // ✨ [신규] 힐 순위별 회복 계수 추가
             'heal': [1.3, 1.2, 1.1, 1.0],
+            'grindstone': [0.25, 0.20, 0.15, 0.10],
+            'throwingAxe': [1.0, 1.2, 1.4, 1.6],
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -80,6 +82,13 @@ class SkillModifierEngine {
             }
         }
 
+        if (baseSkillData.id === 'grindstone' && modifiedSkill.effect) {
+            const bonusModifiers = this.rankModifiers['grindstone'];
+            if (bonusModifiers && bonusModifiers[rankIndex] !== undefined) {
+                modifiedSkill.effect.modifiers.value = bonusModifiers[rankIndex];
+            }
+        }
+
         // 차지 스킬의 경우 슬롯 순위에 따라 기절 턴 수를 보정합니다.
         if (baseSkillData.id === 'charge' && modifiedSkill.effect) {
             modifiedSkill.effect.duration = (rank === 1)
@@ -116,6 +125,10 @@ class SkillModifierEngine {
             if (modifiedSkill.healMultiplier) {
                 const healAmount = `지혜 * ${modifiedSkill.healMultiplier.toFixed(2)}`;
                 modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', healAmount);
+            }
+            if (baseSkillData.id === 'grindstone') {
+                const bonusValue = (this.rankModifiers.grindstone[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
             }
         }
 

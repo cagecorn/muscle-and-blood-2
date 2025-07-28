@@ -2,6 +2,7 @@ import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 import { tokenEngine } from './TokenEngine.js';
 import { cooldownManager } from './CooldownManager.js';
+import { sharedResourceEngine } from './SharedResourceEngine.js';
 
 // 스킬 종류와 해당 색상, 이름을 상수로 정의합니다.
 export const SKILL_TYPES = {
@@ -53,16 +54,23 @@ class SkillEngine {
             return false;
         }
 
-        // 2. 이번 턴에 해당 유닛이 이미 사용한 스킬인가?
+        // 2. 공유 자원이 충분한가?
+        if (skill.resourceCost) {
+            if (sharedResourceEngine.getResource(skill.resourceCost.type) < skill.resourceCost.amount) {
+                return false;
+            }
+        }
+
+        // 3. 이번 턴에 해당 유닛이 이미 사용한 스킬인가?
         const unitUsed = this.usedSkillsThisTurn.get(unit.uniqueId);
         if (unitUsed && unitUsed.has(skill.id)) {
             return false;
         }
 
-        // 3. 이번 턴에 다른 스킬을 이미 사용했더라도 토큰이 남아 있다면 추가 행동이 가능하다
+        // 4. 이번 턴에 다른 스킬을 이미 사용했더라도 토큰이 남아 있다면 추가 행동이 가능하다
         //    단, 같은 스킬은 한 번만 사용할 수 있도록 위에서 체크했다.
 
-        // 4. 쿨타임이 지났는가?
+        // 5. 쿨타임이 지났는가?
         if (!cooldownManager.isReady(unit.uniqueId, skill.id)) {
             return false;
         }

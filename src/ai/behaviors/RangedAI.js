@@ -76,9 +76,24 @@ function createRangedAI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        // ✨ [신규] 5순위 스킬
+        // ✨ 우선순위 5 ~ 8 스킬
         new SequenceNode([
             new CanUseSkillBySlotNode(4),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(5),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(6),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(7),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),

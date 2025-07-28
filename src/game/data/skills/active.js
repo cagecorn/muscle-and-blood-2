@@ -1,6 +1,6 @@
 import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
-// SkillTagManager에서 태그 정의를 가져옵니다.
 import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
+import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 
 // 액티브 스킬 데이터 정의
 export const activeSkills = {
@@ -249,6 +249,80 @@ export const activeSkills = {
             cooldown: 0,
             range: 3,
             generatesToken: { chance: 1.0, amount: 1 }
+        }
+    },
+    throwingAxe: {
+        NORMAL: {
+            id: 'throwingAxe',
+            name: '도끼 던지기',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING],
+            cost: 0,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 도끼를 던져 {{damage}}%의 피해를 입힙니다. (소모 자원: 철 1)',
+            illustrationPath: 'assets/images/skills/throwing-axe.png',
+            requiredClass: 'warrior',
+            cooldown: 1,
+            range: 3,
+            damageMultiplier: 1.6,
+            resourceCost: { type: 'IRON', amount: 1 }
+        },
+        RARE: {
+            id: 'throwingAxe',
+            name: '도끼 던지기 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING],
+            cost: 0,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 도끼를 던져 {{damage}}%의 피해를 입힙니다. (쿨타임 없음, 소모 자원: 철 1)',
+            illustrationPath: 'assets/images/skills/throwing-axe.png',
+            requiredClass: 'warrior',
+            cooldown: 0,
+            range: 3,
+            damageMultiplier: 1.6,
+            resourceCost: { type: 'IRON', amount: 1 }
+        },
+        EPIC: {
+            id: 'throwingAxe',
+            name: '도끼 던지기 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING],
+            cost: 0,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 도끼를 던져 {{damage}}%의 피해를 입히고, 20% 확률로 기절시킵니다. (소모 자원: 철 1)',
+            illustrationPath: 'assets/images/skills/throwing-axe.png',
+            requiredClass: 'warrior',
+            cooldown: 0,
+            range: 3,
+            damageMultiplier: 1.6,
+            resourceCost: { type: 'IRON', amount: 1 },
+            effect: {
+                type: EFFECT_TYPES.STATUS_EFFECT,
+                id: 'stun',
+                duration: 1,
+                chance: 0.2
+            }
+        },
+        LEGENDARY: {
+            id: 'throwingAxe',
+            name: '도끼 던지기 [L]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING],
+            cost: 0,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 도끼를 던져 {{damage}}%의 피해를 입히고, 40% 확률로 기절시킵니다. (소모 자원: 철 1)',
+            illustrationPath: 'assets/images/skills/throwing-axe.png',
+            requiredClass: 'warrior',
+            cooldown: 0,
+            range: 3,
+            damageMultiplier: 1.6,
+            resourceCost: { type: 'IRON', amount: 1 },
+            effect: {
+                type: EFFECT_TYPES.STATUS_EFFECT,
+                id: 'stun',
+                duration: 1,
+                chance: 0.4
+            }
         }
     }
 };

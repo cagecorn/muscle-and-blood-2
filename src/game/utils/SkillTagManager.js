@@ -28,6 +28,9 @@ export const SKILL_TAGS = {
     // 원소/개념 속성
     EARTH: '대지',
     WILL: '의지',
+    IRON: '철',
+    PRODUCTION: '생산',
+    THROWING: '투척',
 };
 
 // 실제 코드에서는 위 객체를 직접 import하여 사용하면 됩니다.

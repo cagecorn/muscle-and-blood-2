@@ -63,9 +63,24 @@ function createHealerAI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        // ✨ [신규] 우선순위 5: 5번 슬롯(소환) 스킬 사용 시도
+        // ✨ 우선순위 5 ~ 8: 특수 스킬 사용 시도
         new SequenceNode([
             new CanUseSkillBySlotNode(4),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(5),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(6),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        new SequenceNode([
+            new CanUseSkillBySlotNode(7),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
