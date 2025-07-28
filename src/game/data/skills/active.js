@@ -468,8 +468,73 @@ export const activeSkills = {
             range: 4,
             damageMultiplier: 1.0,
             fixedDamage: 'CRITICAL',
-            armorPenetration: 0.15,
+        armorPenetration: 0.15,
         },
     },
+    // --- ▼ [신규] '낙인' 스킬을 DEBUFF에서 ACTIVE로 이동 및 수정 ▼ ---
+    stigma: {
+        NORMAL: {
+            id: 'stigma',
+            name: '낙인',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.PROHIBITION, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '가장 멀리 있는 체력이 가장 낮은 적 1명에게 3턴간 [치료 금지] 디버프를 겁니다.',
+            illustrationPath: 'assets/images/skills/stigma.png',
+            requiredClass: 'medic',
+            cooldown: 5,
+            range: 10,
+            resourceCost: { type: 'IRON', amount: 3 },
+            effect: { id: 'stigma', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        },
+        RARE: {
+            id: 'stigma',
+            name: '낙인 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.PROHIBITION, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '가장 멀리 있는 체력이 가장 낮은 적 1명에게 3턴간 [치료 금지] 디버프를 겁니다. (쿨타임 4턴)',
+            illustrationPath: 'assets/images/skills/stigma.png',
+            requiredClass: 'medic',
+            cooldown: 4,
+            range: 10,
+            resourceCost: { type: 'IRON', amount: 3 },
+            effect: { id: 'stigma', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        },
+        EPIC: {
+            id: 'stigma',
+            name: '낙인 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.PROHIBITION, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '가장 멀리 있는 체력이 가장 낮은 적 1명에게 3턴간 [치료 금지] 디버프를 겁니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/stigma.png',
+            requiredClass: 'medic',
+            cooldown: 3,
+            range: 10,
+            resourceCost: { type: 'IRON', amount: 3 },
+            effect: { id: 'stigma', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        },
+        LEGENDARY: {
+            id: 'stigma',
+            name: '낙인 [L]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.PROHIBITION, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '가장 멀리 있는 체력이 가장 낮은 적 2명에게 3턴간 [치료 금지] 디버프를 겁니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/stigma.png',
+            requiredClass: 'medic',
+            cooldown: 3,
+            range: 10,
+            resourceCost: { type: 'IRON', amount: 3 },
+            numberOfTargets: 2,
+            effect: { id: 'stigma', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        }
+    },
+    // --- ▲ [신규] '낙인' 스킬을 DEBUFF에서 ACTIVE로 이동 및 수정 ▲ ---
     // --- ▲ [신규] 크리티컬 샷 스킬 추가 ▲ ---
 };

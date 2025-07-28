@@ -25,10 +25,10 @@ for (const grade of grades) {
 
 // ---- Stigma skill tests ----
 const stigmaBase = {
-    NORMAL: { id: 'stigma', type: 'DEBUFF', cooldown: 5, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
-    RARE: { id: 'stigma', type: 'DEBUFF', cooldown: 4, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
-    EPIC: { id: 'stigma', type: 'DEBUFF', cooldown: 3, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
-    LEGENDARY: { id: 'stigma', type: 'DEBUFF', cooldown: 3, numberOfTargets: 2, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } }
+    NORMAL: { id: 'stigma', type: 'ACTIVE', cooldown: 5, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    RARE: { id: 'stigma', type: 'ACTIVE', cooldown: 4, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    EPIC: { id: 'stigma', type: 'ACTIVE', cooldown: 3, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    LEGENDARY: { id: 'stigma', type: 'ACTIVE', cooldown: 3, numberOfTargets: 2, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } }
 };
 
 const expectedCooldowns = { NORMAL: 5, RARE: 4, EPIC: 3, LEGENDARY: 3 };
