@@ -48,13 +48,13 @@ class AttackTargetNode extends Node {
 
         // 데미지 계산 및 적용
         // ✨ 데미지 계산 시 스킬 정보 전달
-        const damage = this.combatEngine.calculateDamage(unit, target, attackSkill);
+        const { damage, hitType } = this.combatEngine.calculateDamage(unit, target, attackSkill);
         target.currentHp -= damage;
 
         // 시각 효과
         this.vfxManager.updateHealthBar(target.healthBar, target.currentHp, target.finalStats.hp);
         this.vfxManager.createBloodSplatter(target.sprite.x, target.sprite.y);
-        this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, damage);
+        this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, damage, '#ff4d4d', hitType);
 
         // 딜레이
         await this.delayEngine.hold(200);

@@ -84,7 +84,7 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(skillTarget, 'hitted', 300);
 
             if (modifiedSkill.type === 'ACTIVE') {
-                const totalDamage = this.combatEngine.calculateDamage(
+                const { damage: totalDamage, hitType } = this.combatEngine.calculateDamage(
                     unit,
                     skillTarget,
                     baseSkillData,
@@ -102,7 +102,8 @@ class UseSkillNode extends Node {
                         skillTarget.sprite.x,
                         skillTarget.sprite.y - 10,
                         damageToBarrier,
-                        '#ffd700'
+                        '#ffd700',
+                        hitType
                     );
                 }
                 if (damageToHp > 0) {
@@ -111,7 +112,8 @@ class UseSkillNode extends Node {
                         skillTarget.sprite.x,
                         skillTarget.sprite.y + 10,
                         damageToHp,
-                        '#ff4d4d'
+                        '#ff4d4d',
+                        hitType
                     );
                 }
 
