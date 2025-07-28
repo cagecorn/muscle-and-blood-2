@@ -9,6 +9,10 @@ import { passiveSkills } from '../data/skills/passive.js';
 // ✨ ValorEngine과 디버거를 import합니다.
 import { statEngine } from './StatEngine.js';
 import { debugValorManager } from '../debug/DebugValorManager.js';
+// ✨ 1. GradeManager와 관련 상수들을 가져옵니다.
+import { gradeManager } from './GradeManager.js';
+import { ATTACK_TYPE } from '../data/classGrades.js';
+import { SKILL_TAGS } from './SkillTagManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -52,6 +56,56 @@ class CombatCalculationEngine {
 
         const initialDamage = Math.max(1, skillDamage - finalDefense);
 
+        // --- ✨ 등급 시스템 계산 로직 추가 ---
+        let hitType = null;
+        let combatMultiplier = 1.0;
+
+        // 1. 스킬 태그를 기반으로 공격 타입을 결정합니다.
+        const attackType = this.getAttackTypeFromSkill(finalSkill);
+
+        if (attackType) {
+            // 2. 등급 매니저를 통해 최종 등급 티어를 계산합니다.
+            const resultTier = gradeManager.calculateCombatGrade(attacker, defender, attackType);
+
+            // 3. 등급 티어에 따라 확률적 효과를 결정합니다.
+            const roll = Math.random();
+            let chance = 0.05; // 기본 확률 5%
+
+            switch (resultTier) {
+                case 2: // 치명타
+                    chance += (attacker.finalStats.criticalChance || 0) / 100;
+                    if (roll < chance) {
+                        hitType = '치명타';
+                        combatMultiplier = 2.0;
+                    }
+                    break;
+                case 1: // 약점
+                    chance += (attacker.finalStats.weaknessChance || 0) / 100;
+                    if (roll < chance) {
+                        hitType = '약점';
+                        combatMultiplier = 1.5;
+                    }
+                    break;
+                case -1: // 완화
+                    chance += (defender.finalStats.mitigationChance || 0) / 100;
+                    if (roll < chance) {
+                        hitType = '완화';
+                        combatMultiplier = 0.75;
+                    }
+                    break;
+                case -2: // 막기
+                    chance += (defender.finalStats.blockChance || 0) / 100;
+                    if (roll < chance) {
+                        hitType = '막기';
+                        combatMultiplier = 0.5;
+                    }
+                    break;
+            }
+        }
+        // --- ✨ 등급 시스템 계산 로직 종료 ---
+
+        const damageAfterGrade = initialDamage * combatMultiplier;
+
         // ✨ 방어자의 받는 데미지 증가/감소 효과 적용
         const damageReductionPercent = statusEffectManager.getModifierValue(defender, 'damageReduction');
         const damageIncreasePercent = statusEffectManager.getModifierValue(defender, 'damageIncrease');
@@ -61,7 +115,7 @@ class CombatCalculationEngine {
         // 모든 데미지 감소/증가 효과를 합산
         const finalDamageMultiplier = 1 - damageReductionPercent - ironWillReduction + damageIncreasePercent;
 
-        const finalDamage = initialDamage * finalDamageMultiplier;
+        const finalDamage = damageAfterGrade * finalDamageMultiplier;
 
         if (damageReductionPercent > 0 || damageIncreasePercent > 0 || ironWillReduction > 0) {
             const effects = (statusEffectManager.activeEffects.get(defender.uniqueId) || [])
@@ -77,7 +131,20 @@ class CombatCalculationEngine {
 
         // 디버그 로그에 finalDefense 사용하도록 수정
         debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage, finalDefense);
-        return Math.round(finalDamage);
+        return { damage: Math.round(finalDamage), hitType: hitType };
+    }
+
+    /**
+     * 스킬 데이터의 태그를 분석하여 공격 타입을 반환합니다.
+     * @param {object} skill - 스킬 데이터
+     * @returns {string|null} - 'melee', 'ranged', 'magic' 또는 null
+     */
+    getAttackTypeFromSkill(skill) {
+        if (!skill.tags) return null;
+        if (skill.tags.includes(SKILL_TAGS.MELEE)) return ATTACK_TYPE.MELEE;
+        if (skill.tags.includes(SKILL_TAGS.RANGED)) return ATTACK_TYPE.RANGED;
+        if (skill.tags.includes(SKILL_TAGS.MAGIC)) return ATTACK_TYPE.MAGIC;
+        return null;
     }
 
     /**

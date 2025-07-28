@@ -116,7 +116,15 @@ export class VFXManager {
      * @param {number} y - 생성 위치 y
      * @param {number|string} damage - 표시할 데미지 숫자
      */
-    createDamageNumber(x, y, value, color = '#ff4d4d') {
+    /**
+     * 물리 효과가 적용된 데미지 숫자를 생성합니다.
+     * @param {number} x - 생성 위치 x
+     * @param {number} y - 생성 위치 y
+     * @param {number|string} value - 표시할 데미지 값
+     * @param {string} color - 기본 색상
+     * @param {string|null} label - 데미지 옆에 표시할 추가 라벨(예: '치명타')
+     */
+    createDamageNumber(x, y, value, color = '#ff4d4d', label = null) {
         const style = {
             fontFamily: '"Arial Black", Arial, sans-serif',
             fontSize: '32px',
@@ -153,6 +161,23 @@ export class VFXManager {
                 numberText.destroy();
             },
         });
+
+        // ✨ 라벨이 있으면 데미지 숫자 옆에 함께 표시합니다.
+        if (label) {
+            const labelStyle = { ...style, fontSize: '28px', color: '#ffc107' };
+            const labelText = this.scene.add.text(x - 40, y - 20, label, labelStyle).setOrigin(1, 0.5);
+            this.scene.physics.add.existing(labelText);
+            labelText.body.setVelocity(randomX, randomY);
+            labelText.body.setGravityY(400);
+            labelText.body.setAngularVelocity(Math.random() * 200 - 100);
+            this.scene.tweens.add({
+                targets: labelText,
+                alpha: 0,
+                duration: 800,
+                ease: 'Cubic.easeIn',
+                onComplete: () => labelText.destroy(),
+            });
+        }
 
         const logMessage = isHealing
             ? `${value} 회복 숫자를 생성했습니다.`
