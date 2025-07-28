@@ -281,6 +281,95 @@ export const buffSkills = {
                 ]
             }
         }
-    }
+    },
     // --- ▲ [신규] 전투의 함성 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 사냥꾼의 감각 스킬 추가 ▼ ---
+    huntSense: {
+        NORMAL: {
+            id: 'huntSense',
+            name: '사냥꾼의 감각',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 2,
+            targetType: 'self',
+            description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 4턴)',
+            illustrationPath: 'assets/images/skills/hunt-sense.png',
+            requiredClass: 'gunner',
+            cooldown: 4,
+            effect: {
+                id: 'huntSenseBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                modifiers: [
+                    { stat: 'rangedAttack', type: 'flat', value: 1 },
+                    { stat: 'criticalChance', type: 'percentage', value: 0.15 }
+                ]
+            }
+        },
+        RARE: {
+            id: 'huntSense',
+            name: '사냥꾼의 감각 [R]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 4턴)',
+            illustrationPath: 'assets/images/skills/hunt-sense.png',
+            requiredClass: 'gunner',
+            cooldown: 4,
+            effect: {
+                id: 'huntSenseBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                modifiers: [
+                    { stat: 'rangedAttack', type: 'flat', value: 1 },
+                    { stat: 'criticalChance', type: 'percentage', value: 0.15 }
+                ]
+            }
+        },
+        EPIC: {
+            id: 'huntSense',
+            name: '사냥꾼의 감각 [E]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/hunt-sense.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            effect: {
+                id: 'huntSenseBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                modifiers: [
+                    { stat: 'rangedAttack', type: 'flat', value: 1 },
+                    { stat: 'criticalChance', type: 'percentage', value: 0.15 }
+                ]
+            }
+        },
+        LEGENDARY: {
+            id: 'huntSense',
+            name: '사냥꾼의 감각 [L]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '4턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/hunt-sense.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            effect: {
+                id: 'huntSenseBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 4,
+                modifiers: [
+                    { stat: 'rangedAttack', type: 'flat', value: 1 },
+                    { stat: 'criticalChance', type: 'percentage', value: 0.15 }
+                ]
+            }
+        }
+    }
+    // --- ▲ [신규] 사냥꾼의 감각 스킬 추가 ▲ ---
 };
