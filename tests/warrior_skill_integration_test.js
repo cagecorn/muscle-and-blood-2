@@ -20,10 +20,64 @@ const chargeBase = {
 };
 
 const stoneSkinBase = {
-    NORMAL: { id: 'stoneSkin', type: 'BUFF', cost: 2, cooldown: 3, effect: { id: 'stoneSkin', type: 'BUFF', duration: 4, modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.15 } } },
-    RARE: { id: 'stoneSkin', type: 'BUFF', cost: 1, cooldown: 3, effect: { id: 'stoneSkin', type: 'BUFF', duration: 4, modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.15 } } },
-    EPIC: { id: 'stoneSkin', type: 'BUFF', cost: 1, cooldown: 3, effect: { id: 'stoneSkin', type: 'BUFF', duration: 4, modifiers: [ { stat: 'damageReduction', type: 'percentage', value: 0.15 }, { stat: 'physicalDefense', type: 'percentage', value: 0.10 } ] } },
-    LEGENDARY: { id: 'stoneSkin', type: 'BUFF', cost: 1, cooldown: 3, effect: { id: 'stoneSkin', type: 'BUFF', duration: 4, modifiers: [ { stat: 'damageReduction', type: 'percentage', value: 0.15 }, { stat: 'physicalDefense', type: 'percentage', value: 0.15 } ] } }
+    NORMAL: {
+        id: 'stoneSkin',
+        type: 'BUFF',
+        cost: 2,
+        cooldown: 3,
+        generatesResource: { type: 'EARTH', amount: 1 },
+        effect: {
+            id: 'stoneSkin',
+            type: 'BUFF',
+            duration: 4,
+            modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.15 }
+        }
+    },
+    RARE: {
+        id: 'stoneSkin',
+        type: 'BUFF',
+        cost: 1,
+        cooldown: 3,
+        generatesResource: { type: 'EARTH', amount: 1 },
+        effect: {
+            id: 'stoneSkin',
+            type: 'BUFF',
+            duration: 4,
+            modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.15 }
+        }
+    },
+    EPIC: {
+        id: 'stoneSkin',
+        type: 'BUFF',
+        cost: 1,
+        cooldown: 3,
+        generatesResource: { type: 'EARTH', amount: 1 },
+        effect: {
+            id: 'stoneSkin',
+            type: 'BUFF',
+            duration: 4,
+            modifiers: [
+                { stat: 'damageReduction', type: 'percentage', value: 0.15 },
+                { stat: 'physicalDefense', type: 'percentage', value: 0.10 }
+            ]
+        }
+    },
+    LEGENDARY: {
+        id: 'stoneSkin',
+        type: 'BUFF',
+        cost: 1,
+        cooldown: 3,
+        generatesResource: { type: 'EARTH', amount: 1 },
+        effect: {
+            id: 'stoneSkin',
+            type: 'BUFF',
+            duration: 4,
+            modifiers: [
+                { stat: 'damageReduction', type: 'percentage', value: 0.15 },
+                { stat: 'physicalDefense', type: 'percentage', value: 0.15 }
+            ]
+        }
+    }
 };
 
 const shieldBreakBase = {
