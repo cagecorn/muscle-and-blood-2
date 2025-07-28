@@ -17,6 +17,14 @@ export const statusEffects = {
             unit.isStunned = false;
         },
     },
+    // 전투의 함성: 일시적으로 근접 공격 등급을 상승시킵니다.
+    battleCryBuff: {
+        id: 'battleCryBuff',
+        name: '전투의 함성',
+        iconPath: 'assets/images/skills/battle_cry.png',
+        // 등급 보정치 예시: 근접 공격 등급 +1
+        modifiers: { stat: 'meleeAttack', type: 'flat', value: 1 }
+    },
     // ✨ 스톤 스킨 효과 추가
     stoneSkin: {
         id: 'stoneSkin',
