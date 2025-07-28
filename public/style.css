@@ -1341,3 +1341,35 @@ body {
     min-width: 20px; /* 숫자가 바뀔 때 레이아웃이 흔들리지 않도록 */
     text-align: left;
 }
+
+/* --- 스킬 관리 씬 필터 탭 스타일 --- */
+.skill-filter-tabs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 2px solid #555;
+}
+
+.skill-filter-tab {
+    background-color: #3a3837;
+    border: 1px solid #555;
+    color: #ccc;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.skill-filter-tab:hover {
+    background-color: #4a4847;
+    color: #fff;
+}
+
+.skill-filter-tab.active {
+    background-color: #f0e68c;
+    color: #333;
+    font-weight: bold;
+    border-color: #f0e68c;
+}
