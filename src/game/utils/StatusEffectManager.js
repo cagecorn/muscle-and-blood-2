@@ -153,7 +153,8 @@ class StatusEffectManager {
         this.activeEffects.get(targetUnit.uniqueId).push(newEffect);
 
         if (effectDefinition.onApply) {
-            effectDefinition.onApply(targetUnit);
+            // 스택 정보 등 추가 데이터를 전달하기 위해 newEffect 전체를 인자로 넘깁니다.
+            effectDefinition.onApply(targetUnit, newEffect);
         }
 
         // 상태 효과 이름 표시

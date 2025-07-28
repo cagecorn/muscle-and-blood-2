@@ -41,4 +41,29 @@ for (const grade of grades) {
     }
 }
 
+// --- ▼ [신규] 윌 가드 테스트 로직 추가 ▼ ---
+const willGuardBase = {
+    NORMAL: { id: 'willGuard', cost: 3, cooldown: 3, healMultiplier: 0.5, effect: { stack: { amount: 2 } } },
+    RARE: { id: 'willGuard', cost: 2, cooldown: 3, healMultiplier: 0.5, effect: { stack: { amount: 2 } } },
+    EPIC: { id: 'willGuard', cost: 2, cooldown: 2, healMultiplier: 0.5, effect: { stack: { amount: 3 } } },
+    LEGENDARY: { id: 'willGuard', cost: 2, cooldown: 2, healMultiplier: 0.5, effect: { stack: { amount: 3 } } }
+};
+
+const expectedWillGuardHeals = [0.8, 0.7, 0.6, 0.5];
+
+for (const grade of grades) {
+    for (let rank = 1; rank <= 4; rank++) {
+        const skill = skillModifierEngine.getModifiedSkill(willGuardBase[grade], rank, grade);
+
+        // 순위별 치유 계수 확인
+        assert.strictEqual(skill.healMultiplier, expectedWillGuardHeals[rank - 1], `Will Guard healMultiplier failed for ${grade} rank ${rank}`);
+
+        // 등급별 스탯 확인
+        assert.strictEqual(skill.cost, willGuardBase[grade].cost, `Will Guard cost failed for ${grade}`);
+        assert.strictEqual(skill.cooldown, willGuardBase[grade].cooldown, `Will Guard cooldown failed for ${grade}`);
+        assert.strictEqual(skill.effect.stack.amount, willGuardBase[grade].effect.stack.amount, `Will Guard stack amount failed for ${grade}`);
+    }
+}
+// --- ▲ [신규] 윌 가드 테스트 로직 추가 ▲ ---
+
 console.log('Medic skill integration test passed.');

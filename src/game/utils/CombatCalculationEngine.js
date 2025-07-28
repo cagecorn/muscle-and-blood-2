@@ -18,6 +18,9 @@ import { comboManager } from './ComboManager.js';
 import { debugComboManager } from '../debug/DebugComboManager.js';
 // ✨ [신규] 확정 데미지 매니저를 import합니다.
 import { fixedDamageManager } from './FixedDamageManager.js';
+// ✨ [신규] 스택 매니저와 확정 데미지 타입 상수를 가져옵니다.
+import { stackManager } from './StackManager.js';
+import { FIXED_DAMAGE_TYPES } from './FixedDamageManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -73,13 +76,26 @@ class CombatCalculationEngine {
         let hitType = null;
         let combatMultiplier = 1.0;
 
+        // ✨ [수정] 방어자의 확정 효과 스택을 확인합니다.
+        let defenderEffect = null;
+        if (stackManager.hasStack(defender.uniqueId, FIXED_DAMAGE_TYPES.BLOCK)) {
+            defenderEffect = FIXED_DAMAGE_TYPES.BLOCK;
+        } else if (stackManager.hasStack(defender.uniqueId, FIXED_DAMAGE_TYPES.MITIGATION)) {
+            defenderEffect = FIXED_DAMAGE_TYPES.MITIGATION;
+        }
+
         // 1. 확정 데미지 판정을 먼저 확인합니다.
-        const fixedResult = fixedDamageManager.calculateFixedDamage(finalSkill.fixedDamage, null); // TODO: 방어자 확정 효과 추가
+        const fixedResult = fixedDamageManager.calculateFixedDamage(finalSkill.fixedDamage, defenderEffect);
 
         if (fixedResult) {
             // 확정 판정이 있는 경우 해당 결과를 사용
             hitType = fixedResult.hitType;
             combatMultiplier = fixedResult.multiplier;
+
+            // ✨ 방어자가 확정 효과를 사용했다면 스택을 소모합니다.
+            if (defenderEffect) {
+                stackManager.consumeStack(defender.uniqueId, defenderEffect);
+            }
         } else {
             // 확정 판정이 없으면 기존 등급 시스템으로 계산
             const attackType = this.getAttackTypeFromSkill(finalSkill);

@@ -1,3 +1,6 @@
+import { stackManager } from "../utils/StackManager.js";
+import { FIXED_DAMAGE_TYPES } from "../utils/FixedDamageManager.js";
+
 /**
  * 모든 상태 효과의 정의를 담는 데이터베이스입니다.
  * StatusEffectManager는 이 데이터를 참조하여 효과를 적용하고 해제합니다.
@@ -63,5 +66,21 @@ export const statusEffects = {
             unit.isHealingProhibited = false;
             console.log(`${unit.instanceName}의 [치료 금지] 효과가 해제됩니다.`);
         },
-    }
+    },
+    // --- ▼ [신규] 윌 가드 효과 추가 ▼ ---
+    willGuard: {
+        id: 'willGuard',
+        name: '의지 방패',
+        description: '다음 공격을 확정적으로 [막기]로 판정합니다.',
+        iconPath: 'assets/images/skills/shield-buff.png',
+        onApply: (unit, effectData) => {
+            if (effectData && effectData.stack) {
+                stackManager.addStack(unit.uniqueId, FIXED_DAMAGE_TYPES.BLOCK, effectData.stack.amount);
+            }
+        },
+        onRemove: (unit) => {
+            // 스택은 자동 소모되므로 특별한 로직이 필요 없을 수 있습니다.
+        },
+    },
+    // --- ▲ [신규] 윌 가드 효과 추가 ▲ ---
 };

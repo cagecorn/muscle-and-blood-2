@@ -62,5 +62,90 @@ export const aidSkills = {
             healMultiplier: 1.0,
             removesDebuff: { chance: 1.0 }
         }
+    },
+    // --- ▼ [신규] 윌 가드 스킬 추가 ▼ ---
+    willGuard: {
+        NORMAL: {
+            id: 'willGuard',
+            name: '윌 가드',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.HEAL],
+            cost: 3,
+            targetType: 'ally',
+            description: '아군에게 {{heal}}의 치유를 하고, 다음 2회의 공격을 [확정 막기]로 만듭니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/shield-buff.png',
+            requiredClass: 'medic',
+            cooldown: 3,
+            range: 3,
+            healMultiplier: 0.5,
+            effect: {
+                id: 'willGuard',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'BLOCK', amount: 2 }
+            }
+        },
+        RARE: {
+            id: 'willGuard',
+            name: '윌 가드 [R]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.HEAL],
+            cost: 2,
+            targetType: 'ally',
+            description: '아군에게 {{heal}}의 치유를 하고, 다음 2회의 공격을 [확정 막기]로 만듭니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/shield-buff.png',
+            requiredClass: 'medic',
+            cooldown: 3,
+            range: 3,
+            healMultiplier: 0.5,
+            effect: {
+                id: 'willGuard',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'BLOCK', amount: 2 }
+            }
+        },
+        EPIC: {
+            id: 'willGuard',
+            name: '윌 가드 [E]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.HEAL],
+            cost: 2,
+            targetType: 'ally',
+            description: '아군에게 {{heal}}의 치유를 하고, 다음 3회의 공격을 [확정 막기]로 만듭니다. (쿨타임 2턴)',
+            illustrationPath: 'assets/images/skills/shield-buff.png',
+            requiredClass: 'medic',
+            cooldown: 2,
+            range: 4,
+            healMultiplier: 0.5,
+            effect: {
+                id: 'willGuard',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'BLOCK', amount: 3 }
+            }
+        },
+        LEGENDARY: {
+            id: 'willGuard',
+            name: '윌 가드 [L]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.HEAL],
+            cost: 2,
+            targetType: 'ally',
+            description: '아군에게 {{heal}}의 치유를 하고, 다음 3회의 공격을 [확정 막기]로 만듭니다. 보호막이 활성화된 동안 [지혜]가 10% 증가합니다. (쿨타임 2턴)',
+            illustrationPath: 'assets/images/skills/shield-buff.png',
+            requiredClass: 'medic',
+            cooldown: 2,
+            range: 4,
+            healMultiplier: 0.5,
+            effect: {
+                id: 'willGuard',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'BLOCK', amount: 3 },
+                modifiers: {
+                    stat: 'wisdom',
+                    type: 'percentage',
+                    value: 0.10
+                }
+            }
+        }
     }
+    // --- ▲ [신규] 윌 가드 스킬 추가 ▲ ---
 };
