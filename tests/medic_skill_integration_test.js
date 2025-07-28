@@ -23,4 +23,22 @@ for (const grade of grades) {
     }
 }
 
+// ---- Stigma skill tests ----
+const stigmaBase = {
+    NORMAL: { id: 'stigma', type: 'DEBUFF', cooldown: 5, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    RARE: { id: 'stigma', type: 'DEBUFF', cooldown: 4, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    EPIC: { id: 'stigma', type: 'DEBUFF', cooldown: 3, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } },
+    LEGENDARY: { id: 'stigma', type: 'DEBUFF', cooldown: 3, numberOfTargets: 2, effect: { id: 'stigma', type: 'DEBUFF', duration: 3 } }
+};
+
+const expectedCooldowns = { NORMAL: 5, RARE: 4, EPIC: 3, LEGENDARY: 3 };
+
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(stigmaBase[grade], 1, grade);
+    assert.strictEqual(skill.cooldown, expectedCooldowns[grade]);
+    if (grade === 'LEGENDARY') {
+        assert.strictEqual(skill.numberOfTargets, 2);
+    }
+}
+
 console.log('Medic skill integration test passed.');

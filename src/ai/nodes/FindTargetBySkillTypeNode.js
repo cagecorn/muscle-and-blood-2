@@ -27,6 +27,27 @@ class FindTargetBySkillTypeNode extends Node {
         }
 
         let target = null;
+        // 특별 타겟팅 로직: '낙인'은 가장 멀리 있으며 체력이 가장 낮은 적을 노립니다.
+        if (skillData.id === 'stigma') {
+            if (enemyUnits && enemyUnits.length > 0) {
+                let farthestEnemies = [];
+                let maxDist = -1;
+
+                enemyUnits.forEach(enemy => {
+                    const dist = Math.abs(unit.gridX - enemy.gridX) + Math.abs(unit.gridY - enemy.gridY);
+                    if (dist > maxDist) {
+                        maxDist = dist;
+                        farthestEnemies = [enemy];
+                    } else if (dist === maxDist) {
+                        farthestEnemies.push(enemy);
+                    }
+                });
+
+                if (farthestEnemies.length > 0) {
+                    target = farthestEnemies.sort((a, b) => a.currentHp - b.currentHp)[0];
+                }
+            }
+        } else {
         switch (skillData.type) {
             case 'ACTIVE':
                 if (!enemyUnits || enemyUnits.length === 0) {
@@ -73,7 +94,7 @@ class FindTargetBySkillTypeNode extends Node {
                 target = this.targetManager.findNearestEnemy(unit, enemyUnits);
                 break;
         }
-
+        }
         if (target) {
             blackboard.set('skillTarget', target);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skillData.name}]의 대상 (${target.instanceName}) 설정`);

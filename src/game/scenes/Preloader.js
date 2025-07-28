@@ -111,6 +111,7 @@ export class Preloader extends Scene
         // --- ✨ [추가] 스킬 슬롯 이미지를 로드합니다. ---
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
+        this.load.image('stigma', 'images/skills/stigma.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');

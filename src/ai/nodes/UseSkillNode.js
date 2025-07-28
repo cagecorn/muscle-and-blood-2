@@ -149,13 +149,17 @@ class UseSkillNode extends Node {
             spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
         }
 
-        // ✨ AID 타입 스킬 처리 - 회복 및 디버프 제거
+        // ✨ AID 타입 스킬 처리 - 회복 및 디버프 제거 (치료 금지 체크)
         if (modifiedSkill.type === 'AID') {
-            const healAmount = Math.round(unit.finalStats.wisdom * (modifiedSkill.healMultiplier || 0));
-            skillTarget.currentHp = Math.min(skillTarget.finalStats.hp, skillTarget.currentHp + healAmount);
-            this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, `+${healAmount}`, '#22c55e');
-            if (modifiedSkill.removesDebuff && Math.random() < modifiedSkill.removesDebuff.chance) {
-                statusEffectManager.removeOneDebuff(skillTarget);
+            if (skillTarget.isHealingProhibited) {
+                debugLogEngine.log('UseSkillNode', `${skillTarget.instanceName}은(는) 치료 금지 상태라 회복 불가!`);
+            } else {
+                const healAmount = Math.round(unit.finalStats.wisdom * (modifiedSkill.healMultiplier || 0));
+                skillTarget.currentHp = Math.min(skillTarget.finalStats.hp, skillTarget.currentHp + healAmount);
+                this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, `+${healAmount}`, '#22c55e');
+                if (modifiedSkill.removesDebuff && Math.random() < modifiedSkill.removesDebuff.chance) {
+                    statusEffectManager.removeOneDebuff(skillTarget);
+                }
             }
         }
 
@@ -165,12 +169,36 @@ class UseSkillNode extends Node {
         }
 
         if (modifiedSkill.effect) {
-            const roll = Math.random();
-            if (modifiedSkill.effect.chance === undefined || roll < modifiedSkill.effect.chance) {
-                statusEffectManager.addEffect(skillTarget, modifiedSkill);
-            } else {
-                debugLogEngine.log('UseSkillNode', `[${modifiedSkill.name}]의 효과 발동 실패 (확률: ${modifiedSkill.effect.chance}, 주사위: ${roll.toFixed(2)})`);
+            const targets = [skillTarget];
+            if (modifiedSkill.numberOfTargets && modifiedSkill.numberOfTargets > 1) {
+                const enemyUnits = blackboard.get('enemyUnits')?.filter(e => e.currentHp > 0 && e.uniqueId !== skillTarget.uniqueId) || [];
+                if (enemyUnits.length > 0) {
+                    let farthestEnemies = [];
+                    let maxDist = -1;
+                    enemyUnits.forEach(enemy => {
+                        const dist = Math.abs(unit.gridX - enemy.gridX) + Math.abs(unit.gridY - enemy.gridY);
+                        if (dist > maxDist) {
+                            maxDist = dist;
+                            farthestEnemies = [enemy];
+                        } else if (dist === maxDist) {
+                            farthestEnemies.push(enemy);
+                        }
+                    });
+                    if (farthestEnemies.length > 0) {
+                        const secondTarget = farthestEnemies.sort((a, b) => a.currentHp - b.currentHp)[0];
+                        if (secondTarget) targets.push(secondTarget);
+                    }
+                }
             }
+
+            targets.forEach(target => {
+                const roll = Math.random();
+                if (modifiedSkill.effect.chance === undefined || roll < modifiedSkill.effect.chance) {
+                    statusEffectManager.addEffect(target, modifiedSkill);
+                } else {
+                    debugLogEngine.log('UseSkillNode', `[${modifiedSkill.name}]의 효과 발동 실패 (확률: ${modifiedSkill.effect.chance}, 주사위: ${roll.toFixed(2)})`);
+                }
+            });
         }
 
         console.log(`[AI] ${unit.instanceName}이(가) ${skillTarget.instanceName}에게 스킬 [${modifiedSkill.name}] 사용!`);
