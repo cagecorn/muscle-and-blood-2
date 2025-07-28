@@ -2,9 +2,10 @@ import { statEngine } from '../utils/StatEngine.js';
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
-// ✨ 스킬 툴팁 매니저를 import하여 슬롯에 마우스 오버 기능을 제공합니다.
 import { SkillTooltipManager } from './SkillTooltipManager.js';
 import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
+// ✨ 등급 데이터를 가져오기 위해 classGrades를 import합니다.
+import { classGrades } from '../data/classGrades.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -12,6 +13,8 @@ import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 export class UnitDetailDOM {
     static create(unitData) {
         const finalStats = statEngine.calculateStats(unitData, unitData.baseStats, []);
+        // ✨ 해당 유닛의 등급 데이터를 가져옵니다.
+        const grades = classGrades[unitData.id] || {};
 
         const overlay = document.createElement('div');
         overlay.id = 'unit-detail-overlay';
@@ -23,7 +26,7 @@ export class UnitDetailDOM {
 
         const detailPane = document.createElement('div');
         detailPane.id = 'unit-detail-pane';
-        
+
         const instanceName = unitData.instanceName || unitData.name;
         let headerHTML = `
             <div class="detail-header">
@@ -34,14 +37,32 @@ export class UnitDetailDOM {
             <div id="unit-detail-close" onclick="this.closest('#unit-detail-overlay').remove()">X</div>
         `;
         detailPane.innerHTML = headerHTML;
-        
+
         const detailContent = document.createElement('div');
         detailContent.className = 'detail-content';
-        
+
         const leftSection = document.createElement('div');
         leftSection.className = 'detail-section left';
+
+        // ✨ --- 등급 표시 로직 추가 ---
+        const gradeDisplayHTML = `
+            <div class="unit-grades-container">
+                <div class="unit-grades left">
+                    <div class="grade-item" data-tooltip="근접 공격 등급: 이 유닛이 근접 공격 시 얼마나 우위를 갖는지 나타냅니다. 높을수록 강력합니다.">⚔️ ${grades.meleeAttack || 1}</div>
+                    <div class="grade-item" data-tooltip="원거리 공격 등급: 원거리 공격 시 유불리를 나타냅니다. 원거리 딜러에게 중요합니다.">🏹 ${grades.rangedAttack || 1}</div>
+                    <div class="grade-item" data-tooltip="마법 공격 등급: 마법 공격 시 효율을 나타냅니다. 마법사 클래스의 핵심 능력치입니다.">🔮 ${grades.magicAttack || 1}</div>
+                </div>
+                <div class="unit-portrait" style="background-image: url(${unitData.uiImage})"></div>
+                <div class="unit-grades right">
+                    <div class="grade-item" data-tooltip="근접 방어 등급: 근접 공격을 받았을 때 얼마나 잘 버티는지 나타냅니다. 탱커에게 필수적입니다.">🛡️ ${grades.meleeDefense || 1}</div>
+                    <div class="grade-item" data-tooltip="원거리 방어 등급: 화살이나 총탄 등 원거리 공격에 대한 저항력입니다.">🎯 ${grades.rangedDefense || 1}</div>
+                    <div class="grade-item" data-tooltip="마법 방어 등급: 마법 공격에 대한 저항력입니다. 적 마법사를 상대할 때 중요합니다.">✨ ${grades.magicDefense || 1}</div>
+                </div>
+            </div>
+        `;
+
         leftSection.innerHTML = `
-            <div class="unit-portrait" style="background-image: url(${unitData.uiImage})"></div>
+            ${gradeDisplayHTML}
             <div class="stats-grid">
                 <div class="section-title">스탯</div>
                 <div class="stat-item"><span>HP</span><span>${finalStats.hp}</span></div>
@@ -52,14 +73,6 @@ export class UnitDetailDOM {
                 <div class="stat-item"><span>지능</span><span>${finalStats.intelligence}</span></div>
                 <div class="stat-item"><span>지혜</span><span>${finalStats.wisdom}</span></div>
                 <div class="stat-item"><span>행운</span><span>${finalStats.luck}</span></div>
-            </div>
-            <div class="traits-section">
-                <div class="section-title">특성 (미구현)</div>
-                <div class="placeholder-box"></div>
-            </div>
-            <div class="synergy-section">
-                <div class="section-title">시너지 (미구현)</div>
-                <div class="placeholder-box"></div>
             </div>
         `;
 
