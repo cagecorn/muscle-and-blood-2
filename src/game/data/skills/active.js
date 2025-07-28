@@ -251,6 +251,80 @@ export const activeSkills = {
             generatesToken: { chance: 1.0, amount: 1 }
         }
     },
+    // --- ▼ [신규] 제압 사격 스킬 추가 ▼ ---
+    suppressShot: {
+        NORMAL: {
+            id: 'suppressShot',
+            name: '제압 사격',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '적을 80% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
+            illustrationPath: 'assets/images/skills/suppress-shot.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            range: 3,
+            damageMultiplier: 0.8,
+            resourceCost: { type: 'IRON', amount: 2 },
+            turnOrderEffect: 'pushToBack'
+        },
+        RARE: {
+            id: 'suppressShot',
+            name: '제압 사격 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '적을 100% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
+            illustrationPath: 'assets/images/skills/suppress-shot.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            range: 3,
+            damageMultiplier: 1.0,
+            resourceCost: { type: 'IRON', amount: 2 },
+            turnOrderEffect: 'pushToBack'
+        },
+        EPIC: {
+            id: 'suppressShot',
+            name: '제압 사격 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '적을 120% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
+            illustrationPath: 'assets/images/skills/suppress-shot.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            range: 3,
+            damageMultiplier: 1.2,
+            resourceCost: { type: 'IRON', amount: 2 },
+            turnOrderEffect: 'pushToBack'
+        },
+        LEGENDARY: {
+            id: 'suppressShot',
+            name: '제압 사격 [L]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '적을 120% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어내고 1턴간 토큰 하나를 잃게 합니다. (소모 자원: 철 2)',
+            illustrationPath: 'assets/images/skills/suppress-shot.png',
+            requiredClass: 'gunner',
+            cooldown: 3,
+            range: 3,
+            damageMultiplier: 1.2,
+            resourceCost: { type: 'IRON', amount: 2 },
+            turnOrderEffect: 'pushToBack',
+            effect: {
+                id: 'tokenLoss',
+                duration: 1,
+                applyOnce: true,
+                tokenLoss: 1
+            }
+        }
+    },
+    // --- ▲ [신규] 제압 사격 스킬 추가 ▲ ---
     throwingAxe: {
         NORMAL: {
             id: 'throwingAxe',

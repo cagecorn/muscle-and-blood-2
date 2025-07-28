@@ -70,6 +70,7 @@ export class BattleSimulatorEngine {
             cameraControl: this.scene.cameraControl,
             // ✨ AI가 소환 엔진을 사용할 수 있도록 패키지에 포함합니다.
             summoningEngine: this.summoningEngine,
+            battleSimulator: this,
         };
 
         this.turnQueue = [];

@@ -23,6 +23,22 @@ class TurnOrderManager {
 
         return turnQueue;
     }
+
+    /**
+     * 특정 유닛을 턴 큐의 가장 마지막으로 이동시킵니다.
+     * @param {Array<object>} turnQueue - 현재 턴 큐
+     * @param {object} targetUnit - 순서를 변경할 대상 유닛
+     * @returns {Array<object>} - 변경된 턴 큐
+     */
+    pushToBack(turnQueue, targetUnit) {
+        const index = turnQueue.findIndex(u => u.uniqueId === targetUnit.uniqueId);
+        if (index > -1) {
+            const [unit] = turnQueue.splice(index, 1);
+            turnQueue.push(unit);
+            debugLogEngine.log('TurnOrderManager', `'${targetUnit.instanceName}'의 턴 순서가 마지막으로 변경되었습니다.`);
+        }
+        return turnQueue;
+    }
 }
 
 export const turnOrderManager = new TurnOrderManager();

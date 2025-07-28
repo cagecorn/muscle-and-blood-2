@@ -93,6 +93,20 @@ class StatusEffectManager {
     }
 
     /**
+     * 대상 유닛의 토큰을 즉시 감소시키는 효과를 적용합니다.
+     * @param {object} targetUnit
+     * @param {object} effectData
+     */
+    applyTokenLoss(targetUnit, effectData) {
+        if (effectData.tokenLoss > 0) {
+            tokenEngine.spendTokens(targetUnit.uniqueId, effectData.tokenLoss, '제압 사격 효과');
+            if (this.battleSimulator && this.battleSimulator.vfxManager) {
+                this.battleSimulator.vfxManager.showEffectName(targetUnit.sprite, '토큰 감소!', '#ef4444');
+            }
+        }
+    }
+
+    /**
      * 대상 유닛에게 새로운 상태 효과를 적용합니다.
      * @param {object} targetUnit - 효과를 받을 유닛
      * @param {object} sourceSkill - 효과를 발생시킨 스킬 데이터
@@ -115,6 +129,12 @@ class StatusEffectManager {
     applySingleEffect(targetUnit, sourceSkill) {
         const effectId = sourceSkill.effect.id;
         const effectDefinition = statusEffects[effectId];
+
+        // 즉시 발동하는 토큰 감소 효과 처리
+        if (sourceSkill.effect.applyOnce && sourceSkill.effect.tokenLoss) {
+            this.applyTokenLoss(targetUnit, sourceSkill.effect);
+            return;
+        }
 
         if (!effectDefinition) {
             debugLogEngine.warn('StatusEffectManager', `정의되지 않은 효과 ID: ${effectId}`);
