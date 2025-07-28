@@ -16,6 +16,8 @@ import { SKILL_TAGS } from './SkillTagManager.js';
 import { comboManager } from './ComboManager.js';
 // 콤보 계산 과정을 상세히 기록하기 위한 디버그 매니저
 import { debugComboManager } from '../debug/DebugComboManager.js';
+// ✨ [신규] 확정 데미지 매니저를 import합니다.
+import { fixedDamageManager } from './FixedDamageManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -46,12 +48,6 @@ class CombatCalculationEngine {
         }
         const amplifiedAttack = baseAttack * amp;
 
-        // ✨ 방어자의 방어력 감소/증가 효과 적용
-        const defenseReductionPercent = statusEffectManager.getModifierValue(defender, 'physicalDefense');
-        const initialDefense = defender.finalStats?.physicalDefense || 0;
-        // 방어력 보정치 적용 (예: -0.1이면 10% 감소)
-        const finalDefense = initialDefense * (1 + defenseReductionPercent);
-
         let finalSkill = skill;
         if (instanceId) {
             const equippedSkills = ownedSkillsManager.getEquippedSkills(attacker.uniqueId);
@@ -61,59 +57,71 @@ class CombatCalculationEngine {
             }
         }
 
+        // ✨ [신규] 방어력 관통 효과 적용
+        const armorPen = finalSkill.armorPenetration || 0;
+        const defenseReductionPercent = statusEffectManager.getModifierValue(defender, 'physicalDefense');
+        const initialDefense = defender.finalStats?.physicalDefense || 0;
+        const finalDefense = initialDefense * (1 + defenseReductionPercent) * (1 - armorPen);
+
         const damageMultiplier = finalSkill.damageMultiplier || 1.0;
         // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
         const skillDamage = amplifiedAttack * damageMultiplier;
 
         const initialDamage = Math.max(1, skillDamage - finalDefense);
 
-        // --- ✨ 등급 시스템 계산 로직 추가 ---
+        // --- ✨ 전투 판정 로직 수정 ---
         let hitType = null;
         let combatMultiplier = 1.0;
 
-        // 1. 스킬 태그를 기반으로 공격 타입을 결정합니다.
-        const attackType = this.getAttackTypeFromSkill(finalSkill);
+        // 1. 확정 데미지 판정을 먼저 확인합니다.
+        const fixedResult = fixedDamageManager.calculateFixedDamage(finalSkill.fixedDamage, null); // TODO: 방어자 확정 효과 추가
 
-        if (attackType) {
-            // 2. 등급 매니저를 통해 최종 등급 티어를 계산합니다.
-            const resultTier = gradeManager.calculateCombatGrade(attacker, defender, attackType);
+        if (fixedResult) {
+            // 확정 판정이 있는 경우 해당 결과를 사용
+            hitType = fixedResult.hitType;
+            combatMultiplier = fixedResult.multiplier;
+        } else {
+            // 확정 판정이 없으면 기존 등급 시스템으로 계산
+            const attackType = this.getAttackTypeFromSkill(finalSkill);
+            if (attackType) {
+                const resultTier = gradeManager.calculateCombatGrade(attacker, defender, attackType);
 
-            // 3. 등급 티어에 따라 확률적 효과를 결정합니다.
-            const roll = Math.random();
-            let chance = 0.05; // 기본 확률 5%
+                const roll = Math.random();
+                let chance = 0.05;
 
-            switch (resultTier) {
-                case 2: // 치명타
-                    chance += (attacker.finalStats.criticalChance || 0) / 100;
-                    if (roll < chance) {
-                        hitType = '치명타';
-                        combatMultiplier = 2.0;
-                    }
-                    break;
-                case 1: // 약점
-                    chance += (attacker.finalStats.weaknessChance || 0) / 100;
-                    if (roll < chance) {
-                        hitType = '약점';
-                        combatMultiplier = 1.5;
-                    }
-                    break;
-                case -1: // 완화
-                    chance += (defender.finalStats.mitigationChance || 0) / 100;
-                    if (roll < chance) {
-                        hitType = '완화';
-                        combatMultiplier = 0.75;
-                    }
-                    break;
-                case -2: // 막기
-                    chance += (defender.finalStats.blockChance || 0) / 100;
-                    if (roll < chance) {
-                        hitType = '막기';
-                        combatMultiplier = 0.5;
-                    }
-                    break;
+                switch (resultTier) {
+                    case 2:
+                        chance += (attacker.finalStats.criticalChance || 0) / 100;
+                        if (roll < chance) {
+                            hitType = '치명타';
+                            combatMultiplier = 2.0;
+                        }
+                        break;
+                    case 1:
+                        chance += (attacker.finalStats.weaknessChance || 0) / 100;
+                        if (roll < chance) {
+                            hitType = '약점';
+                            combatMultiplier = 1.5;
+                        }
+                        break;
+                    case -1:
+                        chance += (defender.finalStats.mitigationChance || 0) / 100;
+                        if (roll < chance) {
+                            hitType = '완화';
+                            combatMultiplier = 0.75;
+                        }
+                        break;
+                    case -2:
+                        chance += (defender.finalStats.blockChance || 0) / 100;
+                        if (roll < chance) {
+                            hitType = '막기';
+                            combatMultiplier = 0.5;
+                        }
+                        break;
+                }
             }
         }
-        // --- ✨ 등급 시스템 계산 로직 종료 ---
+        // --- ✨ 전투 판정 로직 종료 ---
 
         const damageAfterGrade = initialDamage * combatMultiplier;
 

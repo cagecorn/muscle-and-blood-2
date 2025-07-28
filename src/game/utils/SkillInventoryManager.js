@@ -42,6 +42,8 @@ class SkillInventoryManager {
                 this.addSkillById('battleCry', grade);
                 // ✨ [신규] 사냥꾼의 감각 카드 지급
                 this.addSkillById('huntSense', grade);
+                // ✨ [신규] 크리티컬 샷 카드 지급
+                this.addSkillById('criticalShot', grade);
             }
         });
 
