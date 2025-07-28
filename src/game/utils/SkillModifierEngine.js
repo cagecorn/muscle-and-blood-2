@@ -159,6 +159,11 @@ class SkillModifierEngine {
                 const bonusValue = (this.rankModifiers.grindstone[rankIndex] || 0) * 100;
                 modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
             }
+            // ✨ [신규] '전투의 함성' 스킬 설명의 {{attackBonus}}% 부분을 실제 값으로 치환합니다.
+            if (baseSkillData.id === 'battleCry') {
+                const bonusValue = (this.rankModifiers.battleCry[rankIndex] || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
+            }
             // ✨ [신규] 사냥꾼의 감각 치명타 확률 치환
             if (baseSkillData.id === 'huntSense') {
                 const critValue = (this.rankModifiers.huntSense[rankIndex] || 0) * 100;
