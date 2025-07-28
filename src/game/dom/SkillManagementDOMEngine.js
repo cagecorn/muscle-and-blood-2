@@ -18,6 +18,8 @@ export class SkillManagementDOMEngine {
 
         this.selectedMercenaryData = null;
         this.draggedData = null;
+        // 현재 필터 상태 (기본값: 전체)
+        this.currentFilter = { type: 'all', value: null };
 
         this.createView();
     }
@@ -40,6 +42,10 @@ export class SkillManagementDOMEngine {
 
         const inventoryPanel = this.createPanel('skill-inventory-panel', '스킬 카드 인벤토리');
         mainLayout.appendChild(inventoryPanel);
+
+        // 필터 탭 영역을 생성합니다.
+        this.createFilterTabs(inventoryPanel);
+
         this.skillInventoryContent = inventoryPanel.querySelector('.panel-content');
 
         this.skillInventoryContent.ondragover = e => e.preventDefault();
@@ -53,6 +59,41 @@ export class SkillManagementDOMEngine {
         backButton.innerText = '← 영지로';
         backButton.onclick = () => this.scene.scene.start('TerritoryScene');
         this.container.appendChild(backButton);
+    }
+
+    // 인벤토리 필터 탭 생성
+    createFilterTabs(parentPanel) {
+        const filterContainer = document.createElement('div');
+        filterContainer.className = 'skill-filter-tabs-container';
+
+        const createTab = (text, type, value) => {
+            const tab = document.createElement('button');
+            tab.innerText = text;
+            tab.className = 'skill-filter-tab';
+            tab.onclick = () => {
+                this.currentFilter = { type, value };
+                this.refreshSkillInventory();
+
+                filterContainer.querySelectorAll('.skill-filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            };
+            return tab;
+        };
+
+        const allTab = createTab('전체', 'all', null);
+        allTab.classList.add('active');
+        filterContainer.appendChild(allTab);
+
+        filterContainer.appendChild(createTab('전사', 'class', 'warrior'));
+        filterContainer.appendChild(createTab('거너', 'class', 'gunner'));
+        filterContainer.appendChild(createTab('메딕', 'class', 'medic'));
+
+        filterContainer.appendChild(createTab('노멀', 'grade', 'NORMAL'));
+        filterContainer.appendChild(createTab('레어', 'grade', 'RARE'));
+        filterContainer.appendChild(createTab('에픽', 'grade', 'EPIC'));
+        filterContainer.appendChild(createTab('레전더리', 'grade', 'LEGENDARY'));
+
+        parentPanel.insertBefore(filterContainer, parentPanel.querySelector('.panel-content'));
     }
 
     createPanel(id, title) {
@@ -196,7 +237,19 @@ export class SkillManagementDOMEngine {
         this.skillInventoryContent.innerHTML = '';
         const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
 
-        skillInventoryManager.getInventory().forEach(instance => {
+        let inventory = skillInventoryManager.getInventory();
+
+        // 현재 선택된 필터에 따라 인벤토리를 필터링합니다.
+        if (this.currentFilter.type === 'class') {
+            inventory = inventory.filter(instance => {
+                const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
+                return !data.requiredClass || data.requiredClass === this.currentFilter.value;
+            });
+        } else if (this.currentFilter.type === 'grade') {
+            inventory = inventory.filter(instance => instance.grade === this.currentFilter.value);
+        }
+
+        inventory.forEach(instance => {
             const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
             const card = document.createElement('div');
             card.className = `skill-inventory-card ${data.type.toLowerCase()}-card grade-${instance.grade.toLowerCase()}`;
@@ -207,7 +260,6 @@ export class SkillManagementDOMEngine {
             card.onmouseenter = e => SkillTooltipManager.show(data, e, instance.grade);
             card.onmouseleave = () => SkillTooltipManager.hide();
 
-            // 별 생성 컨테이너
             const starsContainer = document.createElement('div');
             starsContainer.className = 'grade-stars';
             const starCount = gradeMap[instance.grade] || 1;
@@ -217,8 +269,6 @@ export class SkillManagementDOMEngine {
                 starsContainer.appendChild(starImg);
             }
             card.appendChild(starsContainer);
-
-            // 인벤토리 카드에서는 클래스 태그를 표시하지 않습니다.
             this.skillInventoryContent.appendChild(card);
         });
     }
