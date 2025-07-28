@@ -194,4 +194,93 @@ export const buffSkills = {
             }
         }
     },
+
+    // --- ▼ [신규] 전투의 함성 스킬 추가 ▼ ---
+    battleCry: {
+        NORMAL: {
+            id: 'battleCry',
+            name: '전투의 함성',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 2,
+            targetType: 'self',
+            description: '2턴간 자신의 [공격력]을 상승시키고, [근접 공격 등급]을 +1 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/battle_cry.png',
+            requiredClass: 'warrior',
+            cooldown: 3,
+            effect: {
+                id: 'battleCryBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: [
+                    { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                    { stat: 'meleeAttack', type: 'flat', value: 1 }
+                ]
+            }
+        },
+        RARE: {
+            id: 'battleCry',
+            name: '전투의 함성 [R]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '2턴간 자신의 [공격력]을 상승시키고, [근접 공격 등급]을 +1 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/battle_cry.png',
+            requiredClass: 'warrior',
+            cooldown: 3,
+            effect: {
+                id: 'battleCryBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: [
+                    { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                    { stat: 'meleeAttack', type: 'flat', value: 1 }
+                ]
+            }
+        },
+        EPIC: {
+            id: 'battleCry',
+            name: '전투의 함성 [E]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '3턴간 자신의 [공격력]을 상승시키고, [근접 공격 등급]을 +1 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/battle_cry.png',
+            requiredClass: 'warrior',
+            cooldown: 3,
+            effect: {
+                id: 'battleCryBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                modifiers: [
+                    { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                    { stat: 'meleeAttack', type: 'flat', value: 1 }
+                ]
+            }
+        },
+        LEGENDARY: {
+            id: 'battleCry',
+            name: '전투의 함성 [L]',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.WILL],
+            cost: 1,
+            targetType: 'self',
+            description: '3턴간 자신의 [공격력]을 상승시키고, [근접 공격 등급]을 +1 상승시킵니다. (쿨타임 3턴)',
+            illustrationPath: 'assets/images/skills/battle_cry.png',
+            requiredClass: 'warrior',
+            cooldown: 3,
+            effect: {
+                id: 'battleCryBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                modifiers: [
+                    { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                    { stat: 'meleeAttack', type: 'flat', value: 1 }
+                ]
+            }
+        }
+    }
+    // --- ▲ [신규] 전투의 함성 스킬 추가 ▲ ---
 };

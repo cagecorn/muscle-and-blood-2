@@ -125,6 +125,55 @@ const ironWillBase = {
     LEGENDARY: { maxReduction: 0.30, hpRegen: 0.06 }
 };
 
+// --- ▼ [신규] 전투의 함성 테스트 데이터 추가 ▼ ---
+const battleCryBase = {
+    NORMAL: {
+        id: 'battleCry',
+        cost: 2,
+        effect: {
+            duration: 2,
+            modifiers: [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                { stat: 'meleeAttack', type: 'flat', value: 1 }
+            ]
+        }
+    },
+    RARE: {
+        id: 'battleCry',
+        cost: 1,
+        effect: {
+            duration: 2,
+            modifiers: [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                { stat: 'meleeAttack', type: 'flat', value: 1 }
+            ]
+        }
+    },
+    EPIC: {
+        id: 'battleCry',
+        cost: 1,
+        effect: {
+            duration: 3,
+            modifiers: [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                { stat: 'meleeAttack', type: 'flat', value: 1 }
+            ]
+        }
+    },
+    LEGENDARY: {
+        id: 'battleCry',
+        cost: 1,
+        effect: {
+            duration: 3,
+            modifiers: [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.15 },
+                { stat: 'meleeAttack', type: 'flat', value: 1 }
+            ]
+        }
+    }
+};
+// --- ▲ [신규] 전투의 함성 테스트 데이터 추가 ▲ ---
+
 // ------- Grade/Rank Tests -------
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
@@ -226,6 +275,24 @@ for (const grade of grades) {
         assert(Math.abs(value - grindstoneExpected[rank - 1]) < 1e-6);
     }
 }
+
+// --- ▼ [신규] 전투의 함성 테스트 로직 추가 ▼ ---
+const battleCryExpectedDamage = [0.30, 0.25, 0.20, 0.15];
+for (const grade of grades) {
+    for (let rank = 1; rank <= 4; rank++) {
+        const skill = skillModifierEngine.getModifiedSkill(battleCryBase[grade], rank, grade);
+        const mods = skill.effect.modifiers;
+        const attackMod = Array.isArray(mods) ? mods.find(m => m.stat === 'physicalAttack') : mods;
+
+        assert.strictEqual(skill.cost, battleCryBase[grade].cost, `Battle Cry cost failed for grade ${grade}`);
+        assert.strictEqual(skill.effect.duration, battleCryBase[grade].effect.duration, `Battle Cry duration failed for grade ${grade}`);
+        assert(Math.abs(attackMod.value - battleCryExpectedDamage[rank - 1]) < 1e-6, `Battle Cry modifier value failed for grade ${grade} rank ${rank}`);
+
+        const meleeMod = Array.isArray(mods) ? mods.find(m => m.stat === 'meleeAttack') : null;
+        assert(meleeMod && meleeMod.value === 1, `meleeAttack modifier missing or incorrect for grade ${grade}`);
+    }
+}
+// --- ▲ [신규] 전투의 함성 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
 const throwingAxeExpected = [1.2, 1.2, 1.2, 1.2];

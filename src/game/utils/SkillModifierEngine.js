@@ -21,7 +21,9 @@ class SkillModifierEngine {
             'rangedAttack': [1.3, 1.2, 1.1, 1.0],
             // ✨ [신규] 힐 순위별 회복 계수 추가
             'heal': [1.3, 1.2, 1.1, 1.0],
-            'grindstone': [0.25, 0.20, 0.15, 0.10]
+            'grindstone': [0.25, 0.20, 0.15, 0.10],
+            // ✨ [신규] 전투의 함성 공격력 증가 계수
+            'battleCry': [0.30, 0.25, 0.20, 0.15]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
@@ -85,6 +87,19 @@ class SkillModifierEngine {
             const bonusModifiers = this.rankModifiers['grindstone'];
             if (bonusModifiers && bonusModifiers[rankIndex] !== undefined) {
                 modifiedSkill.effect.modifiers.value = bonusModifiers[rankIndex];
+            }
+        }
+
+        // ✨ '전투의 함성' 스킬의 공격력 증가 보정
+        if (baseSkillData.id === 'battleCry' && modifiedSkill.effect) {
+            const attackModifiers = this.rankModifiers['battleCry'];
+            if (attackModifiers && attackModifiers[rankIndex] !== undefined) {
+                if (Array.isArray(modifiedSkill.effect.modifiers)) {
+                    const attackMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'physicalAttack');
+                    if (attackMod) attackMod.value = attackModifiers[rankIndex];
+                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'physicalAttack') {
+                    modifiedSkill.effect.modifiers.value = attackModifiers[rankIndex];
+                }
             }
         }
 
