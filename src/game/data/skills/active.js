@@ -257,7 +257,8 @@ export const activeSkills = {
             id: 'suppressShot',
             name: '제압 사격',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '적을 80% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
@@ -273,7 +274,8 @@ export const activeSkills = {
             id: 'suppressShot',
             name: '제압 사격 [R]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '적을 100% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
@@ -289,7 +291,8 @@ export const activeSkills = {
             id: 'suppressShot',
             name: '제압 사격 [E]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '적을 120% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어냅니다. (소모 자원: 철 2)',
@@ -305,7 +308,8 @@ export const activeSkills = {
             id: 'suppressShot',
             name: '제압 사격 [L]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.DELAY, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '적을 120% 데미지로 제압 사격하여, 턴 순서를 가장 마지막으로 밀어내고 1턴간 토큰 하나를 잃게 합니다. (소모 자원: 철 2)',
@@ -330,7 +334,8 @@ export const activeSkills = {
             id: 'throwingAxe',
             name: '도끼 던지기',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '3타일 거리의 적에게 도끼를 던져 120%의 피해를 입힙니다. (소모 자원: 철 1)',
@@ -345,7 +350,8 @@ export const activeSkills = {
             id: 'throwingAxe',
             name: '도끼 던지기 [R]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '3타일 거리의 적에게 도끼를 던져 120%의 피해를 입힙니다. (쿨타임 없음, 소모 자원: 철 1)',
@@ -360,7 +366,8 @@ export const activeSkills = {
             id: 'throwingAxe',
             name: '도끼 던지기 [E]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '3타일 거리의 적에게 도끼를 던져 120%의 피해를 입히고, 20% 확률로 기절시킵니다. (소모 자원: 철 1)',
@@ -381,7 +388,8 @@ export const activeSkills = {
             id: 'throwingAxe',
             name: '도끼 던지기 [L]',
             type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
+            // ✨ [마부] 물리 태그 추가
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.SPECIAL],
             cost: 0,
             targetType: 'enemy',
             description: '3타일 거리의 적에게 도끼를 던져 120%의 피해를 입히고, 40% 확률로 기절시킵니다. (소모 자원: 철 1)',
