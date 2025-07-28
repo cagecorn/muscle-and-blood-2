@@ -146,6 +146,88 @@ export const aidSkills = {
                 }
             }
         }
-    }
+    },
     // --- ▲ [신규] 윌 가드 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 마이티 쉴드 스킬 추가 ▼ ---
+    mightyShield: {
+        NORMAL: {
+            id: 'mightyShield',
+            name: '마이티 쉴드',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'ally',
+            description: '아군에게 2회의 공격을 완벽하게 막아내는 빛의 방패를 부여합니다. (쿨타임 10턴, 소모 자원: 빛 5)',
+            illustrationPath: 'assets/images/skills/mighty-shield.png',
+            requiredClass: 'medic',
+            cooldown: 10,
+            range: 3,
+            resourceCost: { type: 'LIGHT', amount: 5 },
+            effect: {
+                id: 'mightyShield',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'DAMAGE_IMMUNITY', amount: 2 }
+            }
+        },
+        RARE: {
+            id: 'mightyShield',
+            name: '마이티 쉴드 [R]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'ally',
+            description: '아군에게 3회의 공격을 완벽하게 막아내는 빛의 방패를 부여합니다. (쿨타임 9턴, 소모 자원: 빛 5)',
+            illustrationPath: 'assets/images/skills/mighty-shield.png',
+            requiredClass: 'medic',
+            cooldown: 9,
+            range: 3,
+            resourceCost: { type: 'LIGHT', amount: 5 },
+            effect: {
+                id: 'mightyShield',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'DAMAGE_IMMUNITY', amount: 3 }
+            }
+        },
+        EPIC: {
+            id: 'mightyShield',
+            name: '마이티 쉴드 [E]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'ally',
+            description: '아군에게 4회의 공격을 완벽하게 막아내는 빛의 방패를 부여합니다. (쿨타임 8턴, 소모 자원: 빛 4)',
+            illustrationPath: 'assets/images/skills/mighty-shield.png',
+            requiredClass: 'medic',
+            cooldown: 8,
+            range: 4,
+            resourceCost: { type: 'LIGHT', amount: 4 },
+            effect: {
+                id: 'mightyShield',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'DAMAGE_IMMUNITY', amount: 4 }
+            }
+        },
+        LEGENDARY: {
+            id: 'mightyShield',
+            name: '마이티 쉴드 [L]',
+            type: 'AID',
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.FIXED, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'ally',
+            description: '아군에게 5회의 공격을 완벽하게 막아내는 빛의 방패를 부여하고, 대상의 해로운 효과를 1개 제거합니다. (쿨타임 7턴, 소모 자원: 빛 4)',
+            illustrationPath: 'assets/images/skills/mighty-shield.png',
+            requiredClass: 'medic',
+            cooldown: 7,
+            range: 4,
+            resourceCost: { type: 'LIGHT', amount: 4 },
+            removesDebuff: { chance: 1.0 },
+            effect: {
+                id: 'mightyShield',
+                type: EFFECT_TYPES.BUFF,
+                stack: { type: 'DAMAGE_IMMUNITY', amount: 5 }
+            }
+        }
+    }
+    // --- ▲ [신규] 마이티 쉴드 스킬 추가 ▲ ---
 };
