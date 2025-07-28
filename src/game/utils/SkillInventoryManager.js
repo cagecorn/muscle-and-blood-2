@@ -38,6 +38,8 @@ class SkillInventoryManager {
                 this.addSkillById('suppressShot', grade);
                 // ✨ 낙인 카드 추가
                 this.addSkillById('stigma', grade);
+                // ✨ [신규] 전투의 함성 카드 지급
+                this.addSkillById('battleCry', grade);
             }
         });
 
