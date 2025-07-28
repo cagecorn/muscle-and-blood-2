@@ -79,25 +79,30 @@ class AIManager {
 
         console.group(`[AIManager] --- ${data.instance.instanceName} (ID: ${unit.uniqueId}) 턴 시작 ---`);
 
-        // 반복적으로 행동 트리를 실행하여 남은 토큰이 허용하는 한 여러 번 행동합니다.
-        while (tokenEngine.getTokens(unit.uniqueId) > 0) {
+        // 남은 토큰이 없더라도 0코스트 스킬 사용을 시도할 수 있도록
+        // 일정 횟수만큼 행동 트리를 반복 실행합니다.
+        const maxActionsPerTurn = 10;
+        for (let i = 0; i < maxActionsPerTurn; i++) {
             const blackboard = data.behaviorTree.blackboard;
             const prevTokens = tokenEngine.getTokens(unit.uniqueId);
-            const prevSkillsUsedSize = blackboard.get('usedSkillsThisTurn').size;
+            // usedSkillsThisTurn이 없을 수도 있으므로 기본값을 사용합니다.
+            const prevSkillsUsedSize = (blackboard.get('usedSkillsThisTurn') || new Set()).size;
             const wasMoved = blackboard.get('hasMovedThisTurn');
 
             await data.behaviorTree.execute(unit, allUnits, enemyUnits);
 
             const currentTokens = tokenEngine.getTokens(unit.uniqueId);
-            const currentSkillsUsedSize = blackboard.get('usedSkillsThisTurn').size;
+            const currentSkillsUsedSize = (blackboard.get('usedSkillsThisTurn') || new Set()).size;
             const hasMoved = blackboard.get('hasMovedThisTurn');
 
             const tokenSpent = currentTokens < prevTokens;
             const skillUsed = currentSkillsUsedSize > prevSkillsUsedSize;
             const movedThisLoop = !wasMoved && hasMoved;
 
-            // 토큰 소모, 스킬 사용, 이동 중 아무것도 하지 않았다면 루프를 중단합니다.
+            // 토큰 소모, 스킬 사용, 이동 중 아무것도 하지 않았다면
+            // 더 이상 할 행동이 없는 것으로 간주하고 종료합니다.
             if (!tokenSpent && !skillUsed && !movedThisLoop) {
+                debugLogEngine.log('AIManager', `[${unit.instanceName}] 행동 종료: 변화 없음.`);
                 break;
             }
         }
