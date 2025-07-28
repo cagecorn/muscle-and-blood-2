@@ -25,6 +25,8 @@ export const SKILL_TAGS = {
     WEAKEN: '쇠약',
     HEAL: '치유',
     DELAY: '지연',
+    // 특정 행동이나 상호작용을 금지하는 스킬에 사용
+    PROHIBITION: '금지',
 
     // 원소/개념 속성
     EARTH: '대지',

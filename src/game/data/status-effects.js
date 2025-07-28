@@ -40,5 +40,20 @@ export const statusEffects = {
         id: 'chargeOrderBuff',
         name: '돌격 명령',
         iconPath: 'assets/images/skills/charge-order.png',
+    },
+    // 치료 불가 디버프
+    stigma: {
+        id: 'stigma',
+        name: '낙인',
+        description: '지원(AID) 스킬의 효과를 받을 수 없습니다.',
+        iconPath: 'assets/images/skills/stigma.png',
+        onApply: (unit) => {
+            unit.isHealingProhibited = true;
+            console.log(`${unit.instanceName}에게 [치료 금지] 효과가 적용됩니다.`);
+        },
+        onRemove: (unit) => {
+            unit.isHealingProhibited = false;
+            console.log(`${unit.instanceName}의 [치료 금지] 효과가 해제됩니다.`);
+        },
     }
 };

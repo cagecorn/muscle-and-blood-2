@@ -36,6 +36,8 @@ class SkillInventoryManager {
                 this.addSkillById('knockbackShot', grade);
                 // ✨ 제압 사격 카드 추가
                 this.addSkillById('suppressShot', grade);
+                // ✨ 낙인 카드 추가
+                this.addSkillById('stigma', grade);
             }
         });
 
