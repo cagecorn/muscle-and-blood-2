@@ -27,7 +27,9 @@ class SkillModifierEngine {
             // ✨ [신규] 사냥꾼의 감각 치명타 확률 계수
             'huntSense': [0.30, 0.25, 0.20, 0.15],
             // ✨ [신규] 크리티컬 샷 순위별 데미지 계수 추가
-            'criticalShot': [1.3, 1.2, 1.1, 1.0]
+            'criticalShot': [1.3, 1.2, 1.1, 1.0],
+            // ✨ [신규] 윌 가드 순위별 치유 계수 추가
+            'willGuard': [0.8, 0.7, 0.6, 0.5]
         };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }

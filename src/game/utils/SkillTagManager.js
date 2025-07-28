@@ -32,6 +32,8 @@ export const SKILL_TAGS = {
     FIXED: '확정',
 
     // 원소/개념 속성
+    // ✨ [신규] 윌 가드 전용 태그
+    WILL_GUARD: '의지 방패',
     EARTH: '대지',
     WILL: '의지',
     IRON: '철',

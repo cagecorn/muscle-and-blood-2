@@ -44,6 +44,8 @@ class SkillInventoryManager {
                 this.addSkillById('huntSense', grade);
                 // ✨ [신규] 크리티컬 샷 카드 지급
                 this.addSkillById('criticalShot', grade);
+                // ✨ [신규] 윌 가드 카드 지급
+                this.addSkillById('willGuard', grade);
             }
         });
 
