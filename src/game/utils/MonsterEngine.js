@@ -18,21 +18,24 @@ class MonsterEngine {
      * @returns {object} 생성된 몬스터 인스턴스
      */
     spawnMonster(baseData = {}, type = 'enemy') {
+        // ✨ [수정] 원본 데이터가 변경되지 않도록 깊은 복사본을 생성합니다.
+        const cleanBaseData = JSON.parse(JSON.stringify(baseData));
+
         const id = uniqueIDManager.getNextId();
         const instance = {
-            ...baseData,
+            ...cleanBaseData,
             uniqueId: id,
-            instanceName: baseData.instanceName || baseData.name || `Monster${id}`,
+            instanceName: cleanBaseData.instanceName || cleanBaseData.name || `Monster${id}`,
             // 생성된 몬스터가 어느 진영 소속인지 명확히 남겨둔다.
             team: type,
             skillSlots: [null, null, null, null] // 몬스터를 위한 스킬 슬롯 초기화
         };
 
-        instance.finalStats = statEngine.calculateStats(instance, baseData.baseStats || {}, []);
+        instance.finalStats = statEngine.calculateStats(instance, cleanBaseData.baseStats || {}, []);
 
         // ✨ onSpawn 콜백이 있으면 실행
-        if (typeof baseData.onSpawn === 'function') {
-            baseData.onSpawn(instance);
+        if (typeof cleanBaseData.onSpawn === 'function') {
+            cleanBaseData.onSpawn(instance);
         }
 
         if (type === 'ally') {
