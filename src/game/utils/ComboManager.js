@@ -7,16 +7,11 @@ class ComboManager {
         this.name = 'ComboManager';
         // key: attackerId, value: { targetId, count }
         this.comboData = new Map();
-        this.comboVFX = null;
         debugLogEngine.log(this.name, '콤보 매니저가 초기화되었습니다.');
     }
 
     startTurn(unitId) {
         this.comboData.set(unitId, { targetId: null, count: 0 });
-        if (this.comboVFX) {
-            this.comboVFX.destroy();
-            this.comboVFX = null;
-        }
     }
 
     recordAttack(attackerId, targetId) {
