@@ -1,7 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 // tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
 import { tokenEngine } from './TokenEngine.js';
-import { comboManager } from './ComboManager.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -18,6 +17,9 @@ export class VFXManager {
 
         // 각 유닛의 토큰 UI를 관리하기 위한 Map을 추가합니다.
         this.activeTokenDisplays = new Map();
+
+        // 현재 표시 중인 콤보 텍스트를 추적하기 위한 속성
+        this.comboVFX = null;
 
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
@@ -82,8 +84,8 @@ export class VFXManager {
     showComboCount(count) {
         if (count < 2) return; // 2콤보 이상일 때만 표시
 
-        if (comboManager.comboVFX) {
-            comboManager.comboVFX.destroy();
+        if (this.comboVFX) {
+            this.comboVFX.destroy();
         }
 
         const style = {
@@ -100,7 +102,7 @@ export class VFXManager {
             .setOrigin(0.5, 0.5);
 
         this.vfxLayer.add(comboText);
-        comboManager.comboVFX = comboText;
+        this.comboVFX = comboText;
 
         this.scene.tweens.add({
             targets: comboText,
@@ -109,9 +111,9 @@ export class VFXManager {
             duration: 1500,
             ease: 'Cubic.easeOut',
             onComplete: () => {
-                if (comboManager.comboVFX === comboText) {
+                if (this.comboVFX === comboText) {
                     comboText.destroy();
-                    comboManager.comboVFX = null;
+                    this.comboVFX = null;
                 }
             }
         });
@@ -293,6 +295,10 @@ export class VFXManager {
             display.container.destroy();
         });
         this.activeTokenDisplays.clear();
+        if (this.comboVFX) {
+            this.comboVFX.destroy();
+            this.comboVFX = null;
+        }
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
