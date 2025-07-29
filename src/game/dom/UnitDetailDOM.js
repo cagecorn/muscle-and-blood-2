@@ -125,11 +125,11 @@ export class UnitDetailDOM {
 
         if (unitData.skillSlots && unitData.skillSlots.length > 0) {
             unitData.skillSlots.forEach((slotType, index) => {
-                const typeClass = slotType ? `${slotType.toLowerCase()}-slot` : 'empty-slot';
                 const instanceId = equippedSkills[index];
 
                 const slot = document.createElement('div');
-                slot.className = `skill-slot ${typeClass}`;
+                // ✨ 모든 슬롯이 동일한 스타일을 사용합니다.
+                slot.className = 'skill-slot';
 
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
