@@ -89,5 +89,29 @@ export const mercenaryData = {
             movement: 2,
             weight: 14
         }
+    },
+    // --- ▼ [신규] 플라잉맨 클래스 데이터 추가 ▼ ---
+    flyingmen: {
+        id: 'flyingmen',
+        name: '플라잉맨',
+        hireImage: 'assets/images/unit/flyingmen-hire.png',
+        uiImage: 'assets/images/unit/flyingmen-ui.png',
+        battleSprite: 'flyingmen',
+        sprites: {
+            idle: 'flyingmen',
+            attack: 'flyingmen-attack',
+            hitted: 'flyingmen-hitted',
+            cast: 'flyingmen-cast',
+            'status-effects': 'flyingmen-status-effects',
+        },
+        description: '"바람을 가르는 소리만이 그의 유일한 흔적이다."',
+        baseStats: {
+            hp: 100, valor: 15, strength: 14, endurance: 8,
+            agility: 14, intelligence: 5, wisdom: 5, luck: 10,
+            attackRange: 1,
+            movement: 5,
+            weight: 11
+        }
     }
+    // --- ▲ [신규] 플라잉맨 클래스 데이터 추가 ▲ ---
 };

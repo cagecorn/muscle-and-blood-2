@@ -46,6 +46,16 @@ export const classGrades = {
         rangedDefense: 2,
         magicDefense: 3,
     },
+    // --- ▼ [신규] 플라잉맨 등급 추가 ▼ ---
+    flyingmen: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 1,
+        meleeDefense: 2,
+        rangedDefense: 1,
+        magicDefense: 2,
+    },
+    // --- ▲ [신규] 플라잉맨 등급 추가 ▲ ---
     // --- 다른 클래스 추가 예정 ---
     zombie: {
         meleeAttack: 2,

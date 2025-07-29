@@ -309,6 +309,67 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 나노빔 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 도끼 참격 스킬 추가 ▼ ---
+    axeStrike: {
+        NORMAL: {
+            id: 'axeStrike',
+            name: '도끼 참격',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.MELEE, SKILL_TAGS.PHYSICAL],
+            cost: 1,
+            description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
+            illustrationPath: 'assets/images/skills/axe-strike.png',
+            requiredClass: 'flyingmen',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 1,
+            restoresBarrierPercent: 0.05
+        },
+        RARE: {
+            id: 'axeStrike',
+            name: '도끼 참격 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.MELEE, SKILL_TAGS.PHYSICAL],
+            cost: 0,
+            description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
+            illustrationPath: 'assets/images/skills/axe-strike.png',
+            requiredClass: 'flyingmen',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 1,
+            restoresBarrierPercent: 0.05
+        },
+        EPIC: {
+            id: 'axeStrike',
+            name: '도끼 참격 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.MELEE, SKILL_TAGS.PHYSICAL],
+            cost: 0,
+            description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 7%를 회복합니다.',
+            illustrationPath: 'assets/images/skills/axe-strike.png',
+            requiredClass: 'flyingmen',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 1,
+            restoresBarrierPercent: 0.07
+        },
+        LEGENDARY: {
+            id: 'axeStrike',
+            name: '도끼 참격 [L]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.MELEE, SKILL_TAGS.PHYSICAL],
+            cost: 0,
+            description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 10%를 회복합니다.',
+            illustrationPath: 'assets/images/skills/axe-strike.png',
+            requiredClass: 'flyingmen',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 1,
+            restoresBarrierPercent: 0.10
+        }
+    },
+    // --- ▲ [신규] 도끼 참격 스킬 추가 ▲ ---
     // --- ▼ [신규] 제압 사격 스킬 추가 ▼ ---
     suppressShot: {
         NORMAL: {
