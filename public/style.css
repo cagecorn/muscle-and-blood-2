@@ -1414,6 +1414,32 @@ body {
     border-radius: 5px;
     border: 2px solid #555;
     flex-shrink: 0; /* 컨테이너 크기가 줄어도 초상화는 줄어들지 않음 */
+    position: relative; /* ✨ 숙련도 태그의 부모 기준이 되도록 추가 */
+    display: flex; /* ✨ Flexbox를 사용하여 하단 정렬 */
+    align-items: flex-end; /* ✨ 자식 요소를 아래로 정렬 */
+    justify-content: center; /* ✨ 자식 요소를 가운데로 정렬 */
+}
+
+/* ✨ [신규] 숙련도 태그 컨테이너 스타일 */
+.proficiency-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    padding: 6px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    width: 100%;
+}
+
+/* ✨ [신규] 개별 숙련도 태그 스타일 */
+.proficiency-tag {
+    background-color: rgba(240, 230, 140, 0.2);
+    border: 1px solid rgba(240, 230, 140, 0.6);
+    color: #f0e68c;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
 }
 
 .unit-grades {
