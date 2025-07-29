@@ -251,6 +251,64 @@ export const activeSkills = {
             generatesToken: { chance: 1.0, amount: 1 }
         }
     },
+    // --- ▼ [신규] 나노빔 스킬 추가 ▼ ---
+    nanobeam: {
+        NORMAL: {
+            id: 'nanobeam',
+            name: '나노빔',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC],
+            cost: 1,
+            description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격합니다.',
+            illustrationPath: 'assets/images/skills/nanobeam.png',
+            requiredClass: 'nanomancer',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 2,
+        },
+        RARE: {
+            id: 'nanobeam',
+            name: '나노빔 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC],
+            cost: 0,
+            description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격합니다.',
+            illustrationPath: 'assets/images/skills/nanobeam.png',
+            requiredClass: 'nanomancer',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 2,
+        },
+        EPIC: {
+            id: 'nanobeam',
+            name: '나노빔 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC],
+            cost: 0,
+            description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
+            illustrationPath: 'assets/images/skills/nanobeam.png',
+            requiredClass: 'nanomancer',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 2,
+            generatesToken: { chance: 0.5, amount: 1 }
+        },
+        LEGENDARY: {
+            id: 'nanobeam',
+            name: '나노빔 [L]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC],
+            cost: 0,
+            description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
+            illustrationPath: 'assets/images/skills/nanobeam.png',
+            requiredClass: 'nanomancer',
+            damageMultiplier: 1.0,
+            cooldown: 0,
+            range: 2,
+            generatesToken: { chance: 1.0, amount: 1 }
+        }
+    },
+    // --- ▲ [신규] 나노빔 스킬 추가 ▲ ---
     // --- ▼ [신규] 제압 사격 스킬 추가 ▼ ---
     suppressShot: {
         NORMAL: {

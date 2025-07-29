@@ -38,6 +38,14 @@ export const classGrades = {
         rangedDefense: 2,
         magicDefense: 3,
     },
+    nanomancer: {
+        meleeAttack: 1,
+        rangedAttack: 2,
+        magicAttack: 3,
+        meleeDefense: 1,
+        rangedDefense: 2,
+        magicDefense: 3,
+    },
     // --- 다른 클래스 추가 예정 ---
     zombie: {
         meleeAttack: 2,

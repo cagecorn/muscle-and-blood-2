@@ -19,6 +19,7 @@ class SkillModifierEngine {
             'knockbackShot': [1.4, 1.2, 1.0, 0.8],
             // ✨ [신규] 원거리 공격 순위별 데미지 계수 추가
             'rangedAttack': [1.3, 1.2, 1.1, 1.0],
+            'nanobeam': [1.3, 1.2, 1.1, 1.0],
             // ✨ [신규] 힐 순위별 회복 계수 추가
             'heal': [1.3, 1.2, 1.1, 1.0],
             'grindstone': [0.25, 0.20, 0.15, 0.10],

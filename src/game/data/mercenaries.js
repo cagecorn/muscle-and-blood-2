@@ -66,6 +66,28 @@ export const mercenaryData = {
             movement: 2,
             weight: 18 // ✨ 메딕 무게 추가
         }
-    }
+    },
     // --- ▲ [신규] 메딕 클래스 데이터 추가 ▲ ---
+    nanomancer: {
+        id: 'nanomancer',
+        name: '나노맨서',
+        hireImage: 'assets/images/unit/nanomancer-hire.png',
+        uiImage: 'assets/images/unit/nanomancer-ui.png',
+        battleSprite: 'nanomancer',
+        sprites: {
+            idle: 'nanomancer',
+            attack: 'nanomancer-attack',
+            hitted: 'nanomancer-hitted',
+            cast: 'nanomancer-cast',
+            'status-effects': 'nanomancer-status-effects',
+        },
+        description: '"가장 작은 것이 가장 강력한 힘을 지녔다."',
+        baseStats: {
+            hp: 75, valor: 7, strength: 5, endurance: 5,
+            agility: 12, intelligence: 18, wisdom: 14, luck: 10,
+            attackRange: 2,
+            movement: 2,
+            weight: 14
+        }
+    }
 };
