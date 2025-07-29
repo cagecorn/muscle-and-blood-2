@@ -49,9 +49,8 @@ class PathfinderEngine {
                 const cell = grid.getCell(neighbor.col, neighbor.row);
 
                 // ✨ [수정된 부분]
-                // 목표 지점(endNode)이 아니라면, 점유된 셀은 경로에서 제외합니다.
-                // 이를 통해 목표 바로 옆까지는 이동할 수 있게 됩니다.
-                const isOccupied = cell && cell.isOccupied;
+                // 플라잉맨은 다른 유닛을 통과할 수 있으므로, isOccupied 검사를 건너뜁니다.
+                const isOccupied = cell && cell.isOccupied && unit.id !== 'flyingmen';
                 const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
 
                 if (closedSet.has(key) || (isOccupied && !isEndNode)) {
