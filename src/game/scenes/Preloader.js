@@ -85,6 +85,16 @@ export class Preloader extends Scene
         this.load.image('medic-ui', 'images/territory/medic-ui.png');
         // --- ▲ [신규] 메딕 관련 이미지 로드 추가 ▲ ---
 
+        // --- ▼ [신규] 나노맨서 관련 이미지 로드 추가 ▼ ---
+        this.load.image('nanomancer', 'images/unit/nanomancer.png');
+        this.load.image('nanomancer-attack', 'images/unit/nanomancer-attack.png');
+        this.load.image('nanomancer-hitted', 'images/unit/nanomancer-hitted.png');
+        this.load.image('nanomancer-cast', 'images/unit/nanomancer-cast.png');
+        this.load.image('nanomancer-status-effects', 'images/unit/nanomancer-status-effects.png');
+        this.load.image('nanomancer-hire', 'images/unit/nanomancer-hire.png');
+        this.load.image('nanomancer-ui', 'images/unit/nanomancer-ui.png');
+        // --- ▲ [신규] 나노맨서 관련 이미지 로드 추가 ▲ ---
+
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
 
@@ -112,6 +122,7 @@ export class Preloader extends Scene
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
         this.load.image('stigma', 'images/skills/stigma.png');
+        this.load.image('nanobeam', 'images/skills/nanobeam.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');
@@ -136,7 +147,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'zombie', 'ancestor-peor',
+            'warrior', 'gunner', 'medic', 'nanomancer', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

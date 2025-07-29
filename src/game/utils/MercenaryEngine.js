@@ -58,14 +58,15 @@ class MercenaryEngine {
                 // 새로 생성된 인스턴스는 용병 전용이므로 인벤토리 목록에서는 제거합니다.
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
-        } else if (newInstance.id === 'gunner') {
+        } else if (newInstance.id === 'gunner' || newInstance.id === 'nanomancer') {
             newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
-            // 거너를 위한 4번째 슬롯 처리
+            // 거너와 나노맨서를 위한 4번째 슬롯 처리
             newInstance.skillSlots.push('ACTIVE');
 
-            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('rangedAttack');
+            const baseAttackSkillId = newInstance.id === 'gunner' ? 'rangedAttack' : 'nanobeam';
+            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill(baseAttackSkillId);
             if (consumed) {
-                const attackInstance = skillInventoryManager.addSkillById('rangedAttack', consumed.grade);
+                const attackInstance = skillInventoryManager.addSkillById(baseAttackSkillId, consumed.grade);
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 skillInventoryManager.removeSkillFromInventoryList(attackInstance.instanceId);
             }
