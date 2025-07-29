@@ -180,86 +180,83 @@ const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 // Attack
 const attackExpectedDamage = [1.3, 1.2, 1.1, 1.0];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(attackBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-        if (grade === 'NORMAL') {
-            assert.strictEqual(skill.cost, 1);
-        } else {
-            assert.strictEqual(skill.cost, 0);
-        }
-        if (grade === 'EPIC') {
-            assert(skill.generatesToken && skill.generatesToken.chance === 0.5);
-        } else if (grade === 'LEGENDARY') {
-            assert(skill.generatesToken && skill.generatesToken.chance === 1.0);
-        } else {
-            assert(!skill.generatesToken);
-        }
+    const skill = skillModifierEngine.getModifiedSkill(attackBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    if (grade === 'NORMAL') {
+        assert.strictEqual(skill.cost, 1);
+    } else {
+        assert.strictEqual(skill.cost, 0);
+    }
+    if (grade === 'EPIC') {
+        assert(skill.generatesToken && skill.generatesToken.chance === 0.5);
+    } else if (grade === 'LEGENDARY') {
+        assert(skill.generatesToken && skill.generatesToken.chance === 1.0);
+    } else {
+        assert(!skill.generatesToken);
     }
 }
 
 // Charge
-const chargeExpectedDamage = [1.5, 1.2, 1.0, 0.8];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(chargeBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-        const expectedDuration = rank === 1 ? 1 : (grade === 'LEGENDARY' ? 2 : 1);
-        assert.strictEqual(skill.effect.duration, expectedDuration);
-    }
+    const skill = skillModifierEngine.getModifiedSkill(chargeBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    const expectedDuration = grade === 'LEGENDARY' ? 2 : 1;
+    assert.strictEqual(skill.effect.duration, expectedDuration);
 }
 
 // Stone Skin
-const stoneSkinExpectedReduction = [0.24, 0.21, 0.18, 0.15];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(stoneSkinBase[grade], rank, grade);
-        const mods = skill.effect.modifiers;
-        const reduction = Array.isArray(mods) ? mods.find(m => m.stat === 'damageReduction').value : mods.value;
-        assert(Math.abs(reduction - stoneSkinExpectedReduction[rank - 1]) < 1e-6);
-        if (grade === 'EPIC') {
-            const pd = mods.find(m => m.stat === 'physicalDefense');
-            assert(pd && Math.abs(pd.value - 0.10) < 1e-6);
-        } else if (grade === 'LEGENDARY') {
-            const pd = mods.find(m => m.stat === 'physicalDefense');
-            assert(pd && Math.abs(pd.value - 0.15) < 1e-6);
-        } else if (Array.isArray(mods)) {
-            assert(!mods.some(m => m.stat === 'physicalDefense'));
-        }
+    const skill = skillModifierEngine.getModifiedSkill(stoneSkinBase[grade], grade);
+    const mods = skill.effect.modifiers;
+    const reduction = Array.isArray(mods) ? mods.find(m => m.stat === 'damageReduction').value : mods.value;
+    if (grade === 'NORMAL') {
+        assert(Math.abs(reduction - 0.15) < 1e-6);
+    } else if (grade === 'RARE') {
+        assert(Math.abs(reduction - 0.15) < 1e-6);
+    } else if (grade === 'EPIC') {
+        assert(Math.abs(reduction - 0.15) < 1e-6);
+    } else {
+        assert(Math.abs(reduction - 0.15) < 1e-6);
+    }
+    if (grade === 'EPIC') {
+        const pd = mods.find(m => m.stat === 'physicalDefense');
+        assert(pd && Math.abs(pd.value - 0.10) < 1e-6);
+    } else if (grade === 'LEGENDARY') {
+        const pd = mods.find(m => m.stat === 'physicalDefense');
+        assert(pd && Math.abs(pd.value - 0.15) < 1e-6);
+    } else if (Array.isArray(mods)) {
+        assert(!mods.some(m => m.stat === 'physicalDefense'));
     }
 }
 
 // Shield Break
-const shieldBreakExpectedIncrease = [0.24, 0.21, 0.18, 0.15];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(shieldBreakBase[grade], rank, grade);
-        const mods = skill.effect.modifiers;
-        const increase = Array.isArray(mods) ? mods.find(m => m.stat === 'damageIncrease').value : mods.value;
-        assert(Math.abs(increase - shieldBreakExpectedIncrease[rank - 1]) < 1e-6);
-        if (grade === 'EPIC') {
-            const pd = mods.find(m => m.stat === 'physicalDefense');
-            assert(pd && Math.abs(pd.value + 0.05) < 1e-6);
-        } else if (grade === 'LEGENDARY') {
-            const pd = mods.find(m => m.stat === 'physicalDefense');
-            assert(pd && Math.abs(pd.value + 0.10) < 1e-6);
-        } else if (Array.isArray(mods)) {
-            assert(!mods.some(m => m.stat === 'physicalDefense'));
-        }
+    const skill = skillModifierEngine.getModifiedSkill(shieldBreakBase[grade], grade);
+    const mods = skill.effect.modifiers;
+    const increase = Array.isArray(mods) ? mods.find(m => m.stat === 'damageIncrease').value : mods.value;
+    assert(Math.abs(increase - 0.15) < 1e-6);
+    if (grade === 'EPIC') {
+        const pd = mods.find(m => m.stat === 'physicalDefense');
+        assert(pd && Math.abs(pd.value + 0.05) < 1e-6);
+    } else if (grade === 'LEGENDARY') {
+        const pd = mods.find(m => m.stat === 'physicalDefense');
+        assert(pd && Math.abs(pd.value + 0.10) < 1e-6);
+    } else if (Array.isArray(mods)) {
+        assert(!mods.some(m => m.stat === 'physicalDefense'));
     }
 }
 
 // Iron Will
-function computeIronWillReduction(unit, rank) {
-    const maxReduction = ironWillBase.rankModifiers[rank - 1] || ironWillBase.NORMAL.maxReduction;
+function computeIronWillReduction(unit, grade) {
+    const maxReduction = ironWillBase[grade].maxReduction;
     const lostRatio = 1 - (unit.currentHp / unit.finalStats.hp);
     return maxReduction * lostRatio;
 }
 
-for (let rank = 1; rank <= 4; rank++) {
+for (const grade of grades) {
     const testUnit = { finalStats: { hp: 100 }, currentHp: 50 };
-    const reduction = computeIronWillReduction(testUnit, rank);
-    assert(Math.abs(reduction - ironWillBase.rankModifiers[rank - 1] * 0.5) < 1e-6);
+    const reduction = computeIronWillReduction(testUnit, grade);
+    assert(Math.abs(reduction - ironWillBase[grade].maxReduction * 0.5) < 1e-6);
 }
 
 for (const grade of grades) {
@@ -267,40 +264,31 @@ for (const grade of grades) {
 }
 
 // Grindstone
-const grindstoneExpected = [0.25, 0.20, 0.15, 0.10];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(grindstoneBase[grade], rank, grade);
-        const value = skill.effect.modifiers.value;
-        assert(Math.abs(value - grindstoneExpected[rank - 1]) < 1e-6);
-    }
+    const skill = skillModifierEngine.getModifiedSkill(grindstoneBase[grade], grade);
+    const value = skill.effect.modifiers.value;
+    assert(Math.abs(value - 0.10) < 1e-6);
 }
 
 // --- ▼ [신규] 전투의 함성 테스트 로직 추가 ▼ ---
-const battleCryExpectedDamage = [0.30, 0.25, 0.20, 0.15];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(battleCryBase[grade], rank, grade);
-        const mods = skill.effect.modifiers;
-        const attackMod = Array.isArray(mods) ? mods.find(m => m.stat === 'physicalAttack') : mods;
+    const skill = skillModifierEngine.getModifiedSkill(battleCryBase[grade], grade);
+    const mods = skill.effect.modifiers;
+    const attackMod = Array.isArray(mods) ? mods.find(m => m.stat === 'physicalAttack') : mods;
 
-        assert.strictEqual(skill.cost, battleCryBase[grade].cost, `Battle Cry cost failed for grade ${grade}`);
-        assert.strictEqual(skill.effect.duration, battleCryBase[grade].effect.duration, `Battle Cry duration failed for grade ${grade}`);
-        assert(Math.abs(attackMod.value - battleCryExpectedDamage[rank - 1]) < 1e-6, `Battle Cry modifier value failed for grade ${grade} rank ${rank}`);
+    assert.strictEqual(skill.cost, battleCryBase[grade].cost, `Battle Cry cost failed for grade ${grade}`);
+    assert.strictEqual(skill.effect.duration, battleCryBase[grade].effect.duration, `Battle Cry duration failed for grade ${grade}`);
+    assert(Math.abs(attackMod.value - 0.15) < 1e-6, `Battle Cry modifier value failed for grade ${grade}`);
 
-        const meleeMod = Array.isArray(mods) ? mods.find(m => m.stat === 'meleeAttack') : null;
-        assert(meleeMod && meleeMod.value === 1, `meleeAttack modifier missing or incorrect for grade ${grade}`);
-    }
+    const meleeMod = Array.isArray(mods) ? mods.find(m => m.stat === 'meleeAttack') : null;
+    assert(meleeMod && meleeMod.value === 1, `meleeAttack modifier missing or incorrect for grade ${grade}`);
 }
 // --- ▲ [신규] 전투의 함성 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
-const throwingAxeExpected = [1.2, 1.2, 1.2, 1.2];
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(throwingAxeBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-    }
+    const skill = skillModifierEngine.getModifiedSkill(throwingAxeBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
 }
 
 // ------- Skill Usage Integration Test -------
@@ -323,10 +311,9 @@ const baseSkills = [
     { data: ironWillBase, target: soldier }
 ];
 
-const rankedSkills = baseSkills.map((entry, idx) => {
-    const rank = idx + 1;
-    const modified = skillModifierEngine.getModifiedSkill(entry.data, rank, 'NORMAL');
-    return { ...modified, target: entry.target, rank };
+const rankedSkills = baseSkills.map((entry) => {
+    const modified = skillModifierEngine.getModifiedSkill(entry.data, 'NORMAL');
+    return { ...modified, target: entry.target };
 });
 
 const usedOrder = [];
@@ -367,7 +354,7 @@ for (let turn = 1; turn <= 5; turn++) {
 assert.deepStrictEqual(usedOrder, ['charge', 'stoneSkin', 'shieldBreak', 'charge', 'stoneSkin']);
 assert(tokenHistory.every(t => t === 1));
 
-assert(firstStoneSkin && Math.abs((firstStoneSkin.modifiers.value ?? firstStoneSkin.modifiers.find(m => m.stat === 'damageReduction').value) - 0.21) < 1e-6);
-assert(firstShieldBreak && Math.abs((firstShieldBreak.modifiers.value ?? firstShieldBreak.modifiers.find(m => m.stat === 'damageIncrease').value) - 0.18) < 1e-6);
+assert(firstStoneSkin && Math.abs((firstStoneSkin.modifiers.value ?? firstStoneSkin.modifiers.find(m => m.stat === 'damageReduction').value) - 0.15) < 1e-6);
+assert(firstShieldBreak && Math.abs((firstShieldBreak.modifiers.value ?? firstShieldBreak.modifiers.find(m => m.stat === 'damageIncrease').value) - 0.15) < 1e-6);
 
 console.log('Warrior skill integration test passed.');

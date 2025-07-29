@@ -18,7 +18,7 @@ class DebugSkillExecutionManager {
      * @param {number} rank - 사용된 스킬 슬롯 순위 (1-4)
      * @param {string} grade - 사용된 스킬 등급
      */
-    logSkillExecution(unit, baseSkill, modifiedSkill, rank, grade) {
+    logSkillExecution(unit, baseSkill, modifiedSkill, grade) {
         const skillColor = SKILL_TYPES[baseSkill.type].color;
 
         console.groupCollapsed(
@@ -27,7 +27,6 @@ class DebugSkillExecutionManager {
         );
 
         debugLogEngine.log(this.name, `--- 스킬 기본 정보 ---`);
-        debugLogEngine.log(this.name, `사용 순위: ${rank}순위`);
         debugLogEngine.log(this.name, `스킬 등급: ${grade}`);
 
         console.groupCollapsed(`%c[${this.name}] 등급별 효과`, `color: #4ade80; font-weight: bold;`);
@@ -38,9 +37,9 @@ class DebugSkillExecutionManager {
         });
         console.groupEnd();
         
-        console.groupCollapsed(`%c[${this.name}] 순위 보정 효과`, `color: #4ade80; font-weight: bold;`);
+        console.groupCollapsed(`%c[${this.name}] 최종 보정 효과`, `color: #4ade80; font-weight: bold;`);
         console.table({
-            '데미지 계수': { Base: baseSkill.damageMultiplier, Modified: modifiedSkill.damageMultiplier, Rank: `${rank}순위` }
+            '데미지 계수': { Base: baseSkill.damageMultiplier, Modified: modifiedSkill.damageMultiplier }
         });
         console.groupEnd();
 

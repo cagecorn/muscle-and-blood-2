@@ -12,21 +12,19 @@ const expectedDamage = [1.3, 1.2, 1.1, 1.0];
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(nanobeamBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-        if (grade === 'NORMAL') {
-            assert.strictEqual(skill.cost, 1);
-        } else {
-            assert.strictEqual(skill.cost, 0);
-        }
-        if (grade === 'EPIC') {
-            assert(skill.generatesToken && skill.generatesToken.chance === 0.5);
-        } else if (grade === 'LEGENDARY') {
-            assert(skill.generatesToken && skill.generatesToken.chance === 1.0);
-        } else {
-            assert(!skill.generatesToken);
-        }
+    const skill = skillModifierEngine.getModifiedSkill(nanobeamBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    if (grade === 'NORMAL') {
+        assert.strictEqual(skill.cost, 1);
+    } else {
+        assert.strictEqual(skill.cost, 0);
+    }
+    if (grade === 'EPIC') {
+        assert(skill.generatesToken && skill.generatesToken.chance === 0.5);
+    } else if (grade === 'LEGENDARY') {
+        assert(skill.generatesToken && skill.generatesToken.chance === 1.0);
+    } else {
+        assert(!skill.generatesToken);
     }
 }
 

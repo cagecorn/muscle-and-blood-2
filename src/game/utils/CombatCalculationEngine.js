@@ -60,11 +60,7 @@ class CombatCalculationEngine {
 
         let finalSkill = skill;
         if (instanceId) {
-            const equippedSkills = ownedSkillsManager.getEquippedSkills(attacker.uniqueId);
-            const rank = equippedSkills.indexOf(instanceId) + 1;
-            if (rank > 0) {
-                finalSkill = skillModifierEngine.getModifiedSkill(skill, rank, grade);
-            }
+            finalSkill = skillModifierEngine.getModifiedSkill(skill, grade);
         }
 
         // ✨ [신규] 방어력 관통 효과 적용
@@ -201,16 +197,12 @@ class CombatCalculationEngine {
         const equipped = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
         let reduction = 0;
 
-        equipped.forEach((instId, index) => {
+        equipped.forEach((instId) => {
             if (!instId) return;
             const inst = skillInventoryManager.getInstanceData(instId);
             if (inst && inst.skillId === 'ironWill') {
-                const skillData = passiveSkills.ironWill;
-                const rank = index + 1;
-                const rankIndex = rank - 1;
-
-                // 순위에 맞는 최대 감소율 가져오기
-                const maxReduction = skillData.rankModifiers[rankIndex] || skillData.NORMAL.maxReduction;
+                const gradeData = passiveSkills.ironWill[inst.grade] || passiveSkills.ironWill.NORMAL;
+                const maxReduction = gradeData.maxReduction;
 
                 // 잃은 체력 비율 계산 (0 ~ 1)
                 const lostHpRatio = 1 - (unit.currentHp / unit.finalStats.hp);

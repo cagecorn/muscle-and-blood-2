@@ -1,181 +1,42 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-// 아이언 윌 데이터를 직접 참조하기 위해 import 합니다.
 import { passiveSkills } from '../data/skills/passive.js';
 
 /**
- * 스킬의 슬롯 순위에 따라 최종 능력치를 계산하는 엔진
+ * 스킬의 등급에 따라 최종 능력치를 계산하는 엔진 (순위 보정 제거됨)
  */
 class SkillModifierEngine {
     constructor() {
-        // 순위별 계수 (1순위 -> 4순위)
-        this.rankModifiers = {
-            'charge': [1.5, 1.2, 1.0, 0.8],
-            'attack': [1.3, 1.2, 1.1, 1.0],
-            // 'stoneSkin' 스킬의 순위별 데미지 감소율
-            'stoneSkin': [0.24, 0.21, 0.18, 0.15],
-            // ✨ 쉴드 브레이크의 순위별 '받는 데미지 증가' 효과 수치
-            'shieldBreak': [0.24, 0.21, 0.18, 0.15],
-            // ✨ 넉백샷 순위별 데미지 계수 추가
-            'knockbackShot': [1.4, 1.2, 1.0, 0.8],
-            // ✨ [신규] 원거리 공격 순위별 데미지 계수 추가
-            'rangedAttack': [1.3, 1.2, 1.1, 1.0],
-            'nanobeam': [1.3, 1.2, 1.1, 1.0],
-            'axeStrike': [1.3, 1.2, 1.1, 1.0],
-            // ✨ [신규] 힐 순위별 회복 계수 추가
-            'heal': [1.3, 1.2, 1.1, 1.0],
-            'grindstone': [0.25, 0.20, 0.15, 0.10],
-            // ✨ [신규] 전투의 함성 공격력 증가 계수
-            'battleCry': [0.30, 0.25, 0.20, 0.15],
-            // ✨ [신규] 사냥꾼의 감각 치명타 확률 계수
-            'huntSense': [0.30, 0.25, 0.20, 0.15],
-            // ✨ [신규] 크리티컬 샷 순위별 데미지 계수 추가
-            'criticalShot': [1.3, 1.2, 1.1, 1.0],
-            // ✨ [신규] 윌 가드 순위별 치유 계수 추가
-            'willGuard': [0.8, 0.7, 0.6, 0.5]
-        };
         debugLogEngine.log('SkillModifierEngine', '스킬 보정 엔진이 초기화되었습니다.');
     }
 
     /**
-     * 스킬 데이터와 순위를 받아 보정된 스킬 데이터를 반환합니다.
+     * 스킬 데이터와 등급을 받아 보정된 스킬 데이터를 반환합니다.
      * @param {object} baseSkillData - 원본 스킬 데이터
-     * @param {number} rank - 슬롯 순위 (1부터 시작)
+     * @param {string} grade - 스킬 등급
      * @returns {object} - 보정된 스킬 데이터
      */
-    getModifiedSkill(baseSkillData, rank, grade = 'NORMAL') {
+    getModifiedSkill(baseSkillData, grade = 'NORMAL') {
         if (!baseSkillData) return null;
-
-        // 원본 훼손을 막기 위해 깊은 복사를 수행합니다.
         const modifiedSkill = JSON.parse(JSON.stringify(baseSkillData));
-        const rankIndex = rank - 1;
 
-        const damageModifiers = this.rankModifiers[baseSkillData.id];
-        if (damageModifiers && damageModifiers[rankIndex] !== undefined) {
-            if (modifiedSkill.damageMultiplier) {
-                if (typeof modifiedSkill.damageMultiplier === 'object') {
-                    modifiedSkill.damageMultiplier = {
-                        min: modifiedSkill.damageMultiplier.min * damageModifiers[rankIndex],
-                        max: modifiedSkill.damageMultiplier.max * damageModifiers[rankIndex],
-                    };
-                } else {
-                    modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
-                }
-            }
-            // ✨ [신규] 회복 계수 보정
-            if (modifiedSkill.healMultiplier) {
-                if (typeof modifiedSkill.healMultiplier === 'object') {
-                    modifiedSkill.healMultiplier = {
-                        min: modifiedSkill.healMultiplier.min * damageModifiers[rankIndex],
-                        max: modifiedSkill.healMultiplier.max * damageModifiers[rankIndex],
-                    };
-                } else {
-                    modifiedSkill.healMultiplier = damageModifiers[rankIndex];
-                }
-            }
-        }
-
-        // 'stoneSkin' 스킬의 데미지 감소 효과 보정
-        if (baseSkillData.id === 'stoneSkin' && modifiedSkill.effect) {
-            const reductionModifiers = this.rankModifiers['stoneSkin'];
-            if (reductionModifiers && reductionModifiers[rankIndex] !== undefined) {
-                if (Array.isArray(modifiedSkill.effect.modifiers)) {
-                    const reductionMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'damageReduction');
-                    if (reductionMod) {
-                        reductionMod.value = reductionModifiers[rankIndex];
-                    }
-                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'damageReduction') {
-                    modifiedSkill.effect.modifiers.value = reductionModifiers[rankIndex];
-                }
-            }
-        }
-
-        // ✨ 'shieldBreak' 스킬의 '받는 데미지 증가' 효과 보정
-        if (baseSkillData.id === 'shieldBreak' && modifiedSkill.effect) {
-            const increaseModifiers = this.rankModifiers['shieldBreak'];
-            if (increaseModifiers && increaseModifiers[rankIndex] !== undefined) {
-                // modifiers가 배열인지 단일 객체인지 확인하여 처리
-                if (Array.isArray(modifiedSkill.effect.modifiers)) {
-                    const increaseMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'damageIncrease');
-                    if (increaseMod) {
-                        increaseMod.value = increaseModifiers[rankIndex];
-                    }
-                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'damageIncrease') {
-                    modifiedSkill.effect.modifiers.value = increaseModifiers[rankIndex];
-                }
-            }
-        }
-
-        if (baseSkillData.id === 'grindstone' && modifiedSkill.effect) {
-            const bonusModifiers = this.rankModifiers['grindstone'];
-            if (bonusModifiers && bonusModifiers[rankIndex] !== undefined) {
-                modifiedSkill.effect.modifiers.value = bonusModifiers[rankIndex];
-            }
-        }
-
-        // ✨ '전투의 함성' 스킬의 공격력 증가 보정
-        if (baseSkillData.id === 'battleCry' && modifiedSkill.effect) {
-            const attackModifiers = this.rankModifiers['battleCry'];
-            if (attackModifiers && attackModifiers[rankIndex] !== undefined) {
-                if (Array.isArray(modifiedSkill.effect.modifiers)) {
-                    const attackMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'physicalAttack');
-                    if (attackMod) attackMod.value = attackModifiers[rankIndex];
-                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'physicalAttack') {
-                    modifiedSkill.effect.modifiers.value = attackModifiers[rankIndex];
-                }
-            }
-        }
-
-        // ✨ '사냥꾼의 감각' 스킬의 치명타 확률 보정
-        if (baseSkillData.id === 'huntSense' && modifiedSkill.effect) {
-            const critModifiers = this.rankModifiers['huntSense'];
-            if (critModifiers && critModifiers[rankIndex] !== undefined) {
-                if (Array.isArray(modifiedSkill.effect.modifiers)) {
-                    const critMod = modifiedSkill.effect.modifiers.find(m => m.stat === 'criticalChance');
-                    if (critMod) critMod.value = critModifiers[rankIndex];
-                } else if (modifiedSkill.effect.modifiers && modifiedSkill.effect.modifiers.stat === 'criticalChance') {
-                    modifiedSkill.effect.modifiers.value = critModifiers[rankIndex];
-                }
-            }
-        }
-
-        // 차지 스킬의 경우 슬롯 순위에 따라 기절 턴 수를 보정합니다.
+        // 레전더리 차지 스킬은 스턴 턴이 2가 됩니다.
         if (baseSkillData.id === 'charge' && modifiedSkill.effect) {
-            modifiedSkill.effect.duration = (rank === 1)
-                ? 1
-                : (grade === 'LEGENDARY' ? 2 : 1);
+            modifiedSkill.effect.duration = grade === 'LEGENDARY' ? 2 : 1;
         }
 
-        // --- ✨ 새로운 설명 동적 생성 로직 ---
-
+        // --- 설명 동적 치환 로직 ---
         if (modifiedSkill.description) {
-            // 1. 데미지 계수 치환 (차지, 공격 스킬 등)
             if (modifiedSkill.damageMultiplier) {
-                // ✨ 넉백샷도 이 로직을 공유하게 됩니다.
                 if (typeof modifiedSkill.damageMultiplier === 'object') {
                     const minDamage = Math.round(modifiedSkill.damageMultiplier.min * 100);
                     const maxDamage = Math.round(modifiedSkill.damageMultiplier.max * 100);
-                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${minDamage}% ~ ${maxDamage}%`);
+                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}', `${minDamage}~${maxDamage}`);
                 } else {
                     const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
-                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${damagePercent}%`);
+                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}', `${damagePercent}`);
                 }
             }
-            // 2. 스톤 스킨 감소율 치환
-            if (baseSkillData.id === 'stoneSkin') {
-                const reductionValue = (this.rankModifiers.stoneSkin[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{reduction}}%', `${reductionValue.toFixed(0)}%`);
-            }
-            // 3. 쉴드 브레이크 증가율 치환
-            if (baseSkillData.id === 'shieldBreak') {
-                const increaseValue = (this.rankModifiers.shieldBreak[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{increase}}%', `${increaseValue.toFixed(0)}%`);
-            }
-            // 4. 아이언 윌 최대 감소율 치환
-            if (baseSkillData.id === 'ironWill') {
-                const maxReductionValue = (passiveSkills.ironWill.rankModifiers[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}%', `${maxReductionValue.toFixed(0)}%`);
-            }
-            // ✨ [신규] 힐 스킬 설명 치환
+
             if (modifiedSkill.healMultiplier) {
                 if (typeof modifiedSkill.healMultiplier === 'object') {
                     const minHeal = modifiedSkill.healMultiplier.min.toFixed(2);
@@ -186,19 +47,55 @@ class SkillModifierEngine {
                     modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', healAmount);
                 }
             }
-            if (baseSkillData.id === 'grindstone') {
-                const bonusValue = (this.rankModifiers.grindstone[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
+
+            if (baseSkillData.id === 'stoneSkin' && modifiedSkill.effect) {
+                const mod = Array.isArray(modifiedSkill.effect.modifiers)
+                    ? modifiedSkill.effect.modifiers.find(m => m.stat === 'damageReduction')
+                    : modifiedSkill.effect.modifiers;
+                if (mod) {
+                    const value = (mod.value || 0) * 100;
+                    modifiedSkill.description = modifiedSkill.description.replace('{{reduction}}', `${value.toFixed(0)}`);
+                }
             }
-            // ✨ [신규] '전투의 함성' 스킬 설명의 {{attackBonus}}% 부분을 실제 값으로 치환합니다.
-            if (baseSkillData.id === 'battleCry') {
-                const bonusValue = (this.rankModifiers.battleCry[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}%', `${bonusValue.toFixed(0)}%`);
+
+            if (baseSkillData.id === 'shieldBreak' && modifiedSkill.effect) {
+                const mod = Array.isArray(modifiedSkill.effect.modifiers)
+                    ? modifiedSkill.effect.modifiers.find(m => m.stat === 'damageIncrease')
+                    : modifiedSkill.effect.modifiers;
+                if (mod) {
+                    const value = (mod.value || 0) * 100;
+                    modifiedSkill.description = modifiedSkill.description.replace('{{increase}}', `${value.toFixed(0)}`);
+                }
             }
-            // ✨ [신규] 사냥꾼의 감각 치명타 확률 치환
-            if (baseSkillData.id === 'huntSense') {
-                const critValue = (this.rankModifiers.huntSense[rankIndex] || 0) * 100;
-                modifiedSkill.description = modifiedSkill.description.replace('{{critChance}}%', `${critValue.toFixed(0)}%`);
+
+            if (baseSkillData.id === 'ironWill') {
+                const value = (passiveSkills.ironWill[grade]?.maxReduction || passiveSkills.ironWill.NORMAL.maxReduction) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{maxReduction}}', `${value.toFixed(0)}`);
+            }
+
+            if (baseSkillData.id === 'grindstone' && modifiedSkill.effect) {
+                const bonus = (modifiedSkill.effect.modifiers.value || 0) * 100;
+                modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}', `${bonus.toFixed(0)}`);
+            }
+
+            if (baseSkillData.id === 'battleCry' && modifiedSkill.effect) {
+                const mod = Array.isArray(modifiedSkill.effect.modifiers)
+                    ? modifiedSkill.effect.modifiers.find(m => m.stat === 'physicalAttack')
+                    : modifiedSkill.effect.modifiers;
+                if (mod) {
+                    const value = (mod.value || 0) * 100;
+                    modifiedSkill.description = modifiedSkill.description.replace('{{attackBonus}}', `${value.toFixed(0)}`);
+                }
+            }
+
+            if (baseSkillData.id === 'huntSense' && modifiedSkill.effect) {
+                const mod = Array.isArray(modifiedSkill.effect.modifiers)
+                    ? modifiedSkill.effect.modifiers.find(m => m.stat === 'criticalChance')
+                    : modifiedSkill.effect.modifiers;
+                if (mod) {
+                    const value = (mod.value || 0) * 100;
+                    modifiedSkill.description = modifiedSkill.description.replace('{{critChance}}', `${value.toFixed(0)}`);
+                }
             }
         }
 

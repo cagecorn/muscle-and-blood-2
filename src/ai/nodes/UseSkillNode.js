@@ -45,15 +45,13 @@ class UseSkillNode extends Node {
         const instanceData = skillInventoryManager.getInstanceData(instanceId);
         const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
 
-        const equippedSkills = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
-        const rank = equippedSkills.indexOf(instanceId) + 1;
-        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, rank, instanceData.grade);
+        const modifiedSkill = skillModifierEngine.getModifiedSkill(baseSkillData, instanceData.grade);
         if (!modifiedSkill) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '스킬 데이터 처리 오류');
             return NodeState.FAILURE;
         }
 
-        debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, rank, instanceData.grade);
+        debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, instanceData.grade);
 
         // ✨ 숙련도에 따른 주사위 굴림으로 최종 계수 결정
         let finalDamageMultiplier = modifiedSkill.damageMultiplier;

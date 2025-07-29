@@ -13,15 +13,13 @@ const expectedDamage = [1.3, 1.2, 1.1, 1.0];
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(criticalShotBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-        assert.strictEqual(skill.cost, criticalShotBase[grade].cost, `Cost failed for ${grade}`);
-        assert.strictEqual(skill.cooldown, criticalShotBase[grade].cooldown, `Cooldown failed for ${grade}`);
-        assert.strictEqual(skill.fixedDamage, 'CRITICAL', `Fixed damage property missing for ${grade}`);
-        if (grade === 'LEGENDARY') {
-            assert.strictEqual(skill.armorPenetration, 0.15, 'Armor penetration failed for LEGENDARY');
-        }
+    const skill = skillModifierEngine.getModifiedSkill(criticalShotBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    assert.strictEqual(skill.cost, criticalShotBase[grade].cost, `Cost failed for ${grade}`);
+    assert.strictEqual(skill.cooldown, criticalShotBase[grade].cooldown, `Cooldown failed for ${grade}`);
+    assert.strictEqual(skill.fixedDamage, 'CRITICAL', `Fixed damage property missing for ${grade}`);
+    if (grade === 'LEGENDARY') {
+        assert.strictEqual(skill.armorPenetration, 0.15, 'Armor penetration failed for LEGENDARY');
     }
 }
 
