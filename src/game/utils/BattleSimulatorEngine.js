@@ -12,6 +12,7 @@ import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 import { createRangedAI } from '../../ai/behaviors/RangedAI.js';
 // ✨ 메딕을 위한 Healer AI를 import 합니다.
 import { createHealerAI } from '../../ai/behaviors/createHealerAI.js';
+import { createFlyingmanAI } from '../../ai/behaviors/createFlyingmanAI.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
@@ -113,6 +114,9 @@ export class BattleSimulatorEngine {
             } else if (unit.name === '메딕') {
                 // ✨ 메딕 AI 등록 로직 추가
                 aiManager.registerUnit(unit, createHealerAI(this.aiEngines));
+            } else if (unit.name === '플라잉맨') {
+                // ✨ 플라잉맨 AI 등록
+                aiManager.registerUnit(unit, createFlyingmanAI(this.aiEngines));
             }
         });
 
