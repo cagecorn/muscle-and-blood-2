@@ -7,6 +7,9 @@ import { uniqueIDManager } from './UniqueIDManager.js';
 import { skillEngine } from './SkillEngine.js';
 import { ownedSkillsManager } from './OwnedSkillsManager.js';
 import { skillInventoryManager } from './SkillInventoryManager.js';
+// ✨ 1. 속성 특화 데이터와 주사위 엔진을 가져옵니다.
+import { attributeSpecializations } from '../data/attributeSpecializations.js';
+import { diceEngine } from './DiceEngine.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -39,8 +42,14 @@ class MercenaryEngine {
             // ✨ 1. 스킬 슬롯 생성을 클래스별로 분기 처리하기 위해 초기화 위치를 변경합니다.
             skillSlots: []
         };
-        
-        // ✨ 2. '전사', '거너', '메딕' 클래스에 대한 특별 처리
+
+        // ✨ 2. [신규] 용병 생성 시 무작위 속성 특화 태그를 부여합니다.
+        const randomAttribute = diceEngine.getRandomElement(attributeSpecializations);
+        if (randomAttribute) {
+            newInstance.attributeSpec = randomAttribute;
+        }
+
+        // ✨ 3. '전사', '거너', '메딕' 클래스에 대한 특별 처리
         // 전사와 거너의 랜덤 스킬 풀에서 'AID'를 제외합니다.
         const nonAidSkillTypes = ['ACTIVE', 'BUFF', 'DEBUFF', 'PASSIVE'];
 

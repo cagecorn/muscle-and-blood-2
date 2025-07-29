@@ -23,6 +23,8 @@ export class UnitDetailDOM {
         const proficiencies = classProficiencies[unitData.id] || [];
         // ✨ 특화 태그 목록을 가져옵니다.
         const specializations = classSpecializations[unitData.id] || [];
+        // ✨ 1. 용병의 고유 속성 특화 정보를 가져옵니다.
+        const attributeSpec = unitData.attributeSpec;
 
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
@@ -68,6 +70,7 @@ export class UnitDetailDOM {
                     <div class="proficiency-tags-container">
                         ${proficiencies.map(tag => `<span class="proficiency-tag">${tag}</span>`).join('')}
                         ${specializations.map(spec => `<span class="specialization-tag" data-tooltip="${spec.description}">${spec.tag}</span>`).join('')}
+                        ${attributeSpec ? `<span class="attribute-tag" data-tooltip="${attributeSpec.description}">${attributeSpec.tag}</span>` : ''}
                     </div>
                 </div>
                 <div class="unit-grades right">

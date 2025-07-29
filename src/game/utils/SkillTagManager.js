@@ -34,6 +34,11 @@ export const SKILL_TAGS = {
     EARTH: '대지',      // '대지' 자원 관련
     IRON: '철',         // '철' 자원 관련
     LIGHT: '빛',        // '빛' 자원 관련
+    // ✨ [신규] 속성 태그 추가
+    FIRE: '불',
+    WATER: '물',
+    WIND: '바람',
+    DARK: '어둠',
     PRODUCTION: '생산', // 공유 자원을 생성하는 스킬
     THROWING: '투척',   // 무기나 물체를 던지는 컨셉
     SPECIAL: '특수 스킬',// 특수 슬롯 전용 스킬
