@@ -15,7 +15,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 공격력으로 공격합니다.',
             illustrationPath: 'assets/images/skills/rending_strike.png',
             requiredClass: 'warrior',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
         },
@@ -28,7 +28,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 공격력으로 공격합니다.',
             illustrationPath: 'assets/images/skills/rending_strike.png',
             requiredClass: 'warrior',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
         },
@@ -41,7 +41,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 공격력으로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/rending_strike.png',
             requiredClass: 'warrior',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             generatesToken: { chance: 0.5, amount: 1 }
@@ -55,7 +55,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 공격력으로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/rending_strike.png',
             requiredClass: 'warrior',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             generatesToken: { chance: 1.0, amount: 1 }
@@ -71,7 +71,7 @@ export const activeSkills = {
             description: '적을 {{damage}}%의 데미지로 공격하고, 1턴간 기절 시킵니다.',
             illustrationPath: 'assets/images/skills/charge.png',
             requiredClass: 'warrior',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 3,
             range: 1,
             effect: {
@@ -89,7 +89,7 @@ export const activeSkills = {
             description: '적을 {{damage}}%의 데미지로 공격하고, 1턴간 기절 시킵니다.',
             illustrationPath: 'assets/images/skills/charge.png',
             requiredClass: 'warrior',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 2,
             range: 1,
             effect: {
@@ -107,7 +107,7 @@ export const activeSkills = {
             description: '적을 {{damage}}%의 데미지로 공격하고, 1턴간 기절 시킵니다.',
             illustrationPath: 'assets/images/skills/charge.png',
             requiredClass: 'warrior',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 2,
             range: 1,
             effect: {
@@ -125,7 +125,7 @@ export const activeSkills = {
             description: '적을 {{damage}}%의 데미지로 공격하고, 2턴간 기절 시킵니다.',
             illustrationPath: 'assets/images/skills/charge.png',
             requiredClass: 'warrior',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 2,
             range: 1,
             effect: {
@@ -145,7 +145,7 @@ export const activeSkills = {
             description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 2턴)',
             illustrationPath: 'assets/images/skills/knock-back-shot.png',
             requiredClass: 'gunner',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 2,
             range: 3,
             push: 1
@@ -159,7 +159,7 @@ export const activeSkills = {
             description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 1턴)',
             illustrationPath: 'assets/images/skills/knock-back-shot.png',
             requiredClass: 'gunner',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 1,
             range: 3,
             push: 1
@@ -173,7 +173,7 @@ export const activeSkills = {
             description: '적에게 {{damage}}% 데미지를 주고 뒤로 1칸 밀쳐냅니다. (쿨타임 1턴)',
             illustrationPath: 'assets/images/skills/knock-back-shot.png',
             requiredClass: 'gunner',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 1,
             range: 3,
             push: 1
@@ -187,7 +187,7 @@ export const activeSkills = {
             description: '적에게 {{damage}}% 데미지를 주고 뒤로 2칸 밀쳐냅니다. (쿨타임 1턴)',
             illustrationPath: 'assets/images/skills/knock-back-shot.png',
             requiredClass: 'gunner',
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             cooldown: 1,
             range: 3,
             push: 2
@@ -205,7 +205,7 @@ export const activeSkills = {
             description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             requiredClass: 'gunner',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 3,
         },
@@ -218,7 +218,7 @@ export const activeSkills = {
             description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             requiredClass: 'gunner',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 3,
         },
@@ -231,7 +231,7 @@ export const activeSkills = {
             description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             requiredClass: 'gunner',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 3,
             generatesToken: { chance: 0.5, amount: 1 }
@@ -245,7 +245,7 @@ export const activeSkills = {
             description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             requiredClass: 'gunner',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 3,
             generatesToken: { chance: 1.0, amount: 1 }
@@ -262,7 +262,7 @@ export const activeSkills = {
             description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격합니다.',
             illustrationPath: 'assets/images/skills/nanobeam.png',
             requiredClass: 'nanomancer',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 2,
         },
@@ -275,7 +275,7 @@ export const activeSkills = {
             description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격합니다.',
             illustrationPath: 'assets/images/skills/nanobeam.png',
             requiredClass: 'nanomancer',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 2,
         },
@@ -288,7 +288,7 @@ export const activeSkills = {
             description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/nanobeam.png',
             requiredClass: 'nanomancer',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 2,
             generatesToken: { chance: 0.5, amount: 1 }
@@ -302,7 +302,7 @@ export const activeSkills = {
             description: '나노 입자 빔을 발사하여 적을 {{damage}}% 마법 공격력으로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
             illustrationPath: 'assets/images/skills/nanobeam.png',
             requiredClass: 'nanomancer',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 2,
             generatesToken: { chance: 1.0, amount: 1 }
@@ -321,7 +321,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
             requiredClass: 'flyingmen',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             restoresBarrierPercent: 0.05
@@ -335,7 +335,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
             requiredClass: 'flyingmen',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             restoresBarrierPercent: 0.05
@@ -349,7 +349,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 7%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
             requiredClass: 'flyingmen',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             restoresBarrierPercent: 0.07
@@ -363,7 +363,7 @@ export const activeSkills = {
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 10%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
             requiredClass: 'flyingmen',
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
             range: 1,
             restoresBarrierPercent: 0.10
@@ -385,7 +385,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 0.8,
+            damageMultiplier: { min: 0.7, max: 0.9 },
             resourceCost: { type: 'IRON', amount: 2 },
             turnOrderEffect: 'pushToBack'
         },
@@ -402,7 +402,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             resourceCost: { type: 'IRON', amount: 2 },
             turnOrderEffect: 'pushToBack'
         },
@@ -419,7 +419,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 2 },
             turnOrderEffect: 'pushToBack'
         },
@@ -436,7 +436,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 2 },
             turnOrderEffect: 'pushToBack',
             effect: {
@@ -462,7 +462,7 @@ export const activeSkills = {
             requiredClass: 'warrior',
             cooldown: 1,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 1 }
         },
         RARE: {
@@ -478,7 +478,7 @@ export const activeSkills = {
             requiredClass: 'warrior',
             cooldown: 0,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 1 }
         },
         EPIC: {
@@ -494,7 +494,7 @@ export const activeSkills = {
             requiredClass: 'warrior',
             cooldown: 0,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 1 },
             effect: {
                 type: EFFECT_TYPES.STATUS_EFFECT,
@@ -516,7 +516,7 @@ export const activeSkills = {
             requiredClass: 'warrior',
             cooldown: 0,
             range: 3,
-            damageMultiplier: 1.2,
+            damageMultiplier: { min: 1.1, max: 1.3 },
             resourceCost: { type: 'IRON', amount: 1 },
             effect: {
                 type: EFFECT_TYPES.STATUS_EFFECT,
@@ -540,7 +540,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             fixedDamage: 'CRITICAL',
         },
         RARE: {
@@ -555,7 +555,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 3,
             range: 3,
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             fixedDamage: 'CRITICAL',
         },
         EPIC: {
@@ -570,7 +570,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 2,
             range: 4,
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             fixedDamage: 'CRITICAL',
         },
         LEGENDARY: {
@@ -585,7 +585,7 @@ export const activeSkills = {
             requiredClass: 'gunner',
             cooldown: 2,
             range: 4,
-            damageMultiplier: 1.0,
+            damageMultiplier: { min: 0.9, max: 1.1 },
             fixedDamage: 'CRITICAL',
         armorPenetration: 0.15,
         },

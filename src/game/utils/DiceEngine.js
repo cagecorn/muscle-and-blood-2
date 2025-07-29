@@ -20,6 +20,24 @@ class DiceEngine {
         const index = Math.floor(Math.random() * array.length);
         return array[index];
     }
+
+    /**
+     * 지정된 범위에서 주사위를 여러 번 굴려 가장 높은 값을 반환합니다.
+     * @param {number} min - 최소값
+     * @param {number} max - 최대값
+     * @param {number} rolls - 주사위를 굴릴 횟수
+     * @returns {number} - 굴림 중 가장 높은 값
+     */
+    rollWithAdvantage(min, max, rolls = 1) {
+        let best = -Infinity;
+        for (let i = 0; i < rolls; i++) {
+            const roll = Math.random() * (max - min) + min;
+            if (roll > best) {
+                best = roll;
+            }
+        }
+        return best;
+    }
 }
 
 export const diceEngine = new DiceEngine();

@@ -52,11 +52,25 @@ class SkillModifierEngine {
         const damageModifiers = this.rankModifiers[baseSkillData.id];
         if (damageModifiers && damageModifiers[rankIndex] !== undefined) {
             if (modifiedSkill.damageMultiplier) {
-                modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
+                if (typeof modifiedSkill.damageMultiplier === 'object') {
+                    modifiedSkill.damageMultiplier = {
+                        min: modifiedSkill.damageMultiplier.min * damageModifiers[rankIndex],
+                        max: modifiedSkill.damageMultiplier.max * damageModifiers[rankIndex],
+                    };
+                } else {
+                    modifiedSkill.damageMultiplier = damageModifiers[rankIndex];
+                }
             }
             // ✨ [신규] 회복 계수 보정
             if (modifiedSkill.healMultiplier) {
-                modifiedSkill.healMultiplier = damageModifiers[rankIndex];
+                if (typeof modifiedSkill.healMultiplier === 'object') {
+                    modifiedSkill.healMultiplier = {
+                        min: modifiedSkill.healMultiplier.min * damageModifiers[rankIndex],
+                        max: modifiedSkill.healMultiplier.max * damageModifiers[rankIndex],
+                    };
+                } else {
+                    modifiedSkill.healMultiplier = damageModifiers[rankIndex];
+                }
             }
         }
 
@@ -137,9 +151,14 @@ class SkillModifierEngine {
             // 1. 데미지 계수 치환 (차지, 공격 스킬 등)
             if (modifiedSkill.damageMultiplier) {
                 // ✨ 넉백샷도 이 로직을 공유하게 됩니다.
-                const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
-                // '{{damage}}%' 패턴을 찾아 '수치%'로 변경합니다.
-                modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${damagePercent}%`);
+                if (typeof modifiedSkill.damageMultiplier === 'object') {
+                    const minDamage = Math.round(modifiedSkill.damageMultiplier.min * 100);
+                    const maxDamage = Math.round(modifiedSkill.damageMultiplier.max * 100);
+                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${minDamage}% ~ ${maxDamage}%`);
+                } else {
+                    const damagePercent = Math.round(modifiedSkill.damageMultiplier * 100);
+                    modifiedSkill.description = modifiedSkill.description.replace('{{damage}}%', `${damagePercent}%`);
+                }
             }
             // 2. 스톤 스킨 감소율 치환
             if (baseSkillData.id === 'stoneSkin') {
@@ -158,8 +177,14 @@ class SkillModifierEngine {
             }
             // ✨ [신규] 힐 스킬 설명 치환
             if (modifiedSkill.healMultiplier) {
-                const healAmount = `지혜 * ${modifiedSkill.healMultiplier.toFixed(2)}`;
-                modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', healAmount);
+                if (typeof modifiedSkill.healMultiplier === 'object') {
+                    const minHeal = modifiedSkill.healMultiplier.min.toFixed(2);
+                    const maxHeal = modifiedSkill.healMultiplier.max.toFixed(2);
+                    modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', `지혜 * ${minHeal} ~ ${maxHeal}`);
+                } else {
+                    const healAmount = `지혜 * ${modifiedSkill.healMultiplier.toFixed(2)}`;
+                    modifiedSkill.description = modifiedSkill.description.replace('{{heal}}', healAmount);
+                }
             }
             if (baseSkillData.id === 'grindstone') {
                 const bonusValue = (this.rankModifiers.grindstone[rankIndex] || 0) * 100;
