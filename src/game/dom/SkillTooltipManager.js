@@ -21,13 +21,16 @@ export class SkillTooltipManager {
             skillNameHTML += ` <span style="font-size: 14px; color: #ffc107;">[${className} 전용]</span>`;
         }
 
+        // 사거리 텍스트: 없으면 "기본 사거리"로 표시
+        const rangeText = skillData.range !== undefined ? `사거리 ${skillData.range}` : '기본 사거리';
+
         tooltip.innerHTML = `
             <div class="skill-illustration-large" style="background-image: url(${skillData.illustrationPath})"></div>
             <div class="skill-info-large">
                 <div class="skill-name-large">${skillNameHTML}</div>
                 <div class="skill-type-cost-large">
                     <span style="color: ${SKILL_TYPES[skillData.type].color};">[${SKILL_TYPES[skillData.type].name}]</span>
-                    <span>쿨타임 ${skillData.cooldown || 0}</span>
+                    <span>${rangeText} | 쿨타임 ${skillData.cooldown || 0}</span>
                 </div>
                 <div class="skill-description-large">${description}</div>
                 <div class="skill-cost-container-large"></div>

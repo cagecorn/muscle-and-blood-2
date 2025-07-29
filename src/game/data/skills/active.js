@@ -16,7 +16,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/rending_strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
         },
         RARE: {
             id: 'attack',
@@ -28,7 +27,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/rending_strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
         },
         EPIC: {
             id: 'attack',
@@ -40,7 +38,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/rending_strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             generatesToken: { chance: 0.5, amount: 1 }
         },
         LEGENDARY: {
@@ -53,7 +50,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/rending_strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             generatesToken: { chance: 1.0, amount: 1 }
         }
     },
@@ -194,7 +190,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 3,
         },
         RARE: {
             id: 'rangedAttack',
@@ -206,7 +201,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 3,
         },
         EPIC: {
             id: 'rangedAttack',
@@ -218,7 +212,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 3,
             generatesToken: { chance: 0.5, amount: 1 }
         },
         LEGENDARY: {
@@ -231,7 +224,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 3,
             generatesToken: { chance: 1.0, amount: 1 }
         }
     },
@@ -247,7 +239,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/nanobeam.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 2,
         },
         RARE: {
             id: 'nanobeam',
@@ -259,7 +250,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/nanobeam.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 2,
         },
         EPIC: {
             id: 'nanobeam',
@@ -271,7 +261,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/nanobeam.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 2,
             generatesToken: { chance: 0.5, amount: 1 }
         },
         LEGENDARY: {
@@ -284,7 +273,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/nanobeam.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 2,
             generatesToken: { chance: 1.0, amount: 1 }
         }
     },
@@ -302,7 +290,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/axe-strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             restoresBarrierPercent: 0.05
         },
         RARE: {
@@ -315,7 +302,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/axe-strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             restoresBarrierPercent: 0.05
         },
         EPIC: {
@@ -328,7 +314,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/axe-strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             restoresBarrierPercent: 0.07
         },
         LEGENDARY: {
@@ -341,7 +326,6 @@ export const activeSkills = {
             illustrationPath: 'assets/images/skills/axe-strike.png',
             damageMultiplier: { min: 0.9, max: 1.1 },
             cooldown: 0,
-            range: 1,
             restoresBarrierPercent: 0.10
         }
     },
