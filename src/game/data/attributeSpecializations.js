@@ -1,5 +1,5 @@
 import { SKILL_TAGS } from '../utils/SkillTagManager.js';
-import { EFFECT_TYPES } from '../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../utils/EffectTypes.js';
 
 /**
  * 용병에게 무작위로 부여되는 '속성 특화' 목록입니다.

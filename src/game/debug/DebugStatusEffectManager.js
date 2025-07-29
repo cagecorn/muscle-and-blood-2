@@ -1,5 +1,5 @@
 import { debugLogEngine } from '../utils/DebugLogEngine.js';
-import { EFFECT_TYPES } from '../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../utils/EffectTypes.js';
 
 class DebugStatusEffectManager {
     constructor() {

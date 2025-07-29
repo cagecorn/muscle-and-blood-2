@@ -1,5 +1,5 @@
 import { SKILL_TAGS } from '../utils/SkillTagManager.js';
-import { EFFECT_TYPES } from '../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../utils/EffectTypes.js';
 
 /**
  * 각 클래스별 특화 태그와 이에 따른 보너스 효과 정의

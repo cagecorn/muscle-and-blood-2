@@ -7,13 +7,8 @@ import { skillInventoryManager } from './SkillInventoryManager.js';
 import { passiveSkills } from '../data/skills/passive.js';
 // 상태이상 시 스프라이트 교체에 사용
 import { spriteEngine } from './SpriteEngine.js';
-
-// 효과의 종류를 명확히 구분하기 위한 상수
-export const EFFECT_TYPES = {
-    BUFF: 'BUFF',
-    DEBUFF: 'DEBUFF',
-    STATUS_EFFECT: 'STATUS_EFFECT', // 기절, 빙결 등 행동을 제어하는 효과
-};
+// 효과 타입 상수 분리
+import { EFFECT_TYPES } from './EffectTypes.js';
 
 /**
  * 게임 내 모든 상태 효과(버프, 디버프, 상태이상)를 관리하는 중앙 엔진
