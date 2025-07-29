@@ -15,6 +15,8 @@ import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 // ✨ 1. 새로 만든 BattleTagManager를 import 합니다.
 import { battleTagManager } from '../../game/utils/BattleTagManager.js';
 import { turnOrderManager } from '../../game/utils/TurnOrderManager.js';
+import { classProficiencies } from '../../game/data/classProficiencies.js';
+import { diceEngine } from '../../game/utils/DiceEngine.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se, battleSimulator } = {}) {
@@ -52,6 +54,34 @@ class UseSkillNode extends Node {
 
         debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, rank, instanceData.grade);
 
+        // ✨ 숙련도에 따른 주사위 굴림으로 최종 계수 결정
+        let finalDamageMultiplier = modifiedSkill.damageMultiplier;
+        if (typeof finalDamageMultiplier === 'object') {
+            const prof = classProficiencies[unit.id] || [];
+            const matching = modifiedSkill.tags.filter(t => prof.includes(t)).length;
+            const rolls = Math.max(1, matching);
+            finalDamageMultiplier = diceEngine.rollWithAdvantage(
+                finalDamageMultiplier.min,
+                finalDamageMultiplier.max,
+                rolls
+            );
+            debugLogEngine.log('UseSkillNode', `${unit.instanceName}의 [${modifiedSkill.name}] 숙련도 체크. 일치 태그: ${matching}개. 주사위 ${rolls}번 굴림 -> 최종 계수: ${finalDamageMultiplier.toFixed(2)}`);
+        }
+
+        let finalHealMultiplier = modifiedSkill.healMultiplier;
+        if (typeof finalHealMultiplier === 'object') {
+            const prof = classProficiencies[unit.id] || [];
+            const matching = modifiedSkill.tags.filter(t => prof.includes(t)).length;
+            const rolls = Math.max(1, matching);
+            finalHealMultiplier = diceEngine.rollWithAdvantage(
+                finalHealMultiplier.min,
+                finalHealMultiplier.max,
+                rolls
+            );
+        }
+
+        const skillToUse = { ...modifiedSkill, damageMultiplier: finalDamageMultiplier, healMultiplier: finalHealMultiplier };
+
         if (!this.skillEngine.canUseSkill(unit, modifiedSkill)) {
             debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${modifiedSkill.name}] 사용 조건 미충족`);
             return NodeState.FAILURE;
@@ -87,7 +117,7 @@ class UseSkillNode extends Node {
                 const { damage: totalDamage, hitType, comboCount } = this.combatEngine.calculateDamage(
                     unit,
                     skillTarget,
-                    baseSkillData,
+                    skillToUse,
                     instanceId,
                     instanceData.grade
                 );
@@ -171,7 +201,7 @@ class UseSkillNode extends Node {
             if (skillTarget.isHealingProhibited) {
                 debugLogEngine.log('UseSkillNode', `${skillTarget.instanceName}은(는) 치료 금지 상태라 회복 불가!`);
             } else {
-                const healAmount = Math.round(unit.finalStats.wisdom * (modifiedSkill.healMultiplier || 0));
+                const healAmount = Math.round(unit.finalStats.wisdom * (skillToUse.healMultiplier || 0));
                 skillTarget.currentHp = Math.min(skillTarget.finalStats.hp, skillTarget.currentHp + healAmount);
                 this.vfxManager.createDamageNumber(skillTarget.sprite.x, skillTarget.sprite.y, `+${healAmount}`, '#22c55e');
                 if (modifiedSkill.removesDebuff && Math.random() < modifiedSkill.removesDebuff.chance) {

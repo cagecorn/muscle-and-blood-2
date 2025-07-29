@@ -16,7 +16,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 0,
             range: 2,
-            healMultiplier: 1.0,
+            healMultiplier: { min: 0.9, max: 1.1 },
         },
         RARE: {
             id: 'heal',
@@ -30,7 +30,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 0,
             range: 2,
-            healMultiplier: 1.0,
+            healMultiplier: { min: 0.9, max: 1.1 },
         },
         EPIC: {
             id: 'heal',
@@ -44,7 +44,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 0,
             range: 2,
-            healMultiplier: 1.0,
+            healMultiplier: { min: 0.9, max: 1.1 },
             removesDebuff: { chance: 0.5 }
         },
         LEGENDARY: {
@@ -59,7 +59,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 0,
             range: 2,
-            healMultiplier: 1.0,
+            healMultiplier: { min: 0.9, max: 1.1 },
             removesDebuff: { chance: 1.0 }
         }
     },
@@ -77,7 +77,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 3,
             range: 3,
-            healMultiplier: 0.5,
+            healMultiplier: { min: 0.45, max: 0.55 },
             effect: {
                 id: 'willGuard',
                 type: EFFECT_TYPES.BUFF,
@@ -96,7 +96,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 3,
             range: 3,
-            healMultiplier: 0.5,
+            healMultiplier: { min: 0.45, max: 0.55 },
             effect: {
                 id: 'willGuard',
                 type: EFFECT_TYPES.BUFF,
@@ -115,7 +115,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 2,
             range: 4,
-            healMultiplier: 0.5,
+            healMultiplier: { min: 0.45, max: 0.55 },
             effect: {
                 id: 'willGuard',
                 type: EFFECT_TYPES.BUFF,
@@ -134,7 +134,7 @@ export const aidSkills = {
             requiredClass: 'medic',
             cooldown: 2,
             range: 4,
-            healMultiplier: 0.5,
+            healMultiplier: { min: 0.45, max: 0.55 },
             effect: {
                 id: 'willGuard',
                 type: EFFECT_TYPES.BUFF,
