@@ -140,6 +140,20 @@ class UseSkillNode extends Node {
                     await formationEngine.pushUnit(skillTarget, unit, modifiedSkill.push, this.animationEngine);
                 }
 
+                // --- ▼ [신규] 배리어 회복 로직 추가 ▼ ---
+                if (modifiedSkill.restoresBarrierPercent && unit.maxBarrier > 0) {
+                    const healAmount = Math.round(unit.maxBarrier * modifiedSkill.restoresBarrierPercent);
+                    unit.currentBarrier = Math.min(unit.maxBarrier, unit.currentBarrier + healAmount);
+                    this.vfxManager.createDamageNumber(
+                        unit.sprite.x,
+                        unit.sprite.y - 10,
+                        `+${healAmount}`,
+                        '#ffd700',
+                        '배리어'
+                    );
+                }
+                // --- ▲ [신규] 배리어 회복 로직 추가 ▲ ---
+
                 if (skillTarget.currentHp <= 0) {
                     this.terminationManager.handleUnitDeath(skillTarget);
                 }

@@ -95,6 +95,16 @@ export class Preloader extends Scene
         this.load.image('nanomancer-ui', 'images/unit/nanomancer-ui.png');
         // --- ▲ [신규] 나노맨서 관련 이미지 로드 추가 ▲ ---
 
+        // --- ▼ [신규] 플라잉맨 관련 이미지 로드 추가 ▼ ---
+        this.load.image('flyingmen', 'images/unit/flyingmen.png');
+        this.load.image('flyingmen-attack', 'images/unit/flyingmen-attack.png');
+        this.load.image('flyingmen-hitted', 'images/unit/flyingmen-hitted.png');
+        this.load.image('flyingmen-cast', 'images/unit/flyingmen-cast.png');
+        this.load.image('flyingmen-status-effects', 'images/unit/flyingmen-status-effects.png');
+        this.load.image('flyingmen-hire', 'images/unit/flyingmen-hire.png');
+        this.load.image('flyingmen-ui', 'images/unit/flyingmen-ui.png');
+        // --- ▲ [신규] 플라잉맨 관련 이미지 로드 추가 ▲ ---
+
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
 
@@ -123,6 +133,7 @@ export class Preloader extends Scene
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
         this.load.image('stigma', 'images/skills/stigma.png');
         this.load.image('nanobeam', 'images/skills/nanobeam.png');
+        this.load.image('axe-strike', 'images/skills/axe-strike.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');
@@ -147,7 +158,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'medic', 'nanomancer', 'zombie', 'ancestor-peor',
+            'warrior', 'gunner', 'medic', 'nanomancer', 'flyingmen', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

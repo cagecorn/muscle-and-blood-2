@@ -29,6 +29,7 @@ class SkillInventoryManager {
                 // 원거리 공격 스킬 카드도 등급별로 지급합니다.
                 this.addSkillById('rangedAttack', grade);
                 this.addSkillById('nanobeam', grade);
+                this.addSkillById('axeStrike', grade);
                 this.addSkillById('stoneSkin', grade);
                 this.addSkillById('shieldBreak', grade);
                 this.addSkillById('ironWill', grade);

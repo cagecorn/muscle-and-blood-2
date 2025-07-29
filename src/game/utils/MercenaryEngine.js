@@ -44,15 +44,16 @@ class MercenaryEngine {
         // 전사와 거너의 랜덤 스킬 풀에서 'AID'를 제외합니다.
         const nonAidSkillTypes = ['ACTIVE', 'BUFF', 'DEBUFF', 'PASSIVE'];
 
-        if (newInstance.id === 'warrior') {
+        if (newInstance.id === 'warrior' || newInstance.id === 'flyingmen') {
             newInstance.skillSlots = skillEngine.generateRandomSkillSlots(nonAidSkillTypes);
             // 4번째 슬롯을 'ACTIVE' 타입으로 고정
             newInstance.skillSlots.push('ACTIVE');
 
-            // 인벤토리에서 'attack' 스킬 인스턴스를 소비하고, 동일한 스킬을 새로 생성하여 장착합니다.
-            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill('attack');
+            // 인벤토리에서 기본 공격 스킬 인스턴스를 소비하고, 동일한 스킬을 새로 생성하여 장착합니다.
+            const baseAttackSkillId = newInstance.id === 'warrior' ? 'attack' : 'axeStrike';
+            const consumed = skillInventoryManager.findAndRemoveInstanceOfSkill(baseAttackSkillId);
             if (consumed) {
-                const attackInstance = skillInventoryManager.addSkillById('attack', consumed.grade);
+                const attackInstance = skillInventoryManager.addSkillById(baseAttackSkillId, consumed.grade);
                 // 4번 슬롯(인덱스 3)에 장착
                 ownedSkillsManager.equipSkill(newInstance.uniqueId, 3, attackInstance.instanceId);
                 // 새로 생성된 인스턴스는 용병 전용이므로 인벤토리 목록에서는 제거합니다.
