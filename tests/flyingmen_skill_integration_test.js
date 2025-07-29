@@ -12,16 +12,13 @@ const expectedDamage = [1.3, 1.2, 1.1, 1.0];
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(axeStrikeBase[grade], rank, grade);
-        assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-        if (grade === 'NORMAL') {
-            assert.strictEqual(skill.cost, 1);
-        } else {
-            assert.strictEqual(skill.cost, 0);
-        }
+    const skill = skillModifierEngine.getModifiedSkill(axeStrikeBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    if (grade === 'NORMAL') {
+        assert.strictEqual(skill.cost, 1);
+    } else {
+        assert.strictEqual(skill.cost, 0);
     }
-    const skill = skillModifierEngine.getModifiedSkill(axeStrikeBase[grade], 1, grade);
     if (grade === 'NORMAL' || grade === 'RARE') {
         assert.strictEqual(skill.restoresBarrierPercent, 0.05);
     } else if (grade === 'EPIC') {

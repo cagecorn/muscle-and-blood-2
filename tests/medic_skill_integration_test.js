@@ -12,14 +12,12 @@ const expectedHeals = [1.3, 1.2, 1.1, 1.0];
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(healBase[grade], rank, grade);
-        assert(skill.healMultiplier && typeof skill.healMultiplier === 'object');
-        if (grade === 'NORMAL') {
-            assert.strictEqual(skill.cost, 1);
-        } else {
-            assert.strictEqual(skill.cost, 0);
-        }
+    const skill = skillModifierEngine.getModifiedSkill(healBase[grade], grade);
+    assert(skill.healMultiplier && typeof skill.healMultiplier === 'object');
+    if (grade === 'NORMAL') {
+        assert.strictEqual(skill.cost, 1);
+    } else {
+        assert.strictEqual(skill.cost, 0);
     }
 }
 
@@ -34,7 +32,7 @@ const stigmaBase = {
 const expectedCooldowns = { NORMAL: 5, RARE: 4, EPIC: 3, LEGENDARY: 3 };
 
 for (const grade of grades) {
-    const skill = skillModifierEngine.getModifiedSkill(stigmaBase[grade], 1, grade);
+    const skill = skillModifierEngine.getModifiedSkill(stigmaBase[grade], grade);
     assert.strictEqual(skill.cooldown, expectedCooldowns[grade]);
     if (grade === 'LEGENDARY') {
         assert.strictEqual(skill.numberOfTargets, 2);
@@ -52,17 +50,12 @@ const willGuardBase = {
 const expectedWillGuardHeals = [0.8, 0.7, 0.6, 0.5];
 
 for (const grade of grades) {
-    for (let rank = 1; rank <= 4; rank++) {
-        const skill = skillModifierEngine.getModifiedSkill(willGuardBase[grade], rank, grade);
+    const skill = skillModifierEngine.getModifiedSkill(willGuardBase[grade], grade);
+    assert(skill.healMultiplier && typeof skill.healMultiplier === 'object');
 
-        // 순위별 치유 계수 확인
-        assert(skill.healMultiplier && typeof skill.healMultiplier === 'object');
-
-        // 등급별 스탯 확인
-        assert.strictEqual(skill.cost, willGuardBase[grade].cost, `Will Guard cost failed for ${grade}`);
-        assert.strictEqual(skill.cooldown, willGuardBase[grade].cooldown, `Will Guard cooldown failed for ${grade}`);
-        assert.strictEqual(skill.effect.stack.amount, willGuardBase[grade].effect.stack.amount, `Will Guard stack amount failed for ${grade}`);
-    }
+    assert.strictEqual(skill.cost, willGuardBase[grade].cost, `Will Guard cost failed for ${grade}`);
+    assert.strictEqual(skill.cooldown, willGuardBase[grade].cooldown, `Will Guard cooldown failed for ${grade}`);
+    assert.strictEqual(skill.effect.stack.amount, willGuardBase[grade].effect.stack.amount, `Will Guard stack amount failed for ${grade}`);
 }
 // --- ▲ [신규] 윌 가드 테스트 로직 추가 ▲ ---
 

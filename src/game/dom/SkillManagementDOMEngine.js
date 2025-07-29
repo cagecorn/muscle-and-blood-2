@@ -225,9 +225,6 @@ export class SkillManagementDOMEngine {
         slot.ondragover = e => e.preventDefault();
         slot.ondrop = e => this.onDropOnSlot(e);
 
-        const rank = document.createElement('span');
-        rank.innerText = `${index + 1} 순위`;
-        slot.appendChild(rank);
 
         return slot;
     }

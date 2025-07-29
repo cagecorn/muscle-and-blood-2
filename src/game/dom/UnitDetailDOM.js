@@ -155,8 +155,6 @@ export class UnitDetailDOM {
                     }
                 }
                 slot.style.backgroundImage = bgImage;
-
-                slot.innerHTML += `<span class="slot-rank">${index + 1} 순위</span>`;
                 if (index < 4) {
                     mainSkillGrid.appendChild(slot);
                 } else {

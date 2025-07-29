@@ -13,8 +13,7 @@ const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 // 2. 모든 등급에 대해 테스트 실행
 for (const grade of grades) {
-    // 특수 스킬은 순위 보정이 없으므로 rank는 1로 고정
-    const skill = skillModifierEngine.getModifiedSkill(mightyShieldBase[grade], 1, grade);
+    const skill = skillModifierEngine.getModifiedSkill(mightyShieldBase[grade], grade);
 
     // 3. 각 등급별 속성 값이 예상과 일치하는지 확인
     assert.strictEqual(skill.cooldown, mightyShieldBase[grade].cooldown, `Cooldown failed for ${grade}`);
