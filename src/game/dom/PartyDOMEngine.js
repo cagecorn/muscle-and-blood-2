@@ -141,6 +141,12 @@ export class PartyDOMEngine {
 
         this.unitDetailView = UnitDetailDOM.create(unitData);
         this.container.appendChild(this.unitDetailView);
+
+        // ✨ [추가] DOM에 추가한 후 'visible' 클래스를 추가하여 fade-in 애니메이션을 트리거합니다.
+        // requestAnimationFrame을 사용하여 브라우저가 요소를 렌더링할 시간을 줍니다.
+        requestAnimationFrame(() => {
+            this.unitDetailView.classList.add('visible');
+        });
     }
 
     hideUnitDetails() {

@@ -17,10 +17,14 @@ export class UnitDetailDOM {
         const grades = classGrades[unitData.id] || {};
 
         const overlay = document.createElement('div');
-        overlay.id = 'unit-detail-overlay';
+        // ✨ [수정] ID 대신 클래스를 사용합니다.
+        overlay.className = 'modal-overlay';
         overlay.onclick = (e) => {
-            if (e.target.id === 'unit-detail-overlay') {
-                overlay.remove();
+            // ✨ [수정] fade-out 애니메이션을 위해 클래스를 제거하는 방식으로 변경합니다.
+            if (e.target === overlay) {
+                overlay.classList.remove('visible');
+                // 애니메이션이 끝난 후 DOM에서 완전히 제거합니다.
+                overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
             }
         };
 
@@ -34,7 +38,7 @@ export class UnitDetailDOM {
                 <span class="unit-class">${unitData.name}</span>
                 <span class="unit-level">Lv. ${unitData.level}</span>
             </div>
-            <div id="unit-detail-close" onclick="this.closest('#unit-detail-overlay').remove()">X</div>
+            <div id="unit-detail-close">X</div>
         `;
         detailPane.innerHTML = headerHTML;
 
@@ -151,6 +155,13 @@ export class UnitDetailDOM {
         detailContent.appendChild(rightSection);
         detailPane.appendChild(detailContent);
         overlay.appendChild(detailPane);
+
+        // ✨ [추가] 닫기 버튼에 이벤트 리스너를 추가합니다.
+        const closeButton = detailPane.querySelector('#unit-detail-close');
+        closeButton.onclick = () => {
+            overlay.classList.remove('visible');
+            overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+        };
 
         return overlay;
     }

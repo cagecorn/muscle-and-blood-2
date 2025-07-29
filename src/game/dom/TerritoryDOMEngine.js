@@ -195,7 +195,8 @@ export class TerritoryDOMEngine {
         if (this.hireModal) return;
 
         this.hireModal = document.createElement('div');
-        this.hireModal.id = 'hire-modal-overlay';
+        // ✨ [수정] ID 대신 클래스를 사용합니다.
+        this.hireModal.className = 'modal-overlay';
         
         const modalContent = document.createElement('div');
         modalContent.id = 'hire-modal-content';
@@ -249,6 +250,11 @@ export class TerritoryDOMEngine {
         this.hireModal.appendChild(modalContent);
         this.container.appendChild(this.hireModal);
 
+        // ✨ [추가] fade-in 애니메이션을 트리거합니다.
+        requestAnimationFrame(() => {
+            this.hireModal.classList.add('visible');
+        });
+
         this.hireModal.addEventListener('wheel', (event) => {
             event.preventDefault();
             this.changeMercenary(event.deltaY > 0 ? 1 : -1);
@@ -259,8 +265,12 @@ export class TerritoryDOMEngine {
     
     hideHireModal() {
         if (this.hireModal) {
-            this.hireModal.remove();
-            this.hireModal = null;
+            // ✨ [수정] fade-out 애니메이션을 트리거하고, 끝나면 DOM에서 제거합니다.
+            this.hireModal.classList.remove('visible');
+            this.hireModal.addEventListener('transitionend', () => {
+                if (this.hireModal) this.hireModal.remove();
+                this.hireModal = null;
+            }, { once: true });
         }
     }
 
@@ -299,6 +309,11 @@ export class TerritoryDOMEngine {
 
         this.unitDetailView = UnitDetailDOM.create(unitData);
         this.container.appendChild(this.unitDetailView);
+
+        // ✨ [추가] fade-in 애니메이션을 트리거합니다.
+        requestAnimationFrame(() => {
+            this.unitDetailView.classList.add('visible');
+        });
     }
 
     hideUnitDetails() {
