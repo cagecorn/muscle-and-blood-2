@@ -1,4 +1,4 @@
-import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../../utils/EffectTypes.js';
 import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 

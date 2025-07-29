@@ -1,4 +1,4 @@
-import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../../utils/EffectTypes.js';
 import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 
 // 디버프 스킬 데이터 정의

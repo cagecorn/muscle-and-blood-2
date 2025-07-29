@@ -1,4 +1,4 @@
-import { EFFECT_TYPES } from '../../utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../../utils/EffectTypes.js';
 
 export const strategySkills = {
     chargeOrder: {
