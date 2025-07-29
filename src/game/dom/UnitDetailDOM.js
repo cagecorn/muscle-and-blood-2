@@ -6,6 +6,8 @@ import { SkillTooltipManager } from './SkillTooltipManager.js';
 import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 // ✨ 등급 데이터를 가져오기 위해 classGrades를 import합니다.
 import { classGrades } from '../data/classGrades.js';
+// ✨ 1. 새로 만든 숙련도 태그 데이터를 가져옵니다.
+import { classProficiencies } from '../data/classProficiencies.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -15,6 +17,8 @@ export class UnitDetailDOM {
         const finalStats = statEngine.calculateStats(unitData, unitData.baseStats, []);
         // ✨ 해당 유닛의 등급 데이터를 가져옵니다.
         const grades = classGrades[unitData.id] || {};
+        // ✨ 2. 현재 유닛의 숙련도 태그 목록을 가져옵니다.
+        const proficiencies = classProficiencies[unitData.id] || [];
 
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
@@ -56,7 +60,11 @@ export class UnitDetailDOM {
                     <div class="grade-item" data-tooltip="원거리 공격 등급: 원거리 공격 시 유불리를 나타냅니다. 원거리 딜러에게 중요합니다.">🏹 ${grades.rangedAttack || 1}</div>
                     <div class="grade-item" data-tooltip="마법 공격 등급: 마법 공격 시 효율을 나타냅니다. 마법사 클래스의 핵심 능력치입니다.">🔮 ${grades.magicAttack || 1}</div>
                 </div>
-                <div class="unit-portrait" style="background-image: url(${unitData.uiImage})"></div>
+                <div class="unit-portrait" style="background-image: url(${unitData.uiImage})">
+                    <div class="proficiency-tags-container">
+                        ${proficiencies.map(tag => `<span class="proficiency-tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
                 <div class="unit-grades right">
                     <div class="grade-item" data-tooltip="근접 방어 등급: 근접 공격을 받았을 때 얼마나 잘 버티는지 나타냅니다. 탱커에게 필수적입니다.">🛡️ ${grades.meleeDefense || 1}</div>
                     <div class="grade-item" data-tooltip="원거리 방어 등급: 화살이나 총탄 등 원거리 공격에 대한 저항력입니다.">🎯 ${grades.rangedDefense || 1}</div>
