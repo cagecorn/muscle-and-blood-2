@@ -99,6 +99,19 @@ class UseSkillNode extends Node {
             }
         });
 
+        // ✨ [신규] 속성 특화 보너스 적용 로직
+        if (unit.attributeSpec) {
+            const spec = unit.attributeSpec;
+            if (skillToUse.tags.includes(spec.tag)) {
+                const bonusEffectSkill = {
+                    name: `속성 특화: ${spec.tag}`,
+                    effect: spec.effect
+                };
+                statusEffectManager.addEffect(unit, bonusEffectSkill);
+                debugLogEngine.log('UseSkillNode', `${unit.instanceName}가 속성 특화 태그 [${spec.tag}] 보너스 획득!`);
+            }
+        }
+
         // ✨ 2. 스킬 사용이 확정된 이 시점에 BattleTagManager에 정보를 기록합니다.
         battleTagManager.recordSkillUse(unit, skillTarget, modifiedSkill);
 
