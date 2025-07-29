@@ -18,7 +18,8 @@ class FindPathToSkillRangeNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const skillRange = skillData.range || unit.finalStats.attackRange || 1;
+        // 스킬 range가 없으면 유닛의 기본 attackRange 사용, 기본값은 1
+        const skillRange = skillData.range ?? unit.finalStats.attackRange ?? 1;
 
         const path = this._findPathToUnit(unit, target, skillRange);
         if (path) {
