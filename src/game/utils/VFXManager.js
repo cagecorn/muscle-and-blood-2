@@ -76,6 +76,32 @@ export class VFXManager {
     }
 
     /**
+     * 유닛의 체력바 표시를 갱신합니다.
+     * healthBar는 DOM 요소 또는 Phaser 객체 모음일 수 있습니다.
+     * @param {object} healthBar - 업데이트할 체력바 객체
+     * @param {number} currentHp - 현재 체력
+     * @param {number} maxHp - 최대 체력
+     */
+    updateHealthBar(healthBar, currentHp, maxHp) {
+        if (!healthBar || maxHp <= 0) return;
+
+        const ratio = Math.max(0, Math.min(1, currentHp / maxHp));
+
+        // DOM 요소 형태 지원
+        if (healthBar.style) {
+            healthBar.style.width = `${ratio * 100}%`;
+        }
+
+        // Phaser 이미지/그래픽 형태 지원
+        const bar = healthBar.bar || healthBar.foreground;
+        if (bar) {
+            const fullWidth = bar.getData('fullWidth') || bar.displayWidth;
+            bar.setData('fullWidth', fullWidth);
+            bar.displayWidth = fullWidth * ratio;
+        }
+    }
+
+    /**
      * 화면 오른쪽에 콤보 카운트 텍스트를 표시합니다.
      * @param {number} count - 현재 콤보 수
      */
