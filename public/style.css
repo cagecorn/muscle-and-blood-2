@@ -1442,6 +1442,18 @@ body {
     border-radius: 12px;
 }
 
+/* ✨ [신규] 개별 특화 태그 스타일 */
+.specialization-tag {
+    background-color: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.6);
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: help;
+}
+
 .unit-grades {
     display: flex;
     flex-direction: column;
@@ -1500,8 +1512,29 @@ body {
     transition: opacity 0.2s;
 }
 
+/* ✨ [신규] 특화 태그 툴팁 스타일 */
+.specialization-tag:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1a1817;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
 
 .grade-item:hover::after,
-.grade-item:hover::before {
+.grade-item:hover::before,
+.specialization-tag:hover::after {
     opacity: 1;
 }

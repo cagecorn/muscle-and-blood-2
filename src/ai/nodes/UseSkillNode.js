@@ -17,6 +17,7 @@ import { battleTagManager } from '../../game/utils/BattleTagManager.js';
 import { turnOrderManager } from '../../game/utils/TurnOrderManager.js';
 import { classProficiencies } from '../../game/data/classProficiencies.js';
 import { diceEngine } from '../../game/utils/DiceEngine.js';
+import { classSpecializations } from '../../game/data/classSpecializations.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se, battleSimulator } = {}) {
@@ -86,6 +87,17 @@ class UseSkillNode extends Node {
             debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${modifiedSkill.name}] 사용 조건 미충족`);
             return NodeState.FAILURE;
         }
+
+        // ✨ 클래스 특화 태그 보너스 적용
+        const specializations = classSpecializations[unit.id] || [];
+        skillToUse.tags.forEach(tag => {
+            const spec = specializations.find(s => s.tag === tag);
+            if (spec) {
+                const bonusEffectSkill = { name: `특화 보너스: ${spec.tag}`, effect: spec.effect };
+                statusEffectManager.addEffect(unit, bonusEffectSkill);
+                debugLogEngine.log('UseSkillNode', `${unit.instanceName}가 특화 태그 [${spec.tag}] 보너스 획득!`);
+            }
+        });
 
         // ✨ 2. 스킬 사용이 확정된 이 시점에 BattleTagManager에 정보를 기록합니다.
         battleTagManager.recordSkillUse(unit, skillTarget, modifiedSkill);
