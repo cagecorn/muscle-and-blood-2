@@ -311,8 +311,8 @@ export class SkillManagementDOMEngine {
             alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
             return;
         }
-        // 1~4번 슬롯은 타입이 일치해야 함
-        if (targetSlotIndex < 4 && draggedSkillData.type !== targetSlotType) {
+        // ✨ [수정] 전략 스킬이 아닐 경우에만 타입 일치를 검사합니다.
+        if (targetSlotIndex < 4 && draggedSkillData.type !== 'STRATEGY' && draggedSkillData.type !== targetSlotType) {
             alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
             return;
         }
