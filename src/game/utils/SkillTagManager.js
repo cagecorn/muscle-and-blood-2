@@ -33,6 +33,7 @@ export const SKILL_TAGS = {
     WILL: '의지',       // '정신력', '용기' 테마 스킬 그룹
     EARTH: '대지',      // '대지' 자원 관련
     IRON: '철',         // '철' 자원 관련
+    LIGHT: '빛',        // '빛' 자원 관련
     PRODUCTION: '생산', // 공유 자원을 생성하는 스킬
     THROWING: '투척',   // 무기나 물체를 던지는 컨셉
     SPECIAL: '특수 스킬',// 특수 슬롯 전용 스킬
