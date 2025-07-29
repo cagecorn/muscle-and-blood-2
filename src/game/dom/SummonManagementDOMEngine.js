@@ -132,9 +132,9 @@ export class SummonManagementDOMEngine {
 
     createSkillSlotElement(slotType, index, instanceId) {
         const slot = document.createElement('div');
-        slot.className = `merc-skill-slot ${slotType.toLowerCase()}-slot`;
+        // ✨ 소환 슬롯도 타입 제한 없이 동일한 스타일을 사용합니다.
+        slot.className = 'merc-skill-slot';
         slot.dataset.slotIndex = index;
-        slot.dataset.slotType = slotType;
 
         if (instanceId) {
             const instanceData = skillInventoryManager.getInstanceData(instanceId);
@@ -225,7 +225,6 @@ export class SummonManagementDOMEngine {
 
         const targetSlot = event.currentTarget;
         const targetSlotIndex = parseInt(targetSlot.dataset.slotIndex);
-        const targetSlotType = targetSlot.dataset.slotType;
         const targetInstanceId = targetSlot.dataset.instanceId ? parseInt(targetSlot.dataset.instanceId) : null;
 
         const unitId = this.selectedMercenaryData.uniqueId;
@@ -233,14 +232,7 @@ export class SummonManagementDOMEngine {
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
-        if (draggedSkillData.requiredClass && this.selectedMercenaryData.id !== draggedSkillData.requiredClass) {
-            alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
-            return;
-        }
-        if (draggedSkillData.type !== targetSlotType) {
-            alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
-            return;
-        }
+        // ✨ 타입이나 클래스 제한 없이 장착 가능하도록 수정합니다.
 
         if (this.draggedData.source === 'inventory') {
             ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);

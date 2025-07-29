@@ -14,7 +14,6 @@ export const debuffSkills = {
             targetType: 'enemy',
             description: '적에게 3턴간 받는 데미지 증가 {{increase}}% 디버프를 겁니다. (쿨타임 2턴)',
             illustrationPath: 'assets/images/skills/shield-break.png',
-            requiredClass: 'warrior',
             cooldown: 2,
             range: 1,
             effect: {
@@ -38,7 +37,6 @@ export const debuffSkills = {
             targetType: 'enemy',
             description: '적에게 3턴간 받는 데미지 증가 {{increase}}% 디버프를 겁니다. (쿨타임 2턴)',
             illustrationPath: 'assets/images/skills/shield-break.png',
-            requiredClass: 'warrior',
             cooldown: 2,
             range: 1,
             effect: {
@@ -62,7 +60,6 @@ export const debuffSkills = {
             targetType: 'enemy',
             description: '적에게 3턴간 받는 데미지 {{increase}}% 증가, 방어력 5% 감소 디버프를 겁니다. (쿨타임 2턴)',
             illustrationPath: 'assets/images/skills/shield-break.png',
-            requiredClass: 'warrior',
             cooldown: 2,
             range: 1,
             effect: {
@@ -86,7 +83,6 @@ export const debuffSkills = {
             targetType: 'enemy',
             description: '적에게 3턴간 받는 데미지 {{increase}}% 증가, 방어력 10% 감소 디버프를 겁니다. (쿨타임 2턴)',
             illustrationPath: 'assets/images/skills/shield-break.png',
-            requiredClass: 'warrior',
             cooldown: 2,
             range: 1,
             effect: {

@@ -12,7 +12,6 @@ export const passiveSkills = {
         cost: 0,
         description: '체력이 감소할수록 받는 데미지가 감소합니다. 최대 {{maxReduction}}%. 등급이 높을수록 매 턴 체력을 회복합니다.',
         illustrationPath: 'assets/images/skills/iron_will.png',
-        requiredClass: 'warrior',
 
         // 등급별 상세 효과 정의
         NORMAL: {

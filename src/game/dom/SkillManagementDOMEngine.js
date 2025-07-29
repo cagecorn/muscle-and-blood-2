@@ -188,10 +188,9 @@ export class SkillManagementDOMEngine {
 
     createSkillSlotElement(slotType, index, instanceId) {
         const slot = document.createElement('div');
-        const typeClass = slotType ? `${slotType.toLowerCase()}-slot` : 'empty-slot';
-        slot.className = `merc-skill-slot ${typeClass}`;
+        // ✨ 슬롯 타입에 관계없이 동일한 스타일을 사용합니다.
+        slot.className = `merc-skill-slot`;
         slot.dataset.slotIndex = index;
-        slot.dataset.slotType = slotType;
 
         if (instanceId) {
             const instanceData = skillInventoryManager.getInstanceData(instanceId);
@@ -284,7 +283,6 @@ export class SkillManagementDOMEngine {
 
         const targetSlot = event.currentTarget;
         const targetSlotIndex = parseInt(targetSlot.dataset.slotIndex);
-        const targetSlotType = targetSlot.dataset.slotType;
         const targetInstanceId = targetSlot.dataset.instanceId ? parseInt(targetSlot.dataset.instanceId) : null;
 
         const unitId = this.selectedMercenaryData.uniqueId;
@@ -292,30 +290,7 @@ export class SkillManagementDOMEngine {
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
-        // --- 슬롯 장착 규칙 검사 ---
-        const isSpecialSkill = draggedSkillData.tags && draggedSkillData.tags.includes('특수 스킬');
-
-        // 특수 스킬은 5~8번 슬롯에만 장착 가능
-        if (isSpecialSkill && targetSlotIndex < 4) {
-            alert('특수 스킬은 5~8번 슬롯에만 장착할 수 있습니다.');
-            return;
-        }
-
-        // 일반 스킬은 특수 스킬 슬롯에 장착할 수 없음
-        if (!isSpecialSkill && targetSlotIndex >= 4) {
-            alert('일반 스킬은 특수 스킬 슬롯에 장착할 수 없습니다.');
-            return;
-        }
-
-        if (draggedSkillData.requiredClass && this.selectedMercenaryData.id !== draggedSkillData.requiredClass) {
-            alert(`이 스킬은 ${draggedSkillData.requiredClass} 전용입니다.`);
-            return;
-        }
-        // ✨ [수정] 전략 스킬이 아닐 경우에만 타입 일치를 검사합니다.
-        if (targetSlotIndex < 4 && draggedSkillData.type !== 'STRATEGY' && draggedSkillData.type !== targetSlotType) {
-            alert('스킬과 슬롯의 타입이 일치하지 않습니다.');
-            return;
-        }
+        // ✨ 슬롯 타입이나 클래스에 대한 제한을 두지 않습니다.
 
         if (this.draggedData.source === 'inventory') {
             ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);

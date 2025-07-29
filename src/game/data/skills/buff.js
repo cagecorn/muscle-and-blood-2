@@ -14,7 +14,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}% 버프를 겁니다. 공유 자원 [대지]를 1개 생산합니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/ston-skin.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             generatesResource: { type: 'EARTH', amount: 1 },
             effect: {
@@ -38,7 +37,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}% 버프를 겁니다. 공유 자원 [대지]를 1개 생산합니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/ston-skin.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             generatesResource: { type: 'EARTH', amount: 1 },
             effect: {
@@ -62,7 +60,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}%, 방어력 상승 10% 버프를 겁니다. 공유 자원 [대지]를 1개 생산합니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/ston-skin.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             generatesResource: { type: 'EARTH', amount: 1 },
             effect: {
@@ -86,7 +83,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '4턴간 자신에게 데미지 감소 {{reduction}}%, 방어력 상승 15% 버프를 겁니다. 공유 자원 [대지]를 1개 생산합니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/ston-skin.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             generatesResource: { type: 'EARTH', amount: 1 },
             effect: {
@@ -110,7 +106,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '날카롭게 벼려낸 칼날이 번뜩입니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 공유 자원 [철]을 1개 생산합니다.',
             illustrationPath: 'assets/images/skills/grindstone.png',
-            requiredClass: 'warrior',
             cooldown: 2,
             generatesResource: { type: 'IRON', amount: 1 },
             effect: {
@@ -133,7 +128,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '숙련된 솜씨로 무기를 손질합니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 1개 생산합니다. (쿨타임 1턴)',
             illustrationPath: 'assets/images/skills/grindstone.png',
-            requiredClass: 'warrior',
             cooldown: 1,
             generatesResource: { type: 'IRON', amount: 1 },
             effect: {
@@ -156,7 +150,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '순식간에 무기를 최상의 상태로 만듭니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 1개 생산합니다.',
             illustrationPath: 'assets/images/skills/grindstone.png',
-            requiredClass: 'warrior',
             cooldown: 1,
             generatesResource: { type: 'IRON', amount: 1 },
             effect: {
@@ -179,7 +172,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '장인의 경지에 이른 연마술입니다. 1턴간 자신의 공격력을 {{attackBonus}}% 상승시키고 [철]을 2개 생산합니다.',
             illustrationPath: 'assets/images/skills/grindstone.png',
-            requiredClass: 'warrior',
             cooldown: 1,
             generatesResource: { type: 'IRON', amount: 2 },
             effect: {
@@ -206,7 +198,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '2턴간 자신의 [공격력]을 {{attackBonus}}% 상승시키고, [근접 공격 등급]을 +1 상승시킵니다.',
             illustrationPath: 'assets/images/skills/battle_cry.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             effect: {
                 id: 'battleCryBuff',
@@ -227,7 +218,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '2턴간 자신의 [공격력]을 {{attackBonus}}% 상승시키고, [근접 공격 등급]을 +1 상승시킵니다.',
             illustrationPath: 'assets/images/skills/battle_cry.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             effect: {
                 id: 'battleCryBuff',
@@ -248,7 +238,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '3턴간 자신의 [공격력]을 {{attackBonus}}% 상승시키고, [근접 공격 등급]을 +1 상승시킵니다.',
             illustrationPath: 'assets/images/skills/battle_cry.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             effect: {
                 id: 'battleCryBuff',
@@ -269,7 +258,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '3턴간 자신의 [공격력]을 {{attackBonus}}% 상승시키고, [근접 공격 등급]을 +1 상승시킵니다.',
             illustrationPath: 'assets/images/skills/battle_cry.png',
-            requiredClass: 'warrior',
             cooldown: 3,
             effect: {
                 id: 'battleCryBuff',
@@ -295,7 +283,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 4턴)',
             illustrationPath: 'assets/images/skills/hunt-sense.png',
-            requiredClass: 'gunner',
             cooldown: 4,
             effect: {
                 id: 'huntSenseBuff',
@@ -316,7 +303,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 4턴)',
             illustrationPath: 'assets/images/skills/hunt-sense.png',
-            requiredClass: 'gunner',
             cooldown: 4,
             effect: {
                 id: 'huntSenseBuff',
@@ -337,7 +323,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '3턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/hunt-sense.png',
-            requiredClass: 'gunner',
             cooldown: 3,
             effect: {
                 id: 'huntSenseBuff',
@@ -358,7 +343,6 @@ export const buffSkills = {
             targetType: 'self',
             description: '4턴간 자신의 [원거리 공격 등급]을 +1, [치명타 확률]을 {{critChance}}% 상승시킵니다. (쿨타임 3턴)',
             illustrationPath: 'assets/images/skills/hunt-sense.png',
-            requiredClass: 'gunner',
             cooldown: 3,
             effect: {
                 id: 'huntSenseBuff',
