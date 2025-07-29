@@ -8,6 +8,8 @@ import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 import { classGrades } from '../data/classGrades.js';
 // ✨ 1. 새로 만든 숙련도 태그 데이터를 가져옵니다.
 import { classProficiencies } from '../data/classProficiencies.js';
+// ✨ 새로 만든 특화 태그 데이터를 가져옵니다.
+import { classSpecializations } from '../data/classSpecializations.js';
 
 /**
  * 용병 상세 정보 창의 DOM을 생성하고 관리하는 유틸리티 클래스
@@ -19,6 +21,8 @@ export class UnitDetailDOM {
         const grades = classGrades[unitData.id] || {};
         // ✨ 2. 현재 유닛의 숙련도 태그 목록을 가져옵니다.
         const proficiencies = classProficiencies[unitData.id] || [];
+        // ✨ 특화 태그 목록을 가져옵니다.
+        const specializations = classSpecializations[unitData.id] || [];
 
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
@@ -63,6 +67,7 @@ export class UnitDetailDOM {
                 <div class="unit-portrait" style="background-image: url(${unitData.uiImage})">
                     <div class="proficiency-tags-container">
                         ${proficiencies.map(tag => `<span class="proficiency-tag">${tag}</span>`).join('')}
+                        ${specializations.map(spec => `<span class="specialization-tag" data-tooltip="${spec.description}">${spec.tag}</span>`).join('')}
                     </div>
                 </div>
                 <div class="unit-grades right">

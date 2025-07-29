@@ -100,4 +100,32 @@ export const statusEffects = {
         },
     },
     // --- ▲ [신규] 마이티 쉴드 효과 추가 ▲ ---
+
+    // --- ▼ [신규] 클래스 특화 보너스 효과 추가 ▼ ---
+    warriorWillBonus: {
+        id: 'warriorWillBonus',
+        name: '투지',
+        iconPath: 'assets/images/skills/battle_cry.png',
+    },
+    gunnerKineticBonus: {
+        id: 'gunnerKineticBonus',
+        name: '반동 제어',
+        iconPath: 'assets/images/skills/knock-back-shot.png',
+    },
+    medicHealBonus: {
+        id: 'medicHealBonus',
+        name: '집중',
+        iconPath: 'assets/images/skills/heal.png',
+    },
+    nanomancerProductionBonus: {
+        id: 'nanomancerProductionBonus',
+        name: '과부하',
+        iconPath: 'assets/images/skills/nanobeam.png',
+    },
+    flyingmenChargeBonus: {
+        id: 'flyingmenChargeBonus',
+        name: '신속',
+        iconPath: 'assets/images/skills/charge.png',
+    },
+    // --- ▲ [신규] 클래스 특화 보너스 효과 추가 ▲ ---
 };
