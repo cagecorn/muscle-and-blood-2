@@ -4,6 +4,9 @@ import { SKILL_TAGS } from './SkillTagManager.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 // 새로 만든 점수 데이터 파일을 import 합니다.
 import { SCORE_BY_TYPE, SCORE_BY_TAG } from '../data/skillScores.js';
+// ✨ AIMemoryEngine과 Debug 매니저 추가
+import { aiMemoryEngine } from './AIMemoryEngine.js';
+import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
 
 /**
  * AI의 스킬 선택을 위해 각 스킬의 전략적 가치를 계산하는 엔진
@@ -23,7 +26,7 @@ class SkillScoreEngine {
      * @param {Array<object>} enemies - 모든 적군 유닛 목록
      * @returns {number} - 계산된 최종 점수
      */
-    calculateScore(unit, skillData, allies, enemies) {
+    async calculateScore(unit, skillData, target, allies, enemies) {
         if (!skillData || skillData.type === 'PASSIVE') {
             return 0;
         }
@@ -69,16 +72,41 @@ class SkillScoreEngine {
             }
         }
 
-        const totalScore = baseScore + tagScore + situationScore;
+        const calculatedScore = baseScore + tagScore + situationScore;
+
+        // ✨ AI 기억 가중치 적용
+        let finalScore = calculatedScore;
+        if (target && target.team !== unit.team) {
+            const memory = await aiMemoryEngine.getMemory(unit.uniqueId);
+            const targetMemory = memory[`target_${target.uniqueId}`];
+            if (targetMemory) {
+                const attackType = this.getAttackTypeFromSkillTags(skillData.tags);
+                if (attackType) {
+                    const weight = targetMemory[`${attackType}_weight`] || 1.0;
+                    if (weight !== 1.0) {
+                        finalScore *= weight;
+                        debugAIMemoryManager.logScoreModification(skillData.name, calculatedScore, weight, finalScore);
+                    }
+                }
+            }
+        }
 
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${totalScore}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
-        return totalScore;
+        return finalScore;
+    }
+
+    // ✨ 스킬 태그로부터 공격 타입을 알아내는 헬퍼 함수
+    getAttackTypeFromSkillTags(tags = []) {
+        if (tags.includes(SKILL_TAGS.MELEE)) return 'melee';
+        if (tags.includes(SKILL_TAGS.RANGED)) return 'ranged';
+        if (tags.includes(SKILL_TAGS.MAGIC)) return 'magic';
+        return null;
     }
 }
 

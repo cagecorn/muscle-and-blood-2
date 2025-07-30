@@ -18,27 +18,34 @@ class FindBestSkillByScoreNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
 
+        const target = blackboard.get('skillTarget');
         const equippedSkillInstances = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
         const allies = blackboard.get('allyUnits') || [];
         const enemies = blackboard.get('enemyUnits') || [];
 
         let bestSkill = null;
-        let maxScore = -1;
+        let maxScore = -Infinity;
 
+        const availableSkills = [];
         for (const instanceId of equippedSkillInstances) {
             if (!instanceId || usedSkills.has(instanceId)) continue;
-
             const instData = skillInventoryManager.getInstanceData(instanceId);
             const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
-
             if (this.skillEngine.canUseSkill(unit, skillData)) {
-                // ✨ 스코어 계산 시 unit, allies, enemies 정보를 함께 전달합니다.
-                const currentScore = this.skillScoreEngine.calculateScore(unit, skillData, allies, enemies);
-                if (currentScore > maxScore) {
-                    maxScore = currentScore;
-                    bestSkill = { skillData, instanceId };
-                }
+                availableSkills.push({ skillData, instanceId });
+            }
+        }
+
+        const scores = await Promise.all(
+            availableSkills.map(s => this.skillScoreEngine.calculateScore(unit, s.skillData, target, allies, enemies))
+        );
+
+        for (let i = 0; i < availableSkills.length; i++) {
+            const currentScore = scores[i];
+            if (currentScore > maxScore) {
+                maxScore = currentScore;
+                bestSkill = availableSkills[i];
             }
         }
 
