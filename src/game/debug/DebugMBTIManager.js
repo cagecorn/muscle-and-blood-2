@@ -15,7 +15,11 @@ class DebugMBTIManager {
      * @param {object} unit - 해당 유닛
      */
     logDecisionStart(decisionName, unit) {
-        const mbtiString = `E:${unit.mbti.E}/I:${unit.mbti.I} S:${unit.mbti.S}/N:${unit.mbti.N} T:${unit.mbti.T}/F:${unit.mbti.F} J:${unit.mbti.J}/P:${unit.mbti.P}`;
+        let mbtiString = 'N/A';
+        if (unit && unit.mbti) {
+            const m = unit.mbti;
+            mbtiString = `E:${m.E}/I:${m.I} S:${m.S}/N:${m.N} T:${m.T}/F:${m.F} J:${m.J}/P:${m.P}`;
+        }
         console.groupCollapsed(
             `%c[${this.name}]`, `color: #ea580c; font-weight: bold;`,
             `${unit.instanceName} - ${decisionName} (MBTI: ${mbtiString})`
