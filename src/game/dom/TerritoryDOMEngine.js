@@ -34,6 +34,7 @@ export class TerritoryDOMEngine {
         this.addSkillManagementButton(1, 1);
         // --- ✨ [신규] 선조 소환 관리 버튼 추가 ---
         this.addSummonManagementButton(2, 1); // 스킬 관리 옆에 배치
+        this.addArenaButton(0, 2); // 아레나 아이콘 추가
     }
 
     createGrid() {
@@ -150,6 +151,21 @@ export class TerritoryDOMEngine {
             this.container.style.display = 'none';
             // ✨ SummonManagementScene을 시작합니다.
             this.scene.scene.start('SummonManagementScene');
+        });
+        this.grid.appendChild(button);
+    }
+
+    addArenaButton(col, row) {
+        const button = document.createElement('div');
+        button.className = 'building-icon';
+        button.style.backgroundImage = 'url(assets/images/territory/arena-icon.png)';
+        button.style.gridColumnStart = col + 1;
+        button.style.gridRowStart = row + 1;
+        button.addEventListener('mouseover', (event) => this.domEngine.showTooltip(event.clientX, event.clientY, '[아레나]'));
+        button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
+        button.addEventListener('click', () => {
+            this.container.style.display = 'none';
+            this.scene.scene.start('ArenaScene');
         });
         this.grid.appendChild(button);
     }
