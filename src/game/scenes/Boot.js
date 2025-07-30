@@ -15,6 +15,7 @@ import { CursedForestBattleScene } from './CursedForestBattleScene.js';
 import { SkillManagementScene } from './SkillManagementScene.js';
 // ✨ SummonManagementScene을 import 합니다.
 import { SummonManagementScene } from './SummonManagementScene.js';
+import { ArenaScene } from './ArenaScene.js';
 
 export class Boot extends Scene
 {
@@ -46,6 +47,7 @@ export class Boot extends Scene
         this.scene.add('SkillManagementScene', SkillManagementScene);
         // ✨ 새로 만든 씬을 추가합니다.
         this.scene.add('SummonManagementScene', SummonManagementScene);
+        this.scene.add('ArenaScene', ArenaScene);
 
         this.scene.start('Preloader');
     }
