@@ -1,6 +1,7 @@
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { skillInventoryManager } from './SkillInventoryManager.js';
 import { classProficiencies } from '../data/classProficiencies.js';
+import { classSpecializations } from '../data/classSpecializations.js';
 
 /**
  * 용병의 MBTI 성향에 따라 장착할 스킬 카드를 결정하는 엔진 (심화 버전)
@@ -48,14 +49,32 @@ class MercenaryCardSelector {
         let selected = [];
         let currentCandidates = [...candidates];
 
+        const proficiencies = classProficiencies[mercenary.id] || [];
+        const specializations = classSpecializations[mercenary.id]?.map(s => s.tag) || [];
+
         for (let i = 0; i < count; i++) {
             if (currentCandidates.length === 0) break;
 
-            // 각 카드에 대해 MBTI 기반 선호도 점수 계산
+            const proficientSkillsCount = selected.filter(inst => {
+                const data = this._getSkillData(inst);
+                return data.tags && data.tags.some(tag => proficiencies.includes(tag) || specializations.includes(tag));
+            }).length;
+
             const weightedCandidates = currentCandidates.map(inst => {
                 const card = this._getSkillData(inst);
                 const tags = card.tags || [];
-                let score = 100; // 기본 점수
+                let score = 100;
+
+                const isProficientOrSpecialized = tags.some(tag => proficiencies.includes(tag) || specializations.includes(tag));
+                if (isProficientOrSpecialized) {
+                    if (proficientSkillsCount < 2) {
+                        score += 400;
+                    } else if (proficientSkillsCount < 4) {
+                        score += 150;
+                    } else {
+                        score += 50;
+                    }
+                }
 
                 // E vs I: 외향(공격/돌진) vs 내향(원거리/방어)
                 if (tags.some(t => [SKILL_TAGS.CHARGE, SKILL_TAGS.MELEE].includes(t))) score += mercenary.mbti.E;
