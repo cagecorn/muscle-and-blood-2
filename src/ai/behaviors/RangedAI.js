@@ -63,8 +63,7 @@ function createRangedAI(engines = {}) {
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -91,8 +90,7 @@ function createRangedAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -119,8 +117,7 @@ function createRangedAI(engines = {}) {
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -140,8 +137,7 @@ function createRangedAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FindPathToAllyNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -167,8 +163,7 @@ function createRangedAI(engines = {}) {
                 { async evaluate() { debugMBTIManager.logAction('유리한 위치로 이동 (J)'); return NodeState.SUCCESS; } },
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ])
     ]);
 
@@ -184,8 +179,7 @@ function createRangedAI(engines = {}) {
         new FindKitingPositionNode(engines),
         new MoveToTargetNode(engines),
         new SelectorNode([
-            attackSequence,
-            new SuccessNode()
+            attackSequence
         ])
     ]);
 
