@@ -200,6 +200,11 @@ export class BattleSimulatorEngine {
                     console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
                 }
 
+                // ✨ Reset stun recovery flag at turn end
+                if (currentUnit.justRecoveredFromStun) {
+                    currentUnit.justRecoveredFromStun = false;
+                }
+
                 // 살아있는 유닛은 기절 여부와 관계없이 쿨다운이 감소해야 합니다.
                 cooldownManager.reduceCooldowns(currentUnit.uniqueId);
 
