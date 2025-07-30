@@ -20,6 +20,21 @@ class MercenaryEngine {
     }
 
     /**
+     * MBTI 성향 점수를 생성합니다.
+     * @returns {object} - 각 MBTI 축에 대한 점수
+     */
+    _generateMBTI() {
+        const traits = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        const axes = [ ['E','I'], ['S','N'], ['T','F'], ['J','P'] ];
+        axes.forEach(axis => {
+            const score = Math.floor(Math.random() * 101); // 0-100
+            traits[axis[0]] = score;
+            traits[axis[1]] = 100 - score;
+        });
+        return traits;
+    }
+
+    /**
      * 특정 타입의 용병을 고용하고, 고유한 인스턴스를 생성하여 반환합니다.
      * @param {object} baseMercenaryData - 고용할 용병의 기본 데이터
      * @param {string} type - 생성할 유닛의 타입 ('ally' 또는 'enemy')
@@ -37,7 +52,9 @@ class MercenaryEngine {
             exp: 0,
             equippedItems: [],
             // ✨ 모든 용병이 동일한 형태의 스킬 슬롯을 갖도록 초기화합니다.
-            skillSlots: [null, null, null, null, null, null, null, null]
+            skillSlots: [null, null, null, null, null, null, null, null],
+            // ✨ 각 용병은 고유한 MBTI 성향을 가집니다.
+            mbti: this._generateMBTI()
         };
 
         // ✨ 2. [신규] 용병 생성 시 무작위 속성 특화 태그를 부여합니다.

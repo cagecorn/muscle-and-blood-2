@@ -13,6 +13,11 @@ import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
+import MBTIActionNode from '../nodes/MBTIActionNode.js';
+import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
+import FleeNode from '../nodes/FleeNode.js';
+import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
+import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
 
 /**
  * 근접 유닛(전사)을 위한 행동 트리를 재구성합니다.
@@ -41,7 +46,56 @@ function createMeleeAI(engines = {}) {
         ])
     ]);
 
+    // MBTI 기반 이동 결정
+    const mbtiBasedMovement = new SelectorNode([
+        new SequenceNode([
+            new MBTIActionNode('E'),
+            new FindMeleeStrategicTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        new SuccessNode()
+    ]);
+
+    // 체력이 낮을 때 생존 본능
+    const survivalBehavior = new SequenceNode([
+        new IsHealthBelowThresholdNode(0.35),
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('I'),
+                new FleeNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SequenceNode([
+                new MBTIActionNode('E'),
+                new FindTargetBySkillTypeNode(engines),
+                new UseSkillNode(engines)
+            ]),
+            new SuccessNode()
+        ])
+    ]);
+
+    // 위험한 아군을 돌보는 로직
+    const allyCareBehavior = new SequenceNode([
+        new FindNearestAllyInDangerNode(),
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('F'),
+                new HasNotMovedNode(),
+                new FindPathToAllyNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SuccessNode()
+        ])
+    ]);
+
     const rootNode = new SelectorNode([
+        // 최우선: 생존 본능
+        survivalBehavior,
+
+        // 두번째: 아군 돌보기 또는 무시
+        allyCareBehavior,
+
         // 우선순위 1: 1번 슬롯 스킬 사용 시도
         new SequenceNode([
             new CanUseSkillBySlotNode(0),
@@ -88,13 +142,10 @@ function createMeleeAI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 우선순위 6: 사용할 스킬이 없을 경우, 이동만 실행
+        // 우선순위 6: 사용할 스킬이 없을 경우 MBTI 기반 이동만 실행
         new SequenceNode([
-            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
             new HasNotMovedNode(),
-            new FindMeleeStrategicTargetNode(engines),
-            new FindPathToTargetNode(engines),
-            new MoveToTargetNode(engines)
+            mbtiBasedMovement
         ]),
 
         // 최후의 보루: 아무것도 할 수 없을 때 성공으로 턴 종료
