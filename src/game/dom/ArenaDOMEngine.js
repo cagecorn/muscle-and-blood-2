@@ -1,7 +1,7 @@
 import { partyEngine } from '../utils/PartyEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { formationEngine } from '../utils/FormationEngine.js';
-import { arenaManager } from '../utils/ArenaManager.js'; // ArenaManager import
+import { arenaManager } from '../utils/ArenaManager.js';
 
 export class ArenaDOMEngine {
     constructor(scene, domEngine) {
@@ -129,24 +129,25 @@ export class ArenaDOMEngine {
         }
     }
 
-    // ArenaDOMEngine 클래스 내에 새로운 메소드 추가
+    // 저장된 위치를 사용하여 적 유닛을 배치합니다.
     placeEnemyUnits() {
         const enemyTeam = arenaManager.getEnemyTeam();
-        const cells = Array.from(this.grid.children).filter(c => !c.classList.contains('ally-area'));
 
         enemyTeam.forEach(unit => {
-            // 적 진형 내에서 무작위 빈 셀을 찾습니다.
-            const availableCells = cells.filter(c => !c.hasChildNodes());
-            if (availableCells.length === 0) return;
+            const savedIndex = formationEngine.getPosition(unit.uniqueId);
+            if (savedIndex === undefined) return; // 위치 정보가 없으면 건너뜀
 
-            const cell = availableCells[Math.floor(Math.random() * availableCells.length)];
-            if (!cell) return;
+            const cell = this.grid.querySelector(`.formation-cell[data-index='${savedIndex}']`);
+            if (!cell || cell.hasChildNodes()) return; // 셀이 없거나 이미 유닛이 있으면 건너뜀
+
+            // 아군 영역에 배치되지 않도록 방어 코드 추가
+            if (cell.classList.contains('ally-area')) return;
 
             const unitDiv = document.createElement('div');
-            unitDiv.className = 'formation-unit'; // 동일한 스타일 사용
+            unitDiv.className = 'formation-unit';
             unitDiv.dataset.unitId = unit.uniqueId;
             unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
-            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)'; // 적으로 보이도록 필터 적용
+            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)';
 
             const nameLabel = document.createElement('div');
             nameLabel.className = 'formation-unit-name';
