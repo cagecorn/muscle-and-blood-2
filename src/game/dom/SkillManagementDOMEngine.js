@@ -204,7 +204,8 @@ export class SkillManagementDOMEngine {
             slot.dataset.instanceId = instanceId;
             slot.draggable = true;
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId, slotIndex: index });
-            slot.onmouseenter = e => SkillTooltipManager.show(modifiedSkill, e, instanceData.grade);
+            // ✨ [핵심 변경] 툴팁 표시에 현재 용병 데이터를 전달합니다.
+            slot.onmouseenter = e => SkillTooltipManager.show(modifiedSkill, e, instanceData.grade, this.selectedMercenaryData);
             slot.onmouseleave = () => SkillTooltipManager.hide();
 
             // 등급에 따른 별 표시
@@ -253,7 +254,8 @@ export class SkillManagementDOMEngine {
             card.draggable = true;
             card.dataset.instanceId = instance.instanceId;
             card.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: instance.instanceId });
-            card.onmouseenter = e => SkillTooltipManager.show(data, e, instance.grade);
+            // ✨ [핵심 변경] 툴팁 표시에 현재 용병 데이터를 전달합니다.
+            card.onmouseenter = e => SkillTooltipManager.show(data, e, instance.grade, this.selectedMercenaryData);
             card.onmouseleave = () => SkillTooltipManager.hide();
 
             const starsContainer = document.createElement('div');
