@@ -1,6 +1,7 @@
 import { partyEngine } from '../utils/PartyEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { formationEngine } from '../utils/FormationEngine.js';
+import { arenaManager } from '../utils/ArenaManager.js'; // ArenaManager import
 
 export class ArenaDOMEngine {
     constructor(scene, domEngine) {
@@ -47,6 +48,7 @@ export class ArenaDOMEngine {
         }
 
         this.placeUnits();
+        this.placeEnemyUnits(); // 적 유닛 배치 함수 호출
 
         const backButton = document.createElement('div');
         backButton.id = 'formation-back-button';
@@ -125,6 +127,34 @@ export class ArenaDOMEngine {
             const otherId = parseInt(targetUnit.dataset.unitId);
             if (otherId) formationEngine.setPosition(otherId, parseInt(fromCell.dataset.index));
         }
+    }
+
+    // ArenaDOMEngine 클래스 내에 새로운 메소드 추가
+    placeEnemyUnits() {
+        const enemyTeam = arenaManager.getEnemyTeam();
+        const cells = Array.from(this.grid.children).filter(c => !c.classList.contains('ally-area'));
+
+        enemyTeam.forEach(unit => {
+            // 적 진형 내에서 무작위 빈 셀을 찾습니다.
+            const availableCells = cells.filter(c => !c.hasChildNodes());
+            if (availableCells.length === 0) return;
+
+            const cell = availableCells[Math.floor(Math.random() * availableCells.length)];
+            if (!cell) return;
+
+            const unitDiv = document.createElement('div');
+            unitDiv.className = 'formation-unit'; // 동일한 스타일 사용
+            unitDiv.dataset.unitId = unit.uniqueId;
+            unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
+            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)'; // 적으로 보이도록 필터 적용
+
+            const nameLabel = document.createElement('div');
+            nameLabel.className = 'formation-unit-name';
+            nameLabel.innerText = unit.instanceName || unit.name;
+            unitDiv.appendChild(nameLabel);
+
+            cell.appendChild(unitDiv);
+        });
     }
 
     hide() {
