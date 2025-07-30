@@ -48,7 +48,7 @@ export class ArenaDOMEngine {
         }
 
         this.placeUnits();
-        this.placeEnemyUnits(); // 적 유닛 배치 함수 호출
+        this.placeEnemyUnits(); // 적 유닛 배치
 
         const backButton = document.createElement('div');
         backButton.id = 'formation-back-button';
@@ -58,52 +58,46 @@ export class ArenaDOMEngine {
             this.scene.scene.start('TerritoryScene');
         });
         this.container.appendChild(backButton);
+
+        // --- 전투 시작 버튼 추가 ---
+        const startBattleButton = document.createElement('div');
+        startBattleButton.id = 'start-battle-button';
+        startBattleButton.innerText = '[ 전투 시작 ]';
+        startBattleButton.style.position = 'absolute';
+        startBattleButton.style.top = '20px';
+        startBattleButton.style.right = '20px';
+        startBattleButton.style.padding = '10px 20px';
+        startBattleButton.style.backgroundColor = '#991b1b';
+        startBattleButton.style.color = '#fecaca';
+        startBattleButton.style.border = '2px solid #7f1d1d';
+        startBattleButton.style.borderRadius = '5px';
+        startBattleButton.style.cursor = 'pointer';
+        startBattleButton.style.fontSize = '18px';
+        startBattleButton.style.pointerEvents = 'auto';
+        startBattleButton.addEventListener('click', () => {
+            this.hide();
+            this.scene.scene.start('ArenaBattleScene');
+        });
+        this.container.appendChild(startBattleButton);
     }
 
     placeUnits() {
         const partyMembers = partyEngine.getPartyMembers();
         const allMercs = mercenaryEngine.getAllAlliedMercenaries();
         const cells = Array.from(this.grid.children).filter(c => c.classList.contains('ally-area'));
-        let cellIndex = 0;
+
         partyMembers.forEach(id => {
+            if (id === undefined) return;
             const unit = allMercs.find(m => m.uniqueId === id);
             if (!unit) return;
 
-            let cell = null;
             const savedIndex = formationEngine.getPosition(id);
-            if (savedIndex !== undefined) {
-                cell = this.grid.querySelector(`[data-index='${savedIndex}']`);
-            }
-            if (!cell || !cell.classList.contains('ally-area')) {
-                while(cellIndex < cells.length && cells[cellIndex].hasChildNodes()) {
-                    cellIndex++;
-                }
-                if (cellIndex < cells.length) {
-                    cell = cells[cellIndex++];
-                }
-            }
-            if (!cell) return;
+            const cell = this.grid.querySelector(`.formation-cell[data-index='${savedIndex}']`);
 
-            const unitDiv = document.createElement('div');
-            unitDiv.className = 'formation-unit';
-            unitDiv.dataset.unitId = id;
-            unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
-            unitDiv.draggable = true;
-            unitDiv.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('unit-id', id);
-                e.dataTransfer.setData('from-cell', unitDiv.parentElement.dataset.index);
-            });
-
-            const nameLabel = document.createElement('div');
-            nameLabel.className = 'formation-unit-name';
-            nameLabel.innerText = unit.instanceName || unit.name;
-            unitDiv.appendChild(nameLabel);
-
-            while (cell.firstChild) {
-                cell.removeChild(cell.firstChild);
+            if(cell && !cell.hasChildNodes()) {
+                const unitDiv = this.createUnitElement(unit, false);
+                cell.appendChild(unitDiv);
             }
-            cell.appendChild(unitDiv);
-            formationEngine.setPosition(id, parseInt(cell.dataset.index));
         });
     }
 
@@ -135,27 +129,44 @@ export class ArenaDOMEngine {
 
         enemyTeam.forEach(unit => {
             const savedIndex = formationEngine.getPosition(unit.uniqueId);
-            if (savedIndex === undefined) return; // 위치 정보가 없으면 건너뜀
+            if (savedIndex === undefined) return;
 
             const cell = this.grid.querySelector(`.formation-cell[data-index='${savedIndex}']`);
-            if (!cell || cell.hasChildNodes()) return; // 셀이 없거나 이미 유닛이 있으면 건너뜀
+            if (!cell || cell.classList.contains('ally-area') || cell.hasChildNodes()) return;
 
-            // 아군 영역에 배치되지 않도록 방어 코드 추가
-            if (cell.classList.contains('ally-area')) return;
-
-            const unitDiv = document.createElement('div');
-            unitDiv.className = 'formation-unit';
-            unitDiv.dataset.unitId = unit.uniqueId;
-            unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
-            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)';
-
-            const nameLabel = document.createElement('div');
-            nameLabel.className = 'formation-unit-name';
-            nameLabel.innerText = unit.instanceName || unit.name;
-            unitDiv.appendChild(nameLabel);
-
+            const unitDiv = this.createUnitElement(unit, true);
             cell.appendChild(unitDiv);
         });
+    }
+
+    // 유닛 DOM 요소를 생성하는 헬퍼 함수
+    createUnitElement(unit, isEnemy) {
+        const unitDiv = document.createElement('div');
+        unitDiv.className = 'formation-unit';
+        unitDiv.dataset.unitId = unit.uniqueId;
+        unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
+
+        if (isEnemy) {
+            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)';
+            unitDiv.style.cursor = 'pointer';
+            unitDiv.addEventListener('click', () => {
+                localStorage.setItem('selectedUnitForDetail', JSON.stringify(unit));
+                window.open('unit-detail-viewer.html', '_blank');
+            });
+        } else {
+            unitDiv.draggable = true;
+            unitDiv.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('unit-id', unit.uniqueId);
+                e.dataTransfer.setData('from-cell', unitDiv.parentElement.dataset.index);
+            });
+        }
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'formation-unit-name';
+        nameLabel.innerText = unit.instanceName || unit.name;
+        unitDiv.appendChild(nameLabel);
+
+        return unitDiv;
     }
 
     hide() {
