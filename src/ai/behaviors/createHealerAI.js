@@ -47,13 +47,13 @@ function createHealerAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('I'),
+                new MBTIActionNode('I', engines),
                 { async evaluate() { debugMBTIManager.logAction('후퇴 선택'); return NodeState.SUCCESS; } },
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('E'),
+                new MBTIActionNode('E', engines),
                 { async evaluate() { debugMBTIManager.logAction('최후의 발악 선택'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(0),
                 { async evaluate(unit, blackboard) { blackboard.set('skillTarget', unit); return NodeState.SUCCESS; } },
@@ -74,13 +74,13 @@ function createHealerAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('N'),
+                new MBTIActionNode('N', engines),
                 { async evaluate() { debugMBTIManager.logAction('전황 재평가 선택 (N)'); return NodeState.SUCCESS; } },
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 { async evaluate() { debugMBTIManager.logAction('위치 정비 선택 (J)'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FindSafeRepositionNode(engines),

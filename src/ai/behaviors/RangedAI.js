@@ -52,13 +52,13 @@ function createRangedAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('I'),
+                new MBTIActionNode('I', engines),
                 { async evaluate() { debugMBTIManager.logAction('후퇴 선택'); return NodeState.SUCCESS; } },
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('E'),
+                new MBTIActionNode('E', engines),
                 { async evaluate() { debugMBTIManager.logAction('최후의 발악 선택'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
@@ -79,14 +79,14 @@ function createRangedAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('P'),
+                new MBTIActionNode('P', engines),
                 { async evaluate() { debugMBTIManager.logAction('즉각 반격 선택 (P)'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 { async evaluate() { debugMBTIManager.logAction('위치 정비 선택 (J)'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FindSafeRepositionNode(engines),
@@ -107,14 +107,14 @@ function createRangedAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 new HasNotMovedNode(),
                 { async evaluate() { debugMBTIManager.logAction('다음 턴을 위해 재배치 (J)'); return NodeState.SUCCESS; } },
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('P'),
+                new MBTIActionNode('P', engines),
                 { async evaluate() { debugMBTIManager.logAction('0코스트 스킬 시도 (P)'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
@@ -135,7 +135,7 @@ function createRangedAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('F'),
+                new MBTIActionNode('F', engines),
                 { async evaluate() { debugMBTIManager.logAction('아군 지원 위치로 이동'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FindPathToAllyNode(engines),
@@ -151,7 +151,7 @@ function createRangedAI(engines = {}) {
         new FindEnemyMedicNode(),
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('P'),
+                new MBTIActionNode('P', engines),
                 { async evaluate(unit, blackboard) {
                     const target = blackboard.get('enemyMedic');
                     blackboard.set('skillTarget', target);
@@ -162,7 +162,7 @@ function createRangedAI(engines = {}) {
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 new HasNotMovedNode(),
                 { async evaluate() { debugMBTIManager.logAction('유리한 위치로 이동 (J)'); return NodeState.SUCCESS; } },
                 new FindSafeRepositionNode(engines),

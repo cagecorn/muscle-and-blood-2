@@ -7,10 +7,12 @@ import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 class MBTIActionNode extends Node {
     /**
      * @param {string} trait - 확인할 MBTI 특성 (E, I, S, N, T, F, J, P)
+     * @param {object} [engines={}] - AI에 주입될 엔진들 (VFXManager 등)
      */
-    constructor(trait) {
+    constructor(trait, engines = {}) {
         super();
         this.trait = trait.toUpperCase();
+        this.vfxManager = engines.vfxManager;
     }
 
     async evaluate(unit, blackboard) {
@@ -23,6 +25,10 @@ class MBTIActionNode extends Node {
         const success = roll <= score;
 
         debugMBTIManager.logTraitCheck(this.trait, score, roll, success);
+
+        if (success && this.vfxManager) {
+            this.vfxManager.showMBTITrait(unit.sprite, this.trait);
+        }
 
         return success ? NodeState.SUCCESS : NodeState.FAILURE;
     }
