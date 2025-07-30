@@ -24,6 +24,7 @@ import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindEnemyMedicNode from '../nodes/FindEnemyMedicNode.js';
 import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
+import IsTokenBelowThresholdNode from '../nodes/IsTokenBelowThresholdNode.js';
 
 function createRangedAI(engines = {}) {
     const executeSkillBranch = new SelectorNode([
@@ -89,6 +90,34 @@ function createRangedAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
+            ]),
+            new SuccessNode()
+        ]),
+        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
+    ]);
+
+    const lowTokenResponse = new SequenceNode([
+        new IsTokenBelowThresholdNode(1),
+        {
+            async evaluate(unit) {
+                debugMBTIManager.logDecisionStart('자원 부족 상황 판단', unit);
+                return NodeState.SUCCESS;
+            }
+        },
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('J'),
+                new HasNotMovedNode(),
+                { async evaluate() { debugMBTIManager.logAction('다음 턴을 위해 재배치 (J)'); return NodeState.SUCCESS; } },
+                new FindSafeRepositionNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SequenceNode([
+                new MBTIActionNode('P'),
+                { async evaluate() { debugMBTIManager.logAction('0코스트 스킬 시도 (P)'); return NodeState.SUCCESS; } },
+                new CanUseSkillBySlotNode(3),
+                new FindTargetBySkillTypeNode(engines),
+                executeSkillBranch
             ]),
             new SuccessNode()
         ]),
@@ -167,6 +196,7 @@ function createRangedAI(engines = {}) {
     const rootNode = new SelectorNode([
         survivalBehavior,
         postStunRecoveryBehavior,
+        lowTokenResponse,
         enemyMedicResponse,
         allyCareBehavior,
         kitingBehavior,
