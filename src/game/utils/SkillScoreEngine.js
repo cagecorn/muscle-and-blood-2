@@ -28,54 +28,55 @@ class SkillScoreEngine {
             return 0;
         }
 
-        let totalScore = 0;
+        // 가독성을 위해 계산 항목을 구분해 기록합니다.
+        let baseScore = SCORE_BY_TYPE[skillData.type] || 0;
+        let tagScore = 0;
+        let situationScore = 0;
         const situationLogs = [];
 
-        // 1. 스킬 타입별 기본 점수 추가
-        totalScore += SCORE_BY_TYPE[skillData.type] || 0;
-
-        // 2. 스킬 태그별 점수 추가 (누적)
         if (skillData.tags) {
-            for (const tag of skillData.tags) {
-                totalScore += SCORE_BY_TAG[tag] || 0;
-            }
+            skillData.tags.forEach(tag => {
+                tagScore += SCORE_BY_TAG[tag] || 0;
+            });
         }
-
-        // 3. 상황별 점수 보정
 
         const lowHealthAllies = allies.filter(a => a.currentHp / a.finalStats.hp <= 0.5).length;
-        if (lowHealthAllies > 0 && skillData.tags?.includes(SKILL_TAGS.HEAL)) {
+        if (lowHealthAllies > 0 && (skillData.tags.includes(SKILL_TAGS.HEAL) || skillData.tags.includes(SKILL_TAGS.AID))) {
             const bonus = lowHealthAllies * 15;
-            totalScore += bonus;
-            situationLogs.push(`체력 낮은 아군 ${lowHealthAllies}명 발견, +${bonus}점`);
+            situationScore += bonus;
+            situationLogs.push(`부상 아군(${lowHealthAllies}명):+${bonus}`);
         }
 
-        const buffedEnemy = enemies.find(e => {
+        const buffedEnemies = enemies.filter(e => {
             const effects = statusEffectManager.activeEffects.get(e.uniqueId) || [];
             return effects.some(effect => effect.id === 'battleCryBuff');
         });
-        if (buffedEnemy) {
+        if (buffedEnemies.length > 0) {
             if (skillData.tags.includes(SKILL_TAGS.DEBUFF)) {
-                totalScore += 10;
-                situationLogs.push('위협적인 버프를 받은 적 발견, 디버프 스킬에 +10점');
+                situationScore += 10;
+                situationLogs.push(`적 버프 대응:+10`);
             }
             if (skillData.tags.includes(SKILL_TAGS.FIXED) || skillData.type === 'STRATEGY') {
-                totalScore += 5;
-                situationLogs.push('위협적인 버프를 받은 적 발견, 고위력 스킬에 +5점');
+                situationScore += 5;
+                situationLogs.push(`적 버프 대응(고위력):+5`);
             }
         }
 
-        // 3-3. 방어/버프 스킬: 자신의 체력이 낮을 때 가산
-        if (skillData.tags?.includes(SKILL_TAGS.WILL_GUARD) || skillData.type === 'BUFF') {
-            if (unit.currentHp < unit.finalStats.hp * 0.3) {
-                totalScore += 10;
-                situationLogs.push(`자신 체력 30% 미만, 생존 스킬에 +10점`);
+        if (unit.currentHp < unit.finalStats.hp * 0.3) {
+            if (skillData.tags.includes(SKILL_TAGS.WILL_GUARD) || skillData.type === 'BUFF') {
+                situationScore += 10;
+                situationLogs.push(`생존:+10`);
             }
         }
 
-        if (situationLogs.length > 0) {
-            debugLogEngine.log(this.name, `[${unit.instanceName}] 스킬 [${skillData.name}] 점수 보정: ${situationLogs.join(', ')}`);
-        }
+        const totalScore = baseScore + tagScore + situationScore;
+
+        debugLogEngine.log(
+            this.name,
+            `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${totalScore}` +
+                (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
+        );
 
         return totalScore;
     }
