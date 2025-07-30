@@ -22,6 +22,7 @@ import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
 import JustRecoveredFromStunNode from '../nodes/JustRecoveredFromStunNode.js';
 import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import FindEnemyMedicNode from '../nodes/FindEnemyMedicNode.js';
 import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 
 function createRangedAI(engines = {}) {
@@ -115,6 +116,32 @@ function createRangedAI(engines = {}) {
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
 
+    // 상황: 적 메딕 발견 시 대응
+    const enemyMedicResponse = new SequenceNode([
+        new FindEnemyMedicNode(),
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('P'),
+                { async evaluate(unit, blackboard) {
+                    const target = blackboard.get('enemyMedic');
+                    blackboard.set('skillTarget', target);
+                    debugMBTIManager.logAction('메딕 즉시 공격 (P)');
+                    return NodeState.SUCCESS;
+                }},
+                new CanUseSkillBySlotNode(3),
+                executeSkillBranch
+            ]),
+            new SequenceNode([
+                new MBTIActionNode('J'),
+                new HasNotMovedNode(),
+                { async evaluate() { debugMBTIManager.logAction('유리한 위치로 이동 (J)'); return NodeState.SUCCESS; } },
+                new FindSafeRepositionNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SuccessNode()
+        ])
+    ]);
+
     const attackSequence = new SelectorNode([
         new SequenceNode([ new CanUseSkillBySlotNode(0), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
         new SequenceNode([ new CanUseSkillBySlotNode(1), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
@@ -140,6 +167,7 @@ function createRangedAI(engines = {}) {
     const rootNode = new SelectorNode([
         survivalBehavior,
         postStunRecoveryBehavior,
+        enemyMedicResponse,
         allyCareBehavior,
         kitingBehavior,
         attackSequence,
