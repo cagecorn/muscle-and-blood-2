@@ -5,6 +5,8 @@ import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { SkillTooltipManager } from './SkillTooltipManager.js';
 import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
+// ✨ SKILL_TAGS를 import하여 'SPECIAL' 태그를 확인할 수 있게 합니다.
+import { SKILL_TAGS } from '../utils/SkillTagManager.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -289,7 +291,18 @@ export class SkillManagementDOMEngine {
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
-        // ✨ 슬롯 타입이나 클래스에 대한 제한을 두지 않습니다.
+        // ✨ [추가] 스킬 장착 규칙 검사
+        const isSpecialSkill = draggedSkillData.tags.includes(SKILL_TAGS.SPECIAL);
+        const isSpecialSlot = targetSlotIndex >= 4;
+
+        if (isSpecialSkill && !isSpecialSlot) {
+            alert('특수 스킬은 5~8번(특수) 슬롯에만 장착할 수 있습니다.');
+            return;
+        }
+        if (!isSpecialSkill && isSpecialSlot) {
+            alert('일반 스킬은 특수 스킬 슬롯에 장착할 수 없습니다.');
+            return;
+        }
 
         if (this.draggedData.source === 'inventory') {
             ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);

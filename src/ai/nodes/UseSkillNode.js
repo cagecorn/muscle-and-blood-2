@@ -113,9 +113,13 @@ class UseSkillNode extends Node {
         // ✨ 2. 스킬 사용이 확정된 이 시점에 BattleTagManager에 정보를 기록합니다.
         battleTagManager.recordSkillUse(unit, skillTarget, modifiedSkill);
 
+        // ✨ [수정] 자원 소모 시 unit.team 정보 전달
         if (modifiedSkill.resourceCost) {
-            sharedResourceEngine.spendResource(modifiedSkill.resourceCost.type, modifiedSkill.resourceCost.amount);
-            debugLogEngine.log('UseSkillNode', `[${modifiedSkill.resourceCost.type}] ${modifiedSkill.resourceCost.amount} 소모`);
+            sharedResourceEngine.spendResource(unit.team, modifiedSkill.resourceCost);
+            const costText = Array.isArray(modifiedSkill.resourceCost) 
+                ? modifiedSkill.resourceCost.map(c => `[${c.type}] ${c.amount}`).join(', ')
+                : `[${modifiedSkill.resourceCost.type}] ${modifiedSkill.resourceCost.amount}`;
+            debugLogEngine.log('UseSkillNode', `${costText} 소모`);
         }
 
         this.skillEngine.recordSkillUse(unit, modifiedSkill); // 보정된 데이터로 기록
@@ -233,8 +237,9 @@ class UseSkillNode extends Node {
             }
         }
 
+        // ✨ [수정] 자원 생성 시 unit.team 정보 전달
         if (modifiedSkill.generatesResource) {
-            sharedResourceEngine.addResource(modifiedSkill.generatesResource.type, modifiedSkill.generatesResource.amount);
+            sharedResourceEngine.addResource(unit.team, modifiedSkill.generatesResource.type, modifiedSkill.generatesResource.amount);
             debugLogEngine.log('UseSkillNode', `[${modifiedSkill.generatesResource.type}] ${modifiedSkill.generatesResource.amount} 생산`);
         }
 

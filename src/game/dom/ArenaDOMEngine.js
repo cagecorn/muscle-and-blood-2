@@ -2,6 +2,8 @@ import { partyEngine } from '../utils/PartyEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { formationEngine } from '../utils/FormationEngine.js';
 import { arenaManager } from '../utils/ArenaManager.js';
+// ✨ UnitDetailDOM을 import하여 게임 내 상세 정보창을 사용합니다.
+import { UnitDetailDOM } from './UnitDetailDOM.js';
 
 export class ArenaDOMEngine {
     constructor(scene, domEngine) {
@@ -123,23 +125,24 @@ export class ArenaDOMEngine {
         }
     }
 
-    // 저장된 위치를 사용하여 적 유닛을 배치합니다.
+    // ✨ [수정] 적 유닛 배치 로직 수정
     placeEnemyUnits() {
         const enemyTeam = arenaManager.getEnemyTeam();
 
         enemyTeam.forEach(unit => {
-            const savedIndex = formationEngine.getPosition(unit.uniqueId);
-            if (savedIndex === undefined) return;
+            // 적 유닛의 gridX, gridY를 사용해 올바른 셀 인덱스를 계산합니다.
+            const index = unit.gridY * 16 + unit.gridX;
+            const cell = this.grid.querySelector(`.formation-cell[data-index='${index}']`);
 
-            const cell = this.grid.querySelector(`.formation-cell[data-index='${savedIndex}']`);
-            if (!cell || cell.classList.contains('ally-area') || cell.hasChildNodes()) return;
-
-            const unitDiv = this.createUnitElement(unit, true);
-            cell.appendChild(unitDiv);
+            // 셀이 존재하고, 아군 진영이 아니고, 비어있는 경우에만 배치합니다.
+            if (cell && !cell.classList.contains('ally-area') && !cell.hasChildNodes()) {
+                const unitDiv = this.createUnitElement(unit, true);
+                cell.appendChild(unitDiv);
+            }
         });
     }
 
-    // 유닛 DOM 요소를 생성하는 헬퍼 함수
+    // ✨ [수정] 유닛 DOM 요소를 생성하는 헬퍼 함수 수정
     createUnitElement(unit, isEnemy) {
         const unitDiv = document.createElement('div');
         unitDiv.className = 'formation-unit';
@@ -147,11 +150,17 @@ export class ArenaDOMEngine {
         unitDiv.style.backgroundImage = `url(assets/images/unit/${unit.id}.png)`;
 
         if (isEnemy) {
-            unitDiv.style.filter = 'grayscale(80%) brightness(0.8)';
+            // ✨ 2. 적 스프라이트 좌우 반전
+            unitDiv.style.transform = 'scaleX(-1)';
             unitDiv.style.cursor = 'pointer';
+
+            // ✨ 1. 새 탭 대신 게임 내 상세 정보창을 띄우도록 수정
             unitDiv.addEventListener('click', () => {
-                localStorage.setItem('selectedUnitForDetail', JSON.stringify(unit));
-                window.open('unit-detail-viewer.html', '_blank');
+                const detailView = UnitDetailDOM.create(unit);
+                this.container.appendChild(detailView);
+                requestAnimationFrame(() => {
+                    detailView.classList.add('visible');
+                });
             });
         } else {
             unitDiv.draggable = true;

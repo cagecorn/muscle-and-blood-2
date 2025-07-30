@@ -52,7 +52,7 @@ export class SharedResourceUIManager {
      * 현재 자원 상태에 맞춰 UI를 업데이트합니다.
      */
     update() {
-        const allResources = sharedResourceEngine.getAllResources();
+        const allResources = sharedResourceEngine.getAllResources('ally');
         for (const [type, value] of Object.entries(allResources)) {
             const element = this.resourceValueElements.get(type);
             if (element && element.innerText !== value.toString()) {
