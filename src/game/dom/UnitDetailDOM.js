@@ -81,19 +81,45 @@ export class UnitDetailDOM {
             </div>
         `;
 
+        // --- ▼ [핵심 변경] 스탯 표시 영역 구조 변경 ---
+        const statsContainerHTML = `
+            <div class="stats-container">
+                <div class="stats-header">
+                    <div class="section-title">스탯</div>
+                    <div class="stats-pagination">
+                        <button class="stats-page-btn active" data-page="1">기본</button>
+                        <button class="stats-page-btn" data-page="2">반영</button>
+                    </div>
+                </div>
+                <div id="stats-page-1" class="stats-grid stats-page active">
+                    <div class="stat-item" data-tooltip="체력. 0이 되면 전투에서 패배합니다."><span>HP</span><span>${finalStats.hp}</span></div>
+                    <div class="stat-item" data-tooltip="전투 시작 시 용맹 수치에 비례하는 '배리어'를 생성하며, 배리어가 높을수록 공격력이 증가합니다."><span>용맹</span><span>${finalStats.valor}</span></div>
+                    <div class="stat-item" data-tooltip="물리 공격력에 영향을 줍니다."><span>힘</span><span>${finalStats.strength}</span></div>
+                    <div class="stat-item" data-tooltip="물리 방어력과 상태이상 저항력에 영향을 줍니다."><span>인내</span><span>${finalStats.endurance}</span></div>
+                    <div class="stat-item" data-tooltip="물리 공격 회피율과 명중률에 영향을 줍니다."><span>민첩</span><span>${finalStats.agility}</span></div>
+                    <div class="stat-item" data-tooltip="마법 공격력과 상태이상 적용 확률에 영향을 줍니다."><span>지능</span><span>${finalStats.intelligence}</span></div>
+                    <div class="stat-item" data-tooltip="마법 방어력과 치유량에 영향을 줍니다."><span>지혜</span><span>${finalStats.wisdom}</span></div>
+                    <div class="stat-item" data-tooltip="마법 회피율과 치명타 확률에 영향을 줍니다."><span>행운</span><span>${finalStats.luck}</span></div>
+                </div>
+                <div id="stats-page-2" class="stats-grid stats-page">
+                    <div class="stat-item"><span>최대 배리어</span><span>${finalStats.maxBarrier}</span></div>
+                    <div class="stat-item"><span>총 무게</span><span>${finalStats.totalWeight}</span></div>
+                    <div class="stat-item"><span>물리 공격력</span><span>${finalStats.physicalAttack.toFixed(1)}</span></div>
+                    <div class="stat-item"><span>물리 방어력</span><span>${finalStats.physicalDefense.toFixed(1)}</span></div>
+                    <div class="stat-item"><span>마법 공격력</span><span>${finalStats.magicAttack.toFixed(1)}</span></div>
+                    <div class="stat-item"><span>마법 방어력</span><span>${finalStats.magicDefense.toFixed(1)}</span></div>
+                    <div class="stat-item"><span>치명타 확률</span><span>${(finalStats.criticalChance).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>물리 회피율</span><span>${(finalStats.physicalEvadeChance).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>상태이상 저항</span><span>${(finalStats.statusEffectResistance).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>상태이상 적용</span><span>${(finalStats.statusEffectApplication).toFixed(1)}%</span></div>
+                </div>
+            </div>
+        `;
+        // --- ▲ [핵심 변경] 스탯 표시 영역 구조 변경 ---
+
         leftSection.innerHTML = `
             ${gradeDisplayHTML}
-            <div class="stats-grid">
-                <div class="section-title">스탯</div>
-                <div class="stat-item"><span>HP</span><span>${finalStats.hp}</span></div>
-                <div class="stat-item"><span>용맹</span><span>${finalStats.valor}</span></div>
-                <div class="stat-item"><span>힘</span><span>${finalStats.strength}</span></div>
-                <div class="stat-item"><span>인내</span><span>${finalStats.endurance}</span></div>
-                <div class="stat-item"><span>민첩</span><span>${finalStats.agility}</span></div>
-                <div class="stat-item"><span>지능</span><span>${finalStats.intelligence}</span></div>
-                <div class="stat-item"><span>지혜</span><span>${finalStats.wisdom}</span></div>
-                <div class="stat-item"><span>행운</span><span>${finalStats.luck}</span></div>
-            </div>
+            ${statsContainerHTML}
         `;
 
         const rightSection = document.createElement('div');
@@ -176,6 +202,23 @@ export class UnitDetailDOM {
             overlay.classList.remove('visible');
             overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
         };
+
+        // --- ▼ [핵심 변경] 페이지네이션 버튼 이벤트 리스너 추가 ---
+        const pageButtons = leftSection.querySelectorAll('.stats-page-btn');
+        pageButtons.forEach(button => {
+            button.onclick = () => {
+                const pageNumber = button.dataset.page;
+
+                // 모든 페이지와 버튼에서 active 클래스 제거
+                leftSection.querySelectorAll('.stats-page').forEach(p => p.classList.remove('active'));
+                leftSection.querySelectorAll('.stats-page-btn').forEach(b => b.classList.remove('active'));
+
+                // 클릭된 버튼과 해당 페이지에 active 클래스 추가
+                leftSection.querySelector(`#stats-page-${pageNumber}`).classList.add('active');
+                button.classList.add('active');
+            };
+        });
+        // --- ▲ [핵심 변경] 페이지네이션 버튼 이벤트 리스너 추가 ---
 
         return overlay;
     }
