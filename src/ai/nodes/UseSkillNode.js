@@ -92,7 +92,7 @@ class UseSkillNode extends Node {
             const spec = specializations.find(s => s.tag === tag);
             if (spec) {
                 const bonusEffectSkill = { name: `특화 보너스: ${spec.tag}`, effect: spec.effect };
-                statusEffectManager.addEffect(unit, bonusEffectSkill);
+                statusEffectManager.addEffect(unit, bonusEffectSkill, unit);
                 debugLogEngine.log('UseSkillNode', `${unit.instanceName}가 특화 태그 [${spec.tag}] 보너스 획득!`);
             }
         });
@@ -105,7 +105,7 @@ class UseSkillNode extends Node {
                     name: `속성 특화: ${spec.tag}`,
                     effect: spec.effect
                 };
-                statusEffectManager.addEffect(unit, bonusEffectSkill);
+                statusEffectManager.addEffect(unit, bonusEffectSkill, unit);
                 debugLogEngine.log('UseSkillNode', `${unit.instanceName}가 속성 특화 태그 [${spec.tag}] 보너스 획득!`);
             }
         }
@@ -264,7 +264,7 @@ class UseSkillNode extends Node {
             targets.forEach(target => {
                 const roll = Math.random();
                 if (modifiedSkill.effect.chance === undefined || roll < modifiedSkill.effect.chance) {
-                    statusEffectManager.addEffect(target, modifiedSkill);
+                    statusEffectManager.addEffect(target, modifiedSkill, unit);
                 } else {
                     debugLogEngine.log('UseSkillNode', `[${modifiedSkill.name}]의 효과 발동 실패 (확률: ${modifiedSkill.effect.chance}, 주사위: ${roll.toFixed(2)})`);
                 }

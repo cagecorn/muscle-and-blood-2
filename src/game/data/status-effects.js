@@ -18,6 +18,7 @@ export const statusEffects = {
         onRemove: (unit) => {
             console.log(`${unit.instanceName}의 기절이 풀렸습니다.`);
             unit.isStunned = false;
+            unit.justRecoveredFromStun = true;
         },
     },
     // 전투의 함성: 일시적으로 근접 공격 등급을 상승시킵니다.

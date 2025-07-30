@@ -106,22 +106,22 @@ class StatusEffectManager {
      * @param {object} targetUnit - 효과를 받을 유닛
      * @param {object} sourceSkill - 효과를 발생시킨 스킬 데이터
      */
-    addEffect(targetUnit, sourceSkill) {
+    addEffect(targetUnit, sourceSkill, attackerUnit = null) {
         if (!sourceSkill.effect) return;
 
         // ✨ [신규] isGlobal 효과 처리
         if (sourceSkill.effect.isGlobal) {
             const allies = this.battleSimulator.turnQueue.filter(u => u.team === targetUnit.team && u.currentHp > 0);
             allies.forEach(ally => {
-                this.applySingleEffect(ally, sourceSkill);
+                this.applySingleEffect(ally, sourceSkill, attackerUnit);
             });
         } else {
-            this.applySingleEffect(targetUnit, sourceSkill);
+            this.applySingleEffect(targetUnit, sourceSkill, attackerUnit);
         }
     }
 
     // ✨ 기존 addEffect 로직을 별도 함수로 분리
-    applySingleEffect(targetUnit, sourceSkill) {
+    applySingleEffect(targetUnit, sourceSkill, attackerUnit = null) {
         const effectId = sourceSkill.effect.id;
         const effectDefinition = statusEffects[effectId];
 
@@ -140,6 +140,7 @@ class StatusEffectManager {
             instanceId: this.nextEffectInstanceId++,
             ...sourceSkill.effect,
             sourceSkillName: sourceSkill.name,
+            attackerId: attackerUnit ? attackerUnit.uniqueId : null,
         };
 
         if (!this.activeEffects.has(targetUnit.uniqueId)) {
@@ -150,6 +151,11 @@ class StatusEffectManager {
         if (effectDefinition.onApply) {
             // 스택 정보 등 추가 데이터를 전달하기 위해 newEffect 전체를 인자로 넘깁니다.
             effectDefinition.onApply(targetUnit, newEffect);
+        }
+
+        // ✨ If stun effect, remember who applied it
+        if (newEffect.id === 'stun' && attackerUnit) {
+            targetUnit.stunnedBy = attackerUnit;
         }
 
         // 상태 효과 이름 표시
