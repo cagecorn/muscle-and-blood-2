@@ -18,6 +18,11 @@ import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 // ✨ HasNotMovedNode를 import합니다.
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
+import MBTIActionNode from '../nodes/MBTIActionNode.js';
+import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
+import FleeNode from '../nodes/FleeNode.js';
+import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
+import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
 
 /**
  * 원거리 유닛(거너)을 위한 행동 트리를 재구성합니다.
@@ -31,22 +36,64 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
  */
 function createRangedAI(engines = {}) {
 
-    // 스킬 하나를 실행하는 공통 로직 (이동 포함)
+    // J 성향: 계획적 이동 후 공격
+    const plannedAttack = new SequenceNode([
+        new MBTIActionNode('J'),
+        new HasNotMovedNode(),
+        new FindKitingPositionNode(engines),
+        new MoveToTargetNode(engines),
+        new IsSkillInRangeNode(engines),
+        new UseSkillNode(engines)
+    ]);
+
+    // P 성향: 즉흥적 제자리 공격
+    const impulsiveAttack = new SequenceNode([
+        new MBTIActionNode('P'),
+        new IsSkillInRangeNode(engines),
+        new UseSkillNode(engines)
+    ]);
+
+    // 스킬 하나를 실행하는 공통 로직 (MBTI 행동 포함)
     const executeSkillBranch = new SelectorNode([
-        // A. 제자리에서 즉시 사용
-        new SequenceNode([
-            new IsSkillInRangeNode(engines),
-            new UseSkillNode(engines)
-        ]),
-        // B. 이동 후 사용
+        impulsiveAttack,
+        plannedAttack,
         new SequenceNode([
             new HasNotMovedNode(),
-            // ✨ [핵심 변경] 공격을 위한 이동 시, 단순 경로 탐색이 아닌
-            // 주변 모든 위협을 고려하는 '카이팅 위치'를 탐색하도록 변경합니다.
             new FindKitingPositionNode(engines),
             new MoveToTargetNode(engines),
-            new IsSkillInRangeNode(engines), // 이동 후 사거리 재확인
+            new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
+        ])
+    ]);
+
+    // 체력 낮을 때 도주 또는 발악
+    const survivalBehavior = new SequenceNode([
+        new IsHealthBelowThresholdNode(0.35),
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('I'),
+                new FleeNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SequenceNode([
+                new MBTIActionNode('E'),
+                new FindTargetBySkillTypeNode(engines),
+                new UseSkillNode(engines)
+            ]),
+            new SuccessNode()
+        ])
+    ]);
+
+    const allyCareBehavior = new SequenceNode([
+        new FindNearestAllyInDangerNode(),
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('F'),
+                new HasNotMovedNode(),
+                new FindPathToAllyNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SuccessNode()
         ])
     ]);
     
@@ -100,26 +147,26 @@ function createRangedAI(engines = {}) {
     ]);
 
     const rootNode = new SelectorNode([
+        survivalBehavior,
+        allyCareBehavior,
+
         // 최우선 순위 1: 생존 - 적이 너무 가까우면 카이팅부터 실행
         new SequenceNode([
-            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
             new HasNotMovedNode(),
-            new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }), // 위험 거리 설정
+            new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
             new FindKitingPositionNode(engines),
             new MoveToTargetNode(engines),
-            // 이동 후, 그 자리에서 공격할 기회가 있다면 공격
             new SelectorNode([
                 findAndUseBestSkillSequence,
-                new SuccessNode() // 공격할 스킬이 없어도 카이팅 자체는 성공
+                new SuccessNode()
             ])
         ]),
 
         // 우선순위 2: 공격 - 위협적이지 않다면 스킬 사용 시도
         findAndUseBestSkillSequence,
 
-        // 우선순위 3: 이동 - 공격할 스킬이 없다면, 다음 턴을 위해 이동만 실행
+        // 우선순위 3: 이동 - 공격할 스킬이 없다면 이동만 실행
         new SequenceNode([
-            // ✨ 이동하기 전에 아직 움직이지 않았는지 확인합니다.
             new HasNotMovedNode(),
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
