@@ -254,6 +254,36 @@ export class VFXManager {
         debugLogEngine.log('VFXManager', logMessage);
     }
 
+    /**
+     * MBTI 성향 문자를 머리 위에 표시합니다.
+     * @param {Phaser.GameObjects.Sprite} parentSprite
+     * @param {string} trait
+     */
+    showMBTITrait(parentSprite, trait) {
+        const style = {
+            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontSize: '32px',
+            color: '#ea580c',
+            stroke: '#000000',
+            strokeThickness: 5,
+        };
+
+        const traitText = this.scene.add
+            .text(parentSprite.x, parentSprite.y - 60, trait, style)
+            .setOrigin(0.5, 0.5);
+        this.vfxLayer.add(traitText);
+
+        this.scene.tweens.add({
+            targets: traitText,
+            y: traitText.y - 40,
+            alpha: 0,
+            scale: 1.5,
+            duration: 1200,
+            ease: 'Cubic.easeOut',
+            onComplete: () => traitText.destroy(),
+        });
+    }
+
     // 스킬 이름을 머리 위에 표시하는 효과를 보여줍니다.
     showSkillName(parentSprite, skillName, color = '#ffffff') {
         const style = {

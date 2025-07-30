@@ -26,6 +26,27 @@ export class UnitDetailDOM {
         // ✨ 1. 용병의 고유 속성 특화 정보를 가져옵니다.
         const attributeSpec = unitData.attributeSpec;
 
+        // --- MBTI 문자열과 툴팁 텍스트를 준비합니다. ---
+        const mbti = unitData.mbti;
+        let mbtiString = '';
+        if (mbti) {
+            mbtiString += mbti.E > mbti.I ? 'E' : 'I';
+            mbtiString += mbti.S > mbti.N ? 'S' : 'N';
+            mbtiString += mbti.T > mbti.F ? 'T' : 'F';
+            mbtiString += mbti.J > mbti.P ? 'J' : 'P';
+        }
+
+        const mbtiTooltips = {
+            E: '외향형(E): 위기 상황에서 최후의 발악을 선택할 확률이 높습니다.',
+            I: '내향형(I): 위기 상황에서 후퇴하여 생존을 도모할 확률이 높습니다.',
+            S: '감각형(S): 기절에서 회복했을 때, 자신을 기절시킨 적에게 즉시 복수하려는 경향이 있습니다.',
+            N: '직관형(N): 기절에서 회복했을 때, 전황을 다시 파악하고 가장 유리한 대상을 공격합니다.',
+            T: '사고형(T): 적의 위협적인 버프에 디버프로 맞서려는 경향이 있습니다.',
+            F: '감정형(F): 위험에 처한 아군을 우선적으로 보호하려는 경향이 있습니다.',
+            J: '판단형(J): 기절 회복 또는 자원 부족 시, 다음 턴을 위해 안전한 위치로 재정비하는 것을 선호합니다.',
+            P: '인식형(P): 기절 회복 또는 자원 부족 시, 즉흥적으로 0코스트 스킬을 사용하며 변수를 만들려 합니다.'
+        };
+
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
         overlay.className = 'modal-overlay';
@@ -46,6 +67,7 @@ export class UnitDetailDOM {
             <div class="detail-header">
                 <span class="unit-name">${instanceName}</span>
                 <span class="unit-class">${unitData.name}</span>
+                <div class="unit-mbti" data-tooltip="${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}">${mbtiString}</div>
                 <span class="unit-level">Lv. ${unitData.level}</span>
             </div>
             <div id="unit-detail-close">X</div>

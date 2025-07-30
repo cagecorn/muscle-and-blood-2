@@ -53,13 +53,13 @@ function createMeleeAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('I'),
+                new MBTIActionNode('I', engines),
                 { async evaluate() { debugMBTIManager.logAction('후퇴 선택'); return NodeState.SUCCESS; } },
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('E'),
+                new MBTIActionNode('E', engines),
                 { async evaluate() { debugMBTIManager.logAction('최후의 발악 선택'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(0),
                 new FindTargetBySkillTypeNode(engines),
@@ -80,7 +80,7 @@ function createMeleeAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('S'),
+                new MBTIActionNode('S', engines),
                 { async evaluate() { debugMBTIManager.logAction('복수 선택 (S)'); return NodeState.SUCCESS; } },
                 new SetTargetToStunnerNode(),
                 new CanUseSkillBySlotNode(3),
@@ -90,7 +90,7 @@ function createMeleeAI(engines = {}) {
                 new UseSkillNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 { async evaluate() { debugMBTIManager.logAction('위치 정비 선택 (J)'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FleeNode(engines),
@@ -111,14 +111,14 @@ function createMeleeAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 new HasNotMovedNode(),
                 { async evaluate() { debugMBTIManager.logAction('다음 턴을 위해 재배치 (J)'); return NodeState.SUCCESS; } },
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('P'),
+                new MBTIActionNode('P', engines),
                 { async evaluate() { debugMBTIManager.logAction('0코스트 스킬 시도 (P)'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
@@ -139,7 +139,7 @@ function createMeleeAI(engines = {}) {
         },
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('F'),
+                new MBTIActionNode('F', engines),
                 { async evaluate() { debugMBTIManager.logAction('아군에게 이동'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FindPathToAllyNode(engines),
@@ -155,14 +155,14 @@ function createMeleeAI(engines = {}) {
         new FindAllyClusterNode(),
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('J'),
+                new MBTIActionNode('J', engines),
                 { async evaluate() { debugMBTIManager.logAction('진형 합류 선택 (J)'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FindPathToAllyNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
-                new MBTIActionNode('P'),
+                new MBTIActionNode('P', engines),
                 { async evaluate() { debugMBTIManager.logAction('위험 분산 선택 (P)'); return NodeState.SUCCESS; } },
                 new HasNotMovedNode(),
                 new FleeNode(engines),
@@ -177,7 +177,7 @@ function createMeleeAI(engines = {}) {
         new FindBuffedEnemyNode(),
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('S'),
+                new MBTIActionNode('S', engines),
                 { async evaluate(unit, blackboard) {
                     const target = blackboard.get('buffedEnemy');
                     blackboard.set('skillTarget', target);
@@ -188,7 +188,7 @@ function createMeleeAI(engines = {}) {
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('T'),
+                new MBTIActionNode('T', engines),
                 { async evaluate(unit, blackboard) {
                     const target = blackboard.get('buffedEnemy');
                     blackboard.set('skillTarget', target);
@@ -199,14 +199,14 @@ function createMeleeAI(engines = {}) {
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('F'),
+                new MBTIActionNode('F', engines),
                 { async evaluate() { debugMBTIManager.logAction('아군 보호 태세 (F)'); return NodeState.SUCCESS; } },
                 new CanUseSkillBySlotNode(1),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('N'),
+                new MBTIActionNode('N', engines),
                 { async evaluate() { debugMBTIManager.logAction('원래 목표 유지 (N)'); return NodeState.SUCCESS; } },
                 { async evaluate() { return NodeState.FAILURE; } }
             ]),
@@ -219,7 +219,7 @@ function createMeleeAI(engines = {}) {
         new FindEnemyMedicNode(),
         new SelectorNode([
             new SequenceNode([
-                new MBTIActionNode('E'),
+                new MBTIActionNode('E', engines),
                 { async evaluate(unit, blackboard) {
                     const target = blackboard.get('enemyMedic');
                     blackboard.set('skillTarget', target);
@@ -230,7 +230,7 @@ function createMeleeAI(engines = {}) {
                 executeSkillBranch
             ]),
             new SequenceNode([
-                new MBTIActionNode('I'),
+                new MBTIActionNode('I', engines),
                 { async evaluate(unit, blackboard) {
                     if (Math.random() < 0.5) {
                         const target = blackboard.get('enemyMedic');
