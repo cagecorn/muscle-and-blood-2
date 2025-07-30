@@ -54,15 +54,16 @@ class MercenaryCardSelector {
             // 각 카드에 대해 MBTI 기반 선호도 점수 계산
             const weightedCandidates = currentCandidates.map(inst => {
                 const card = this._getSkillData(inst);
+                const tags = card.tags || [];
                 let score = 100; // 기본 점수
 
                 // E vs I: 외향(공격/돌진) vs 내향(원거리/방어)
-                if (card.tags.some(t => [SKILL_TAGS.CHARGE, SKILL_TAGS.MELEE].includes(t))) score += mercenary.mbti.E;
-                if (card.tags.some(t => [SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD].includes(t)) || card.type === 'BUFF') score += mercenary.mbti.I;
+                if (tags.some(t => [SKILL_TAGS.CHARGE, SKILL_TAGS.MELEE].includes(t))) score += mercenary.mbti.E;
+                if (tags.some(t => [SKILL_TAGS.RANGED, SKILL_TAGS.WILL_GUARD].includes(t)) || card.type === 'BUFF') score += mercenary.mbti.I;
 
                 // S vs N: 감각(단순/확정) vs 직관(복합/상태이상)
-                if (card.tags.includes(SKILL_TAGS.FIXED) || (!card.effect && (card.damageMultiplier || card.healMultiplier))) score += mercenary.mbti.S;
-                if (card.effect || card.push || card.turnOrderEffect || card.tags.includes(SKILL_TAGS.PROHIBITION)) score += mercenary.mbti.N;
+                if (tags.includes(SKILL_TAGS.FIXED) || (!card.effect && (card.damageMultiplier || card.healMultiplier))) score += mercenary.mbti.S;
+                if (card.effect || card.push || card.turnOrderEffect || tags.includes(SKILL_TAGS.PROHIBITION)) score += mercenary.mbti.N;
 
                 // T vs F: 사고(자신 강화/적 약화) vs 감정(아군 지원/치유)
                 if (card.type === 'DEBUFF' || (card.type === 'BUFF' && card.targetType === 'self')) score += mercenary.mbti.T;
@@ -103,7 +104,8 @@ class MercenaryCardSelector {
 
     _isConventional(card, classId) {
         const proficiencies = classProficiencies[classId] || [];
-        return card.tags.some(tag => proficiencies.includes(tag));
+        const tags = card.tags || [];
+        return tags.some(tag => proficiencies.includes(tag));
     }
 }
 
