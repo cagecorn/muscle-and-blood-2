@@ -21,6 +21,7 @@ import { fixedDamageManager } from './FixedDamageManager.js';
 // ✨ [신규] 스택 매니저와 확정 데미지 타입 상수를 가져옵니다.
 import { stackManager } from './StackManager.js';
 import { FIXED_DAMAGE_TYPES } from './FixedDamageManager.js';
+import { aiMemoryEngine } from './AIMemoryEngine.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -168,6 +169,14 @@ class CombatCalculationEngine {
                     return e.modifiers.stat === 'damageReduction' || e.modifiers.stat === 'damageIncrease';
                 });
             debugStatusEffectManager.logDamageModification(defender, initialDamage, finalDamage, effects);
+        }
+
+        // 전투 결과를 AI 기억에 저장합니다.
+        if (hitType && attacker.team !== defender.team) {
+            const attackType = this.getAttackTypeFromSkill(skill);
+            if (attackType) {
+                aiMemoryEngine.updateMemory(attacker.uniqueId, defender.uniqueId, attackType, hitType);
+            }
         }
 
         // 디버그 로그에 finalDefense 사용하도록 수정

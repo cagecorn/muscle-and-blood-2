@@ -2,6 +2,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { SKILL_TYPES } from './SkillEngine.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { statusEffectManager } from './StatusEffectManager.js';
+import { aiMemoryEngine } from './AIMemoryEngine.js';
+import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
 // 새로 만든 점수 데이터 파일을 import 합니다.
 import { SCORE_BY_TYPE, SCORE_BY_TAG } from '../data/skillScores.js';
 
@@ -23,7 +25,7 @@ class SkillScoreEngine {
      * @param {Array<object>} enemies - 모든 적군 유닛 목록
      * @returns {number} - 계산된 최종 점수
      */
-    calculateScore(unit, skillData, allies, enemies) {
+    async calculateScore(unit, skillData, target, allies, enemies) {
         if (!skillData || skillData.type === 'PASSIVE') {
             return 0;
         }
@@ -69,16 +71,42 @@ class SkillScoreEngine {
             }
         }
 
-        const totalScore = baseScore + tagScore + situationScore;
+        const calculatedScore = baseScore + tagScore + situationScore;
+
+        // ✨ AI 기억 가중치 적용
+        let finalScore = calculatedScore;
+        if (target && target.team !== unit.team) {
+            const memory = await aiMemoryEngine.getMemory(unit.uniqueId);
+            if (memory) {
+                const targetMemory = memory[`target_${target.uniqueId}`];
+                if (targetMemory) {
+                    const attackType = this.getAttackTypeFromSkillTags(skillData.tags);
+                    if (attackType) {
+                        const weight = targetMemory[`${attackType}_weight`] || 1.0;
+                        if (weight !== 1.0) {
+                            finalScore *= weight;
+                            debugAIMemoryManager.logScoreModification(skillData.name, calculatedScore, weight, finalScore);
+                        }
+                    }
+                }
+            }
+        }
 
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${totalScore}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${finalScore}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
-        return totalScore;
+        return finalScore;
+    }
+
+    getAttackTypeFromSkillTags(tags = []) {
+        if (tags.includes(SKILL_TAGS.MELEE)) return 'melee';
+        if (tags.includes(SKILL_TAGS.RANGED)) return 'ranged';
+        if (tags.includes(SKILL_TAGS.MAGIC)) return 'magic';
+        return null;
     }
 }
 
