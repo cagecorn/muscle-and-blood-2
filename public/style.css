@@ -1571,3 +1571,16 @@ body {
 .attribute-tag:hover::after {
     opacity: 1;
 }
+
+/* --- 스킬 툴팁 태그 강조 스타일 --- */
+#skill-tooltip .skill-tag.proficient-tag {
+    color: #f0e68c; /* 밝은 노란색 (숙련) */
+    border-color: #f0e68c;
+    background-color: rgba(240, 230, 140, 0.15);
+}
+
+#skill-tooltip .skill-tag.specialized-tag {
+    color: #60a5fa; /* 밝은 파란색 (특화) */
+    border-color: #60a5fa;
+    background-color: rgba(59, 130, 246, 0.15);
+}

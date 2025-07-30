@@ -1,13 +1,21 @@
 import { SKILL_TYPES } from '../utils/SkillEngine.js';
+// ✨ 1. 숙련도 및 특화 데이터를 가져옵니다.
+import { classProficiencies } from '../data/classProficiencies.js';
+import { classSpecializations } from '../data/classSpecializations.js';
 
 /**
  * 스킬 카드 위에 마우스를 올렸을 때 TCG 스타일의 큰 툴팁을 표시하는 매니저
  */
 export class SkillTooltipManager {
-    static show(skillData, event, grade = 'NORMAL') {
+    // ✨ [핵심 변경] 4번째 인자로 용병 데이터를 받습니다.
+    static show(skillData, event, grade = 'NORMAL', mercData = null) {
         this.hide();
 
         if (!skillData) return;
+
+        // ✨ 2. 용병 데이터가 있으면 숙련도와 특화 태그 목록을 준비합니다.
+        const proficiencies = mercData ? classProficiencies[mercData.id] || [] : [];
+        const specializations = mercData ? classSpecializations[mercData.id]?.map(s => s.tag) || [] : [];
 
         const tooltip = document.createElement('div');
         tooltip.id = 'skill-tooltip';
@@ -37,19 +45,24 @@ export class SkillTooltipManager {
             </div>
         `;
 
-        // ✨ --- 스킬 태그 표시 로직 추가 --- ✨
+        // ✨ 3. 스킬 태그를 생성할 때 숙련/특화 여부를 확인하고 클래스를 추가합니다.
         if (skillData.tags && skillData.tags.length > 0) {
             const tagsContainer = document.createElement('div');
             tagsContainer.className = 'skill-tags-container-large';
             skillData.tags.forEach(tag => {
                 const tagElement = document.createElement('span');
                 tagElement.className = 'skill-tag';
+                if (proficiencies.includes(tag)) {
+                    tagElement.classList.add('proficient-tag');
+                }
+                if (specializations.includes(tag)) {
+                    tagElement.classList.add('specialized-tag');
+                }
                 tagElement.innerText = tag;
                 tagsContainer.appendChild(tagElement);
             });
             tooltip.querySelector('.skill-info-large').appendChild(tagsContainer);
         }
-        // ✨ --- 로직 추가 끝 --- ✨
 
         const gradeMap = { 'NORMAL': 1, 'RARE': 2, 'EPIC': 3, 'LEGENDARY': 4 };
         const starsContainer = document.createElement('div');
