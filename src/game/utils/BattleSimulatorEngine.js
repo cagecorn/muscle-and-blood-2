@@ -88,7 +88,9 @@ export class BattleSimulatorEngine {
         aiManager.clear();
         cooldownManager.reset();
         this.summoningEngine.reset();
-        sharedResourceEngine.initialize();
+        // ✨ [수정] 각 팀의 자원을 개별적으로 초기화
+        sharedResourceEngine.initialize('ally');
+        sharedResourceEngine.initialize('enemy');
         statusEffectManager.setBattleSimulator(this);
 
         const allUnits = [...allies, ...enemies];

@@ -54,9 +54,9 @@ class SkillEngine {
             return false;
         }
 
-        // 2. 공유 자원이 충분한가?
+        // 2. 공유 자원이 충분한가? (✨ [수정] 팀 정보 전달 및 배열 처리)
         if (skill.resourceCost) {
-            if (sharedResourceEngine.getResource(skill.resourceCost.type) < skill.resourceCost.amount) {
+            if (!sharedResourceEngine.hasResources(unit.team, skill.resourceCost)) {
                 return false;
             }
         }
