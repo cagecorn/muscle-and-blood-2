@@ -249,8 +249,8 @@ function createMeleeAI(engines = {}) {
     ]);
 
     const attackSequence = new SequenceNode([
-        new FindBestSkillByScoreNode(engines),
         new FindTargetBySkillTypeNode(engines),
+        new FindBestSkillByScoreNode(engines),
         executeSkillBranch
     ]);
 
