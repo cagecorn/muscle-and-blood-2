@@ -13,6 +13,7 @@ import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import FindPriorityTargetNode from '../nodes/FindPriorityTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 
 /**
  * 플라잉맨을 위한 행동 트리 (암살자 역할)
@@ -37,34 +38,11 @@ function createFlyingmanAI(engines = {}) {
     ]);
 
     const rootNode = new SelectorNode([
-        // 1순위: 1번 슬롯 스킬
         new SequenceNode([
-            new CanUseSkillBySlotNode(0),
+            new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        // ... (2, 3번 슬롯도 동일하게 구성)
-        new SequenceNode([
-            new CanUseSkillBySlotNode(1),
-            new FindTargetBySkillTypeNode(engines),
-            executeSkillBranch
-        ]),
-        new SequenceNode([
-            new CanUseSkillBySlotNode(2),
-            new FindTargetBySkillTypeNode(engines),
-            executeSkillBranch
-        ]),
-        // 4순위: 4번 슬롯 스킬 (기본 공격)
-        new SequenceNode([
-            new CanUseSkillBySlotNode(3),
-            new FindTargetBySkillTypeNode(engines),
-            executeSkillBranch
-        ]),
-        // 특수 스킬 슬롯 체크 (5-8)
-        new SequenceNode([ new CanUseSkillBySlotNode(4), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(5), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(6), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(7), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
 
         // 이동만 실행
         new SequenceNode([
@@ -74,7 +52,6 @@ function createFlyingmanAI(engines = {}) {
             new MoveToTargetNode(engines)
         ]),
 
-        // 최후의 보루
         new SuccessNode(),
     ]);
 

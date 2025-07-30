@@ -26,6 +26,7 @@ import FindEnemyMedicNode from '../nodes/FindEnemyMedicNode.js';
 import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 import IsTokenBelowThresholdNode from '../nodes/IsTokenBelowThresholdNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 
 function createMeleeAI(engines = {}) {
     const executeSkillBranch = new SelectorNode([
@@ -247,15 +248,10 @@ function createMeleeAI(engines = {}) {
         ])
     ]);
 
-    const attackSequence = new SelectorNode([
-        new SequenceNode([ new CanUseSkillBySlotNode(0), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(1), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(2), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(3), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(4), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(5), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(6), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(7), new FindTargetBySkillTypeNode(engines), executeSkillBranch ])
+    const attackSequence = new SequenceNode([
+        new FindBestSkillByScoreNode(engines),
+        new FindTargetBySkillTypeNode(engines),
+        executeSkillBranch
     ]);
 
     const basicMovement = new SequenceNode([

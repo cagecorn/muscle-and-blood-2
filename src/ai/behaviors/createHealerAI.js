@@ -20,6 +20,7 @@ import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
 import JustRecoveredFromStunNode from '../nodes/JustRecoveredFromStunNode.js';
 import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
 import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 
 function createHealerAI(engines = {}) {
     const executeSkillBranch = new SelectorNode([
@@ -90,15 +91,10 @@ function createHealerAI(engines = {}) {
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
 
-    const supportSequence = new SelectorNode([
-        new SequenceNode([ new CanUseSkillBySlotNode(0), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(1), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(2), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(3), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(4), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(5), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(6), new FindTargetBySkillTypeNode(engines), executeSkillBranch ]),
-        new SequenceNode([ new CanUseSkillBySlotNode(7), new FindTargetBySkillTypeNode(engines), executeSkillBranch ])
+    const supportSequence = new SequenceNode([
+        new FindBestSkillByScoreNode(engines),
+        new FindTargetBySkillTypeNode(engines),
+        executeSkillBranch
     ]);
 
     const repositionSequence = new SequenceNode([
