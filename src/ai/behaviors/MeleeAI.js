@@ -3,6 +3,7 @@ import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import SuccessNode from '../nodes/SuccessNode.js';
+import { NodeState } from '../nodes/Node.js';
 
 // 신규 노드 및 재사용 노드 import
 import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
@@ -18,6 +19,7 @@ import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
 import FleeNode from '../nodes/FleeNode.js';
 import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
 import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
+import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 
 /**
  * 근접 유닛(전사)을 위한 행동 트리를 재구성합니다.
@@ -47,32 +49,54 @@ function createMeleeAI(engines = {}) {
     ]);
 
     // MBTI 기반 이동 결정
-    const mbtiBasedMovement = new SelectorNode([
-        new SequenceNode([
-            new MBTIActionNode('E'),
-            new FindMeleeStrategicTargetNode(engines),
-            new FindPathToTargetNode(engines),
-            new MoveToTargetNode(engines)
+    const mbtiBasedMovement = new SequenceNode([
+        {
+            async evaluate(unit) {
+                debugMBTIManager.logDecisionStart('이동 방식 결정', unit);
+                return NodeState.SUCCESS;
+            }
+        },
+        new SelectorNode([
+            new SequenceNode([
+                new MBTIActionNode('E'),
+                { async evaluate() { debugMBTIManager.logAction('적극적 이동'); return NodeState.SUCCESS; } },
+                new FindMeleeStrategicTargetNode(engines),
+                new FindPathToTargetNode(engines),
+                new MoveToTargetNode(engines)
+            ]),
+            new SequenceNode([
+                new MBTIActionNode('I'),
+                { async evaluate() { debugMBTIManager.logAction('신중한 대기'); return NodeState.SUCCESS; } },
+                new SuccessNode()
+            ])
         ]),
-        new SuccessNode()
+        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
 
     // 체력이 낮을 때 생존 본능
     const survivalBehavior = new SequenceNode([
         new IsHealthBelowThresholdNode(0.35),
+        {
+            async evaluate(unit) {
+                debugMBTIManager.logDecisionStart('생존 본능 발동', unit);
+                return NodeState.SUCCESS;
+            }
+        },
         new SelectorNode([
             new SequenceNode([
                 new MBTIActionNode('I'),
+                { async evaluate() { debugMBTIManager.logAction('후퇴 선택'); return NodeState.SUCCESS; } },
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
                 new MBTIActionNode('E'),
+                { async evaluate() { debugMBTIManager.logAction('최후의 발악 선택'); return NodeState.SUCCESS; } },
                 new FindTargetBySkillTypeNode(engines),
                 new UseSkillNode(engines)
-            ]),
-            new SuccessNode()
-        ])
+            ])
+        ]),
+        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
 
     // 위험한 아군을 돌보는 로직
