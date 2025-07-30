@@ -64,8 +64,7 @@ function createMeleeAI(engines = {}) {
                 new CanUseSkillBySlotNode(0),
                 new FindTargetBySkillTypeNode(engines),
                 new UseSkillNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -95,8 +94,7 @@ function createMeleeAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -123,8 +121,7 @@ function createMeleeAI(engines = {}) {
                 new CanUseSkillBySlotNode(3),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -144,8 +141,7 @@ function createMeleeAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FindPathToAllyNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -167,8 +163,7 @@ function createMeleeAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FleeNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ])
     ]);
 
@@ -209,8 +204,7 @@ function createMeleeAI(engines = {}) {
                 new MBTIActionNode('N', engines),
                 { async evaluate() { debugMBTIManager.logAction('원래 목표 유지 (N)'); return NodeState.SUCCESS; } },
                 { async evaluate() { return NodeState.FAILURE; } }
-            ]),
-            new SuccessNode()
+            ])
         ])
     ]);
 
@@ -243,8 +237,7 @@ function createMeleeAI(engines = {}) {
                 }},
                 new CanUseSkillBySlotNode(3),
                 executeSkillBranch
-            ]),
-            new SuccessNode()
+            ])
         ])
     ]);
 

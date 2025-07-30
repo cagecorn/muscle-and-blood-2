@@ -58,8 +58,7 @@ function createHealerAI(engines = {}) {
                 new CanUseSkillBySlotNode(0),
                 { async evaluate(unit, blackboard) { blackboard.set('skillTarget', unit); return NodeState.SUCCESS; } },
                 new UseSkillNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);
@@ -85,8 +84,7 @@ function createHealerAI(engines = {}) {
                 new HasNotMovedNode(),
                 new FindSafeRepositionNode(engines),
                 new MoveToTargetNode(engines)
-            ]),
-            new SuccessNode()
+            ])
         ]),
         { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
     ]);

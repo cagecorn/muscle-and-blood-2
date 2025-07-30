@@ -52,7 +52,7 @@ function createFlyingmanAI(engines = {}) {
             new MoveToTargetNode(engines)
         ]),
 
-        new SuccessNode(),
+        // new SuccessNode(),
     ]);
 
     return new BehaviorTree(rootNode);
