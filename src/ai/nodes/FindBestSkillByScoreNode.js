@@ -20,6 +20,8 @@ class FindBestSkillByScoreNode extends Node {
 
         const equippedSkillInstances = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
+        const allies = blackboard.get('allyUnits') || [];
+        const enemies = blackboard.get('enemyUnits') || [];
 
         let bestSkill = null;
         let maxScore = -1;
@@ -31,7 +33,8 @@ class FindBestSkillByScoreNode extends Node {
             const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
 
             if (this.skillEngine.canUseSkill(unit, skillData)) {
-                const currentScore = this.skillScoreEngine.calculateScore(skillData, unit, blackboard);
+                // ✨ 스코어 계산 시 unit, allies, enemies 정보를 함께 전달합니다.
+                const currentScore = this.skillScoreEngine.calculateScore(unit, skillData, allies, enemies);
                 if (currentScore > maxScore) {
                     maxScore = currentScore;
                     bestSkill = { skillData, instanceId };
