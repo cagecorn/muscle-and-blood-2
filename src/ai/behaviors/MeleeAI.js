@@ -2,7 +2,6 @@ import BehaviorTree from '../BehaviorTree.js';
 import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
-import SuccessNode from '../nodes/SuccessNode.js';
 import { NodeState } from '../nodes/Node.js';
 
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
@@ -50,9 +49,7 @@ function createMeleeAI(engines = {}) {
             new FindMeleeStrategicTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
-        ]),
-        // 3. 아무것도 할 수 없으면 턴 종료
-        new SuccessNode()
+        ])
     ]);
 
     // --- MBTI 기반 특수 행동들 ---
