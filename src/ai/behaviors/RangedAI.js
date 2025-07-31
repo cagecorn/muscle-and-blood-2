@@ -4,75 +4,38 @@ import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import SuccessNode from '../nodes/SuccessNode.js';
 
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
-import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
-import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
-import FindPreferredTargetNode from '../nodes/FindPreferredTargetNode.js';
-import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
-import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
-import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
-import FleeNode from '../nodes/FleeNode.js';
-import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
-import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
-import CheckAspirationStateNode from '../nodes/CheckAspirationStateNode.js';
-import { ASPIRATION_STATE } from '../../game/utils/AspirationEngine.js';
+import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
+import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
+import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
+import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 
-/**
- * 원거리 유닛을 위한 합리적인 하드코딩 AI를 생성합니다.
- * @param {object} engines - AI 노드에 주입될 각종 엔진
- * @returns {BehaviorTree}
- */
 function createRangedAI(engines = {}) {
-    const useSkillBranch = new SequenceNode([
-        new IsSkillInRangeNode(engines),
-        new UseSkillNode(engines)
-    ]);
-
-    const moveAndUseSkillBranch = new SequenceNode([
-        new HasNotMovedNode(),
-        new FindPathToSkillRangeNode(engines),
-        new MoveToTargetNode(engines),
-        new IsSkillInRangeNode(engines),
-        new UseSkillNode(engines)
-    ]);
-
-    const survivalBehavior = new SequenceNode([
-        new IsHealthBelowThresholdNode(0.35),
-        new FleeNode(engines),
-        new MoveToTargetNode(engines)
-    ]);
-
-    const kitingBehavior = new SequenceNode([
-        new HasNotMovedNode(),
-        new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
-        new FindKitingPositionNode(engines),
-        new MoveToTargetNode(engines)
-    ]);
-
-    const mainAttackLogic = new SequenceNode([
-        new FindBestSkillByScoreNode(engines),
-        new FindTargetBySkillTypeNode(engines),
-        new SelectorNode([
-            useSkillBranch,
-            moveAndUseSkillBranch
+    // --- 공통 사용 브랜치 ---
+    const executeSkillBranch = new SelectorNode([
+        new SequenceNode([new IsSkillInRangeNode(engines), new UseSkillNode(engines)]),
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindPathToSkillRangeNode(engines),
+            new MoveToTargetNode(engines),
+            new IsSkillInRangeNode(engines),
+            new UseSkillNode(engines)
         ])
     ]);
-
-    const basicMovement = new SequenceNode([
-        new HasNotMovedNode(),
-        new FindPreferredTargetNode(engines),
-        new FindPathToTargetNode(engines),
-        new MoveToTargetNode(engines)
-    ]);
-
-    const baseBehaviorTree = new SelectorNode([
-        survivalBehavior,
-        kitingBehavior,
-        mainAttackLogic,
-        basicMovement,
+    
+    // --- 기본 행동 (최후의 보루) ---
+    const basicActionBranch = new SelectorNode([
+        // 1. 주 공격 로직
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        // 2. 공격할 수 없으면 안전한 위치로 재배치
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
@@ -81,12 +44,24 @@ function createRangedAI(engines = {}) {
         new SuccessNode()
     ]);
 
+    // --- MBTI 기반 특수 행동들 ---
+    const kitingBehavior = new SequenceNode([
+        new HasNotMovedNode(),
+        new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
+        new FindKitingPositionNode(engines),
+        new MoveToTargetNode(engines)
+    ]);
+
+    // ... 다른 MBTI 기반 생존/특수 행동 로직 ...
+
+    // --- 최종 행동 트리 구성 ---
     const rootNode = new SelectorNode([
-        new SequenceNode([
-            new CheckAspirationStateNode(ASPIRATION_STATE.COLLAPSED),
-            baseBehaviorTree
-        ]),
-        baseBehaviorTree
+        // 1순위: 카이팅과 같은 특수 행동
+        kitingBehavior,
+        // ... 다른 MBTI 기반 고차원적 행동들 ...
+        
+        // 2순위: 위 행동들이 실행되지 않았다면, 반드시 기본 행동 수행
+        basicActionBranch
     ]);
 
     return new BehaviorTree(rootNode);
