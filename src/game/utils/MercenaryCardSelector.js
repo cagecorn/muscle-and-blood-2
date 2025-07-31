@@ -110,7 +110,8 @@ class MercenaryCardSelector {
             }
             
             selected.push(choice);
-            currentCandidates = currentCandidates.filter(c => c.instanceId !== choice.instanceId);
+            const chosenSkillId = this._getSkillData(choice).id;
+            currentCandidates = currentCandidates.filter(c => this._getSkillData(c).id !== chosenSkillId);
         }
         return selected;
     }
