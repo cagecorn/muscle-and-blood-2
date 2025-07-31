@@ -6,6 +6,7 @@ class MBTIPositioningEngine {
         this.name = 'MBTIPositioningEngine';
         // 아군 진영의 크기 (0~7열, 0~8행)
         this.ALLY_COLS = 8;
+        this.TOTAL_COLS = 16;
         this.ALLY_ROWS = 9;
         this.ROW_CENTER = Math.floor(this.ALLY_ROWS / 2); // 중앙 행
     }
@@ -17,7 +18,7 @@ class MBTIPositioningEngine {
      * @param {Array<object>} placedAllies - 이미 배치된 다른 아군 용병 목록
      * @returns {object|null} - 선택된 최적의 셀 또는 null
      */
-    determinePosition(mercenary, availableCells, placedAllies) {
+    determinePosition(mercenary, availableCells, placedAllies, team = 'ally') {
         if (!availableCells || availableCells.length === 0) {
             return null;
         }
@@ -29,7 +30,15 @@ class MBTIPositioningEngine {
             let totalScore = 1.0; // 기본 점수
 
             // E vs I: 전방 선호 vs 후방 선호
-            const frontPreference = cell.col / (this.ALLY_COLS - 1); // 0 (후방) ~ 1 (전방)
+            // \u2728 팀에 따라 전/후방 기준을 다르게 적용
+            let frontPreference;
+            if (team === 'ally') {
+                // 아군: 0열(후방) ~ 7열(전방)
+                frontPreference = cell.col / (this.ALLY_COLS - 1);
+            } else {
+                // 적군: 15열(후방) ~ 8열(전방)
+                frontPreference = ((this.TOTAL_COLS - 1) - cell.col) / (this.ALLY_COLS - 1);
+            }
             totalScore *= (frontPreference * mbti.E) + ((1 - frontPreference) * mbti.I);
 
             // S vs N: 중앙 선호 vs 측면 선호

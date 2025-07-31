@@ -154,6 +154,11 @@ export class BattleSimulatorEngine {
             unit.sprite.setData('unitId', unit.uniqueId);
             unit.sprite.setData('team', unit.team);
 
+            // \u2728 적군 스프라이트는 오른쪽을 향하도록 좌우 반전합니다.
+            if (unit.team === 'enemy') {
+                unit.sprite.flipX = true;
+            }
+
             unit.currentHp = unit.finalStats.hp;
             // ✨ 배리어 상태 초기화
             unit.maxBarrier = unit.finalStats.maxBarrier;
