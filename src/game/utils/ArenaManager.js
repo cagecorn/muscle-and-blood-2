@@ -23,22 +23,22 @@ class ArenaManager {
         let availableCards = [...skillInventoryManager.getInventory()];
         const mercenaryTypes = Object.values(mercenaryData);
 
-        // --- 아레나 적 진영의 모든 빈 셀 목록을 미리 준비 ---
-        const ALLY_COLS = 8;
-        const ALLY_ROWS = 9;
+        // --- \u2728 아레나 '적' 진영의 모든 빈 셀 목록을 준비 ---
+        const ENEMY_START_COL = 8; // 적 진영 시작 열
+        const TOTAL_COLS = 16;
+        const TOTAL_ROWS = 9;
         let availableCells = [];
-        for (let r = 0; r < ALLY_ROWS; r++) {
-            for (let c = 0; c < ALLY_COLS; c++) {
-                // formationEngine의 grid가 로드되었다고 가정.
-                // BattleStageManager에서 그리드를 생성하므로, 이 시점에서는 셀 정보를 직접 생성.
+        for (let r = 0; r < TOTAL_ROWS; r++) {
+            // 8열부터 15열까지를 적 진영으로 설정합니다.
+            for (let c = ENEMY_START_COL; c < TOTAL_COLS; c++) {
                 availableCells.push({ col: c, row: r, isOccupied: false });
             }
         }
 
-        const placedAllies = [];
+        const placedEnemies = [];
 
         for (let i = 0; i < 12; i++) {
-            if (availableCells.length === 0) break; // 배치할 공간이 없으면 중단
+            if (availableCells.length === 0) break; 
 
             // 1. 랜덤 클래스의 적 용병 생성
             const randomType = mercenaryTypes[Math.floor(Math.random() * mercenaryTypes.length)];
@@ -52,7 +52,7 @@ class ArenaManager {
             availableCards = remainingCards;
 
             // 3. MBTI에 따라 위치 결정
-            const chosenCell = mbtiPositioningEngine.determinePosition(enemyMercenary, availableCells, placedAllies);
+            const chosenCell = mbtiPositioningEngine.determinePosition(enemyMercenary, availableCells, placedEnemies, 'enemy');
 
             if (chosenCell) {
                 // 4. 결정된 위치 정보 저장
@@ -60,9 +60,10 @@ class ArenaManager {
                 enemyMercenary.gridY = chosenCell.row;
                 // formationEngine에 DOM이 아닌 논리적 위치를 저장합니다.
                 // ArenaDOMEngine은 이 정보를 사용하게 됩니다.
-                formationEngine.setPosition(enemyMercenary.uniqueId, (chosenCell.row * ALLY_COLS) + chosenCell.col);
+                const cellIndex = (chosenCell.row * TOTAL_COLS) + chosenCell.col;
+                formationEngine.setPosition(enemyMercenary.uniqueId, cellIndex);
 
-                placedAllies.push(enemyMercenary);
+                placedEnemies.push(enemyMercenary);
                 // 사용된 셀은 후보에서 제거
                 availableCells = availableCells.filter(c => c.col !== chosenCell.col || c.row !== chosenCell.row);
             }
