@@ -4,6 +4,7 @@ import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 // 버프 스킬 데이터 정의
 export const buffSkills = {
     stoneSkin: {
+        yinYangValue: +2,
         // NORMAL 등급: 기본 효과
         NORMAL: {
             id: 'stoneSkin',
@@ -97,6 +98,7 @@ export const buffSkills = {
         }
     },
     grindstone: {
+        yinYangValue: +1,
         NORMAL: {
             id: 'grindstone',
             name: '숯돌 갈기',
@@ -189,6 +191,7 @@ export const buffSkills = {
 
     // --- ▼ [신규] 전투의 함성 스킬 추가 ▼ ---
     battleCry: {
+        yinYangValue: +2,
         NORMAL: {
             id: 'battleCry',
             name: '전투의 함성',
@@ -274,6 +277,7 @@ export const buffSkills = {
 
     // --- ▼ [신규] 사냥꾼의 감각 스킬 추가 ▼ ---
     huntSense: {
+        yinYangValue: +2,
         NORMAL: {
             id: 'huntSense',
             name: '사냥꾼의 감각',

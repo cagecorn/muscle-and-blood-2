@@ -2,6 +2,7 @@ import { EFFECT_TYPES } from '../../utils/EffectTypes.js';
 
 export const strategySkills = {
     chargeOrder: {
+        yinYangValue: +3,
         NORMAL: {
             id: 'chargeOrder',
             name: '돌격 명령',
