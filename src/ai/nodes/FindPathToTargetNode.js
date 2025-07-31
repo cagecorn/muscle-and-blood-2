@@ -10,8 +10,8 @@ class FindPathToTargetNode extends Node {
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
-        // ✨ [수정] 'currentTargetUnit' 대신 'movementTarget'을 참조하도록 변경
-        const target = blackboard.get('movementTarget');
+        // ✨ [수정] 'movementTarget' 대신 'currentTargetUnit'을 참조하도록 변경
+        const target = blackboard.get('currentTargetUnit');
         if (!target) {
             debugAIManager.logNodeResult(NodeState.FAILURE, "이동 목표 없음");
             return NodeState.FAILURE;
