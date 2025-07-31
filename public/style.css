@@ -427,7 +427,11 @@ body {
 
 /* equipment-grid는 오른쪽 영역을 차지하게 됩니다. */
 .equipment-grid {
-    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    justify-items: center;
+    margin-top: 10px;
 }
 
 .stat-item {
@@ -444,11 +448,25 @@ body {
 }
 
 .equip-slot {
-    height: 50px;
+    width: 80px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.equip-slot-image {
+    width: 70px;
+    height: 70px;
     background-color: rgba(0,0,0,0.3);
-    border: 1px solid #444;
-    margin-bottom: 8px;
-    border-radius: 4px;
+    border: 2px dashed #555;
+    border-radius: 5px;
+}
+
+.equip-slot-label {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #aaa;
 }
 
 .detail-footer {
@@ -478,7 +496,14 @@ body {
     flex-direction: column;
     gap: 15px;
     width: 100%;
+    margin-bottom: 20px;
 }
+
+/* --- 장비 카드 섹션 스타일 --- */
+.equipment-section {
+    width: 100%;
+}
+
 
 .unit-skills .skill-grid {
     display: flex;
