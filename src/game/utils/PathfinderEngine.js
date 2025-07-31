@@ -48,12 +48,21 @@ class PathfinderEngine {
                 const key = `${neighbor.col},${neighbor.row}`;
                 const cell = grid.getCell(neighbor.col, neighbor.row);
 
-                // ✨ [수정된 부분]
-                // 플라잉맨은 다른 유닛을 통과할 수 있으므로, isOccupied 검사를 건너뜁니다.
-                const isOccupied = cell && cell.isOccupied && unit.id !== 'flyingmen';
+                // 이미 탐색했거나 유효하지 않은 셀이면 건너뜁니다.
+                if (closedSet.has(key) || !cell) {
+                    return;
+                }
+
                 const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
 
-                if (closedSet.has(key) || (isOccupied && !isEndNode)) {
+                // ✨ [핵심 수정] 플라잉맨 버그 수정 로직
+                // 1. 목표 지점이 다른 유닛에게 점유되어 있다면, 그 경로는 아예 막습니다. (모든 유닛 공통)
+                if (cell.isOccupied && isEndNode) {
+                    return;
+                }
+
+                // 2. 플라잉맨이 아닌 다른 유닛은, 목표 지점이 아니더라도 점유된 칸을 통과할 수 없습니다.
+                if (cell.isOccupied && unit.id !== 'flyingmen') {
                     return;
                 }
 
