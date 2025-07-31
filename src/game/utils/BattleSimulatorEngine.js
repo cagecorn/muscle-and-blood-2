@@ -33,6 +33,7 @@ import { SharedResourceUIManager } from '../dom/SharedResourceUIManager.js';
 import { comboManager } from './ComboManager.js';
 // ✨ YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
+import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -77,6 +78,9 @@ export class BattleSimulatorEngine {
             battleSimulator: this,
         };
 
+        // ✨ AspirationEngine에 battleSimulator 참조 설정
+        aspirationEngine.setBattleSimulator(this);
+
         this.turnQueue = [];
         this.currentTurnIndex = 0;
         // --- ✨ 전체 턴 수를 추적하는 변수 ---
@@ -98,6 +102,8 @@ export class BattleSimulatorEngine {
         yinYangEngine.initializeUnits([...allies, ...enemies]);
 
         const allUnits = [...allies, ...enemies];
+        // ✨ 전투 시작 시 열망 엔진 초기화
+        aspirationEngine.initializeUnits(allUnits);
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
         tokenEngine.initializeUnits(allUnits);
         allies.forEach(u => u.team = 'ally');
