@@ -7,6 +7,7 @@ import { SkillTooltipManager } from './SkillTooltipManager.js';
 import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 // ✨ SKILL_TAGS를 import하여 'SPECIAL' 태그를 확인할 수 있게 합니다.
 import { SKILL_TAGS } from '../utils/SkillTagManager.js';
+import { mercenaryCardSelector } from '../utils/MercenaryCardSelector.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -60,6 +61,32 @@ export class SkillManagementDOMEngine {
         backButton.id = 'skill-back-button';
         backButton.innerText = '← 영지로';
         backButton.onclick = () => this.scene.scene.start('TerritoryScene');
+
+        // --- ▼ [신규] 전원 자동장착 버튼 추가 ▼ ---
+        const autoEquipButton = document.createElement('div');
+        autoEquipButton.id = 'auto-equip-all-button';
+        autoEquipButton.innerText = '[ 전원 자동장착 ]';
+        Object.assign(autoEquipButton.style, {
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            padding: '8px 15px',
+            backgroundColor: 'rgba(240, 230, 140, 0.8)',
+            color: '#333',
+            border: '1px solid #f0e68c',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            zIndex: '100'
+        });
+
+        autoEquipButton.onclick = () => {
+            this.autoEquipAllSkills();
+            alert('모든 용병의 스킬이 MBTI 성향에 따라 자동 장착되었습니다.');
+        };
+        this.container.appendChild(autoEquipButton);
+        // --- ▲ [신규] 전원 자동장착 버튼 추가 ▲ ---
+
         this.container.appendChild(backButton);
     }
 
@@ -348,6 +375,41 @@ export class SkillManagementDOMEngine {
         this.refreshSkillInventory();
         this.draggedData = null;
     }
+
+    // --- ▼ [신규] 전원 자동 장착 메소드 추가 ▼ ---
+    autoEquipAllSkills() {
+        const partyMembers = partyEngine.getPartyMembers().filter(id => id !== undefined);
+        const allMercs = mercenaryEngine.getAllAlliedMercenaries();
+        let availableCards = [...skillInventoryManager.getInventory()];
+
+        allMercs.forEach(merc => {
+            const equipped = ownedSkillsManager.getEquippedSkills(merc.uniqueId);
+            equipped.forEach((instanceId, index) => {
+                if (instanceId) {
+                    ownedSkillsManager.unequipSkill(merc.uniqueId, index);
+                    this.addSkillToInventory(instanceId);
+                }
+            });
+        });
+        availableCards = [...skillInventoryManager.getInventory()];
+
+        partyMembers.forEach(id => {
+            const merc = allMercs.find(m => m.uniqueId === id);
+            if (!merc) return;
+
+            const { selectedCards, remainingCards } = mercenaryCardSelector.selectCardsForMercenary(merc, availableCards);
+
+            selectedCards.forEach((cardInstance, index) => {
+                ownedSkillsManager.equipSkill(merc.uniqueId, index, cardInstance.instanceId);
+            });
+            availableCards = remainingCards;
+        });
+
+        skillInventoryManager.skillInventory = availableCards;
+
+        this.refreshAll();
+    }
+    // --- ▲ [신규] 전원 자동 장착 메소드 추가 ▲ ---
 
     destroy() {
         this.container.innerHTML = '';

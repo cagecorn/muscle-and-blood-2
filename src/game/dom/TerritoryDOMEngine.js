@@ -1,6 +1,7 @@
 import { surveyEngine } from '../utils/SurveyEngine.js';
 import { DOMEngine } from '../utils/DOMEngine.js';
 import { mercenaryEngine } from '../utils/MercenaryEngine.js';
+import { partyEngine } from '../utils/PartyEngine.js';
 // ✨ [변경] PartyDOMEngine의 UnitDetailDOM을 import 합니다.
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { mercenaryData } from '../data/mercenaries.js';
@@ -205,6 +206,35 @@ export class TerritoryDOMEngine {
         });
 
         tavernGrid.appendChild(hireButton);
+
+        // --- ▼ [신규] 랜덤 12명 고용 버튼 추가 ▼ ---
+        const hireRandomButton = document.createElement('div');
+        hireRandomButton.className = 'tavern-button';
+        hireRandomButton.style.backgroundImage = `url(assets/images/territory/party-icon.png)`;
+        hireRandomButton.addEventListener('click', () => {
+            const currentParty = partyEngine.getPartyMembers();
+            currentParty.forEach(id => {
+                if (id !== undefined) {
+                    partyEngine.removePartyMember(id);
+                }
+            });
+
+            const mercenaryTypes = Object.values(this.mercenaries);
+            for (let i = 0; i < 12; i++) {
+                const randomType = mercenaryTypes[Math.floor(Math.random() * mercenaryTypes.length)];
+                mercenaryEngine.hireMercenary(randomType, 'ally');
+            }
+            alert('랜덤 용병 12명이 고용되어 파티에 자동 추가되었습니다.');
+        });
+        hireRandomButton.addEventListener('mouseover', (event) => {
+            this.domEngine.showTooltip(event.clientX, event.clientY, '[랜덤 12명 고용]');
+        });
+        hireRandomButton.addEventListener('mouseout', () => {
+            this.domEngine.hideTooltip();
+        });
+
+        tavernGrid.appendChild(hireRandomButton);
+        // --- ▲ [신규] 랜덤 12명 고용 버튼 추가 ▲ ---
     }
 
     showHireModal() {
