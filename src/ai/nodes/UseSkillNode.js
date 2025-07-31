@@ -7,6 +7,7 @@ import { debugSkillExecutionManager } from '../../game/debug/DebugSkillExecution
 import { classProficiencies } from '../../game/data/classProficiencies.js';
 import { diceEngine } from '../../game/utils/DiceEngine.js';
 import SkillEffectProcessor from '../../game/utils/SkillEffectProcessor.js'; // 새로 만든 클래스를 import
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 class UseSkillNode extends Node {
     constructor(engines = {}) {
