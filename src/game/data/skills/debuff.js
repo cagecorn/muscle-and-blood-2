@@ -4,6 +4,7 @@ import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 // 디버프 스킬 데이터 정의
 export const debuffSkills = {
     shieldBreak: {
+        yinYangValue: +2,
         // NORMAL 등급: 기본 효과
         NORMAL: {
             id: 'shieldBreak',

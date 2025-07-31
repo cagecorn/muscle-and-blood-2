@@ -18,6 +18,8 @@ import { turnOrderManager } from '../../game/utils/TurnOrderManager.js';
 import { classProficiencies } from '../../game/data/classProficiencies.js';
 import { diceEngine } from '../../game/utils/DiceEngine.js';
 import { classSpecializations } from '../../game/data/classSpecializations.js';
+// ✨ 1. YinYangEngine을 import 합니다.
+import { yinYangEngine } from '../../game/utils/YinYangEngine.js';
 
 class UseSkillNode extends Node {
     constructor({ vfxManager, animationEngine, delayEngine, terminationManager, summoningEngine, skillEngine: se, battleSimulator } = {}) {
@@ -123,6 +125,8 @@ class UseSkillNode extends Node {
         }
 
         this.skillEngine.recordSkillUse(unit, modifiedSkill); // 보정된 데이터로 기록
+        // ✨ 스킬 사용이 확정된 후 음양 지수를 업데이트합니다.
+        yinYangEngine.updateBalance(unit.uniqueId, modifiedSkill.yinYangValue);
 
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();
         usedSkills.add(instanceId);

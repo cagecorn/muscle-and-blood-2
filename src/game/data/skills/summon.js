@@ -3,6 +3,7 @@ import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 
 export const summonSkills = {
     summonAncestorPeor: {
+        yinYangValue: +4,
         NORMAL: {
             id: 'summonAncestorPeor',
             name: '소환: 선조 페오르',

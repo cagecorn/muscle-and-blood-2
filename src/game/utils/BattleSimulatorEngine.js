@@ -31,6 +31,8 @@ import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
 import { sharedResourceEngine } from './SharedResourceEngine.js';
 import { SharedResourceUIManager } from '../dom/SharedResourceUIManager.js';
 import { comboManager } from './ComboManager.js';
+// ✨ YinYangEngine을 import 합니다.
+import { yinYangEngine } from './YinYangEngine.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -92,6 +94,8 @@ export class BattleSimulatorEngine {
         sharedResourceEngine.initialize('ally');
         sharedResourceEngine.initialize('enemy');
         statusEffectManager.setBattleSimulator(this);
+        // ✨ 전투 시작 시 음양 엔진을 초기화합니다.
+        yinYangEngine.initializeUnits([...allies, ...enemies]);
 
         const allUnits = [...allies, ...enemies];
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
@@ -221,6 +225,8 @@ export class BattleSimulatorEngine {
                 this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
 
                 statusEffectManager.onTurnEnd();
+                // ✨ 턴 종료 시 음양 지수 자연 감소를 적용합니다.
+                yinYangEngine.applyTurnDecay();
                 tokenEngine.addTokensForNewTurn();
                 skillEngine.resetTurnActions();
             }

@@ -6,6 +6,7 @@ import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 export const activeSkills = {
     // 기본 공격 스킬
     attack: {
+        yinYangValue: -1,
         NORMAL: {
             id: 'attack',
             name: '공격',
@@ -54,6 +55,7 @@ export const activeSkills = {
         }
     },
     charge: {
+        yinYangValue: -2,
         NORMAL: {
             id: 'charge',
             name: '차지',
@@ -124,6 +126,7 @@ export const activeSkills = {
         }
     },
     knockbackShot: {
+        yinYangValue: -2,
         NORMAL: {
             id: 'knockbackShot',
             name: '넉백샷',
@@ -180,6 +183,7 @@ export const activeSkills = {
 
     // ✨ [신규] 원거리 공격 스킬 추가
     rangedAttack: {
+        yinYangValue: -1,
         NORMAL: {
             id: 'rangedAttack',
             name: '원거리 공격',
@@ -229,6 +233,7 @@ export const activeSkills = {
     },
     // --- ▼ [신규] 나노빔 스킬 추가 ▼ ---
     nanobeam: {
+        yinYangValue: -1,
         NORMAL: {
             id: 'nanobeam',
             name: '나노빔',
@@ -280,6 +285,7 @@ export const activeSkills = {
 
     // --- ▼ [신규] 도끼 참격 스킬 추가 ▼ ---
     axeStrike: {
+        yinYangValue: -2,
         NORMAL: {
             id: 'axeStrike',
             name: '도끼 참격',
@@ -332,6 +338,7 @@ export const activeSkills = {
     // --- ▲ [신규] 도끼 참격 스킬 추가 ▲ ---
     // --- ▼ [신규] 제압 사격 스킬 추가 ▼ ---
     suppressShot: {
+        yinYangValue: -3,
         NORMAL: {
             id: 'suppressShot',
             name: '제압 사격',
@@ -405,6 +412,7 @@ export const activeSkills = {
     },
     // --- ▲ [신규] 제압 사격 스킬 추가 ▲ ---
     throwingAxe: {
+        yinYangValue: -2,
         NORMAL: {
             id: 'throwingAxe',
             name: '도끼 던지기',
@@ -480,6 +488,7 @@ export const activeSkills = {
     },
     // --- ▼ [신규] 크리티컬 샷 스킬 추가 ▼ ---
     criticalShot: {
+        yinYangValue: -3,
         NORMAL: {
             id: 'criticalShot',
             name: '크리티컬 샷',
@@ -540,6 +549,7 @@ export const activeSkills = {
     },
     // --- ▼ [신규] '낙인' 스킬을 DEBUFF에서 ACTIVE로 이동 및 수정 ▼ ---
     stigma: {
+        yinYangValue: +2,
         NORMAL: {
             id: 'stigma',
             name: '낙인',

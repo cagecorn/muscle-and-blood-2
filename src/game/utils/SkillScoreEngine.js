@@ -7,6 +7,8 @@ import { SCORE_BY_TYPE, SCORE_BY_TAG } from '../data/skillScores.js';
 // ✨ AIMemoryEngine과 Debug 매니저 추가
 import { aiMemoryEngine } from './AIMemoryEngine.js';
 import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
+// ✨ 1. YinYangEngine을 import 합니다.
+import { yinYangEngine } from './YinYangEngine.js';
 
 /**
  * AI의 스킬 선택을 위해 각 스킬의 전략적 가치를 계산하는 엔진
@@ -35,6 +37,8 @@ class SkillScoreEngine {
         let baseScore = SCORE_BY_TYPE[skillData.type] || 0;
         let tagScore = 0;
         let situationScore = 0;
+        // ✨ 2. 음양 보너스 점수를 위한 변수 추가
+        let yinYangBonus = 0;
         const situationLogs = [];
 
         if (skillData.tags) {
@@ -72,7 +76,26 @@ class SkillScoreEngine {
             }
         }
 
-        const calculatedScore = baseScore + tagScore + situationScore;
+        // ✨ 3. 음양 시스템 점수 계산 로직 추가
+        if (target && skillData.yinYangValue) {
+            const targetBalance = yinYangEngine.getBalance(target.uniqueId);
+            const skillValue = skillData.yinYangValue;
+            let efficiency = 0;
+
+            if (Math.sign(targetBalance) !== Math.sign(skillValue) && targetBalance !== 0) {
+                const currentImbalance = Math.abs(targetBalance);
+                const potentialFutureImbalance = Math.abs(targetBalance + skillValue);
+                efficiency = currentImbalance - potentialFutureImbalance;
+            }
+
+            if (efficiency > 0) {
+                yinYangBonus = efficiency * 2;
+                situationLogs.push(`음양 균형(${yinYangBonus.toFixed(0)})`);
+            }
+        }
+
+        // ✨ 4. 최종 점수 계산에 음양 보너스 합산
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus;
 
         // ✨ AI 기억 가중치 적용
         let finalScore = calculatedScore;
@@ -94,7 +117,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 

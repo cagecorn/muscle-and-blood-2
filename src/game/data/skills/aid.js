@@ -4,6 +4,7 @@ import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 // 지원(AID) 스킬 데이터 정의
 export const aidSkills = {
     heal: {
+        yinYangValue: +2,
         NORMAL: {
             id: 'heal',
             name: '힐',
@@ -61,6 +62,7 @@ export const aidSkills = {
     },
     // --- ▼ [신규] 윌 가드 스킬 추가 ▼ ---
     willGuard: {
+        yinYangValue: +3,
         NORMAL: {
             id: 'willGuard',
             name: '윌 가드',
@@ -143,6 +145,7 @@ export const aidSkills = {
 
     // --- ▼ [신규] 마이티 쉴드 스킬 추가 ▼ ---
     mightyShield: {
+        yinYangValue: +4,
         NORMAL: {
             id: 'mightyShield',
             name: '마이티 쉴드',
