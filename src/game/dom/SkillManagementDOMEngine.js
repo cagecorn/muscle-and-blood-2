@@ -221,6 +221,21 @@ export class SkillManagementDOMEngine {
         slot.className = `merc-skill-slot`;
         slot.dataset.slotIndex = index;
 
+        // MBTI 알파벳 표시
+        if (index < 4 && this.selectedMercenaryData && this.selectedMercenaryData.mbti) {
+            const mbti = this.selectedMercenaryData.mbti;
+            const mbtiString =
+                (mbti.E > mbti.I ? 'E' : 'I') +
+                (mbti.S > mbti.N ? 'S' : 'N') +
+                (mbti.T > mbti.F ? 'T' : 'F') +
+                (mbti.J > mbti.P ? 'J' : 'P');
+
+            const mbtiIndicator = document.createElement('div');
+            mbtiIndicator.className = 'mbti-slot-indicator';
+            mbtiIndicator.innerText = mbtiString[index];
+            slot.appendChild(mbtiIndicator);
+        }
+
         if (instanceId) {
             const instanceData = skillInventoryManager.getInstanceData(instanceId);
             const baseSkillData = skillInventoryManager.getSkillData(instanceData.skillId, instanceData.grade);
