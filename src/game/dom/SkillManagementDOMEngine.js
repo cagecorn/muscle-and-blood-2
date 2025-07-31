@@ -318,6 +318,15 @@ export class SkillManagementDOMEngine {
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
 
+        // --- ▼ 중복 착용 방지 로직 추가 ▼ ---
+        if (this.draggedData.source === 'inventory') {
+            if (ownedSkillsManager.hasSkillId(unitId, draggedInstanceData.skillId)) {
+                alert('이미 동일한 종류의 스킬을 장착하고 있습니다.');
+                return;
+            }
+        }
+        // --- ▲ 중복 착용 방지 로직 추가 ▲ ---
+
         // ✨ [추가] 스킬 장착 규칙 검사
         const isSpecialSkill = draggedSkillData.tags.includes(SKILL_TAGS.SPECIAL);
         const isSpecialSlot = targetSlotIndex >= 4;

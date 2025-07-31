@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { skillInventoryManager } from './SkillInventoryManager.js';
 
 /**
  * 각 용병이 장착한 스킬을 관리하는 매니저
@@ -49,6 +50,21 @@ class OwnedSkillsManager {
     getEquippedSkills(unitId) {
         this.initializeSlots(unitId);
         return this.equippedSkills.get(unitId);
+    }
+
+    /**
+     * 특정 유닛이 지정한 skillId를 가진 스킬을 이미 장착했는지 확인합니다.
+     * @param {number} unitId - 확인할 유닛 ID
+     * @param {string} skillId - 스킬 ID (예: 'charge')
+     * @returns {boolean} 장착 여부
+     */
+    hasSkillId(unitId, skillId) {
+        const equipped = this.getEquippedSkills(unitId);
+        return equipped.some(instanceId => {
+            if (!instanceId) return false;
+            const instanceData = skillInventoryManager.getInstanceData(instanceId);
+            return instanceData && instanceData.skillId === skillId;
+        });
     }
 }
 
