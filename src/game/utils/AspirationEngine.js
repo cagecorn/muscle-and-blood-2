@@ -1,5 +1,7 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
+// 새로 만든 디버그 매니저를 import 합니다.
+import { debugAspirationManager } from '../debug/DebugAspirationManager.js';
 
 // 열망 상태를 나타내는 상수
 export const ASPIRATION_STATE = {
@@ -44,19 +46,30 @@ class AspirationEngine {
         if (data.state !== ASPIRATION_STATE.NORMAL) return;
 
         const oldAspiration = data.aspiration;
-        data.aspiration = Math.max(0, Math.min(100, oldAspiration + amount));
+        const newAspiration = Math.max(0, Math.min(100, oldAspiration + amount));
 
-        debugLogEngine.log(this.name, `유닛 ${unitId} 열망 변경 (${reason}): ${oldAspiration} -> ${data.aspiration} (${amount > 0 ? '+' : ''}${amount})`);
+        // 수치가 실제로 변한 경우에만 기록합니다.
+        if (oldAspiration !== newAspiration) {
+            data.aspiration = newAspiration;
+            const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
+            const unitName = unit ? unit.instanceName : `ID ${unitId}`;
+            debugAspirationManager.logAspirationChange(unitId, unitName, oldAspiration, newAspiration, amount, reason);
+        }
 
         // 상태 변화 체크
         if (data.aspiration >= 100) {
             data.state = ASPIRATION_STATE.EXALTED;
             const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
-            if (unit) this._applyExaltedBuffs(unit);
-            debugLogEngine.log(this.name, `%c유닛 ${unitId} 각성!`, 'color: gold; font-weight: bold;');
+            if (unit) {
+                this._applyExaltedBuffs(unit);
+                debugAspirationManager.logStateChange(unit.instanceName, ASPIRATION_STATE.EXALTED);
+            }
         } else if (data.aspiration <= 0) {
             data.state = ASPIRATION_STATE.COLLAPSED;
-            debugLogEngine.log(this.name, `%c유닛 ${unitId} 열망 붕괴!`, 'color: red; font-weight: bold;');
+            const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
+            if (unit) {
+                debugAspirationManager.logStateChange(unit.instanceName, ASPIRATION_STATE.COLLAPSED);
+            }
         }
     }
 
