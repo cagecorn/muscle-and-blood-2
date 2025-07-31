@@ -181,56 +181,6 @@ export const activeSkills = {
         }
     },
 
-    // ✨ [신규] 원거리 공격 스킬 추가
-    rangedAttack: {
-        yinYangValue: -1,
-        NORMAL: {
-            id: 'rangedAttack',
-            name: '원거리 공격',
-            type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL],
-            cost: 1,
-            description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
-            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
-            cooldown: 0,
-        },
-        RARE: {
-            id: 'rangedAttack',
-            name: '원거리 공격 [R]',
-            type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL],
-            cost: 0,
-            description: '원거리의 적을 {{damage}}% 데미지로 공격합니다.',
-            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
-            cooldown: 0,
-        },
-        EPIC: {
-            id: 'rangedAttack',
-            name: '원거리 공격 [E]',
-            type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL],
-            cost: 0,
-            description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 50% 확률로 토큰 1개를 생성합니다.',
-            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
-            cooldown: 0,
-            generatesToken: { chance: 0.5, amount: 1 }
-        },
-        LEGENDARY: {
-            id: 'rangedAttack',
-            name: '원거리 공격 [L]',
-            type: 'ACTIVE',
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL],
-            cost: 0,
-            description: '원거리의 적을 {{damage}}% 데미지로 공격하고, 100% 확률로 토큰 1개를 생성합니다.',
-            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
-            cooldown: 0,
-            generatesToken: { chance: 1.0, amount: 1 }
-        }
-    },
     // --- ▼ [신규] 나노빔 스킬 추가 ▼ ---
     nanobeam: {
         yinYangValue: -1,
@@ -294,7 +244,7 @@ export const activeSkills = {
             cost: 1,
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
+            damageMultiplier: { min: 0.45, max: 0.55 },
             cooldown: 0,
             restoresBarrierPercent: 0.05
         },
@@ -306,7 +256,7 @@ export const activeSkills = {
             cost: 0,
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 5%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
+            damageMultiplier: { min: 0.45, max: 0.55 },
             cooldown: 0,
             restoresBarrierPercent: 0.05
         },
@@ -318,7 +268,7 @@ export const activeSkills = {
             cost: 0,
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 7%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
+            damageMultiplier: { min: 0.45, max: 0.55 },
             cooldown: 0,
             restoresBarrierPercent: 0.07
         },
@@ -330,7 +280,7 @@ export const activeSkills = {
             cost: 0,
             description: '적을 {{damage}}% 위력으로 공격하고, 최대 용맹 배리어의 10%를 회복합니다.',
             illustrationPath: 'assets/images/skills/axe-strike.png',
-            damageMultiplier: { min: 0.9, max: 1.1 },
+            damageMultiplier: { min: 0.45, max: 0.55 },
             cooldown: 0,
             restoresBarrierPercent: 0.10
         }

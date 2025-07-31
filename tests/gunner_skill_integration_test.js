@@ -10,7 +10,7 @@ const suppressShotBase = {
     LEGENDARY: { id: 'suppressShot', damageMultiplier: { min: 1.1, max: 1.3 }, turnOrderEffect: 'pushToBack', effect: { tokenLoss: 1 } }
 };
 
-// --- ▼ [신규] 넉백샷 및 원거리 공격 테스트 데이터 추가 ▼ ---
+// --- ▼ [신규] 넉백샷 테스트 데이터 추가 ▼ ---
 const knockbackShotBase = {
     NORMAL: { id: 'knockbackShot', cost: 2, cooldown: 2, damageMultiplier: { min: 0.7, max: 0.9 }, push: 1 },
     RARE: { id: 'knockbackShot', cost: 2, cooldown: 1, damageMultiplier: { min: 0.7, max: 0.9 }, push: 1 },
@@ -18,13 +18,7 @@ const knockbackShotBase = {
     LEGENDARY: { id: 'knockbackShot', cost: 1, cooldown: 1, damageMultiplier: { min: 0.7, max: 0.9 }, push: 2 }
 };
 
-const rangedAttackBase = {
-    NORMAL: { id: 'rangedAttack', cost: 1, cooldown: 0, damageMultiplier: { min: 0.9, max: 1.1 } },
-    RARE: { id: 'rangedAttack', cost: 0, cooldown: 0, damageMultiplier: { min: 0.9, max: 1.1 } },
-    EPIC: { id: 'rangedAttack', cost: 0, cooldown: 0, damageMultiplier: { min: 0.9, max: 1.1 }, generatesToken: { chance: 0.5, amount: 1 } },
-    LEGENDARY: { id: 'rangedAttack', cost: 0, cooldown: 0, damageMultiplier: { min: 0.9, max: 1.1 }, generatesToken: { chance: 1.0, amount: 1 } }
-};
-// --- ▲ [신규] 넉백샷 및 원거리 공격 테스트 데이터 추가 ▲ ---
+// --- ▲ [신규] 넉백샷 테스트 데이터 추가 ▲ ---
 
 // --- ▼ [신규] 사냥꾼의 감각 테스트 데이터 추가 ▼ ---
 const huntSenseBase = {
@@ -97,26 +91,6 @@ for (const grade of grades) {
 }
 // --- ▲ [신규] 넉백샷 테스트 로직 추가 ▲ ---
 
-// --- ▼ [신규] 원거리 공격 테스트 로직 추가 ▼ ---
-for (const grade of grades) {
-    const skill = skillModifierEngine.getModifiedSkill(rangedAttackBase[grade], grade);
-    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
-
-    if (grade === 'NORMAL') {
-        assert.strictEqual(skill.cost, 1, `Ranged attack cost failed for ${grade}`);
-    } else {
-        assert.strictEqual(skill.cost, 0, `Ranged attack cost failed for ${grade}`);
-    }
-
-    if (grade === 'EPIC') {
-        assert(skill.generatesToken && skill.generatesToken.chance === 0.5, `Token generation failed for ${grade}`);
-    } else if (grade === 'LEGENDARY') {
-        assert(skill.generatesToken && skill.generatesToken.chance === 1.0, `Token generation failed for ${grade}`);
-    } else {
-        assert(!skill.generatesToken, `Unexpected token generation for ${grade}`);
-    }
-}
-// --- ▲ [신규] 원거리 공격 테스트 로직 추가 ▲ ---
 
 // --- ▼ [신규] 사냥꾼의 감각 테스트 로직 추가 ▼ ---
 for (const grade of grades) {
