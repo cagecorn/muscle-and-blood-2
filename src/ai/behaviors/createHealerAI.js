@@ -2,7 +2,6 @@ import BehaviorTree from '../BehaviorTree.js';
 import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
-import SuccessNode from '../nodes/SuccessNode.js';
 
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
@@ -41,8 +40,7 @@ function createHealerAI(engines = {}) {
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
-        ]),
-        new SuccessNode()
+        ])
     ]);
     
     // ... MBTI 기반 특수 행동 로직 (필요 시 여기에 추가) ...
