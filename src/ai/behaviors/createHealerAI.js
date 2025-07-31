@@ -21,6 +21,8 @@ import JustRecoveredFromStunNode from '../nodes/JustRecoveredFromStunNode.js';
 import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
 import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
+import CheckAspirationStateNode from '../nodes/CheckAspirationStateNode.js';
+import { ASPIRATION_STATE } from '../../game/utils/AspirationEngine.js';
 
 function createHealerAI(engines = {}) {
     const executeSkillBranch = new SelectorNode([
@@ -101,12 +103,20 @@ function createHealerAI(engines = {}) {
         new MoveToTargetNode(engines)
     ]);
 
-    const rootNode = new SelectorNode([
+    const baseBehaviorTree = new SelectorNode([
         survivalBehavior,
         postStunRecoveryBehavior,
         supportSequence,
         repositionSequence,
         new SuccessNode()
+    ]);
+
+    const rootNode = new SelectorNode([
+        new SequenceNode([
+            new CheckAspirationStateNode(ASPIRATION_STATE.COLLAPSED),
+            baseBehaviorTree
+        ]),
+        baseBehaviorTree
     ]);
 
     return new BehaviorTree(rootNode);

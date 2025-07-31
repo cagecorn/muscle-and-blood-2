@@ -33,6 +33,7 @@ import { SharedResourceUIManager } from '../dom/SharedResourceUIManager.js';
 import { comboManager } from './ComboManager.js';
 // ✨ YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
+import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -59,7 +60,7 @@ export class BattleSimulatorEngine {
         // 턴 순서 UI 매니저
         this.turnOrderUI = new TurnOrderUIManager();
         this.sharedResourceUI = new SharedResourceUIManager();
-        
+
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
             targetManager,
@@ -76,6 +77,9 @@ export class BattleSimulatorEngine {
             summoningEngine: this.summoningEngine,
             battleSimulator: this,
         };
+
+        // ✨ AspirationEngine에 battleSimulator 참조 설정
+        aspirationEngine.setBattleSimulator(this);
 
         this.turnQueue = [];
         this.currentTurnIndex = 0;
@@ -98,6 +102,8 @@ export class BattleSimulatorEngine {
         yinYangEngine.initializeUnits([...allies, ...enemies]);
 
         const allUnits = [...allies, ...enemies];
+        // ✨ 전투 시작 시 열망 엔진 초기화
+        aspirationEngine.initializeUnits(allUnits);
         // --- ✨ 전투 시작 시 토큰 엔진 초기화 ---
         tokenEngine.initializeUnits(allUnits);
         allies.forEach(u => u.team = 'ally');

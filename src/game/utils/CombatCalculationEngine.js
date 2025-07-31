@@ -23,6 +23,8 @@ import { stackManager } from './StackManager.js';
 import { FIXED_DAMAGE_TYPES } from './FixedDamageManager.js';
 // ✨ AIMemoryEngine 추가
 import { aiMemoryEngine } from './AIMemoryEngine.js';
+// ✨ AspirationEngine을 import 합니다.
+import { aspirationEngine } from './AspirationEngine.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -175,11 +177,25 @@ class CombatCalculationEngine {
             debugStatusEffectManager.logDamageModification(defender, initialDamage, finalDamage, effects);
         }
 
-        // ✨ 전투 결과를 AI 기억에 저장
+        // ✨ 전투 결과를 AI 기억과 열망에 저장
         if (hitType && attacker.team !== defender.team) {
             const attackType = this.getAttackTypeFromSkill(finalSkill);
             if (attackType) {
                 aiMemoryEngine.updateMemory(attacker.uniqueId, defender.uniqueId, attackType, hitType);
+            }
+
+            // ✨ 열망 시스템 연동
+            switch(hitType) {
+                case '치명타':
+                case '약점':
+                    aspirationEngine.addAspiration(attacker.uniqueId, 15, hitType);
+                    aspirationEngine.addAspiration(defender.uniqueId, -10, `${hitType} 피격`);
+                    break;
+                case '완화':
+                case '막기':
+                    aspirationEngine.addAspiration(attacker.uniqueId, -10, hitType);
+                    aspirationEngine.addAspiration(defender.uniqueId, 15, hitType);
+                    break;
             }
         }
 

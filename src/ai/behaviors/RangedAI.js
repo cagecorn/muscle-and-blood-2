@@ -17,6 +17,8 @@ import FleeNode from '../nodes/FleeNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
+import CheckAspirationStateNode from '../nodes/CheckAspirationStateNode.js';
+import { ASPIRATION_STATE } from '../../game/utils/AspirationEngine.js';
 
 function createRangedAI(engines = {}) {
     // 스킬 하나를 실행하는 공통 로직 (이동 불포함)
@@ -72,19 +74,27 @@ function createRangedAI(engines = {}) {
         new MoveToTargetNode(engines)
     ]);
 
-    // 최종 행동 트리 구성
-    const rootNode = new SelectorNode([
+    // 최종 행동 트리 구성 (기존 로직)
+    const baseBehaviorTree = new SelectorNode([
         survivalBehavior,
         kitingBehavior,
         mainAttackLogic,
         basicMovement,
-        // 아무것도 할 게 없을 때 턴을 넘기기 전 마지막으로 위치 재선정 시도
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
         ]),
-        new SuccessNode() // 모든 행동이 실패했을 경우 턴을 정상적으로 종료
+        new SuccessNode()
+    ]);
+
+    // 열망 상태에 따른 분기 처리
+    const rootNode = new SelectorNode([
+        new SequenceNode([
+            new CheckAspirationStateNode(ASPIRATION_STATE.COLLAPSED),
+            baseBehaviorTree
+        ]),
+        baseBehaviorTree
     ]);
 
     return new BehaviorTree(rootNode);

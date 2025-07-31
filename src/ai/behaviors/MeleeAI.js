@@ -27,6 +27,8 @@ import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
 import IsTokenBelowThresholdNode from '../nodes/IsTokenBelowThresholdNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
+import CheckAspirationStateNode from '../nodes/CheckAspirationStateNode.js';
+import { ASPIRATION_STATE } from '../../game/utils/AspirationEngine.js';
 
 function createMeleeAI(engines = {}) {
     const executeSkillBranch = new SelectorNode([
@@ -254,7 +256,10 @@ function createMeleeAI(engines = {}) {
         new MoveToTargetNode(engines)
     ]);
 
-    const rootNode = new SelectorNode([
+    // =================================================================
+    // 1. [열망 붕괴] 시 행동할 MBTI 기반 비합리적 행동 트리
+    // =================================================================
+    const collapsedBehaviorTree = new SelectorNode([
         survivalBehavior,
         postStunRecoveryBehavior,
         lowTokenResponse,
@@ -265,6 +270,45 @@ function createMeleeAI(engines = {}) {
         attackSequence,
         basicMovement,
         new SuccessNode()
+    ]);
+
+    // =================================================================
+    // 2. [평상시/각성] 상태에서 행동할 합리적인 하드코딩 행동 트리
+    // =================================================================
+    const rationalBehaviorTree = (() => {
+        const executeSkillBranch2 = new SelectorNode([
+            new SequenceNode([new IsSkillInRangeNode(engines), new UseSkillNode(engines)]),
+            new SequenceNode([
+                new HasNotMovedNode(),
+                new FindPathToSkillRangeNode(engines),
+                new MoveToTargetNode(engines),
+                new IsSkillInRangeNode(engines),
+                new UseSkillNode(engines)
+            ])
+        ]);
+        const attackSequence2 = new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch2
+        ]);
+        const basicMovement2 = new SequenceNode([
+            new HasNotMovedNode(),
+            new FindMeleeStrategicTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]);
+        return new SelectorNode([attackSequence2, basicMovement2, new SuccessNode()]);
+    })();
+
+    // =================================================================
+    // 3. 최종 루트 노드: 열망 상태에 따라 행동 분기
+    // =================================================================
+    const rootNode = new SelectorNode([
+        new SequenceNode([
+            new CheckAspirationStateNode(ASPIRATION_STATE.COLLAPSED),
+            collapsedBehaviorTree
+        ]),
+        rationalBehaviorTree
     ]);
 
     return new BehaviorTree(rootNode);
