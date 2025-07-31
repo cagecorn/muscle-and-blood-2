@@ -1,4 +1,4 @@
-import { itemBaseData, itemAffixes } from '../data/items.js';
+import { itemBaseData, itemAffixes, mbtiGradeEffects } from '../data/items.js';
 import { uniqueIDManager } from './UniqueIDManager.js';
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
@@ -9,6 +9,13 @@ import { debugLogEngine } from './DebugLogEngine.js';
 class ItemFactory {
     constructor() {
         this.name = 'ItemFactory';
+        // 등급별 MBTI 효과 개수 설정
+        this.effectsPerGrade = {
+            NORMAL: 1,
+            RARE: 2,
+            EPIC: 3,
+            LEGENDARY: 4
+        };
         debugLogEngine.register(this);
     }
 
@@ -17,7 +24,7 @@ class ItemFactory {
      * @param {string} baseItemId - 생성할 아이템의 ID
      * @returns {object|null} - 생성된 아이템 인스턴스 또는 null
      */
-    createItem(baseItemId) {
+    createItem(baseItemId, grade = 'NORMAL') {
         const baseData = itemBaseData[baseItemId];
         if (!baseData) {
             debugLogEngine.error(this.name, `'${baseItemId}'에 해당하는 아이템 기본 데이터를 찾을 수 없습니다.`);
@@ -32,10 +39,12 @@ class ItemFactory {
         const newItem = {
             instanceId: uniqueIDManager.getNextId(),
             baseId: baseItemId,
-            name: `${prefix.name} ${baseData.name} ${suffix.name}`,
+            name: `[${grade}] ${prefix.name} ${baseData.name} ${suffix.name}`,
             type: baseData.type,
+            grade,
             illustrationPath: baseData.illustrationPath,
             stats: {},
+            mbtiEffects: [],
             weight: baseData.weight
         };
 
@@ -51,7 +60,26 @@ class ItemFactory {
             newItem.stats[statKey] = (newItem.stats[statKey] || 0) + value;
         });
 
+        // --- ▼ [신규] 등급 기반 MBTI 효과 부여 로직 ▼ ---
+        const numberOfEffects = this.effectsPerGrade[grade] || 0;
+        if (numberOfEffects > 0) {
+            const allTraits = Object.keys(mbtiGradeEffects);
+            const shuffledTraits = allTraits.sort(() => 0.5 - Math.random());
+            const selectedTraits = shuffledTraits.slice(0, numberOfEffects);
+
+            selectedTraits.forEach(trait => {
+                const effectPool = mbtiGradeEffects[trait];
+                const selectedEffect = diceEngine.getRandomElement(effectPool);
+
+                const finalEffect = { ...selectedEffect };
+                finalEffect.value = this._getRandomValue(selectedEffect.value.min, selectedEffect.value.max);
+
+                newItem.mbtiEffects.push(finalEffect);
+            });
+        }
+
         debugLogEngine.log(this.name, `새 아이템 생성: [${newItem.name}] (ID: ${newItem.instanceId})`);
+        console.log(newItem);
         return newItem;
     }
 

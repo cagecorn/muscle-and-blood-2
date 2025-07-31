@@ -1,6 +1,7 @@
 /**
  * 게임에 등장하는 모든 아이템의 기본 데이터와
- * 무작위로 부여될 수 있는 접두사, 접미사를 정의하는 파일
+ * 무작위로 부여될 수 있는 접두사, 접미사,
+ * 그리고 등급별로 적용 가능한 MBTI 특성 효과를 정의하는 파일
  */
 
 // 아이템이 장착될 수 있는 부위 정의
@@ -67,4 +68,16 @@ export const itemAffixes = {
         { name: '흡혈의', stat: 'lifeSteal', value: { min: 2, max: 4 } },
         { name: '끈기의', stat: 'aspirationDecayReduction', value: { min: 10, max: 15 } }
     ]
+};
+
+// --- ▼ [신규] MBTI 성향별 등급 효과 데이터베이스 ▼ ---
+export const mbtiGradeEffects = {
+    E: [{ trait: 'E', description: '외향형 장착 시, 주변 아군 수 비례 공격력 +{value}%', stat: 'physicalAttackPercentagePerAlly', value: { min: 1, max: 2 } }],
+    I: [{ trait: 'I', description: '내향형 장착 시, 스킬 토큰 소모량 -{value}%', stat: 'tokenCostReduction', value: { min: 5, max: 10 } }],
+    S: [{ trait: 'S', description: '감각형 장착 시, 명중률 +{value}', stat: 'accuracy', value: { min: 5, max: 10 } }],
+    N: [{ trait: 'N', description: '직관형 장착 시, 스킬 효과 지속시간 +{value}턴', stat: 'effectDuration', value: { min: 1, max: 1 } }],
+    T: [{ trait: 'T', description: '사고형 장착 시, 받는 치명타 피해량 -{value}%', stat: 'criticalDamageReduction', value: { min: 10, max: 15 } }],
+    F: [{ trait: 'F', description: '감정형 장착 시, 아군에게 주는 치유량 +{value}%', stat: 'healingGivenPercentage', value: { min: 5, max: 10 } }],
+    J: [{ trait: 'J', description: '판단형 장착 시, 모든 스킬 재사용 대기시간 -{value}턴', stat: 'cooldownReduction', value: { min: 1, max: 1 } }],
+    P: [{ trait: 'P', description: '인식형 장착 시, {value}% 확률로 토큰 미소모', stat: 'tokenFreeChance', value: { min: 5, max: 10 } }]
 };
