@@ -221,6 +221,41 @@ export class UnitDetailDOM {
 
         rightSection.appendChild(skillsContainer);
 
+        // --- ▼ 장비 카드 섹션 추가 ▼ ---
+        const equipmentSection = document.createElement('div');
+        equipmentSection.className = 'equipment-section';
+        equipmentSection.innerHTML = `<div class="section-title">장비 카드</div>`;
+
+        const equipmentGrid = document.createElement('div');
+        equipmentGrid.className = 'equipment-grid';
+
+        const equipSlots = [
+            { label: '무기' },
+            { label: '갑옷' },
+            { label: '악세사리1' },
+            { label: '악세사리2' }
+        ];
+
+        equipSlots.forEach(slotInfo => {
+            const slot = document.createElement('div');
+            slot.className = 'equip-slot';
+
+            const slotImage = document.createElement('div');
+            slotImage.className = 'equip-slot-image';
+
+            const slotLabel = document.createElement('div');
+            slotLabel.className = 'equip-slot-label';
+            slotLabel.innerText = slotInfo.label;
+
+            slot.appendChild(slotImage);
+            slot.appendChild(slotLabel);
+            equipmentGrid.appendChild(slot);
+        });
+
+        equipmentSection.appendChild(equipmentGrid);
+        rightSection.appendChild(equipmentSection);
+        // --- ▲ 장비 카드 섹션 추가 ▲ ---
+
         detailContent.appendChild(leftSection);
         detailContent.appendChild(rightSection);
         detailPane.appendChild(detailContent);
