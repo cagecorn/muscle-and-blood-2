@@ -42,9 +42,11 @@ class ItemFactory {
             name: `[${grade}] ${prefix.name} ${baseData.name} ${suffix.name}`,
             type: baseData.type,
             grade,
+            synergy: baseData.synergy || null,
             illustrationPath: baseData.illustrationPath,
             stats: {},
             mbtiEffects: [],
+            sockets: [],
             weight: baseData.weight
         };
 
@@ -76,6 +78,12 @@ class ItemFactory {
 
                 newItem.mbtiEffects.push(finalEffect);
             });
+        }
+
+        // --- ▼ [신규] 무작위 소켓 생성 로직 ▼ ---
+        const socketCount = Math.round(diceEngine.rollWithAdvantage(1, 3, 1));
+        for (let i = 0; i < socketCount; i++) {
+            newItem.sockets.push(null);
         }
 
         debugLogEngine.log(this.name, `새 아이템 생성: [${newItem.name}] (ID: ${newItem.instanceId})`);

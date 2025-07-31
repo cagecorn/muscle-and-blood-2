@@ -1,0 +1,44 @@
+import { equipmentManager } from './EquipmentManager.js';
+import { synergySets } from '../data/items.js';
+import { itemFactory } from './ItemFactory.js';
+
+/**
+ * 장비로 인한 스탯 보너스를 계산하는 엔진
+ */
+class ItemEngine {
+    getBonusStatsFromEquipment(unitData) {
+        const bonusStats = {};
+        const equippedItemIds = equipmentManager.getEquippedItems(unitData.uniqueId);
+        const equippedItems = equippedItemIds.map(id => itemFactory.createItem('axe', 'LEGENDARY'));
+
+        // 1. 아이템 자체 스탯 합산
+        equippedItems.forEach(item => {
+            if (!item) return;
+            for (const [stat, value] of Object.entries(item.stats)) {
+                bonusStats[stat] = (bonusStats[stat] || 0) + value;
+            }
+        });
+
+        // 3. 시너지 세트 효과 적용
+        const synergyCounts = {};
+        equippedItems.forEach(item => {
+            if (item && item.synergy) {
+                synergyCounts[item.synergy] = (synergyCounts[item.synergy] || 0) + 1;
+            }
+        });
+        for (const [name, count] of Object.entries(synergyCounts)) {
+            if (count >= 4) {
+                const effect = synergySets[name].effect;
+                if (effect.stat) {
+                    bonusStats[effect.stat] = (bonusStats[effect.stat] || 0) + effect.value;
+                }
+            }
+        }
+
+        // 4. 보석 소켓 효과 (추후 구현 예정)
+
+        return bonusStats;
+    }
+}
+
+export const itemEngine = new ItemEngine();
