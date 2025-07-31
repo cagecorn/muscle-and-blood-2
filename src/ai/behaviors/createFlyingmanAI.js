@@ -2,7 +2,6 @@ import BehaviorTree from '../BehaviorTree.js';
 import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
-import SuccessNode from '../nodes/SuccessNode.js';
 
 // 신규 및 기존 노드 import
 import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
@@ -50,9 +49,7 @@ function createFlyingmanAI(engines = {}) {
             new FindPriorityTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
-        ]),
-
-        // new SuccessNode(),
+        ])
     ]);
 
     return new BehaviorTree(rootNode);
