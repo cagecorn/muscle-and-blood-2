@@ -1,5 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { formationEngine } from './FormationEngine.js';
+import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
 
 /**
  * 유닛 사망 등 특정 로직의 '종료'와 관련된 후처리를 담당하는 매니저
@@ -38,6 +39,19 @@ class TerminationManager {
                 const summon = this.battleSimulator.turnQueue.find(u => u.uniqueId === id);
                 if (summon && summon.currentHp > 0) {
                     this.handleUnitDeath(summon);
+                }
+            });
+        }
+
+        // ✨ 열망 시스템 연동
+        if (this.battleSimulator) {
+            this.battleSimulator.turnQueue.forEach(unit => {
+                if (unit.currentHp > 0) {
+                    if (unit.team === deadUnit.team) {
+                        aspirationEngine.addAspiration(unit.uniqueId, -20, '아군 사망');
+                    } else {
+                        aspirationEngine.addAspiration(unit.uniqueId, 20, '적군 처치');
+                    }
                 }
             });
         }
