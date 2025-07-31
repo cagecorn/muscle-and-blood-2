@@ -3,34 +3,17 @@ import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import SuccessNode from '../nodes/SuccessNode.js';
-import { NodeState } from '../nodes/Node.js';
 
-// 사용할 노드들을 import 합니다.
-import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
+import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
-import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
-import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import FindSafeHealingPositionNode from '../nodes/FindSafeHealingPositionNode.js';
+import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
-import MBTIActionNode from '../nodes/MBTIActionNode.js';
-import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
-import FleeNode from '../nodes/FleeNode.js';
-import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
-import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
-import JustRecoveredFromStunNode from '../nodes/JustRecoveredFromStunNode.js';
-import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
-import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
-import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
-import CheckAspirationStateNode from '../nodes/CheckAspirationStateNode.js';
-import { ASPIRATION_STATE } from '../../game/utils/AspirationEngine.js';
 
-/**
- * 힐러 유닛을 위한 합리적인 하드코딩 AI를 생성합니다.
- * @param {object} engines - AI 노드에 주입될 각종 엔진
- * @returns {BehaviorTree}
- */
 function createHealerAI(engines = {}) {
+    // --- 공통 사용 브랜치 ---
     const executeSkillBranch = new SelectorNode([
         new SequenceNode([
             new IsSkillInRangeNode(engines),
@@ -44,74 +27,34 @@ function createHealerAI(engines = {}) {
             new UseSkillNode(engines)
         ])
     ]);
-
-    const survivalBehavior = new SequenceNode([
-        new IsHealthBelowThresholdNode(0.35),
-        {
-            async evaluate(unit) {
-                debugMBTIManager.logDecisionStart('생존 본능 발동', unit);
-                return NodeState.SUCCESS;
-            }
-        },
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('E', engines),
-                new FleeNode(engines),
-                new MoveToTargetNode(engines)
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('I', engines),
-                new FleeNode(engines),
-                new MoveToTargetNode(engines)
-            ])
+    
+    // --- 기본 행동 (최후의 보루) ---
+    const basicActionBranch = new SelectorNode([
+        // 1. 아군 지원(힐/버프) 또는 적 공격(디버프/공격) 시도
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
         ]),
-        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
-    ]);
-
-    const postStunRecoveryBehavior = new SequenceNode([
-        new JustRecoveredFromStunNode(),
-        new SetTargetToStunnerNode(),
-        new MBTIActionNode('T', engines),
-        new CanUseSkillBySlotNode(0),
-        executeSkillBranch
-    ]);
-
-    const supportSequence = new SequenceNode([
-        new FindBestSkillByScoreNode(engines),
-        new FindTargetBySkillTypeNode(engines),
-        executeSkillBranch
-    ]);
-
-    const allyCareBehavior = new SequenceNode([
-        new FindNearestAllyInDangerNode(engines),
-        new MBTIActionNode('F', engines),
-        new FindPathToAllyNode(engines),
-        new MoveToTargetNode(engines),
-        new CanUseSkillBySlotNode(1),
-        executeSkillBranch
-    ]);
-
-    const repositionSequence = new SequenceNode([
-        new HasNotMovedNode(),
-        new FindSafeRepositionNode(engines),
-        new MoveToTargetNode(engines)
-    ]);
-
-    const baseBehaviorTree = new SelectorNode([
-        survivalBehavior,
-        postStunRecoveryBehavior,
-        supportSequence,
-        allyCareBehavior,
-        repositionSequence,
+        // 2. 할 수 있는 스킬이 없으면 안전한 위치로 재배치
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindSafeRepositionNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
         new SuccessNode()
     ]);
+    
+    // ... MBTI 기반 특수 행동 로직 (필요 시 여기에 추가) ...
 
+
+    // --- 최종 행동 트리 구성 ---
     const rootNode = new SelectorNode([
-        new SequenceNode([
-            new CheckAspirationStateNode(ASPIRATION_STATE.COLLAPSED),
-            baseBehaviorTree
-        ]),
-        baseBehaviorTree
+        // 1순위: 특수 행동 (예: 생존 본능)
+        // ...
+        
+        // 2순위: 기본 행동 (반드시 실행됨)
+        basicActionBranch
     ]);
 
     return new BehaviorTree(rootNode);
