@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { debugYinYangManager } from '../debug/DebugYinYangManager.js';
 
 /**
  * 전투 중 모든 유닛의 음양(Yin-Yang) 지수를 관리하는 엔진입니다.
@@ -30,16 +31,13 @@ class YinYangEngine {
      * @param {number} skillYinYangValue - 사용된 스킬의 음양 값 (예: -15, 20)
      */
     updateBalance(unitId, skillYinYangValue) {
-        if (!this.unitBalances.has(unitId)) return;
+        if (!this.unitBalances.has(unitId) || !skillYinYangValue) return;
 
         const oldValue = this.unitBalances.get(unitId);
         const newValue = oldValue + skillYinYangValue;
         this.unitBalances.set(unitId, newValue);
 
-        debugLogEngine.log(
-            this.name,
-            `유닛 ${unitId}의 음양 지수 변경: ${oldValue} -> ${newValue} (${skillYinYangValue > 0 ? '+' : ''}${skillYinYangValue})`
-        );
+        debugYinYangManager.logBalanceUpdate(unitId, oldValue, newValue, skillYinYangValue);
     }
 
     /**

@@ -9,6 +9,7 @@ import { aiMemoryEngine } from './AIMemoryEngine.js';
 import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
 // ✨ 1. YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
+import { debugYinYangManager } from '../debug/DebugYinYangManager.js';
 
 /**
  * AI의 스킬 선택을 위해 각 스킬의 전략적 가치를 계산하는 엔진
@@ -113,6 +114,13 @@ class SkillScoreEngine {
                 }
             }
         }
+
+        debugYinYangManager.logScoreModification(
+            skillData.name,
+            baseScore + tagScore + situationScore,
+            yinYangBonus,
+            finalScore
+        );
 
         debugLogEngine.log(
             this.name,
