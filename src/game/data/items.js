@@ -18,6 +18,7 @@ export const itemBaseData = {
         id: 'axe',
         name: '도끼',
         type: EQUIPMENT_SLOTS.WEAPON,
+        synergy: '광기의 학살자',
         illustrationPath: 'assets/images/item/throwing-axe.png',
         baseStats: {
             physicalAttack: { min: 8, max: 12 }
@@ -40,6 +41,7 @@ export const itemBaseData = {
         id: 'plateArmor',
         name: '판금 갑옷',
         type: EQUIPMENT_SLOTS.ARMOR,
+        synergy: '신뢰의 방패',
         illustrationPath: 'assets/images/item/plate-armor.png',
         baseStats: {
             physicalDefense: { min: 15, max: 20 },
@@ -80,4 +82,42 @@ export const mbtiGradeEffects = {
     F: [{ trait: 'F', description: '감정형 장착 시, 아군에게 주는 치유량 +{value}%', stat: 'healingGivenPercentage', value: { min: 5, max: 10 } }],
     J: [{ trait: 'J', description: '판단형 장착 시, 모든 스킬 재사용 대기시간 -{value}턴', stat: 'cooldownReduction', value: { min: 1, max: 1 } }],
     P: [{ trait: 'P', description: '인식형 장착 시, {value}% 확률로 토큰 미소모', stat: 'tokenFreeChance', value: { min: 5, max: 10 } }]
+};
+
+// --- ▼ [신규] 장비 시너지 세트 효과 데이터베이스 ▼ ---
+export const synergySets = {
+    '신뢰의 방패': {
+        name: '신뢰의 방패',
+        description: '용맹 배리어가 활성화되어 있는 동안 받는 모든 피해 15% 감소.',
+        effect: { stat: 'damageReductionWhileBarrierActive', value: 15 }
+    },
+    '광기의 학살자': {
+        name: '광기의 학살자',
+        description: '적을 처치할 때마다 즉시 추가 턴을 1회 얻습니다 (연속 획득 불가).',
+        effect: { trigger: 'onKill', action: 'gainExtraTurn' }
+    }
+    // ... 다른 세트 효과들을 여기에 추가 ...
+};
+
+// --- ▼ [신규] 보석 데이터베이스 ▼ ---
+export const gemData = {
+    ruby: {
+        id: 'ruby',
+        name: '화염의 루비',
+        effects: {
+            [EQUIPMENT_SLOTS.WEAPON]: { stat: 'fireDamage', value: { min: 10, max: 15 } },
+            [EQUIPMENT_SLOTS.ARMOR]: { stat: 'fireResistance', value: { min: 5, max: 8 } }
+        },
+        illustrationPath: 'assets/images/placeholder.png'
+    },
+    sapphire: {
+        id: 'sapphire',
+        name: '서리의 사파이어',
+        effects: {
+            [EQUIPMENT_SLOTS.WEAPON]: { stat: 'frostDamage', value: { min: 10, max: 15 } },
+            [EQUIPMENT_SLOTS.ARMOR]: { stat: 'frostResistance', value: { min: 5, max: 8 } }
+        },
+        illustrationPath: 'assets/images/placeholder.png'
+    }
+    // ... 다른 보석들 추가 ...
 };

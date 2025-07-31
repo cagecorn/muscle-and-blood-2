@@ -1,3 +1,5 @@
+import { itemEngine } from './ItemEngine.js';
+
 /**
  * \uC6A9\uB9BD(Valor) \uC2DC\uC2A4\uD15C\uC758 \uACC4\uC0B0\uC744 \uC804\uB2E8\uD558\uB294 \uC5D4\uC9C4\uC785\uB2C8\uB2E4.
  * \uBC29\uC5B4\uB9C9 \uC0DD\uC131, \uD53C\uD574 \uC99D\uD3ED \uB4F1 '\uC6A9\uB9BD' \uC2A4\uD0EF\uACFC \uAD00\uB828\uB41C \uBAA8\uB4E0 \uB85C\uC9C1\uC744 \uB2F4\uB2F9\uD569\uB2C8\uB2E4.
@@ -87,51 +89,21 @@ class StatEngine {
      * @returns {object} - \uBAA8\uB4E0 \uACC4\uC0B0\uC774 \uC644\uB8CC\uB41C \uCD5C\uC885 \uC2A4\uD0EF \uAC1D\uCCB4
      */
     calculateStats(unitData = {}, baseStats = {}, equippedItems = []) {
-        const calculated = {};
+        const finalStats = { ...baseStats };
 
-        // 1. \uAE30\uBCF8 \uC2A4\uD0EF\uC744 \uBCF5\uC0AC\uD569\uB2C8\uB2E4.
-        Object.assign(calculated, {
-            hp: baseStats.hp || 0,
-            valor: baseStats.valor || 0,
-            strength: baseStats.strength || 0,
-            endurance: baseStats.endurance || 0,
-            agility: baseStats.agility || 0,
-            intelligence: baseStats.intelligence || 0,
-            wisdom: baseStats.wisdom || 0,
-            luck: baseStats.luck || 0,
-            attackRange: baseStats.attackRange || 1,
-            movement: baseStats.movement || 0,
-            weight: baseStats.weight || 0, // ✨ baseStats에서 weight를 직접 읽습니다.
-        });
-
-        // 2. \uC804\uBB38 \uC5D4\uC9C4\uC744 \uD1B5\uD574 \uD30C\uC9C0 \uC2A4\uD0EF\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-        calculated.maxBarrier = this.valorEngine.calculateInitialBarrier(calculated.valor);
-        calculated.currentBarrier = calculated.maxBarrier;
-        // ✨ WeightEngine 로직을 직접 처리하여 기본 무게와 장비 무게를 합산합니다.
-        let totalWeight = calculated.weight;
-        for (const item of equippedItems) {
-            totalWeight += item.weight || 0;
+        const equipmentBonusStats = itemEngine.getBonusStatsFromEquipment(unitData);
+        for (const [stat, value] of Object.entries(equipmentBonusStats)) {
+            finalStats[stat] = (finalStats[stat] || 0) + value;
         }
-        calculated.totalWeight = totalWeight;
-        calculated.turnValue = totalWeight; // 현재는 totalWeight를 그대로 사용
 
-        // 3. \uC8FC\uC6A9 \uC804\uD22C \uB2A5\uB825\uCE58\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-        calculated.physicalAttack = (calculated.strength || 0) * 1.5;
-        calculated.rangedAttack = (calculated.agility || 0) * 1.5;
-        calculated.physicalDefense = (calculated.endurance || 0) * 1.2;
-        calculated.magicAttack = (calculated.intelligence || 0) * 1.5;
-        calculated.magicDefense = (calculated.wisdom || 0) * 1.2;
-        
-        // 4. \uAE30\uD0C0 \uBCF4\uC870 \uB2A5\uB825\uCE58\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-        calculated.physicalEvadeChance = (calculated.agility || 0) * 0.2;
-        calculated.accuracy = (calculated.agility || 0) * 0.15;
-        calculated.magicEvadeChance = (calculated.luck || 0) * 0.1;
-        calculated.criticalChance = (calculated.luck || 0) * 0.05;
-        calculated.criticalDamageMultiplier = 1.5;
-        calculated.statusEffectResistance = (calculated.endurance || 0) * 0.1;
-        calculated.statusEffectApplication = (calculated.intelligence || 0) * 0.1;
+        finalStats.physicalAttack = (finalStats.strength || 0) * 1.5 + (finalStats.physicalAttack || 0);
+        finalStats.physicalAttack *= (1 + (finalStats.physicalAttackPercentage || 0) / 100);
 
-        return calculated;
+        finalStats.maxBarrier = this.valorEngine.calculateInitialBarrier(finalStats.valor);
+        finalStats.currentBarrier = finalStats.maxBarrier;
+        finalStats.totalWeight = this.weightEngine.calculateTotalWeight(unitData, equippedItems);
+
+        return finalStats;
     }
 }
 
