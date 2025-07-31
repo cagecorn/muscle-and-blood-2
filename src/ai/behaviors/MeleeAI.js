@@ -3,9 +3,9 @@ import SelectorNode from '../nodes/SelectorNode.js';
 import SequenceNode from '../nodes/SequenceNode.js';
 import MoveToTargetNode from '../nodes/MoveToTargetNode.js';
 import SuccessNode from '../nodes/SuccessNode.js';
-import { NodeState } from '../nodes/Node.js';
 
-import CanUseSkillBySlotNode from '../nodes/CanUseSkillBySlotNode.js';
+// 사용할 노드들을 import 합니다.
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
@@ -13,27 +13,21 @@ import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import FindMeleeStrategicTargetNode from '../nodes/FindMeleeStrategicTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
-import MBTIActionNode from '../nodes/MBTIActionNode.js';
-import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
-import FleeNode from '../nodes/FleeNode.js';
-import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
-import FindPathToAllyNode from '../nodes/FindPathToAllyNode.js';
-import JustRecoveredFromStunNode from '../nodes/JustRecoveredFromStunNode.js';
-import SetTargetToStunnerNode from '../nodes/SetTargetToStunnerNode.js';
-import FindAllyClusterNode from '../nodes/FindAllyClusterNode.js';
-import FindBuffedEnemyNode from '../nodes/FindBuffedEnemyNode.js';
-import FindEnemyMedicNode from '../nodes/FindEnemyMedicNode.js';
-import { debugMBTIManager } from '../../game/debug/DebugMBTIManager.js';
-import IsTokenBelowThresholdNode from '../nodes/IsTokenBelowThresholdNode.js';
-import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
-import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 
+/**
+ * 근접 유닛을 위한 합리적인 하드코딩 AI를 생성합니다.
+ * @param {object} engines - AI 노드에 주입될 각종 엔진
+ * @returns {BehaviorTree}
+ */
 function createMeleeAI(engines = {}) {
+    // 스킬을 실행하는 공통 로직 (이동 포함)
     const executeSkillBranch = new SelectorNode([
+        // 1. 사거리 내에 있으면 즉시 사용
         new SequenceNode([
             new IsSkillInRangeNode(engines),
             new UseSkillNode(engines)
         ]),
+        // 2. 사거리 밖이면 이동 후 사용
         new SequenceNode([
             new HasNotMovedNode(),
             new FindPathToSkillRangeNode(engines),
@@ -43,228 +37,26 @@ function createMeleeAI(engines = {}) {
         ])
     ]);
 
-    const survivalBehavior = new SequenceNode([
-        new IsHealthBelowThresholdNode(0.35),
-        {
-            async evaluate(unit) {
-                debugMBTIManager.logDecisionStart('생존 본능 발동', unit);
-                return NodeState.SUCCESS;
-            }
-        },
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('I', engines),
-                { async evaluate() { debugMBTIManager.logAction('후퇴 선택'); return NodeState.SUCCESS; } },
-                new FleeNode(engines),
-                new MoveToTargetNode(engines)
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('E', engines),
-                { async evaluate() { debugMBTIManager.logAction('최후의 발악 선택'); return NodeState.SUCCESS; } },
-                new CanUseSkillBySlotNode(0),
-                new FindTargetBySkillTypeNode(engines),
-                new UseSkillNode(engines)
-            ])
-        ]),
-        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
-    ]);
-
-    const postStunRecoveryBehavior = new SequenceNode([
-        new JustRecoveredFromStunNode(),
-        {
-            async evaluate(unit) {
-                debugMBTIManager.logDecisionStart('기절 회복 후 반응', unit);
-                return NodeState.SUCCESS;
-            }
-        },
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('S', engines),
-                { async evaluate() { debugMBTIManager.logAction('복수 선택 (S)'); return NodeState.SUCCESS; } },
-                new SetTargetToStunnerNode(),
-                new CanUseSkillBySlotNode(3),
-                new FindPathToSkillRangeNode(engines),
-                new MoveToTargetNode(engines),
-                new IsSkillInRangeNode(engines),
-                new UseSkillNode(engines)
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('J', engines),
-                { async evaluate() { debugMBTIManager.logAction('위치 정비 선택 (J)'); return NodeState.SUCCESS; } },
-                new HasNotMovedNode(),
-                new FleeNode(engines),
-                new MoveToTargetNode(engines)
-            ])
-        ]),
-        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
-    ]);
-
-    const lowTokenResponse = new SequenceNode([
-        new IsTokenBelowThresholdNode(1),
-        {
-            async evaluate(unit) {
-                debugMBTIManager.logDecisionStart('자원 부족 상황 판단', unit);
-                return NodeState.SUCCESS;
-            }
-        },
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('J', engines),
-                new HasNotMovedNode(),
-                { async evaluate() { debugMBTIManager.logAction('다음 턴을 위해 재배치 (J)'); return NodeState.SUCCESS; } },
-                new FindSafeRepositionNode(engines),
-                new MoveToTargetNode(engines)
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('P', engines),
-                { async evaluate() { debugMBTIManager.logAction('0코스트 스킬 시도 (P)'); return NodeState.SUCCESS; } },
-                new CanUseSkillBySlotNode(3),
-                new FindTargetBySkillTypeNode(engines),
-                executeSkillBranch
-            ])
-        ]),
-        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
-    ]);
-
-    const allyCareBehavior = new SequenceNode([
-        new FindNearestAllyInDangerNode(),
-        {
-            async evaluate(unit) {
-                debugMBTIManager.logDecisionStart('아군 보호 판단', unit);
-                return NodeState.SUCCESS;
-            }
-        },
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('F', engines),
-                { async evaluate() { debugMBTIManager.logAction('아군에게 이동'); return NodeState.SUCCESS; } },
-                new HasNotMovedNode(),
-                new FindPathToAllyNode(engines),
-                new MoveToTargetNode(engines)
-            ])
-        ]),
-        { async evaluate() { debugMBTIManager.logDecisionEnd(); return NodeState.SUCCESS; } }
-    ]);
-
-    // 상황 1: 아군 밀집 시 대응
-    const allyClusterResponse = new SequenceNode([
-        new FindAllyClusterNode(),
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('J', engines),
-                { async evaluate() { debugMBTIManager.logAction('진형 합류 선택 (J)'); return NodeState.SUCCESS; } },
-                new HasNotMovedNode(),
-                new FindPathToAllyNode(engines),
-                new MoveToTargetNode(engines)
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('P', engines),
-                { async evaluate() { debugMBTIManager.logAction('위험 분산 선택 (P)'); return NodeState.SUCCESS; } },
-                new HasNotMovedNode(),
-                new FleeNode(engines),
-                new MoveToTargetNode(engines)
-            ])
-        ])
-    ]);
-
-    // 상황 2: 적이 위협 버프 사용 시 대응
-    const enemyBuffResponse = new SequenceNode([
-        new FindBuffedEnemyNode(),
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('S', engines),
-                { async evaluate(unit, blackboard) {
-                    const target = blackboard.get('buffedEnemy');
-                    blackboard.set('skillTarget', target);
-                    debugMBTIManager.logAction('위협 집중 타격 (S)');
-                    return NodeState.SUCCESS;
-                }},
-                new CanUseSkillBySlotNode(3),
-                executeSkillBranch
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('T', engines),
-                { async evaluate(unit, blackboard) {
-                    const target = blackboard.get('buffedEnemy');
-                    blackboard.set('skillTarget', target);
-                    debugMBTIManager.logAction('디버프로 대응 (T)');
-                    return NodeState.SUCCESS;
-                }},
-                new CanUseSkillBySlotNode(2),
-                executeSkillBranch
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('F', engines),
-                { async evaluate() { debugMBTIManager.logAction('아군 보호 태세 (F)'); return NodeState.SUCCESS; } },
-                new CanUseSkillBySlotNode(1),
-                new FindTargetBySkillTypeNode(engines),
-                executeSkillBranch
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('N', engines),
-                { async evaluate() { debugMBTIManager.logAction('원래 목표 유지 (N)'); return NodeState.SUCCESS; } },
-                { async evaluate() { return NodeState.FAILURE; } }
-            ])
-        ])
-    ]);
-
-    // 상황 3: 적 메딕 발견 시 대응
-    const enemyMedicResponse = new SequenceNode([
-        new FindEnemyMedicNode(),
-        new SelectorNode([
-            new SequenceNode([
-                new MBTIActionNode('E', engines),
-                { async evaluate(unit, blackboard) {
-                    const target = blackboard.get('enemyMedic');
-                    blackboard.set('skillTarget', target);
-                    debugMBTIManager.logAction('메딕 돌격 제거 (E)');
-                    return NodeState.SUCCESS;
-                }},
-                new CanUseSkillBySlotNode(3),
-                executeSkillBranch
-            ]),
-            new SequenceNode([
-                new MBTIActionNode('I', engines),
-                { async evaluate(unit, blackboard) {
-                    if (Math.random() < 0.5) {
-                        const target = blackboard.get('enemyMedic');
-                        blackboard.set('skillTarget', target);
-                        debugMBTIManager.logAction('메딕 신중하게 공격 (I)');
-                        return NodeState.SUCCESS;
-                    }
-                    debugMBTIManager.logAction('메딕 공격 안함 (I)');
-                    return NodeState.FAILURE;
-                }},
-                new CanUseSkillBySlotNode(3),
-                executeSkillBranch
-            ])
-        ])
-    ]);
-
+    // 주 공격 시퀀스
     const attackSequence = new SequenceNode([
-        new FindTargetBySkillTypeNode(engines),
         new FindBestSkillByScoreNode(engines),
+        new FindTargetBySkillTypeNode(engines),
         executeSkillBranch
     ]);
 
+    // 기본 이동 로직 (공격할 스킬이 없을 때)
     const basicMovement = new SequenceNode([
         new HasNotMovedNode(),
-        new FindMeleeStrategicTargetNode(engines),
+        new FindMeleeStrategicTargetNode(engines), // 근접 유닛에 맞는 타겟 탐색
         new FindPathToTargetNode(engines),
         new MoveToTargetNode(engines)
     ]);
 
+    // 최종 행동 트리 구성
     const rootNode = new SelectorNode([
-        survivalBehavior,
-        postStunRecoveryBehavior,
-        lowTokenResponse,
-        enemyBuffResponse,
-        enemyMedicResponse,
-        allyClusterResponse,
-        allyCareBehavior,
-        attackSequence,
-        basicMovement,
-        new SuccessNode()
+        attackSequence, // 1순위: 공격 시도
+        basicMovement,  // 2순위: 이동
+        new SuccessNode() // 모든 행동 실패 시 턴 정상 종료
     ]);
 
     return new BehaviorTree(rootNode);
