@@ -43,7 +43,10 @@ class CombatCalculationEngine {
             return { damage: 0, hitType: '무효', comboCount: 0 };
         }
 
-        const baseAttack = attacker.finalStats?.physicalAttack || 0;
+        const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
+        const baseAttack = isRanged
+            ? (attacker.finalStats?.rangedAttack || 0)
+            : (attacker.finalStats?.physicalAttack || 0);
 
         // 콤보 배율 계산을 위한 정보
         let comboMultiplier = 1.0;

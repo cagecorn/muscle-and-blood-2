@@ -117,6 +117,7 @@ class StatEngine {
 
         // 3. \uC8FC\uC6A9 \uC804\uD22C \uB2A5\uB825\uCE58\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
         calculated.physicalAttack = (calculated.strength || 0) * 1.5;
+        calculated.rangedAttack = (calculated.agility || 0) * 1.5;
         calculated.physicalDefense = (calculated.endurance || 0) * 1.2;
         calculated.magicAttack = (calculated.intelligence || 0) * 1.5;
         calculated.magicDefense = (calculated.wisdom || 0) * 1.2;
