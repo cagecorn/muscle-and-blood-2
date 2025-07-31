@@ -51,6 +51,7 @@ export class BattleSimulatorEngine {
         // 그림자 생성용 매니저 초기화
         this.shadowManager = new ShadowManager(scene);
         this.vfxManager = new VFXManager(scene, this.textEngine, this.bindingManager);
+        this.vfxManager.setBattleSimulator(this);
         // 소환 엔진을 먼저 생성합니다.
         this.summoningEngine = new SummoningEngine(scene, this);
         // 소환 엔진을 참조하는 종료 매니저를 초기화합니다.
@@ -147,8 +148,13 @@ export class BattleSimulatorEngine {
         skillEngine.resetTurnActions();
 
         // [✨ 수정] 첫 턴 시작 직후 모든 유닛의 토큰 UI를 업데이트합니다.
-        // unit.uniqueId 대신 unit 객체 전체를 전달합니다.
-        allUnits.forEach(unit => this.vfxManager.updateTokenDisplay(unit));
+        allUnits.forEach(unit => {
+            const bound = this.bindingManager.bindings.get(unit.sprite) || [];
+            const nameTag = bound.find(el => el.type === 'Text');
+            this.vfxManager.updateTokenDisplay(unit, nameTag);
+            this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
+            this.vfxManager.updateAspirationBar(unit.uniqueId);
+        });
 
         this.gameLoop(); // 수정된 루프 시작
     }
@@ -176,14 +182,17 @@ export class BattleSimulatorEngine {
                 unit.gridY = cell.row;
             }
 
-            // ✨ [수정] 팀에 따라 이름표 색상을 다르게 설정합니다.
+            // ✨ 팀에 따라 이름표 색상을 다르게 설정합니다.
             const nameColor = unit.team === 'ally' ? '#60a5fa' : '#f87171';
             const nameTag = this.textEngine.createLabel(unit.sprite, unit.instanceName, nameColor);
 
-            // 그림자 생성 후 원본 스프라이트와 함께 이동하도록 바인딩합니다.
+            // 그림자 생성
             const shadow = this.shadowManager.createShadow(unit.sprite);
 
-            this.bindingManager.bind(unit.sprite, [nameTag, shadow]);
+            // ✨ VFXManager가 모든 UI 요소를 생성하고 바인딩하도록 위임합니다.
+            this.vfxManager.setupUnitVFX(unit, nameTag);
+            // 그림자는 별도로 바인딩합니다.
+            this.bindingManager.bind(unit.sprite, [shadow]);
         });
     }
 
@@ -247,11 +256,14 @@ export class BattleSimulatorEngine {
             this.turnQueue.forEach((u, idx) => u.isTurnActive = (idx === this.currentTurnIndex));
             this.turnOrderUI.update(this.turnQueue);
 
-            // --- ✨ 매 행동 후 모든 유닛의 토큰 UI 업데이트 ---
-            // unit.uniqueId 대신 unit 객체 전체를 전달합니다.
+            // --- ✨ 매 행동 후 모든 유닛의 UI를 갱신합니다. ---
             this.turnQueue.forEach(unit => {
                 if (unit.sprite && unit.sprite.active) {
-                    this.vfxManager.updateTokenDisplay(unit);
+                    const bound = this.bindingManager.bindings.get(unit.sprite) || [];
+                    const nameTag = bound.find(el => el.type === 'Text');
+                    this.vfxManager.updateTokenDisplay(unit, nameTag);
+                    this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
+                    this.vfxManager.updateAspirationBar(unit.uniqueId);
                 }
             });
             this.sharedResourceUI.update();

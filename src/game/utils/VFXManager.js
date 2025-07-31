@@ -2,6 +2,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 // tokenEngine을 import하여 현재 토큰 개수를 가져옵니다.
 import { tokenEngine } from './TokenEngine.js';
 import { comboManager } from './ComboManager.js';
+// ✨ 열망 엔진을 import하여 열망 수치를 가져옵니다.
+import { aspirationEngine } from './AspirationEngine.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -13,20 +15,46 @@ export class VFXManager {
         this.bindingManager = bindingManager;
 
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
-        this.vfxLayer = this.scene.add.layer();
-        this.vfxLayer.setDepth(100); // 다른 요소들 위에 그려지도록 설정
+        this.vfxLayer = this.scene.add.layer().setDepth(100);
 
-        // 각 유닛의 토큰 UI를 관리하기 위한 Map을 추가합니다.
+        // key: unitId, value: { container, tokens: [] }
         this.activeTokenDisplays = new Map();
+        // ✨ 체력/배리어/열망 바 객체를 저장합니다.
+        this.unitBars = new Map();
 
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
+
+    setBattleSimulator(simulator) {
+        this.battleSimulator = simulator;
+    }
+
     /**
-     * 유닛의 UI 요소 생성은 CombatUIManager에서 처리합니다.
-     * 현재 이 메서드는 플로팅 텍스트 등을 필요 시 직접 생성하도록 비워둡니다.
+     * 유닛의 모든 UI 요소를 생성하고 위치를 설정한 뒤 바인딩합니다.
+     * @param {object} unit - 대상 유닛
+     * @param {Phaser.GameObjects.Text} nameTag - 유닛의 이름표 객체
      */
-    setupUnitVFX(unit) {
-        // intentionally left blank
+    setupUnitVFX(unit, nameTag) {
+        const unitId = unit.uniqueId;
+        const barWidth = 8;
+        const barHeight = 80;
+        const xOffset = unit.sprite.displayWidth / 2 + barWidth;
+
+        // 1. 체력 및 배리어 바 생성 (유닛 왼쪽)
+        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e);
+        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700);
+
+        // 2. 열망 게이지 생성 (유닛 오른쪽)
+        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6);
+
+        this.unitBars.set(unitId, { healthBar, barrierBar, aspirationBar });
+
+        // 3. 토큰 디스플레이 초기화
+        this.updateTokenDisplay(unit, nameTag);
+        const tokenDisplay = this.activeTokenDisplays.get(unitId);
+
+        // 4. 생성된 모든 UI 요소를 유닛 스프라이트에 바인딩
+        this.bindingManager.bind(unit.sprite, [nameTag, healthBar.container, barrierBar.container, aspirationBar.container, tokenDisplay.container]);
     }
 
     /**
@@ -34,7 +62,7 @@ export class VFXManager {
      * 특정 유닛의 토큰 개수에 맞춰 화면에 토큰 아이콘을 업데이트합니다.
      * @param {object} unit - 대상 유닛
      */
-    updateTokenDisplay(unit) {
+    updateTokenDisplay(unit, nameTag) {
         if (!unit || !unit.sprite || !unit.sprite.active) return;
 
         const unitId = unit.uniqueId;
@@ -42,16 +70,22 @@ export class VFXManager {
 
         // 유닛의 토큰 UI가 없다면 새로 생성합니다.
         if (!display) {
-            // ✨ [수정] yOffset을 음수 값으로 변경하여 유닛의 머리 위로 이동시킵니다.
-            const yOffset = -(unit.sprite.displayHeight / 2) - 20; // 유닛 머리 위
-            const container = this.scene.add.container(unit.sprite.x, unit.sprite.y + yOffset);
-            this.vfxLayer.add(container);
+            const nameTagWidth = nameTag.width * nameTag.scaleX;
+            const offsetX = nameTagWidth / 2 + 5;
+            const offsetY = nameTag.y - unit.sprite.y;
 
-            // 생성된 컨테이너가 유닛 스프라이트를 따라다니도록 바인딩합니다.
+            const container = this.scene.add.container(unit.sprite.x + offsetX, unit.sprite.y + offsetY);
+            this.vfxLayer.add(container);
             this.bindingManager.bind(unit.sprite, [container]);
 
             display = { container, tokens: [] };
             this.activeTokenDisplays.set(unitId, display);
+        } else {
+            const nameTagWidth = nameTag.width * nameTag.scaleX;
+            const offsetX = nameTagWidth / 2 + 5;
+            const offsetY = nameTag.y - unit.sprite.y;
+            display.container.setData('offsetX', offsetX);
+            display.container.setData('offsetY', offsetY);
         }
 
         const tokenCount = tokenEngine.getTokens(unitId);
@@ -63,16 +97,35 @@ export class VFXManager {
         display.tokens.forEach(token => token.destroy());
         display.tokens = [];
 
-        const tokenSpacing = 12; // 토큰 아이콘 간격
-        const totalWidth = (tokenCount - 1) * tokenSpacing;
-        const startX = -totalWidth / 2; // 중앙 정렬을 위한 시작 X 좌표
-
-        // 현재 토큰 개수만큼 아이콘을 새로 생성합니다.
+        const tokenOverlap = 10;
         for (let i = 0; i < tokenCount; i++) {
-            const tokenImage = this.scene.add.image(startX + i * tokenSpacing, 0, 'token').setScale(0.04);
+            const tokenImage = this.scene.add.image(i * tokenOverlap, 0, 'token').setScale(0.04);
             display.container.add(tokenImage);
             display.tokens.push(tokenImage);
         }
+    }
+
+    /**
+     * 얇은 세로 바 UI를 생성합니다.
+     * @param {Phaser.GameObjects.Sprite} parentSprite - 위치 기준 스프라이트
+     * @param {number} xOffset - parentSprite 중심으로부터의 x축 거리
+     * @param {number} height - 바의 최대 높이
+     * @param {number} width - 바의 너비
+     * @param {number} bgColor - 배경색
+     * @param {number} barColor - 전경색
+     * @returns {{container: Phaser.GameObjects.Container, bar: Phaser.GameObjects.Graphics}}
+     */
+    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor) {
+        const container = this.scene.add.container(parentSprite.x + xOffset, parentSprite.y);
+        this.vfxLayer.add(container);
+
+        const bg = this.scene.add.graphics().fillStyle(bgColor, 0.7).fillRect(-width / 2, -height / 2, width, height);
+        const bar = this.scene.add.graphics().fillStyle(barColor, 1).fillRect(-width / 2, -height / 2, width, height);
+
+        container.add([bg, bar]);
+        bar.setData('fullHeight', height); // 최대 높이 저장
+
+        return { container, bar };
     }
 
     /**
@@ -82,23 +135,32 @@ export class VFXManager {
      * @param {number} currentHp - 현재 체력
      * @param {number} maxHp - 최대 체력
      */
-    updateHealthBar(healthBar, currentHp, maxHp) {
-        if (!healthBar || maxHp <= 0) return;
+    updateHealthBar(unitId, currentHp, maxHp) {
+        const bars = this.unitBars.get(unitId);
+        if (!bars || !bars.healthBar) return;
 
-        const ratio = Math.max(0, Math.min(1, currentHp / maxHp));
+        const ratio = (maxHp > 0) ? Math.max(0, Math.min(1, currentHp / maxHp)) : 0;
+        const fullHeight = bars.healthBar.bar.getData('fullHeight');
 
-        // DOM 요소 형태 지원
-        if (healthBar.style) {
-            healthBar.style.width = `${ratio * 100}%`;
+        bars.healthBar.bar.clear().fillStyle(0x22c55e, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * ratio);
+
+        // 배리어 업데이트
+        const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
+        if (unit) {
+            const barrierRatio = (unit.maxBarrier > 0) ? Math.max(0, Math.min(1, unit.currentBarrier / unit.maxBarrier)) : 0;
+            bars.barrierBar.bar.clear().fillStyle(0xffd700, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * barrierRatio);
         }
+    }
 
-        // Phaser 이미지/그래픽 형태 지원
-        const bar = healthBar.bar || healthBar.foreground;
-        if (bar) {
-            const fullWidth = bar.getData('fullWidth') || bar.displayWidth;
-            bar.setData('fullWidth', fullWidth);
-            bar.displayWidth = fullWidth * ratio;
-        }
+    updateAspirationBar(unitId) {
+        const bars = this.unitBars.get(unitId);
+        if (!bars || !bars.aspirationBar) return;
+
+        const data = aspirationEngine.getAspirationData(unitId);
+        const ratio = data.aspiration / 100;
+        const fullHeight = bars.aspirationBar.bar.getData('fullHeight');
+
+        bars.aspirationBar.bar.clear().fillStyle(0x8b5cf6, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * ratio);
     }
 
     /**
@@ -349,6 +411,12 @@ export class VFXManager {
             display.container.destroy();
         });
         this.activeTokenDisplays.clear();
+        this.unitBars.forEach(bars => {
+            bars.healthBar.container.destroy();
+            bars.barrierBar.container.destroy();
+            bars.aspirationBar.container.destroy();
+        });
+        this.unitBars.clear();
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }

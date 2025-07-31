@@ -31,8 +31,8 @@ export class OffscreenTextEngine {
         label.setResolution(2);  // 해상도를 2배로 설정
         label.setScale(0.5);     // \ud06c\uae30\ub97c 0.5\ubc84\ub2e4\ub97c \ucd95\uc18c\ud558\uc5ec \uc120\uba85\ub3c4 \ud655\ub960
 
-        // ✨ [수정] 유닛 머리 위와의 여백을 조정합니다.
-        label.y = sprite.y - (sprite.displayHeight / 2) - 5;
+        // ✨ 유닛 머리 위와의 여백을 더 확보하여 토큰과 바 영역을 만듭니다.
+        label.y = sprite.y - (sprite.displayHeight / 2) - 15;
 
         this.labels.push({ label, sprite });
         return label;
@@ -46,8 +46,8 @@ export class OffscreenTextEngine {
         this.labels.forEach(item => {
             if (item.sprite.active) {
                 item.label.x = item.sprite.x;
-                // ✨ [수정] 여기도 동일하게 머리 위 여백을 조정합니다.
-                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) - 5;
+                // ✨ 여백 값을 동일하게 조정해 다른 UI와 간섭하지 않도록 합니다.
+                item.label.y = item.sprite.y - (item.sprite.displayHeight / 2) - 15;
             } else {
                 // \uc2a4\ud504\ub808\uc774\ud2b8\uac00 \ube44\ud65c\uc131\ud654\ub418\uba74 \uc774\ub984\ud3a0\ub3c4 \uc228\uae38\ub9ac\ub2c8\ub2e4.
                 item.label.setVisible(false);
