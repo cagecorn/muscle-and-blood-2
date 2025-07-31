@@ -35,6 +35,8 @@ export class TerritoryDOMEngine {
         this.addSkillManagementButton(1, 1);
         // --- ✨ [신규] 선조 소환 관리 버튼 추가 ---
         this.addSummonManagementButton(2, 1); // 스킬 관리 옆에 배치
+        // ✨ [신규] 장비 관리 아이콘을 추가합니다.
+        this.addEquipmentManagementButton(1, 2); // 비어있는 (1, 2) 슬롯에 추가
         this.addArenaButton(0, 2); // 아레나 아이콘 추가
     }
 
@@ -152,6 +154,22 @@ export class TerritoryDOMEngine {
             this.container.style.display = 'none';
             // ✨ SummonManagementScene을 시작합니다.
             this.scene.scene.start('SummonManagementScene');
+        });
+        this.grid.appendChild(button);
+    }
+
+    // ✨ [신규] 장비 관리 버튼 추가 메소드
+    addEquipmentManagementButton(col, row) {
+        const button = document.createElement('div');
+        button.className = 'building-icon';
+        button.style.backgroundImage = `url(assets/images/territory/inventory-icon.png)`;
+        button.style.gridColumnStart = col + 1;
+        button.style.gridRowStart = row + 1;
+        button.addEventListener('mouseover', (event) => this.domEngine.showTooltip(event.clientX, event.clientY, '[장비 관리]'));
+        button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
+        button.addEventListener('click', () => {
+            this.container.style.display = 'none';
+            this.scene.scene.start('EquipmentManagementScene');
         });
         this.grid.appendChild(button);
     }
