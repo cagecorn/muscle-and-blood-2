@@ -128,5 +128,72 @@ export const statusEffects = {
         name: '신속',
         iconPath: 'assets/images/skills/charge.png',
     },
+    // --- ▼ [신규] MBTI 스택 버프 추가 ▼ ---
+    mbtiStackE: {
+        id: 'mbtiStackE',
+        name: '외향(E) 스택',
+        description: '물리/마법 공격력이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/battle_cry.png', // 임시 아이콘
+        onApply: (unit, effect) => {
+            if (!effect.modifiers) effect.modifiers = [];
+            effect.modifiers = [
+                { stat: 'physicalAttack', type: 'percentage', value: 0.01 },
+                { stat: 'magicAttack', type: 'percentage', value: 0.01 }
+            ];
+        }
+    },
+    mbtiStackI: {
+        id: 'mbtiStackI',
+        name: '내향(I) 스택',
+        description: '매 턴 잃은 체력에 비례해 배리어를 회복합니다.',
+        iconPath: 'assets/images/skills/shield-buff.png',
+    },
+    mbtiStackS: {
+        id: 'mbtiStackS',
+        name: '감각(S) 스택',
+        description: '치명타 확률이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/critical-shot.png',
+        modifiers: { stat: 'criticalChance', type: 'percentage', value: 0.005 }
+    },
+    mbtiStackN: {
+        id: 'mbtiStackN',
+        name: '직관(N) 스택',
+        description: '상태이상 적용 확률이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/stigma.png',
+        modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.01 }
+    },
+    mbtiStackT: {
+        id: 'mbtiStackT',
+        name: '사고(T) 스택',
+        description: '방어력 관통이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/shield-break.png',
+    },
+    mbtiStackF: {
+        id: 'mbtiStackF',
+        name: '감정(F) 스택',
+        description: '스킬 사용 시 체력이 가장 낮은 아군을 회복시킵니다.',
+        iconPath: 'assets/images/skills/heal.png',
+    },
+    mbtiStackJ: {
+        id: 'mbtiStackJ',
+        name: '판단(J) 스택',
+        description: '인내(Endurance) 스탯이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/iron_will.png',
+        modifiers: { stat: 'endurance', type: 'flat', value: 1 }
+    },
+    mbtiStackP: {
+        id: 'mbtiStackP',
+        name: '인식(P) 스택',
+        description: '물리/마법 회피율이 영구적으로 증가합니다.',
+        iconPath: 'assets/images/skills/move.png',
+        onApply: (unit, effect) => {
+            if (!effect.modifiers) effect.modifiers = [];
+            effect.modifiers = [
+                { stat: 'physicalEvadeChance', type: 'percentage', value: 0.005 },
+                { stat: 'magicEvadeChance', type: 'percentage', value: 0.005 }
+            ];
+        }
+    },
+    // --- ▲ [신규] MBTI 스택 버프 추가 ▲ ---
     // --- ▲ [신규] 클래스 특화 보너스 효과 추가 ▲ ---
 };

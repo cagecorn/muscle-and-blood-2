@@ -179,6 +179,14 @@ export class UnitDetailDOM {
                 // ✨ 모든 슬롯이 동일한 스타일을 사용합니다.
                 slot.className = 'skill-slot';
 
+                // MBTI 알파벳 표시
+                if (index < 4 && mbtiString) {
+                    const mbtiIndicator = document.createElement('div');
+                    mbtiIndicator.className = 'mbti-slot-indicator';
+                    mbtiIndicator.innerText = mbtiString[index];
+                    slot.appendChild(mbtiIndicator);
+                }
+
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
                     const instData = skillInventoryManager.getInstanceData(instanceId);
