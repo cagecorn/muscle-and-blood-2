@@ -113,7 +113,8 @@ export class BattleSimulatorEngine {
         this._setupUnits(allUnits);
 
         allUnits.forEach(unit => {
-            if (unit.name === '거너') {
+            // ✨ [수정] 거너와 나노맨서가 모두 원거리 AI를 사용하도록 조건을 통합합니다.
+            if (unit.name === '거너' || unit.name === '나노맨서') {
                 aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
             } else if (unit.name === '전사' || unit.name === '좀비') {
                 aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
