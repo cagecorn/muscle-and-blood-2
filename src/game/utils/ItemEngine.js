@@ -14,9 +14,12 @@ class ItemEngine {
         // 1. 아이템 자체 스탯 합산
         equippedItems.forEach(item => {
             if (!item) return;
+            // 아이템 스탯 합산
             for (const [stat, value] of Object.entries(item.stats)) {
                 bonusStats[stat] = (bonusStats[stat] || 0) + value;
             }
+            // 무게 합산 (StatEngine의 WeightEngine에서 활용)
+            bonusStats.weight = (bonusStats.weight || 0) + (item.weight || 0);
         });
 
         // 3. 시너지 세트 효과 적용

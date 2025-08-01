@@ -1,79 +1,77 @@
 import { itemEngine } from './ItemEngine.js';
 
 /**
- * \uC6A9\uB9BD(Valor) \uC2DC\uC2A4\uD15C\uC758 \uACC4\uC0B0\uC744 \uC804\uB2E8\uD558\uB294 \uC5D4\uC9C4\uC785\uB2C8\uB2E4.
- * \uBC29\uC5B4\uB9C9 \uC0DD\uC131, \uD53C\uD574 \uC99D\uD3ED \uB4F1 '\uC6A9\uB9BD' \uC2A4\uD0EF\uACFC \uAD00\uB828\uB41C \uBAA8\uB4E0 \uB85C\uC9C1\uC744 \uB2F4\uB2F9\uD569\uB2C8\uB2E4.
+ * 용맹(Valor) 시스템의 계산을 전담하는 엔진입니다.
+ * 방어막 생성, 피해 증폭 등 '용맹' 스탯과 관련된 모든 로직을 담당합니다.
  */
 class ValorEngine {
     constructor() {
-        // \uB098\uC911\uC5D0 \uC6A9\uB9BD \uAD00\uB828 \uC124\uC815\uAC12\uB4E4\uC744 \uC5B4\uB514\uC5D0 \uCD94\uAC00\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4. (\uC608: this.barrierMultiplier = 10;)
+        // 나중에 용맹 관련 설정값들을 여기에 추가할 수 있습니다. (예: this.barrierMultiplier = 10;)
     }
 
     /**
-     * \uC6A9\uB9BD \uC2A4\uD0EF\uC744 \uAE30\uBCF8\uC73C\uB85C \uC804\uD22C \uC2DC\uC791 \uC2DC\uC758 \uCD08\uAE30 \uBC29\uC5B4\uB9C9(Barrier) \uC591\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-     * @param {number} valor - \uC720\uB2DB\uC758 \uC21C\uC218 \uC6A9\uB9BD \uC2A4\uD0EF
-     * @returns {number} - \uACC4\uC0B0\uB41C \uCD08\uAE30 \uBC29\uC5B4\uB9C9 \uC218\uCE58
+     * 용맹 스탯을 기반으로 전투 시작 시의 초기 방어막(Barrier) 양을 계산합니다.
+     * @param {number} valor - 유닛의 순수 용맹 스탯
+     * @returns {number} - 계산된 초기 방어막 수치
      */
     calculateInitialBarrier(valor = 0) {
-        // \uAC1C\uB150: \uC6A9\uB9BD 1\uD3EC\uC778\uD2B8\uB2F9 \uBC29\uC5B4\uB9C9 10\uC744 \uBD80\uC5EC\uD569\uB2C8\uB2E4.
+        // 개념: 용맹 1포인트당 방어막 10을 부여합니다.
         return valor * 10;
     }
 
     /**
-     * \uD604\uC7AC \uBC29\uC5B4\uB9C9 \uC0C1\uD0DC\uC5D0 \uB530\uB974\uC5B4 \uD53C\uD574 \uC99D\uD3ED\uB960\uC744 \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-     * @param {number} currentBarrier - \uD604\uC7AC \uB0A8\uC740 \uBC29\uC5B4\uB9C9 \uC218\uCE58
-     * @param {number} maxBarrier - \uCD5C\uB300 \uBC29\uC5B4\uB9C9 \uC218\uCE58
-     * @returns {number} - \uD53C\uD574\uB7C9\uC5D0 \uACE0\uD314\uC62C \uC99D\uD3ED\uB960 (\uC608: 1.0\uC740 100%, 1.3\uB294 130%)
+     * 현재 방어막 상태에 따라 피해 증폭률을 계산합니다.
+     * @param {number} currentBarrier - 현재 남은 방어막 수치
+     * @param {number} maxBarrier - 최대 방어막 수치
+     * @returns {number} - 피해량에 곱해질 증폭률 (예: 1.0은 100%, 1.3은 130%)
      */
     calculateDamageAmplification(currentBarrier = 0, maxBarrier = 1) {
         if (maxBarrier <= 0) return 1.0;
-        // \uAC1C\uB150: \uBC29\uC5B4\uB9C9\uC774 \uAC00\uB454 \uC218\uB9CE\uC744\uC218\uB85D(1\uC5D0 \uAC00\uAE4C\uC774) \uCD94\uAC00 \uD53C\uD574\uB97C \uC8FC\uACE0,
-        // \uBC29\uC5B4\uB9C9\uC774 \uC5C6\uC744\uC218\uB85D(0\uC5D0 \uAC00\uAE4C\uC774) \uCD94\uAC00 \uD53C\uD574\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.
-        // \uD604\uC7AC\uB294 \uCD5C\uB300 30%\uC758 \uCD94\uAC00 \uD53C\uD574\uB97C \uC8FC\uB294 \uAC83\uC73C\uB85C \uC124\uC815\uD569\uB2C8\uB2E4.
+        // 개념: 방어막이 가득 찰수록(1에 가까이) 추가 피해를 주고,
+        // 방어막이 없을수록(0에 가까이) 추가 피해가 없습니다.
+        // 현재는 최대 30%의 추가 피해를 주는 것으로 설정합니다.
         const amplification = (currentBarrier / maxBarrier) * 0.3;
         return 1.0 + amplification;
     }
 }
 
 /**
- * \uBB34\uAC8C(Weight) \uC2DC\uC2A4\uD15C\uC758 \uACC4\uC0B0\uC744 \uC804\uB2E8\uD558\uB294 \uC5D4\uC9C4\uC785\uB2C8\uB2E4.
- * \uC7A5\uBE44 \uBB34\uAC8C \uD569\uC0B0, \uD130\uB4F1 \uC21C\uC11C \uACB0\uC815 \uB4F1 '\uBB34\uAC8C'\uC640 \uAD00\uB828\uB41C \uBAA8\uB4E0 \uB85C\uC9C1\uC744 \uB2F4\uB2F9\uD569\uB2C8\uB2E4.
+ * 무게(Weight) 시스템의 계산을 전담하는 엔진입니다.
+ * 장비 무게 합산, 턴 순서 결정 등 '무게'와 관련된 모든 로직을 담당합니다.
  */
 class WeightEngine {
     constructor() {
-        // \uB098\uC911\uC5D0 \uBB34\uAC8C \uAD00\uB828 \uC124\uC815\uAC12\uB4E4\uC744 \uC5B4\uB514\uC5D0 \uCD94\uAC00\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
+        // 나중에 무게 관련 설정값들을 여기에 추가할 수 있습니다.
     }
 
     /**
-     * \uC720\uB2DB\uACFC \uC7A5\uCC29\uD55C \uC544\uC774\uD15C\uB4E4\uC758 \uCD1D \uBB34\uAC8C\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-     * @param {object} unitData - \uC720\uB2DB\uC758 \uAE30\uBCF8 \uC815\uBCF4 (\uAE30\uBCF8 \uBB34\uAC8C \uB4F1)
-     * @param {Array<object>} equippedItems - \uC7A5\uCC29\uD55C \uBAA8\uB4E0 \uC544\uC774\uD15C \uBAA9\uB85D
-     * @returns {number} - \uD569\uC0B0\uB41C \uCD1D \uBB34\uAC8C
+     * 유닛과 장착한 아이템들의 총 무게를 계산합니다.
+     * @param {object} unitData - 유닛의 기본 정보 (기본 무게 등)
+     * @param {Array<object>} equippedItems - 장착한 모든 아이템 목록
+     * @returns {number} - 합산된 총 무게
      */
     calculateTotalWeight(unitData = {}, equippedItems = []) {
         let totalWeight = unitData.weight || 0;
-        for (const item of equippedItems) {
-            totalWeight += item.weight || 0;
-        }
+        // itemEngine을 통해 장비의 무게를 합산하도록 수정 (향후 확장성 고려)
+        const equipmentBonusStats = itemEngine.getBonusStatsFromEquipment(unitData);
+        totalWeight += equipmentBonusStats.weight || 0;
         return totalWeight;
     }
 
     /**
-     * \uCD1D \uBB34\uAC8C\uB97C \uAE30\uBCF8\uC73C\uB85C \uD589\uB3D9 \uC21C\uC11C\uB97C \uACB0\uC815\uD558\uB294 \uB370 \uC0AC\uC6A9\uB420 \uCD5C\uC885 \uC218\uCE58\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.
-     * @param {number} totalWeight - \uC720\uB2DB\uC758 \uCD1D \uBB34\uAC8C
-     * @returns {number} - \uD130\uB4F1 \uACC4\uC0B0\uC5D0 \uC0AC\uC6A9\uB420 \uCD5C\uC885 \uBB34\uAC8C \uAC12 (\uC218\uCE58\uAC00 \uB0AE\uC744\uC218\uB85D \uC120\uD130\uB144)
+     * 총 무게를 기반으로 행동 순서를 결정하는 데 사용될 최종 수치를 계산합니다.
+     * @param {number} totalWeight - 유닛의 총 무게
+     * @returns {number} - 턴 계산에 사용될 최종 무게 값 (수치가 낮을수록 선턴)
      */
-    getTurnValue(totalWeight = 0) {
-        // \uAC1C\uB150: \uC774 \uAC12\uC740 \uB2E8\uC21C\uD788 \uCD1D \uBB34\uAC8C\uAC00 \uB429\uB2C8\uB2E4.
-        // \uB098\uC911\uC5D0 \uBB34\uAC8C\uC5D0 \uB9E4\uCE58\uC5B4 (agility) \uC2A4\uD0EF \uB4F1\uC73C\uB85C \uBCF4\uC815\uC744 \uBC1B\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
-        // \uC608: return totalWeight - (unit.agility * 0.5);
-        return totalWeight;
+    getTurnValue(totalWeight = 0, agility = 0) {
+        // ✨ 민첩 스탯이 무게를 감소시켜 턴 순서에 영향을 주도록 수정
+        return Math.max(1, totalWeight - (agility * 0.5));
     }
 }
 
 /**
- * \uAC8C\uC784 \uB0B4 \uBAA8\uB4E0 \uC720\uB2DB\uC758 \uC2A4\uD0EF\uC744 \uACC4\uC0B0\uD558\uACE0 \uAD00\uB9AC\uD558\uB294 \uD589\uC0AC \uC5D4\uC9C4.
- * \uAC01 \uC804\uBB38 \uC5D4\uC9C4(ValorEngine, WeightEngine)\uC744 \uD1B5\uD569\uD558\uC5EC \uCD5C\uC885 \uC2A4\uD0EF\uC744 \uC0DD\uCD9C\uD569\uB2C8\uB2E4.
+ * 게임 내 모든 유닛의 스탯을 계산하고 관리하는 핵심 엔진.
+ * 각 전문 엔진(ValorEngine, WeightEngine)을 통합하여 최종 스탯을 산출합니다.
  */
 class StatEngine {
     constructor() {
@@ -82,30 +80,54 @@ class StatEngine {
     }
 
     /**
-     * \uAE30\uBCF8 \uC2A4\uD0EF, \uC7A5\uBE44 \uC815\uBCF4 \uB4F1\uC744 \uBC30\uD0C0\uB85C \uCD5C\uC885 \uC801\uC6A9\uB420 \uC2A4\uD0EF \uAC1D\uCCB4\uB97C \uC0DD\uC131\uD569\uB2C8\uB2E4.
-     * @param {object} unitData - \uC720\uB2DB\uC758 \uAE30\uBCF8 \uC815\uBCF4 (\uC608: { name: '\uC804\uC0AC', baseWeight: 10 })
-     * @param {object} baseStats - \uC21C\uC218 \uC2A4\uD0EF \uD3EC\uC778\uD2B8 (\uC608: { hp: 100, strength: 10, valor: 5 })
-     * @param {Array<object>} equippedItems - \uC7A5\uCC29\uD55C \uC544\uC774\uD15C \uBAA9\uB85D (\uC608: [{ name: '\uAC15\uCCA0\uAC80', weight: 15 }])
-     * @returns {object} - \uBAA8\uB4E0 \uACC4\uC0B0\uC774 \uC644\uB8CC\uB41C \uCD5C\uC885 \uC2A4\uD0EF \uAC1D\uCCB4
+     * 기본 스탯, 장비 정보 등을 바탕으로 최종 적용될 스탯 객체를 생성합니다.
+     * @param {object} unitData - 유닛의 기본 정보 (예: { name: '전사', baseWeight: 10 })
+     * @param {object} baseStats - 순수 스탯 포인트 (예: { hp: 100, strength: 10, valor: 5 })
+     * @param {Array<object>} equippedItems - 장착한 아이템 목록 (현재는 ItemEngine을 통해 자동으로 처리됨)
+     * @returns {object} - 모든 계산이 완료된 최종 스탯 객체
      */
-    calculateStats(unitData = {}, baseStats = {}, equippedItems = []) {
+    calculateStats(unitData = {}, baseStats = {}) {
         const finalStats = { ...baseStats };
+
+        // 모든 스탯 키 목록: 이 목록에 있는 스탯은 항상 0으로 초기화되어 'undefined' 오류를 방지합니다.
+        const allStatKeys = [
+            'hp', 'valor', 'strength', 'endurance', 'agility', 'intelligence', 'wisdom', 'luck',
+            'movement', 'attackRange', 'weight', 'physicalAttack', 'magicAttack', 'rangedAttack',
+            'physicalDefense', 'magicDefense', 'rangedDefense', 'criticalChance', 'criticalDamageMultiplier',
+            'physicalEvadeChance', 'magicEvadeChance', 'statusEffectResistance', 'statusEffectApplication',
+            'maxBarrier', 'currentBarrier', 'totalWeight', 'turnValue', 'physicalAttackPercentage', 'magicAttackPercentage'
+        ];
+
+        allStatKeys.forEach(key => {
+            finalStats[key] = finalStats[key] || 0;
+        });
 
         const equipmentBonusStats = itemEngine.getBonusStatsFromEquipment(unitData);
         for (const [stat, value] of Object.entries(equipmentBonusStats)) {
             finalStats[stat] = (finalStats[stat] || 0) + value;
         }
 
-        finalStats.physicalAttack = (finalStats.strength || 0) * 1.5 + (finalStats.physicalAttack || 0);
+        // 파생 스탯 계산
+        finalStats.physicalAttack = (finalStats.strength * 1.5) + (finalStats.physicalAttack || 0);
         finalStats.physicalAttack *= (1 + (finalStats.physicalAttackPercentage || 0) / 100);
+
+        finalStats.magicAttack = (finalStats.intelligence * 1.5) + (finalStats.magicAttack || 0);
+        finalStats.magicAttack *= (1 + (finalStats.magicAttackPercentage || 0) / 100);
+
+        finalStats.rangedAttack = (finalStats.agility * 1.5) + (finalStats.rangedAttack || 0);
+        
+        finalStats.physicalDefense = (finalStats.endurance * 1.2) + (finalStats.physicalDefense || 0);
+        finalStats.magicDefense = (finalStats.wisdom * 1.2) + (finalStats.magicDefense || 0);
 
         finalStats.maxBarrier = this.valorEngine.calculateInitialBarrier(finalStats.valor);
         finalStats.currentBarrier = finalStats.maxBarrier;
-        finalStats.totalWeight = this.weightEngine.calculateTotalWeight(unitData, equippedItems);
+        finalStats.totalWeight = this.weightEngine.calculateTotalWeight(unitData);
+        finalStats.weight = finalStats.totalWeight;
+        finalStats.turnValue = this.weightEngine.getTurnValue(finalStats.totalWeight, finalStats.agility);
 
         return finalStats;
     }
 }
 
-// \uB2E4\uB978 \uD30C\uC77C\uC5D0\uC11C StatEngine\uC758 \uC720\uC77C\uD55C \uC778\uC2A4\uD134\uC2A4\uB97C \uAC00\uC838\uB2F9 \uC4F0\uC77C \uC218 \uC788\uB3C4\uB85D export \uD569\uB2C8\uB2E4.
 export const statEngine = new StatEngine();
+
