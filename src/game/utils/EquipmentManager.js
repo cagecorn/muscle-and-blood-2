@@ -1,16 +1,14 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-import { itemInventoryManager } from './ItemInventoryManager.js'; // 인벤토리 매니저 import
+import { itemInventoryManager } from './ItemInventoryManager.js';
 
 class EquipmentManager {
     constructor() {
-        // key: unitId => { WEAPON: null, ARMOR: null, ACCESSORY1: null, ACCESSORY2: null }
         this.equippedItems = new Map();
-        debugLogEngine.log('EquipmentManager', '장비 관리 매니저가 초기화되었습니다.');
+        debugLogEngine.register(this);
     }
-
+    
     initializeSlots(unitId) {
         if (!this.equippedItems.has(unitId)) {
-            // 슬롯을 이름으로 관리하여 명확성을 높입니다.
             this.equippedItems.set(unitId, {
                 WEAPON: null,
                 ARMOR: null,
@@ -20,71 +18,68 @@ class EquipmentManager {
         }
     }
 
-    /**
-     * 용병의 특정 슬롯에 장비를 장착합니다.
-     * @param {number} unitId
-     * @param {string} slotType - 'WEAPON', 'ARMOR' 등
-     * @param {number} instanceId - 장착할 아이템의 인스턴스 ID
-     * @returns {number|null} - 이전에 장착되어 있던 아이템의 인스턴스 ID
-     */
     equipItem(unitId, slotType, instanceId) {
         this.initializeSlots(unitId);
         const slots = this.equippedItems.get(unitId);
         
         const itemToEquip = itemInventoryManager.getItem(instanceId);
-        if (!itemToEquip) return null;
-
-        // 아이템 타입과 슬롯 타입이 맞는지 확인 (예: 무기는 무기 슬롯에만)
-        // 이 부분은 나중에 더 정교하게 만들 수 있습니다.
-        if (slotType.startsWith('ACCESSORY')) {
-            // 악세사리 슬롯 처리
-        } else if (itemToEquip.type !== slotType) {
-            alert(`${itemToEquip.type}은(는) ${slotType} 슬롯에 장착할 수 없습니다.`);
-            return null;
+        if (!itemToEquip) return;
+        
+        // 아이템 타입과 슬롯 타입 검사 (ACCESSORY1, ACCESSORY2는 모두 ACCESSORY 타입)
+        const requiredType = slotType.startsWith('ACCESSORY') ? 'ACCESSORY' : slotType;
+        if (itemToEquip.type !== requiredType) {
+            alert(`[${itemToEquip.type}] 아이템은 [${slotType}] 슬롯에 장착할 수 없습니다.`);
+            return;
         }
 
-        // 인벤토리에서 아이템 제거
-        itemInventoryManager.removeItem(instanceId);
-
         const prevItemInstanceId = slots[slotType];
-        // 이전에 장착된 아이템이 있었다면 인벤토리로 되돌림
+        
+        // 인벤토리에서 새 아이템 제거
+        itemInventoryManager.removeItem(instanceId);
+        
+        // 이전 아이템이 있었다면 인벤토리로 복귀
         if (prevItemInstanceId) {
-            const prevItem = this.getItemInstanceFromSomeWhere(prevItemInstanceId); // 임시 함수
-            itemInventoryManager.addItem(prevItem);
+            // 아이템 스왑을 위해 임시 저장소 개념을 사용하지 않고,
+            // EquipmentManager가 직접 인벤토리에 추가하도록 로직 변경
+            const prevItem = this.findItemInGame(prevItemInstanceId); // 가상 함수
+            if (prevItem) itemInventoryManager.addItem(prevItem);
         }
 
         slots[slotType] = instanceId;
-        console.log(`[EquipmentManager] 유닛 ${unitId}의 ${slotType} 슬롯에 아이템 ${instanceId} 장착.`);
-        return prevItemInstanceId;
-    }
-    
-    // 임시 함수: 현재는 인벤토리에 없으므로 다시 생성해서 반환
-    getItemInstanceFromSomeWhere(instanceId) {
-        return { instanceId, name: "임시 복구 아이템" };
+        debugLogEngine.log(this.name, `유닛 ${unitId}의 ${slotType} 슬롯에 아이템 ${instanceId} 장착.`);
     }
 
-    /**
-     * 장착된 장비를 해제하여 인벤토리에 되돌립니다.
-     * @param {number} unitId
-     * @param {string} slotType
-     * @returns {number|null} - 해제된 아이템의 인스턴스 ID
-     */
     unequipItem(unitId, slotType) {
         this.initializeSlots(unitId);
         const slots = this.equippedItems.get(unitId);
         const itemInstanceId = slots[slotType];
-        if (!itemInstanceId) return null;
 
-        const item = this.getItemInstanceFromSomeWhere(itemInstanceId); // 임시 함수 사용
-        itemInventoryManager.addItem(item);
-        slots[slotType] = null;
-        console.log(`[EquipmentManager] 유닛 ${unitId}의 ${slotType} 슬롯에서 아이템 ${itemInstanceId} 해제.`);
-        return itemInstanceId;
+        if (itemInstanceId) {
+            const item = this.findItemInGame(itemInstanceId); // 가상 함수
+            if (item) itemInventoryManager.addItem(item);
+            slots[slotType] = null;
+            debugLogEngine.log(this.name, `유닛 ${unitId}의 ${slotType} 슬롯에서 아이템 ${itemInstanceId} 해제.`);
+        }
+    }
+    
+    // 이 함수는 실제 게임에서는 DB나 다른 관리자에서 아이템 정보를 가져와야 합니다.
+    // 지금은 장착 해제/스왑 시 아이템이 소멸하지 않도록 임시로 데이터를 다시 만들어줍니다.
+    findItemInGame(instanceId) {
+        // 이 로직은 완전한 인벤토리 시스템이 갖춰지면 수정되어야 합니다.
+        // 지금은 데모를 위해 임시 아이템을 반환합니다.
+        return {
+            instanceId,
+            name: `복구된 아이템 ${instanceId}`,
+            grade: 'NORMAL',
+            illustrationPath: 'assets/images/placeholder.png',
+            stats: {},
+            mbtiEffects: [],
+            sockets: []
+        };
     }
 
     getEquippedItems(unitId) {
         this.initializeSlots(unitId);
-        // 객체를 배열로 변환하여 반환
         const slots = this.equippedItems.get(unitId);
         return [slots.WEAPON, slots.ARMOR, slots.ACCESSORY1, slots.ACCESSORY2];
     }
