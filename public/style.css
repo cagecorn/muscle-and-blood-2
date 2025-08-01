@@ -1820,3 +1820,10 @@ body {
 .item-stats-large li, .item-mbti-large li { font-size: 14px; margin-bottom: 3px; }
 .item-sockets-large { display: flex; gap: 5px; margin-top: 5px; }
 .item-socket-empty { width: 20px; height: 20px; background-color: #111; border: 1px solid #555; border-radius: 50%; }
+
+/* --- 스킬 인벤토리 카드 비활성화 스타일 --- */
+.skill-inventory-card.unusable-card {
+    opacity: 0.5;
+    filter: grayscale(80%);
+    cursor: not-allowed;
+}

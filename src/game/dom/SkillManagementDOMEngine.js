@@ -8,6 +8,7 @@ import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 // ✨ SKILL_TAGS를 import하여 'SPECIAL' 태그를 확인할 수 있게 합니다.
 import { SKILL_TAGS } from '../utils/SkillTagManager.js';
 import { mercenaryCardSelector } from '../utils/MercenaryCardSelector.js';
+import { mercenaryData } from '../data/mercenaries.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -294,6 +295,13 @@ export class SkillManagementDOMEngine {
             const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
             const card = document.createElement('div');
             card.className = `skill-inventory-card ${data.type.toLowerCase()}-card grade-${instance.grade.toLowerCase()}`;
+
+            // --- ▼ [신규] 장착 불가 카드 시각적 처리 ▼ ---
+            if (this.selectedMercenaryData && data.requiredClass && data.requiredClass !== this.selectedMercenaryData.id) {
+                card.classList.add('unusable-card');
+            }
+            // --- ▲ [신규] 장착 불가 카드 시각적 처리 ▲ ---
+
             card.style.backgroundImage = `url(${data.illustrationPath})`;
             card.draggable = true;
             card.dataset.instanceId = instance.instanceId;
@@ -332,6 +340,13 @@ export class SkillManagementDOMEngine {
         const draggedInstanceId = this.draggedData.instanceId;
         const draggedInstanceData = skillInventoryManager.getInstanceData(draggedInstanceId);
         const draggedSkillData = skillInventoryManager.getSkillData(draggedInstanceData.skillId, draggedInstanceData.grade);
+
+        // --- ▼ [신규] 클래스 전용 스킬 장착 제한 로직 ▼ ---
+        if (draggedSkillData.requiredClass && draggedSkillData.requiredClass !== this.selectedMercenaryData.id) {
+            alert(`[${draggedSkillData.name}] 스킬은 [${mercenaryData[draggedSkillData.requiredClass].name}] 전용 스킬입니다.`);
+            return;
+        }
+        // --- ▲ [신규] 클래스 전용 스킬 장착 제한 로직 ▲ ---
 
         // --- ▼ 중복 착용 방지 로직 추가 ▼ ---
         if (this.draggedData.source === 'inventory') {
