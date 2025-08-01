@@ -4,6 +4,7 @@ import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
 import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from './OwnedSkillsManager.js';
 import { skillInventoryManager } from './SkillInventoryManager.js';
+import { EFFECT_TYPES } from './EffectTypes.js';
 
 /**
  * 상태 효과 아이콘을 생성하고 관리하는 엔진
@@ -12,7 +13,7 @@ export class IconManager {
     constructor(scene, vfxLayer) {
         this.scene = scene;
         this.vfxLayer = vfxLayer;
-        // key: unitId, value: { container: Container, icons: Map<effectInstanceId, {icon, text}> }
+        // key: unitId, value: { buffsContainer, debuffsContainer, buffIcons: Map<effectInstanceId, {icon, text}>, debuffIcons: Map<effectInstanceId, {icon, text}>, parentSprite }
         this.activeIconDisplays = new Map();
         debugLogEngine.log('IconManager', '아이콘 매니저가 초기화되었습니다.');
     }
@@ -20,22 +21,35 @@ export class IconManager {
     /**
      * 특정 유닛의 아이콘 표시 컨테이너를 생성합니다.
      * @param {Phaser.GameObjects.Sprite} parentSprite - 아이콘이 따라다닐 유닛
-     * @param {object} healthBar - 위치 기준이 될 체력바
      */
-    createIconDisplay(parentSprite, healthBar) {
+    createIconDisplay(parentSprite) {
         const unitId = parentSprite.getData('unitId');
         if (!unitId || this.activeIconDisplays.has(unitId)) return;
 
-        const container = this.scene.add.container(healthBar.background.x, healthBar.background.y + 12);
-        this.vfxLayer.add(container);
+        // 버프 아이콘을 위한 컨테이너 (유닛 왼쪽)
+        const buffsContainer = this.scene.add.container(
+            parentSprite.x - parentSprite.displayWidth / 2 - 15,
+            parentSprite.y
+        );
+        this.vfxLayer.add(buffsContainer);
+
+        // 디버프 아이콘을 위한 컨테이너 (유닛 오른쪽)
+        const debuffsContainer = this.scene.add.container(
+            parentSprite.x + parentSprite.displayWidth / 2 + 15,
+            parentSprite.y
+        );
+        this.vfxLayer.add(debuffsContainer);
 
         this.activeIconDisplays.set(unitId, {
-            container: container,
-            icons: new Map()
+            parentSprite,
+            buffsContainer,
+            debuffsContainer,
+            buffIcons: new Map(),
+            debuffIcons: new Map(),
         });
-        
-        // 유닛의 스프라이트와 바인딩될 수 있도록 컨테이너를 반환합니다.
-        return container;
+
+        // 유닛의 스프라이트와 바인딩될 수 있도록 컨테이너들을 반환합니다.
+        return { buffsContainer, debuffsContainer };
     }
 
     /**
@@ -56,75 +70,133 @@ export class IconManager {
         if (!display) return;
 
         const activeEffects = statusEffectManager.activeEffects.get(unitId) || [];
-        const existingIconIds = new Set(display.icons.keys());
-        const iconSpacing = 22;
+        const existingBuffIconIds = new Set(display.buffIcons.keys());
+        const existingDebuffIconIds = new Set(display.debuffIcons.keys());
+        const iconSpacing = 22; // 아이콘 간격
 
-        // 1. 효과를 액티브(버프/디버프)와 패시브로 분리
-        const passiveEffects = [];
-        const otherEffects = activeEffects;
+        const buffs = [];
+        const debuffs = [];
 
+        activeEffects.forEach(effect => {
+            if (effect.type === EFFECT_TYPES.BUFF) {
+                buffs.push(effect);
+            } else {
+                debuffs.push(effect);
+            }
+        });
+
+        // 패시브 스킬 추가 (버프 아이콘으로 취급)
         const equipped = ownedSkillsManager.getEquippedSkills(unitId);
         equipped.forEach(instId => {
             if (!instId) return;
             const inst = skillInventoryManager.getInstanceData(instId);
-            if (inst && inst.skillId === 'ironWill') {
-                passiveEffects.push({
+            const skillData = skillInventoryManager.getSkillData(inst.skillId, inst.grade);
+            if (skillData && skillData.type === 'PASSIVE') {
+                buffs.push({
                     instanceId: `passive_${inst.skillId}`,
-                    id: inst.skillId
+                    id: inst.skillId,
+                    sourceSkillName: skillData.name,
+                    iconPath: skillData.illustrationPath,
+                    duration: 'P', // Passive의 P로 표시
                 });
             }
         });
 
-        // 2. 액티브 효과 아이콘 처리 (왼쪽 정렬)
-        const totalActiveWidth = otherEffects.length > 0 ? (otherEffects.length - 1) * iconSpacing : 0;
-        const activeStartX = -totalActiveWidth / 2;
-
-        otherEffects.forEach((effect, index) => {
+        // 1. 버프 아이콘 처리 (왼쪽 컨테이너)
+        buffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            const iconKey = effectDef ? effectDef.id : null;
-            if (!iconKey) return;
+            const iconKey = effectDef
+                ? effectDef.iconPath
+                    ? effectDef.iconPath.replace(/^assets\//, '')
+                    : effect.id
+                : effect.id; // 패시브 스킬의 illustrationPath 직접 사용
 
-            let iconData = display.icons.get(effect.instanceId);
+            let iconData = display.buffIcons.get(effect.instanceId);
             if (!iconData) {
                 const iconContainer = this.scene.add.container(0, 0);
-                const icon = this.scene.add.image(0, 0, iconKey).setScale(0.04);
-                const turnText = this.scene.add.text(0, 8, effect.duration, { fontSize: '12px', color: '#fff', stroke: '#000', strokeThickness: 2 }).setOrigin(0.5);
+                const icon = this.scene.add
+                    .image(0, 0, iconKey)
+                    .setScale(0.04)
+                    .setAlpha(0.5); // 반투명
+                const turnText = this.scene.add
+                    .text(0, 8, '', {
+                        fontSize: '12px',
+                        color: '#fff',
+                        stroke: '#000',
+                        strokeThickness: 2,
+                    })
+                    .setOrigin(0.5);
                 iconContainer.add([icon, turnText]);
-                display.container.add(iconContainer);
+                display.buffsContainer.add(iconContainer);
                 iconData = { icon: iconContainer, text: turnText };
-                display.icons.set(effect.instanceId, iconData);
+                display.buffIcons.set(effect.instanceId, iconData);
             } else {
-                if (iconData.icon.list[0].texture.key !== iconKey) iconData.icon.list[0].setTexture(iconKey);
+                if (iconData.icon.list[0].texture.key !== iconKey)
+                    iconData.icon.list[0].setTexture(iconKey);
             }
             iconData.text.setText(effect.duration);
-            iconData.icon.setX(activeStartX + index * iconSpacing);
-            existingIconIds.delete(effect.instanceId);
+            // 세로 나열
+            iconData.icon.setY(
+                -display.parentSprite.displayHeight / 2 + 10 + index * iconSpacing
+            );
+            existingBuffIconIds.delete(effect.instanceId);
         });
 
-        // 3. 패시브 스킬 아이콘 처리 (오른쪽 정렬)
-        const totalPassiveWidth = passiveEffects.length > 0 ? (passiveEffects.length - 1) * iconSpacing : 0;
-        const passiveStartX = totalActiveWidth > 0 ? totalActiveWidth / 2 + iconSpacing : -totalPassiveWidth / 2;
+        // 2. 디버프 아이콘 처리 (오른쪽 컨테이너)
+        debuffs.forEach((effect, index) => {
+            const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
+            const iconKey = effectDef
+                ? effectDef.iconPath
+                    ? effectDef.iconPath.replace(/^assets\//, '')
+                    : effect.id
+                : effect.id;
 
-        passiveEffects.forEach((effect, index) => {
-            let iconData = display.icons.get(effect.instanceId);
+            let iconData = display.debuffIcons.get(effect.instanceId);
             if (!iconData) {
                 const iconContainer = this.scene.add.container(0, 0);
-                const icon = this.scene.add.image(0, 0, effect.id).setScale(0.04);
-                iconContainer.add(icon);
-                display.container.add(iconContainer);
-                iconData = { icon: iconContainer, text: null };
-                display.icons.set(effect.instanceId, iconData);
+                const icon = this.scene.add
+                    .image(0, 0, iconKey)
+                    .setScale(0.04)
+                    .setAlpha(0.5); // 반투명
+                const turnText = this.scene.add
+                    .text(0, 8, '', {
+                        fontSize: '12px',
+                        color: '#fff',
+                        stroke: '#000',
+                        strokeThickness: 2,
+                    })
+                    .setOrigin(0.5);
+                iconContainer.add([icon, turnText]);
+                display.debuffsContainer.add(iconContainer);
+                iconData = { icon: iconContainer, text: turnText };
+                display.debuffIcons.set(effect.instanceId, iconData);
+            } else {
+                if (iconData.icon.list[0].texture.key !== iconKey)
+                    iconData.icon.list[0].setTexture(iconKey);
             }
-            iconData.icon.setX(passiveStartX + index * iconSpacing);
-            existingIconIds.delete(effect.instanceId);
+            iconData.text.setText(effect.duration);
+            // 세로 나열
+            iconData.icon.setY(
+                -display.parentSprite.displayHeight / 2 + 10 + index * iconSpacing
+            );
+            existingDebuffIconIds.delete(effect.instanceId);
         });
 
-        // 4. 만료된 아이콘 제거
-        existingIconIds.forEach(instanceId => {
-            const iconData = display.icons.get(instanceId);
+        // 3. 만료된 버프 아이콘 제거
+        existingBuffIconIds.forEach(instanceId => {
+            const iconData = display.buffIcons.get(instanceId);
             if (iconData) {
                 iconData.icon.destroy();
-                display.icons.delete(instanceId);
+                display.buffIcons.delete(instanceId);
+            }
+        });
+
+        // 4. 만료된 디버프 아이콘 제거
+        existingDebuffIconIds.forEach(instanceId => {
+            const iconData = display.debuffIcons.get(instanceId);
+            if (iconData) {
+                iconData.icon.destroy();
+                display.debuffIcons.delete(instanceId);
             }
         });
     }
@@ -136,14 +208,19 @@ export class IconManager {
     removeIconDisplay(unitId) {
         const display = this.activeIconDisplays.get(unitId);
         if (display) {
-            display.container.destroy();
+            display.buffsContainer.destroy();
+            display.debuffsContainer.destroy();
             this.activeIconDisplays.delete(unitId);
         }
     }
 
     shutdown() {
-        this.activeIconDisplays.forEach(({ container }) => container.destroy());
+        this.activeIconDisplays.forEach(display => {
+            display.buffsContainer.destroy();
+            display.debuffsContainer.destroy();
+        });
         this.activeIconDisplays.clear();
         debugLogEngine.log('IconManager', '아이콘 매니저를 종료합니다.');
     }
 }
+

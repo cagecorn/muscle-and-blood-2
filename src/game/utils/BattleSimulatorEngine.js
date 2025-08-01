@@ -153,6 +153,7 @@ export class BattleSimulatorEngine {
             this.vfxManager.updateTokenDisplay(unit, nameTag);
             this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
             this.vfxManager.updateAspirationBar(unit.uniqueId);
+            this.vfxManager.iconManager.updateIconsForUnit(unit.uniqueId);
         });
 
         this.gameLoop(); // 수정된 루프 시작
@@ -263,6 +264,7 @@ export class BattleSimulatorEngine {
                     this.vfxManager.updateTokenDisplay(unit, nameTag);
                     this.vfxManager.updateHealthBar(unit.uniqueId, unit.currentHp, unit.finalStats.hp);
                     this.vfxManager.updateAspirationBar(unit.uniqueId);
+                    this.vfxManager.iconManager.updateIconsForUnit(unit.uniqueId);
                 }
             });
             this.sharedResourceUI.update();
