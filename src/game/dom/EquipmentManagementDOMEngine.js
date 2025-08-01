@@ -3,7 +3,8 @@ import { partyEngine } from '../utils/PartyEngine.js';
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { equipmentManager } from '../utils/EquipmentManager.js';
 import { itemInventoryManager } from '../utils/ItemInventoryManager.js';
-import { ItemTooltipManager } from './ItemTooltipManager.js'; // 툴팁 매니저 import
+import { ItemTooltipManager } from './ItemTooltipManager.js';
+import { EQUIPMENT_SLOTS } from '../data/items.js';
 
 export class EquipmentManagementDOMEngine {
     constructor(scene) {
@@ -14,7 +15,7 @@ export class EquipmentManagementDOMEngine {
         document.getElementById('app').appendChild(this.container);
 
         this.selectedMercenaryData = null;
-        this.draggedData = null; // 드래그 정보 객체로 관리 { source, instanceId, slotType }
+        this.draggedData = null; // { source, instanceId, slotType }
 
         this.createView();
     }
@@ -41,7 +42,7 @@ export class EquipmentManagementDOMEngine {
 
         this.equipmentInventoryContent.ondragover = e => e.preventDefault();
         this.equipmentInventoryContent.ondrop = e => this.onDropOnInventory(e);
-
+        
         this.populateMercenaryList();
         this.refreshInventory();
 
@@ -52,7 +53,6 @@ export class EquipmentManagementDOMEngine {
         this.container.appendChild(backButton);
     }
 
-    // createPanel, populateMercenaryList, selectMercenary는 이전과 동일
     createPanel(id, title) {
         const panel = document.createElement('div');
         panel.id = id;
@@ -60,7 +60,8 @@ export class EquipmentManagementDOMEngine {
         panel.innerHTML = `<div class="panel-title">${title}</div><div class="panel-content"></div>`;
         return panel;
     }
-
+    
+    // ... populateMercenaryList, selectMercenary ...
     populateMercenaryList() {
         this.mercenaryListContent.innerHTML = '';
         const partyMembers = partyEngine.getPartyMembers().filter(id => id !== undefined);
@@ -78,26 +79,26 @@ export class EquipmentManagementDOMEngine {
             }
         });
 
-        if (partyMembers.length > 0) {
+        if (partyMembers.length > 0 && !this.selectedMercenaryData) {
             const first = allMercs.find(m => m.uniqueId === partyMembers[0]);
             if (first) this.selectMercenary(first);
+        } else if (this.selectedMercenaryData) {
+             this.selectMercenary(this.selectedMercenaryData);
         }
     }
     
     selectMercenary(mercData) {
         this.selectedMercenaryData = mercData;
         
-        const selected = this.mercenaryListContent.querySelector('.selected');
-        if (selected) selected.classList.remove('selected');
+        this.mercenaryListContent.querySelectorAll('.merc-list-item').forEach(el => el.classList.remove('selected'));
         const newSelected = this.mercenaryListContent.querySelector(`[data-merc-id='${mercData.uniqueId}']`);
         if (newSelected) newSelected.classList.add('selected');
 
         this.refreshMercenaryDetails();
     }
-    // ...
 
     refreshMercenaryDetails() {
-        if (!this.selectedMercenaryData) { /* ... */ return; }
+        if (!this.selectedMercenaryData) { this.mercenaryDetailsContent.innerHTML = '<p>용병을 선택하세요.</p>'; return; }
         const mercData = this.selectedMercenaryData;
         this.mercenaryDetailsContent.innerHTML = '';
 
@@ -120,7 +121,8 @@ export class EquipmentManagementDOMEngine {
         
         slotTypes.forEach((slotType, idx) => {
             const itemInstanceId = equippedItems[idx];
-            const item = itemInstanceId ? itemInventoryManager.getItem(itemInstanceId) : null;
+            // 캐시 또는 인벤토리에서 아이템 정보 가져오기
+            const item = itemInstanceId ? (equipmentManager.itemInstanceCache.get(itemInstanceId) || itemInventoryManager.getItem(itemInstanceId)) : null;
             const slot = this.createEquipSlot(slotType, slotLabels[idx], item);
             slotsContainer.appendChild(slot);
         });
@@ -140,7 +142,7 @@ export class EquipmentManagementDOMEngine {
             slot.style.backgroundImage = `url(${item.illustrationPath})`;
             slot.draggable = true;
             slot.dataset.instanceId = item.instanceId;
-            slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId: item.instanceId, slotType });
+            slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId: item.instanceId, slotType: slotType });
             slot.onmouseenter = e => ItemTooltipManager.show(item, e);
             slot.onmouseleave = () => ItemTooltipManager.hide();
         }
@@ -157,7 +159,7 @@ export class EquipmentManagementDOMEngine {
         this.equipmentInventoryContent.innerHTML = '';
         const inventory = itemInventoryManager.getInventory();
         if (inventory.length === 0) {
-            this.equipmentInventoryContent.innerHTML = '<p>장비가 없습니다.</p>';
+            this.equipmentInventoryContent.innerHTML = '<p style="text-align:center; color:#888;">장비가 없습니다.</p>';
             return;
         }
         
@@ -183,13 +185,20 @@ export class EquipmentManagementDOMEngine {
 
     onDropOnSlot(event) {
         event.preventDefault();
-        const targetSlotType = event.currentTarget.dataset.slotType;
+        const targetSlotElement = event.currentTarget;
+        const targetSlotType = targetSlotElement.dataset.slotType;
         if (!this.selectedMercenaryData || !this.draggedData) return;
         
         const unitId = this.selectedMercenaryData.uniqueId;
         const draggedInstanceId = this.draggedData.instanceId;
-        
-        equipmentManager.equipItem(unitId, targetSlotType, draggedInstanceId);
+
+        // 아이템 스왑 로직
+        if (this.draggedData.source === 'slot') {
+            const sourceSlotType = this.draggedData.slotType;
+            equipmentManager.swapItems(unitId, sourceSlotType, targetSlotType);
+        } else { // 인벤토리 -> 슬롯
+            equipmentManager.equipItem(unitId, targetSlotType, draggedInstanceId);
+        }
         
         this.refreshAll();
     }
@@ -211,5 +220,6 @@ export class EquipmentManagementDOMEngine {
 
     destroy() {
         this.container.remove();
+        ItemTooltipManager.hide(); // 씬 전환 시 툴팁 제거
     }
 }
