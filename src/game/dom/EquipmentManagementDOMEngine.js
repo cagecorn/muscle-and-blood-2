@@ -61,7 +61,6 @@ export class EquipmentManagementDOMEngine {
         return panel;
     }
     
-    // ... populateMercenaryList, selectMercenary ...
     populateMercenaryList() {
         this.mercenaryListContent.innerHTML = '';
         const partyMembers = partyEngine.getPartyMembers().filter(id => id !== undefined);
@@ -121,7 +120,6 @@ export class EquipmentManagementDOMEngine {
         
         slotTypes.forEach((slotType, idx) => {
             const itemInstanceId = equippedItems[idx];
-            // 캐시 또는 인벤토리에서 아이템 정보 가져오기
             const item = itemInstanceId ? (equipmentManager.itemInstanceCache.get(itemInstanceId) || itemInventoryManager.getItem(itemInstanceId)) : null;
             const slot = this.createEquipSlot(slotType, slotLabels[idx], item);
             slotsContainer.appendChild(slot);
@@ -145,6 +143,18 @@ export class EquipmentManagementDOMEngine {
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId: item.instanceId, slotType: slotType });
             slot.onmouseenter = e => ItemTooltipManager.show(item, e);
             slot.onmouseleave = () => ItemTooltipManager.hide();
+
+            // 등급별 별 표시 추가
+            const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
+            const starsContainer = document.createElement('div');
+            starsContainer.className = 'grade-stars';
+            const starCount = gradeMap[item.grade] || 1;
+            for (let i = 0; i < starCount; i++) {
+                const starImg = document.createElement('img');
+                starImg.src = 'assets/images/territory/skill-card-star.png';
+                starsContainer.appendChild(starImg);
+            }
+            slot.appendChild(starsContainer);
         }
 
         const slotLabel = document.createElement('span');
@@ -173,6 +183,18 @@ export class EquipmentManagementDOMEngine {
             itemCard.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: item.instanceId });
             itemCard.onmouseenter = e => ItemTooltipManager.show(item, e);
             itemCard.onmouseleave = () => ItemTooltipManager.hide();
+
+            // 인벤토리 카드에도 등급별 별 표시 추가
+            const gradeMap = { NORMAL: 1, RARE: 2, EPIC: 3, LEGENDARY: 4 };
+            const starsContainer = document.createElement('div');
+            starsContainer.className = 'grade-stars';
+            const starCount = gradeMap[item.grade] || 1;
+            for (let i = 0; i < starCount; i++) {
+                const starImg = document.createElement('img');
+                starImg.src = 'assets/images/territory/skill-card-star.png';
+                starsContainer.appendChild(starImg);
+            }
+            itemCard.appendChild(starsContainer);
             
             this.equipmentInventoryContent.appendChild(itemCard);
         });
@@ -192,11 +214,10 @@ export class EquipmentManagementDOMEngine {
         const unitId = this.selectedMercenaryData.uniqueId;
         const draggedInstanceId = this.draggedData.instanceId;
 
-        // 아이템 스왑 로직
         if (this.draggedData.source === 'slot') {
             const sourceSlotType = this.draggedData.slotType;
             equipmentManager.swapItems(unitId, sourceSlotType, targetSlotType);
-        } else { // 인벤토리 -> 슬롯
+        } else { 
             equipmentManager.equipItem(unitId, targetSlotType, draggedInstanceId);
         }
         
@@ -220,6 +241,6 @@ export class EquipmentManagementDOMEngine {
 
     destroy() {
         this.container.remove();
-        ItemTooltipManager.hide(); // 씬 전환 시 툴팁 제거
+        ItemTooltipManager.hide();
     }
 }
