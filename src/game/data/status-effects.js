@@ -53,6 +53,12 @@ export const statusEffects = {
         name: '돌격 명령',
         iconPath: 'assets/images/skills/charge-order.png',
     },
+    // ✨ 숯돌 갈기 버프 추가
+    grindstoneBuff: {
+        id: 'grindstoneBuff',
+        name: '숯돌 갈기',
+        iconPath: 'assets/images/skills/grindstone.png',
+    },
     // 치료 불가 디버프
     stigma: {
         id: 'stigma',

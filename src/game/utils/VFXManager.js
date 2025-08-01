@@ -25,6 +25,21 @@ export class VFXManager {
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
 
+    // ✨ createBloodSplatter 함수 추가
+    createBloodSplatter(x, y) {
+        const particles = this.scene.add.particles(x, y, 'red-particle', {
+            speed: { min: 100, max: 300 },
+            angle: { min: 180, max: 360 },
+            scale: { start: 1, end: 0 },
+            lifespan: 600,
+            gravityY: 800,
+            blendMode: 'ADD',
+            emitting: false
+        });
+        particles.explode(16);
+        this.vfxLayer.add(particles);
+    }
+
     setBattleSimulator(simulator) {
         this.battleSimulator = simulator;
     }
