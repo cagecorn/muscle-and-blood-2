@@ -8,8 +8,6 @@ import { classProficiencies } from '../../game/data/classProficiencies.js';
 import { diceEngine } from '../../game/utils/DiceEngine.js';
 import SkillEffectProcessor from '../../game/utils/SkillEffectProcessor.js'; // 새로 만든 클래스를 import
 import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
-import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
-import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 
 class UseSkillNode extends Node {
     constructor(engines = {}) {
@@ -41,10 +39,7 @@ class UseSkillNode extends Node {
             return NodeState.FAILURE;
         }
 
-        // MBTI 스택 버프 적용을 위해 슬롯 인덱스를 계산합니다.
-        const equipped = ownedSkillsManager.getEquippedSkills(unit.uniqueId);
-        const slotIndex = equipped.indexOf(instanceId);
-        this._applyMBTIStackBuff(unit, slotIndex);
+        // MBTI 스택 버프 시스템 제거로 관련 로직을 삭제합니다.
 
         debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, instanceData.grade);
 
@@ -107,34 +102,6 @@ class UseSkillNode extends Node {
         return finalSkill;
     }
 
-    /**
-     * MBTI 성향과 슬롯 인덱스에 맞는 스택 버프를 적용합니다.
-     * @private
-     */
-    _applyMBTIStackBuff(unit, slotIndex) {
-        if (!unit.mbti || slotIndex < 0 || slotIndex >= 4) return;
-
-        const mbtiString =
-            (unit.mbti.E > unit.mbti.I ? 'E' : 'I') +
-            (unit.mbti.S > unit.mbti.N ? 'S' : 'N') +
-            (unit.mbti.T > unit.mbti.F ? 'T' : 'F') +
-            (unit.mbti.J > unit.mbti.P ? 'J' : 'P');
-
-        const trait = mbtiString[slotIndex];
-        const effectId = `mbtiStack${trait}`;
-
-        const buffSkillShell = {
-            name: `${trait} 스택`,
-            effect: {
-                id: effectId,
-                type: 'BUFF',
-                duration: 99,
-            }
-        };
-
-        statusEffectManager.addEffect(unit, buffSkillShell, unit);
-        debugLogEngine.log('UseSkillNode', `${unit.instanceName}에게 [${trait}] 스택 버프가 적용되었습니다.`);
-    }
 }
 
 export default UseSkillNode;

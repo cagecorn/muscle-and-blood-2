@@ -47,22 +47,12 @@ export class UnitDetailDOM {
             P: `**P (인식)**\n- 선호 스킬: 변칙적인 비숙련 스킬\n- 선호 장비: 특수 효과(MBTI 효과)가 붙은 아이템\n- 열망 붕괴: 토큰 소모가 없는 스킬을 사용해 변수를 만들려 합니다.`
         };
 
-        const mbtiSlotBuffs = {
-            E: `**외향(E) 스택**: 물리/마법 공격력 영구 증가`,
-            I: `**내향(I) 스택**: 매 턴 잃은 체력 비례 배리어 회복`,
-            S: `**감각(S) 스택**: 치명타 확률 영구 증가`,
-            N: `**직관(N) 스택**: 상태이상 적용 확률 영구 증가`,
-            T: `**사고(T) 스택**: 방어력 관통 영구 증가`,
-            F: `**감정(F) 스택**: 스킬 사용 시 체력이 가장 낮은 아군 회복`,
-            J: `**판단(J) 스택**: 인내(Endurance) 스탯 영구 증가`,
-            P: `**인식(P) 스택**: 물리/마법 회피율 영구 증가`
-        };
-
         // 툴팁 텍스트를 조합합니다.
         let fullTooltipText = "## MBTI 행동 패턴\n\n";
         if (mbtiString) {
             fullTooltipText += `**[선호도]**\n${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}\n\n`;
-            fullTooltipText += `**[슬롯 버프]**\n- 1번 스킬: ${mbtiSlotBuffs[mbtiString[0]]}\n- 2번 스킬: ${mbtiSlotBuffs[mbtiString[1]]}\n- 3번 스킬: ${mbtiSlotBuffs[mbtiString[2]]}\n- 4번 스킬: ${mbtiSlotBuffs[mbtiString[3]]}`;
+            // MBTI 스택 버프 로직 제거로 인해 관련 툴팁도 제거합니다.
+            // fullTooltipText += `**[슬롯 버프]**\n- 1번 스킬: ${mbtiSlotBuffs[mbtiString[0]]}\n- 2번 스킬: ${mbtiSlotBuffs[mbtiString[1]]}\n- 3번 스킬: ${mbtiSlotBuffs[mbtiString[2]]}\n- 4번 스킬: ${mbtiSlotBuffs[mbtiString[3]]}`;
         }
 
         const overlay = document.createElement('div');
@@ -85,7 +75,7 @@ export class UnitDetailDOM {
             <div class="detail-header">
                 <span class="unit-name">${instanceName}</span>
                 <span class="unit-class">${unitData.name}</span>
-                <div class="unit-mbti" title="${fullTooltipText.replace(/(\r\n|\n|\r)/gm, '&#10;')}">${mbtiString}</div>
+                <div class="unit-mbti" data-tooltip="${fullTooltipText.replace(/(\r\n|\n|\r)/gm, '&#10;')}" style="user-select: none; cursor: help;">${mbtiString}</div>
                 <span class="unit-level">Lv. ${unitData.level}</span>
             </div>
             <div id="unit-detail-close">X</div>
@@ -197,13 +187,13 @@ export class UnitDetailDOM {
                 // ✨ 모든 슬롯이 동일한 스타일을 사용합니다.
                 slot.className = 'skill-slot';
 
-                // MBTI 알파벳 표시
-                if (index < 4 && mbtiString) {
-                    const mbtiIndicator = document.createElement('div');
-                    mbtiIndicator.className = 'mbti-slot-indicator';
-                    mbtiIndicator.innerText = mbtiString[index];
-                    slot.appendChild(mbtiIndicator);
-                }
+                // MBTI 알파벳 표시 (MBTI 스택 버프 시스템 제거로 비활성화)
+                // if (index < 4 && mbtiString) {
+                //     const mbtiIndicator = document.createElement('div');
+                //     mbtiIndicator.className = 'mbti-slot-indicator';
+                //     mbtiIndicator.innerText = mbtiString[index];
+                //     slot.appendChild(mbtiIndicator);
+                // }
 
                 let bgImage = 'url(assets/images/skills/skill-slot.png)';
                 if (instanceId) {
