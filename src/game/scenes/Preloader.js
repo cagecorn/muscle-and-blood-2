@@ -148,8 +148,12 @@ export class Preloader extends Scene
         // --- 추가된 토큰 이미지 로드 ---
         this.load.image('token', 'images/battle/token.png');
 
-        // 핏방울 이펙트를 위한 파티클 텍스처 로드 (빨간색 원)
-        this.load.createRuntimeTexture('red-particle', ['#FF0000']);
+        // 핏방울 이펙트를 위한 간단한 빨간색 파티클 텍스처 생성
+        const redParticle = this.make.graphics({ x: 0, y: 0, add: false });
+        redParticle.fillStyle(0xff0000, 1);
+        redParticle.fillCircle(2, 2, 2);
+        redParticle.generateTexture('red-particle', 4, 4);
+        redParticle.destroy();
 
         // 상태 효과 아이콘 로드
         Object.values(statusEffects).forEach(e => {
