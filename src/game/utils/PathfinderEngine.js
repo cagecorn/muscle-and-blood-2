@@ -6,6 +6,11 @@ import { formationEngine } from './FormationEngine.js';
  */
 class PathfinderEngine {
     constructor() {
+        /**
+         * 내부적으로 참조하는 FormationEngine 인스턴스.
+         * 테스트 환경에서는 이 값을 덮어써서 사용합니다.
+         */
+        this.formationEngine = formationEngine;
         debugLogEngine.log('PathfinderEngine', 'A* 경로 탐색 엔진이 초기화되었습니다.');
     }
 
@@ -17,7 +22,7 @@ class PathfinderEngine {
      * @returns {Array<object>|null} - 경로 좌표 배열 또는 null (경로 없음)
      */
     findPath(unit, startPos, endPos) {
-        const grid = formationEngine.grid;
+        const grid = this.formationEngine?.grid;
         if (!grid) return null;
 
         const openSet = [];
@@ -48,22 +53,23 @@ class PathfinderEngine {
                 const key = `${neighbor.col},${neighbor.row}`;
                 const cell = grid.getCell(neighbor.col, neighbor.row);
 
-                // 이미 탐색했거나 유효하지 않은 셀이면 건너뜁니다.
+                // 이미 탐색했거나 유효하지 않은 셀은 제외합니다.
                 if (closedSet.has(key) || !cell) {
                     return;
                 }
 
-                const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
+                // ✨ [핵심 버그 수정] 유닛 점유에 따른 경로 탐색 규칙 강화
+                if (cell.isOccupied) {
+                    const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
+                    // 어떤 유닛이든 점유된 칸을 최종 목적지로 사용할 수 없습니다.
+                    if (isEndNode) {
+                        return;
+                    }
 
-                // ✨ [핵심 수정] 플라잉맨 버그 수정 로직
-                // 1. 목표 지점이 다른 유닛에게 점유되어 있다면, 그 경로는 아예 막습니다. (모든 유닛 공통)
-                if (cell.isOccupied && isEndNode) {
-                    return;
-                }
-
-                // 2. 플라잉맨이 아닌 다른 유닛은, 목표 지점이 아니더라도 점유된 칸을 통과할 수 없습니다.
-                if (cell.isOccupied && unit.id !== 'flyingmen') {
-                    return;
+                    // 플라잉맨이 아닌 유닛은 점유된 칸을 통과할 수 없습니다.
+                    if (unit.id !== 'flyingmen') {
+                        return;
+                    }
                 }
 
                 const newCost = currentNode.gCost + this._getDistance(currentNode, neighbor);
@@ -99,7 +105,7 @@ class PathfinderEngine {
     }
 
     _getNodeFromGrid(col, row) {
-        const cell = formationEngine.grid.getCell(col, row);
+        const cell = this.formationEngine?.grid?.getCell(col, row);
         if (!cell) return null;
         return { col: cell.col, row: cell.row, gCost: Infinity, hCost: Infinity, fCost: Infinity, parent: null };
     }
