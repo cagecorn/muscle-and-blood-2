@@ -60,14 +60,15 @@ class PathfinderEngine {
 
                 // ✨ [핵심 버그 수정] 유닛 점유에 따른 경로 탐색 규칙 강화
                 // 어떤 유닛이든 점유된 칸을 최종 목적지로 사용할 수 없습니다.
-                // 플라잉맨은 점유된 칸을 통과할 수 있지만, 해당 칸에 도착할 수는 없습니다.
-                // 따라서 플라잉맨이 아닌 유닛은 점유된 칸을 통과할 수 없습니다.
+                // 플라잉맨이 아닌 유닛은 점유된 칸을 통과할 수 없습니다.
                 if (cell.isOccupied) {
                     const isEndNode = neighbor.col === endNode.col && neighbor.row === endNode.row;
                     if (isEndNode) {
                         return; // 목표 지점이 점유되어 있다면 경로를 찾지 않습니다.
                     }
 
+                    // 플라잉맨은 점유된 칸을 통과할 수 있지만, 도착할 수는 없습니다.
+                    // 따라서 통과 시에는 isOccupied 체크를 건너뜁니다.
                     if (unit.id !== 'flyingmen') {
                         return;
                     }
