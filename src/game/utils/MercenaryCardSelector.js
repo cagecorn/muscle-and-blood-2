@@ -65,6 +65,12 @@ class MercenaryCardSelector {
                 const tags = card.tags || [];
                 let score = 100;
 
+                // --- ▼ [핵심 수정] 클래스 제한 로직 추가 ▼ ---
+                if (card.requiredClass && card.requiredClass !== mercenary.id) {
+                    return { instance: inst, score: 0 };
+                }
+                // --- ▲ [핵심 수정] 클래스 제한 로직 추가 ▲ ---
+
                 const isProficientOrSpecialized = tags.some(tag => proficiencies.includes(tag) || specializations.includes(tag));
                 if (isProficientOrSpecialized) {
                     if (proficientSkillsCount < 2) {
@@ -98,8 +104,12 @@ class MercenaryCardSelector {
 
             // 점수에 기반한 가중치 랜덤 선택
             const totalScore = weightedCandidates.reduce((sum, c) => sum + c.score, 0);
+
+            // 모든 후보의 점수가 0이면 더 이상 선택하지 않고 종료
+            if (totalScore === 0) break;
+
             let random = Math.random() * totalScore;
-            
+
             let choice = weightedCandidates[weightedCandidates.length - 1].instance; // fallback
             for (const candidate of weightedCandidates) {
                 if (random < candidate.score) {

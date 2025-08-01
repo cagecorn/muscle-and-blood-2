@@ -2,6 +2,7 @@ import { SKILL_TYPES } from '../utils/SkillEngine.js';
 // ✨ 1. 숙련도 및 특화 데이터를 가져옵니다.
 import { classProficiencies } from '../data/classProficiencies.js';
 import { classSpecializations } from '../data/classSpecializations.js';
+import { mercenaryData } from '../data/mercenaries.js';
 
 /**
  * 스킬 카드 위에 마우스를 올렸을 때 TCG 스타일의 큰 툴팁을 표시하는 매니저
@@ -24,8 +25,8 @@ export class SkillTooltipManager {
         let description = skillData.description;
 
         let skillNameHTML = skillData.name;
-        if (skillData.requiredClass) {
-            const className = skillData.requiredClass === 'warrior' ? '전사' : skillData.requiredClass;
+        if (skillData.requiredClass && mercenaryData[skillData.requiredClass]) {
+            const className = mercenaryData[skillData.requiredClass].name;
             skillNameHTML += ` <span style="font-size: 14px; color: #ffc107;">[${className} 전용]</span>`;
         }
 
