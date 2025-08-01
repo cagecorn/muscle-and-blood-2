@@ -4,6 +4,8 @@ import { DOMEngine } from '../utils/DOMEngine.js';
 import { TerritoryDOMEngine } from '../dom/TerritoryDOMEngine.js';
 // 새로 만든 해상도 로그 매니저를 import 합니다.
 import { debugResolutionLogManager } from '../debug/DebugResolutionLogManager.js';
+// ✨ 로그 다운로더를 import 합니다.
+import { logDownloader } from '../utils/LogDownloader.js';
 
 export class TerritoryScene extends Scene {
     constructor() {
@@ -29,6 +31,12 @@ export class TerritoryScene extends Scene {
         // --- 중요: 해상도 정보 로그 출력 ---
         // 게임이 시작될 때 현재 해상도 정보를 콘솔에 기록합니다.
         debugResolutionLogManager.logResolution(this.sys.game);
+
+        // ✨ 'L' 키를 누르면 로그를 다운로드하는 이벤트 리스너를 추가합니다.
+        this.input.keyboard.on('keydown-L', () => {
+            console.log("'L' 키가 눌렸습니다. 로그 다운로드를 시작합니다...");
+            logDownloader.download();
+        });
 
         // 씬이 종료될 때 DOM 요소들을 정리하도록 이벤트를 설정합니다.
         this.events.on('shutdown', () => {
