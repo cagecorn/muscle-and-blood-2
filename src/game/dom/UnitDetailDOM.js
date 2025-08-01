@@ -130,10 +130,10 @@ export class UnitDetailDOM {
                     <div class="stat-item"><span>물리 방어력</span><span>${finalStats.physicalDefense.toFixed(1)}</span></div>
                     <div class="stat-item"><span>마법 공격력</span><span>${finalStats.magicAttack.toFixed(1)}</span></div>
                     <div class="stat-item"><span>마법 방어력</span><span>${finalStats.magicDefense.toFixed(1)}</span></div>
-                    <div class="stat-item"><span>치명타 확률</span><span>${(finalStats.criticalChance).toFixed(1)}%</span></div>
-                    <div class="stat-item"><span>물리 회피율</span><span>${(finalStats.physicalEvadeChance).toFixed(1)}%</span></div>
-                    <div class="stat-item"><span>상태이상 저항</span><span>${(finalStats.statusEffectResistance).toFixed(1)}%</span></div>
-                    <div class="stat-item"><span>상태이상 적용</span><span>${(finalStats.statusEffectApplication).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>치명타 확률</span><span>${(finalStats.criticalChance ?? 0).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>물리 회피율</span><span>${(finalStats.physicalEvadeChance ?? 0).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>상태이상 저항</span><span>${(finalStats.statusEffectResistance ?? 0).toFixed(1)}%</span></div>
+                    <div class="stat-item"><span>상태이상 적용</span><span>${(finalStats.statusEffectApplication ?? 0).toFixed(1)}%</span></div>
                 </div>
             </div>
         `;
