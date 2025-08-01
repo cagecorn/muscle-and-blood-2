@@ -5,6 +5,9 @@ import { ownedSkillsManager } from './OwnedSkillsManager.js';
 import { mercenaryCardSelector } from './MercenaryCardSelector.js';
 import { formationEngine } from './FormationEngine.js';
 import { mbtiPositioningEngine } from './MBTIPositioningEngine.js';
+// 장비 자동 장착 엔진 및 인벤토리 매니저를 가져옵니다.
+import { mercenaryEquipmentSelector } from './MercenaryEquipmentSelector.js';
+import { itemInventoryManager } from './ItemInventoryManager.js';
 
 /**
  * 아레나 컨텐츠와 관련된 로직(적 생성, 보상 등)을 관리하는 엔진
@@ -21,6 +24,8 @@ class ArenaManager {
     generateEnemyTeam() {
         this.enemyTeam = [];
         let availableCards = [...skillInventoryManager.getInventory()];
+        // 아레나 적들을 위한 임시 장비 인벤토리 풀
+        let availableItems = [...itemInventoryManager.getInventory()];
         const mercenaryTypes = Object.values(mercenaryData);
 
         // --- \u2728 아레나 '적' 진영의 모든 빈 셀 목록을 준비 ---
@@ -51,11 +56,14 @@ class ArenaManager {
             });
             availableCards = remainingCards;
 
-            // 3. MBTI에 따라 위치 결정
+            // 3. MBTI에 따라 장비 선택
+            availableItems = mercenaryEquipmentSelector._selectAndEquipBestItemsForMerc(enemyMercenary, availableItems);
+
+            // 4. MBTI에 따라 위치 결정
             const chosenCell = mbtiPositioningEngine.determinePosition(enemyMercenary, availableCells, placedEnemies, 'enemy');
 
             if (chosenCell) {
-                // 4. 결정된 위치 정보 저장
+                // 5. 결정된 위치 정보 저장
                 enemyMercenary.gridX = chosenCell.col;
                 enemyMercenary.gridY = chosenCell.row;
                 // formationEngine에 DOM이 아닌 논리적 위치를 저장합니다.
@@ -71,7 +79,7 @@ class ArenaManager {
             this.enemyTeam.push(enemyMercenary);
         }
 
-        console.log('[ArenaManager] 아레나 적 팀 생성 및 자동 배치가 완료되었습니다.');
+        console.log('[ArenaManager] 아레나 적 팀 생성 및 자동 장비/스킬/배치가 완료되었습니다.');
         return this.enemyTeam;
     }
 

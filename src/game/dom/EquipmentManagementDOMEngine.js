@@ -5,6 +5,8 @@ import { equipmentManager } from '../utils/EquipmentManager.js';
 import { itemInventoryManager } from '../utils/ItemInventoryManager.js';
 import { ItemTooltipManager } from './ItemTooltipManager.js';
 import { EQUIPMENT_SLOTS } from '../data/items.js';
+// 새로 만든 장비 자동 장착기를 불러옵니다.
+import { mercenaryEquipmentSelector } from '../utils/MercenaryEquipmentSelector.js';
 
 export class EquipmentManagementDOMEngine {
     constructor(scene) {
@@ -51,6 +53,30 @@ export class EquipmentManagementDOMEngine {
         backButton.innerText = '← 영지로';
         backButton.onclick = () => this.scene.scene.start('TerritoryScene');
         this.container.appendChild(backButton);
+
+        // 전원 자동장착 버튼 추가
+        const autoEquipButton = document.createElement('div');
+        autoEquipButton.id = 'auto-equip-all-items-button';
+        autoEquipButton.innerText = '[ 전원 자동장착 ]';
+        Object.assign(autoEquipButton.style, {
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            padding: '8px 15px',
+            backgroundColor: 'rgba(240, 230, 140, 0.8)',
+            color: '#333',
+            border: '1px solid #f0e68c',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            zIndex: '100'
+        });
+        autoEquipButton.onclick = () => {
+            mercenaryEquipmentSelector.autoEquipForParty();
+            this.refreshAll();
+            alert('모든 용병의 장비가 MBTI 성향에 따라 자동 장착되었습니다.');
+        };
+        this.container.appendChild(autoEquipButton);
     }
 
     createPanel(id, title) {
@@ -82,7 +108,8 @@ export class EquipmentManagementDOMEngine {
             const first = allMercs.find(m => m.uniqueId === partyMembers[0]);
             if (first) this.selectMercenary(first);
         } else if (this.selectedMercenaryData) {
-             this.selectMercenary(this.selectedMercenaryData);
+            const updatedMercData = mercenaryEngine.getMercenaryById(this.selectedMercenaryData.uniqueId);
+            if (updatedMercData) this.selectMercenary(updatedMercData);
         }
     }
     
@@ -98,7 +125,7 @@ export class EquipmentManagementDOMEngine {
 
     refreshMercenaryDetails() {
         if (!this.selectedMercenaryData) { this.mercenaryDetailsContent.innerHTML = '<p>용병을 선택하세요.</p>'; return; }
-        const mercData = this.selectedMercenaryData;
+        const mercData = mercenaryEngine.getMercenaryById(this.selectedMercenaryData.uniqueId);
         this.mercenaryDetailsContent.innerHTML = '';
 
         const portrait = document.createElement('div');
@@ -234,8 +261,10 @@ export class EquipmentManagementDOMEngine {
     }
 
     refreshAll() {
-        this.refreshMercenaryDetails();
         this.refreshInventory();
+        if (this.selectedMercenaryData) {
+            this.selectMercenary(this.selectedMercenaryData);
+        }
         this.draggedData = null;
     }
 
