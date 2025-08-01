@@ -37,15 +37,33 @@ export class UnitDetailDOM {
         }
 
         const mbtiTooltips = {
-            E: '외향형(E): 위기 상황에서 최후의 발악을 선택할 확률이 높습니다.',
-            I: '내향형(I): 위기 상황에서 후퇴하여 생존을 도모할 확률이 높습니다.',
-            S: '감각형(S): 기절에서 회복했을 때, 자신을 기절시킨 적에게 즉시 복수하려는 경향이 있습니다.',
-            N: '직관형(N): 기절에서 회복했을 때, 전황을 다시 파악하고 가장 유리한 대상을 공격합니다.',
-            T: '사고형(T): 적의 위협적인 버프에 디버프로 맞서려는 경향이 있습니다.',
-            F: '감정형(F): 위험에 처한 아군을 우선적으로 보호하려는 경향이 있습니다.',
-            J: '판단형(J): 기절 회복 또는 자원 부족 시, 다음 턴을 위해 안전한 위치로 재정비하는 것을 선호합니다.',
-            P: '인식형(P): 기절 회복 또는 자원 부족 시, 즉흥적으로 0코스트 스킬을 사용하며 변수를 만들려 합니다.'
+            E: `**E (외향)**\n- 선호 스킬: 돌진, 근접\n- 선호 장비: 공격력, 용맹\n- 열망 붕괴: 남은 능력을 모두 사용해 최후의 발악을 합니다.`,
+            I: `**I (내향)**\n- 선호 스킬: 원거리, 버프, 의지 방패\n- 선호 장비: 방어력, 토큰 소모량 감소\n- 열망 붕괴: 안전한 위치로 후퇴하여 생존을 도모합니다.`,
+            S: `**S (감각)**\n- 선호 스킬: 확정 효과, 단순 피해/치유\n- 선호 장비: 명중률, 치명타 확률\n- 열망 붕괴: 자신을 기절시킨 적에게 복수하려 합니다.`,
+            N: `**N (직관)**\n- 선호 스킬: 상태이상, 위치 변경 등 복합 효과\n- 선호 장비: 시너지 효과, 상태이상 적용 확률\n- 열망 붕괴: 전황을 다시 파악하고 가장 유리한 대상을 공격합니다.`,
+            T: `**T (사고)**\n- 선호 스킬: 자신 강화(Self-Buff), 적 약화(Debuff)\n- 선호 장비: 치명타 피해, 생명력 흡수\n- 열망 붕괴: 적의 위협적인 버프에 디버프로 맞서려 합니다.`,
+            F: `**F (감정)**\n- 선호 스킬: 아군 지원(AID), 치유\n- 선호 장비: 최대 체력, 치유량 증가\n- 열망 붕괴: 위험에 처한 아군을 우선적으로 보호합니다.`,
+            J: `**J (판단)**\n- 선호 스킬: 클래스 숙련도에 맞는 정석적인 스킬\n- 선호 장비: 세트 아이템\n- 열망 붕괴: 다음 턴을 위해 안전하게 재정비합니다.`,
+            P: `**P (인식)**\n- 선호 스킬: 변칙적인 비숙련 스킬\n- 선호 장비: 특수 효과(MBTI 효과)가 붙은 아이템\n- 열망 붕괴: 토큰 소모가 없는 스킬을 사용해 변수를 만들려 합니다.`
         };
+
+        const mbtiSlotBuffs = {
+            E: `**외향(E) 스택**: 물리/마법 공격력 영구 증가`,
+            I: `**내향(I) 스택**: 매 턴 잃은 체력 비례 배리어 회복`,
+            S: `**감각(S) 스택**: 치명타 확률 영구 증가`,
+            N: `**직관(N) 스택**: 상태이상 적용 확률 영구 증가`,
+            T: `**사고(T) 스택**: 방어력 관통 영구 증가`,
+            F: `**감정(F) 스택**: 스킬 사용 시 체력이 가장 낮은 아군 회복`,
+            J: `**판단(J) 스택**: 인내(Endurance) 스탯 영구 증가`,
+            P: `**인식(P) 스택**: 물리/마법 회피율 영구 증가`
+        };
+
+        // 툴팁 텍스트를 조합합니다.
+        let fullTooltipText = "## MBTI 행동 패턴\n\n";
+        if (mbtiString) {
+            fullTooltipText += `**[선호도]**\n${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}\n\n`;
+            fullTooltipText += `**[슬롯 버프]**\n- 1번 스킬: ${mbtiSlotBuffs[mbtiString[0]]}\n- 2번 스킬: ${mbtiSlotBuffs[mbtiString[1]]}\n- 3번 스킬: ${mbtiSlotBuffs[mbtiString[2]]}\n- 4번 스킬: ${mbtiSlotBuffs[mbtiString[3]]}`;
+        }
 
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
@@ -67,7 +85,7 @@ export class UnitDetailDOM {
             <div class="detail-header">
                 <span class="unit-name">${instanceName}</span>
                 <span class="unit-class">${unitData.name}</span>
-                <div class="unit-mbti" data-tooltip="${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}">${mbtiString}</div>
+                <div class="unit-mbti" title="${fullTooltipText.replace(/(\r\n|\n|\r)/gm, '&#10;')}">${mbtiString}</div>
                 <span class="unit-level">Lv. ${unitData.level}</span>
             </div>
             <div id="unit-detail-close">X</div>
