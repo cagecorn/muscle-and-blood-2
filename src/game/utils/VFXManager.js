@@ -36,16 +36,19 @@ export class VFXManager {
      */
     setupUnitVFX(unit, nameTag) {
         const unitId = unit.uniqueId;
-        const barWidth = 8;
+        // ✨ 2. 체력/열망바 너비를 절반으로 줄입니다.
+        const barWidth = 4;
         const barHeight = 80;
         const xOffset = unit.sprite.displayWidth / 2 + barWidth;
 
         // 1. 체력 및 배리어 바 생성 (유닛 왼쪽)
-        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e);
-        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700);
+        // ✨ 2. 투명도를 50%로 설정합니다.
+        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e, 0.5);
+        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700, 0.5);
 
         // 2. 열망 게이지 생성 (유닛 오른쪽)
-        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6);
+        // ✨ 2. 투명도를 50%로 설정합니다.
+        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6, 0.5);
 
         this.unitBars.set(unitId, { healthBar, barrierBar, aspirationBar });
 
@@ -113,13 +116,14 @@ export class VFXManager {
      * @param {number} width - 바의 너비
      * @param {number} bgColor - 배경색
      * @param {number} barColor - 전경색
+     * @param {number} bgAlpha - 배경 투명도 (기본값 0.7)
      * @returns {{container: Phaser.GameObjects.Container, bar: Phaser.GameObjects.Graphics}}
      */
-    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor) {
+    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor, bgAlpha = 0.7) {
         const container = this.scene.add.container(parentSprite.x + xOffset, parentSprite.y);
         this.vfxLayer.add(container);
 
-        const bg = this.scene.add.graphics().fillStyle(bgColor, 0.7).fillRect(-width / 2, -height / 2, width, height);
+        const bg = this.scene.add.graphics().fillStyle(bgColor, bgAlpha).fillRect(-width / 2, -height / 2, width, height);
         const bar = this.scene.add.graphics().fillStyle(barColor, 1).fillRect(-width / 2, -height / 2, width, height);
 
         container.add([bg, bar]);
@@ -175,7 +179,7 @@ export class VFXManager {
         }
 
         const style = {
-            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
             fontSize: '48px',
             color: '#ffc107',
             stroke: '#000000',
@@ -205,48 +209,6 @@ export class VFXManager {
         });
     }
 
-
-
-    /**
-     * 지정된 위치에 핏방울 파티클 효과를 생성합니다.
-     * @param {number} x - 파티클이 생성될 x 좌표
-     * @param {number} y - 파티클이 생성될 y 좌표
-     */
-    createBloodSplatter(x, y) {
-        const textureKey = 'blood-particle';
-        if (!this.scene.textures.exists(textureKey)) {
-            const g = this.scene.add.graphics();
-            g.fillStyle(0xff0000, 1);
-            g.fillCircle(2, 2, 2); // 4x4 크기의 원형 파티클
-            g.generateTexture(textureKey, 4, 4);
-            g.destroy();
-        }
-
-        const emitter = this.scene.add.particles(x, y, textureKey, {
-            speed: { min: 150, max: 300 },
-            angle: { min: -90, max: 90 },
-            gravityY: 500,
-            scale: { start: 1, end: 0 },
-            alpha: { start: 1, end: 0 },
-            lifespan: { min: 600, max: 1000 },
-            quantity: { min: 3, max: 6 },
-            blendMode: 'ADD'
-        });
-
-        // 파티클이 모두 사라지면 이미터 자동 파괴
-        this.scene.time.delayedCall(1000, () => {
-            emitter.destroy();
-        });
-
-        debugLogEngine.log('VFXManager', '핏방울 파티클 효과를 생성했습니다.');
-    }
-
-    /**
-     * 물리 효과가 적용된 데미지 숫자를 생성합니다.
-     * @param {number} x - 생성 위치 x
-     * @param {number} y - 생성 위치 y
-     * @param {number|string} damage - 표시할 데미지 숫자
-     */
     /**
      * 물리 효과가 적용된 데미지 숫자를 생성합니다.
      * @param {number} x - 생성 위치 x
@@ -257,7 +219,7 @@ export class VFXManager {
      */
     createDamageNumber(x, y, value, color = '#ff4d4d', label = null) {
         const style = {
-            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
             fontSize: '32px',
             color: color,
             stroke: '#000000',
@@ -323,8 +285,8 @@ export class VFXManager {
      */
     showMBTITrait(parentSprite, trait) {
         const style = {
-            fontFamily: '"Arial Black", Arial, sans-serif',
-            fontSize: '32px',
+            fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
+            fontSize: '16px', // ✨ 3. 크기를 절반으로 줄입니다. (원래 32px)
             color: '#ea580c',
             stroke: '#000000',
             strokeThickness: 5,
@@ -334,13 +296,20 @@ export class VFXManager {
             .text(parentSprite.x, parentSprite.y - 60, trait, style)
             .setOrigin(0.5, 0.5);
         this.vfxLayer.add(traitText);
+        this.scene.physics.add.existing(traitText); // ✨ 3. 물리 효과 적용
+
+        // ✨ 3. 데미지 숫자처럼 중력의 영향을 받으며 떨어지게 합니다.
+        const randomX = (Math.random() - 0.5) * 50; // 좌우로 약간의 랜덤성 추가
+        const randomY = -(Math.random() * 50 + 50); // 위로 솟구치는 Y축 속도
+
+        traitText.body.setVelocity(randomX, randomY);
+        traitText.body.setGravityY(200); // 중력 적용 (데미지보다 약간 약하게)
+        traitText.body.setAngularVelocity(Math.random() * 100 - 50); // 회전
 
         this.scene.tweens.add({
             targets: traitText,
-            y: traitText.y - 40,
             alpha: 0,
-            scale: 1.5,
-            duration: 1200,
+            duration: 1200, // 지속 시간 조정
             ease: 'Cubic.easeOut',
             onComplete: () => traitText.destroy(),
         });
@@ -349,7 +318,7 @@ export class VFXManager {
     // 스킬 이름을 머리 위에 표시하는 효과를 보여줍니다.
     showSkillName(parentSprite, skillName, color = '#ffffff') {
         const style = {
-            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
             fontSize: '24px',
             color: color,
             stroke: '#000000',
@@ -380,7 +349,7 @@ export class VFXManager {
      */
     showEffectName(parentSprite, effectName, color = '#ff4d4d') {
         const style = {
-            fontFamily: '"Arial Black", Arial, sans-serif',
+            fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
             fontSize: '22px',
             color: color,
             stroke: '#000000',
@@ -420,3 +389,4 @@ export class VFXManager {
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
+
