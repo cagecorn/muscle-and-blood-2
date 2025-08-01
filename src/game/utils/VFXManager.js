@@ -124,7 +124,8 @@ export class VFXManager {
         this.vfxLayer.add(container);
 
         const bg = this.scene.add.graphics().fillStyle(bgColor, bgAlpha).fillRect(-width / 2, -height / 2, width, height);
-        const bar = this.scene.add.graphics().fillStyle(barColor, 1).fillRect(-width / 2, -height / 2, width, height);
+        // ✨ 2. 게이지 자체도 반투명하게 설정합니다.
+        const bar = this.scene.add.graphics().fillStyle(barColor, 0.5).fillRect(-width / 2, -height / 2, width, height);
 
         container.add([bg, bar]);
         bar.setData('fullHeight', height); // 최대 높이 저장
@@ -146,13 +147,15 @@ export class VFXManager {
         const ratio = (maxHp > 0) ? Math.max(0, Math.min(1, currentHp / maxHp)) : 0;
         const fullHeight = bars.healthBar.bar.getData('fullHeight');
 
-        bars.healthBar.bar.clear().fillStyle(0x22c55e, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * ratio);
+        // ✨ 2. 게이지 너비를 얇게 고정합니다.
+        bars.healthBar.bar.clear().fillStyle(0x22c55e, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
 
         // 배리어 업데이트
         const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
         if (unit) {
             const barrierRatio = (unit.maxBarrier > 0) ? Math.max(0, Math.min(1, unit.currentBarrier / unit.maxBarrier)) : 0;
-            bars.barrierBar.bar.clear().fillStyle(0xffd700, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * barrierRatio);
+            // ✨ 2. 게이지 너비를 얇게 고정합니다.
+            bars.barrierBar.bar.clear().fillStyle(0xffd700, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * barrierRatio);
         }
     }
 
@@ -164,7 +167,8 @@ export class VFXManager {
         const ratio = data.aspiration / 100;
         const fullHeight = bars.aspirationBar.bar.getData('fullHeight');
 
-        bars.aspirationBar.bar.clear().fillStyle(0x8b5cf6, 1).fillRect(-4, -fullHeight / 2, 8, fullHeight * ratio);
+        // ✨ 2. 게이지 너비를 얇게 고정합니다.
+        bars.aspirationBar.bar.clear().fillStyle(0x8b5cf6, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
     }
 
     /**
