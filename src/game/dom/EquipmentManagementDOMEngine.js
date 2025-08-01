@@ -2,17 +2,21 @@ import { mercenaryEngine } from '../utils/MercenaryEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { UnitDetailDOM } from './UnitDetailDOM.js';
 import { equipmentManager } from '../utils/EquipmentManager.js';
+import { itemInventoryManager } from '../utils/ItemInventoryManager.js'; // 인벤토리 import
+import { EQUIPMENT_SLOTS } from '../data/items.js';
 
 export class EquipmentManagementDOMEngine {
     constructor(scene) {
         this.scene = scene;
         this.container = document.createElement('div');
         this.container.id = 'equipment-management-container';
-        // 스킬 관리 씬과 동일한 스타일 클래스 적용
-        this.container.className = 'skill-management-container';
+        this.container.className = 'skill-management-container'; // 기존 CSS 재활용
         document.getElementById('app').appendChild(this.container);
 
         this.selectedMercenaryData = null;
+        this.draggedItemId = null;
+        this.draggedFromSlotType = null;
+
         this.createView();
     }
 
@@ -24,20 +28,27 @@ export class EquipmentManagementDOMEngine {
         mainLayout.id = 'skill-main-layout';
         this.container.appendChild(mainLayout);
 
+        // 왼쪽: 용병 목록
         const listPanel = this.createPanel('merc-list-panel', '출정 용병');
         mainLayout.appendChild(listPanel);
         this.mercenaryListContent = listPanel.querySelector('.panel-content');
 
-        const detailsPanel = this.createPanel('merc-details-panel', '용병 장비 슬롯');
+        // 가운데: 용병 정보 및 장비 슬롯
+        const detailsPanel = this.createPanel('merc-details-panel', '용병 장비');
         mainLayout.appendChild(detailsPanel);
         this.mercenaryDetailsContent = detailsPanel.querySelector('.panel-content');
 
+        // 오른쪽: 아이템 인벤토리
         const inventoryPanel = this.createPanel('equipment-inventory-panel', '장비 인벤토리');
         mainLayout.appendChild(inventoryPanel);
         this.equipmentInventoryContent = inventoryPanel.querySelector('.panel-content');
-        this.equipmentInventoryContent.innerHTML = '<p style="text-align: center; color: #888; margin-top: 20px;">장비가 없습니다.</p>';
 
+        // 드래그 앤 드롭 이벤트 리스너 설정
+        this.equipmentInventoryContent.ondragover = e => e.preventDefault();
+        this.equipmentInventoryContent.ondrop = e => this.onDropOnInventory(e);
+        
         this.populateMercenaryList();
+        this.refreshInventory();
 
         const backButton = document.createElement('div');
         backButton.id = 'skill-back-button';
@@ -100,21 +111,98 @@ export class EquipmentManagementDOMEngine {
         const slotsContainer = document.createElement('div');
         slotsContainer.className = 'merc-equipment-slots-container';
 
-        const equipSlotLabels = ['무기', '갑옷', '악세사리1', '악세사리2'];
         const equippedItems = equipmentManager.getEquippedItems(mercData.uniqueId);
+        const slotTypes = ['WEAPON', 'ARMOR', 'ACCESSORY1', 'ACCESSORY2'];
+        const slotLabels = ['무기', '갑옷', '장신구 1', '장신구 2'];
 
-        equipSlotLabels.forEach((label, idx) => {
-            const slot = document.createElement('div');
-            slot.className = 'merc-equip-slot';
-
-            const slotLabel = document.createElement('span');
-            slotLabel.innerText = label;
-            slot.appendChild(slotLabel);
-
+        slotTypes.forEach((slotType, idx) => {
+            const itemInstanceId = equippedItems[idx];
+            const item = itemInstanceId ? itemInventoryManager.getItem(itemInstanceId) : null;
+            const slot = this.createEquipSlot(slotType, slotLabels[idx], item);
             slotsContainer.appendChild(slot);
         });
 
         this.mercenaryDetailsContent.appendChild(slotsContainer);
+    }
+    
+    createEquipSlot(slotType, label, item) {
+        const slot = document.createElement('div');
+        slot.className = 'merc-equip-slot';
+        slot.dataset.slotType = slotType;
+
+        slot.ondragover = e => e.preventDefault();
+        slot.ondrop = e => this.onDropOnSlot(e);
+
+        const slotLabel = document.createElement('span');
+        slotLabel.innerText = label;
+        
+        const itemIcon = document.createElement('div');
+        itemIcon.className = 'equip-item-icon';
+        if (item) {
+            itemIcon.style.backgroundImage = `url(${item.illustrationPath})`;
+            itemIcon.draggable = true;
+            itemIcon.ondragstart = e => {
+                this.draggedItemId = item.instanceId;
+                this.draggedFromSlotType = slotType;
+                e.dataTransfer.setData('text/plain', item.instanceId);
+            };
+            // 아이템 툴팁 로직 추가 필요
+        }
+        
+        slot.appendChild(slotLabel);
+        slot.appendChild(itemIcon);
+        return slot;
+    }
+
+    refreshInventory() {
+        this.equipmentInventoryContent.innerHTML = '';
+        const inventory = itemInventoryManager.getInventory();
+        if (inventory.length === 0) {
+            this.equipmentInventoryContent.innerHTML = '<p style="text-align: center; color: #888; margin-top: 20px;">장비가 없습니다.</p>';
+            return;
+        }
+        
+        inventory.forEach(item => {
+            const itemCard = document.createElement('div');
+            itemCard.className = 'item-inventory-card';
+            itemCard.style.backgroundImage = `url(${item.illustrationPath})`;
+            itemCard.draggable = true;
+            itemCard.dataset.instanceId = item.instanceId;
+            
+            itemCard.ondragstart = e => {
+                this.draggedItemId = item.instanceId;
+                this.draggedFromSlotType = null;
+                e.dataTransfer.setData('text/plain', item.instanceId);
+            };
+            
+            // 아이템 툴팁 로직 추가 필요
+            this.equipmentInventoryContent.appendChild(itemCard);
+        });
+    }
+
+    onDropOnSlot(event) {
+        event.preventDefault();
+        const targetSlotType = event.currentTarget.dataset.slotType;
+        if (!this.selectedMercenaryData || !this.draggedItemId) return;
+
+        equipmentManager.equipItem(this.selectedMercenaryData.uniqueId, targetSlotType, this.draggedItemId);
+
+        this.refreshMercenaryDetails();
+        this.refreshInventory();
+        this.draggedItemId = null;
+        this.draggedFromSlotType = null;
+    }
+    
+    onDropOnInventory(event) {
+        event.preventDefault();
+        if (!this.selectedMercenaryData || !this.draggedItemId) return;
+        if (this.draggedFromSlotType) {
+            equipmentManager.unequipItem(this.selectedMercenaryData.uniqueId, this.draggedFromSlotType);
+            this.refreshMercenaryDetails();
+            this.refreshInventory();
+        }
+        this.draggedItemId = null;
+        this.draggedFromSlotType = null;
     }
 
     destroy() {
