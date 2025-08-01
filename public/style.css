@@ -1752,17 +1752,71 @@ body {
 }
 
 .merc-equip-slot {
-    width: 250px;
-    height: 50px;
+    width: 280px;
+    height: 60px;
     background-color: rgba(0, 0, 0, 0.4);
     border: 2px solid #666;
     border-radius: 5px;
     display: flex;
     align-items: center;
-    padding: 0 15px;
-    font-size: 16px;
+    padding: 5px;
+    font-size: 14px;
     color: #ccc;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
 .merc-equip-slot:hover {
     border-color: #fff;
 }
+.merc-equip-slot-label {
+    position: absolute;
+    bottom: 2px;
+    left: 5px;
+    background-color: rgba(0,0,0,0.7);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.item-inventory-card {
+    width: 60px;
+    height: 60px;
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #555;
+    border-radius: 4px;
+    float: left;
+    margin: 4px;
+    cursor: grab;
+    position: relative;
+    box-sizing: border-box;
+}
+.item-inventory-card:hover {
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+/* --- 아이템 툴팁 스타일 --- */
+#item-tooltip {
+    position: absolute;
+    width: 250px;
+    z-index: 9999;
+    pointer-events: none;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    border: 2px solid #888;
+    color: #e0e0e0;
+}
+.item-card-large.grade-rare { border-color: #3498db; }
+.item-card-large.grade-epic { border-color: #9b59b6; }
+.item-card-large.grade-legendary { border-color: #f1c40f; }
+
+.item-illustration-large { width: 100%; height: 120px; background-size: cover; background-position: center; }
+.item-info-large { padding: 10px; }
+.item-name-large { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+.item-type-synergy-large { display: flex; justify-content: space-between; color: #aaa; margin-bottom: 10px; }
+.item-section-title { font-weight: bold; color: #f0e68c; margin-top: 10px; border-bottom: 1px solid #444; padding-bottom: 3px; }
+.item-stats-large ul, .item-mbti-large ul { list-style: none; padding: 0; margin: 5px 0 0 0; }
+.item-stats-large li, .item-mbti-large li { font-size: 14px; margin-bottom: 3px; }
+.item-sockets-large { display: flex; gap: 5px; margin-top: 5px; }
+.item-socket-empty { width: 20px; height: 20px; background-color: #111; border: 1px solid #555; border-radius: 50%; }
