@@ -3,7 +3,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { tokenEngine } from './TokenEngine.js';
 import { comboManager } from './ComboManager.js';
 // ✨ 열망 엔진을 import하여 열망 수치를 가져옵니다.
-import { aspirationEngine } from './AspirationEngine.js';
+import { aspirationEngine, ASPIRATION_STATE } from './AspirationEngine.js';
+import { IconManager } from './IconManager.js';
 
 /**
  * 체력바, 데미지 텍스트 등 전투 시각 효과(VFX)를 생성하고 관리하는 엔진
@@ -16,6 +17,7 @@ export class VFXManager {
 
         // 시각 효과들을 담을 레이어를 생성하여 깊이(depth)를 관리합니다.
         this.vfxLayer = this.scene.add.layer().setDepth(100);
+        this.iconManager = new IconManager(scene, this.vfxLayer); // IconManager 인스턴스 생성
 
         // key: unitId, value: { container, tokens: [] }
         this.activeTokenDisplays = new Map();
@@ -71,8 +73,19 @@ export class VFXManager {
         this.updateTokenDisplay(unit, nameTag);
         const tokenDisplay = this.activeTokenDisplays.get(unitId);
 
-        // 4. 생성된 모든 UI 요소를 유닛 스프라이트에 바인딩
-        this.bindingManager.bind(unit.sprite, [nameTag, healthBar.container, barrierBar.container, aspirationBar.container, tokenDisplay.container]);
+        // 4. 아이콘 디스플레이 생성 및 바인딩
+        const iconContainers = this.iconManager.createIconDisplay(unit.sprite);
+
+        // 5. 생성된 모든 UI 요소를 유닛 스프라이트에 바인딩
+        this.bindingManager.bind(unit.sprite, [
+            nameTag,
+            healthBar.container,
+            barrierBar.container,
+            aspirationBar.container,
+            tokenDisplay.container,
+            iconContainers.buffsContainer,
+            iconContainers.debuffsContainer,
+        ]);
     }
 
     /**
@@ -181,9 +194,52 @@ export class VFXManager {
         const data = aspirationEngine.getAspirationData(unitId);
         const ratio = data.aspiration / 100;
         const fullHeight = bars.aspirationBar.bar.getData('fullHeight');
+        const aspirationBarPhaser = bars.aspirationBar.bar;
 
-        // ✨ 2. 게이지 너비를 얇게 고정합니다.
-        bars.aspirationBar.bar.clear().fillStyle(0x8b5cf6, 0.5).fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
+        // Clear previous tween
+        if (aspirationBarPhaser.currentTween) {
+            aspirationBarPhaser.currentTween.stop();
+            aspirationBarPhaser.currentTween = null;
+        }
+
+        aspirationBarPhaser
+            .clear()
+            .fillStyle(0x8b5cf6, 0.5)
+            .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio); // Reset to default
+
+        if (data.state === ASPIRATION_STATE.EXALTED) {
+            // Full aspiration: bright purple glow
+            aspirationBarPhaser.currentTween = this.scene.tweens.add({
+                targets: aspirationBarPhaser,
+                duration: 800,
+                ease: 'Sine.easeInOut',
+                repeat: -1, // Loop indefinitely
+                yoyo: true, // Go back and forth
+                onUpdate: tween => {
+                    const alpha = tween.getValue();
+                    aspirationBarPhaser
+                        .clear()
+                        .fillStyle(0xc084fc, 0.5 + alpha * 0.5)
+                        .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
+                },
+            });
+        } else if (data.state === ASPIRATION_STATE.COLLAPSED) {
+            // Zero aspiration: red glow
+            aspirationBarPhaser.currentTween = this.scene.tweens.add({
+                targets: aspirationBarPhaser,
+                duration: 800,
+                ease: 'Sine.easeInOut',
+                repeat: -1,
+                yoyo: true,
+                onUpdate: tween => {
+                    const alpha = tween.getValue();
+                    aspirationBarPhaser
+                        .clear()
+                        .fillStyle(0xfb7171, 0.5 + alpha * 0.5)
+                        .fillRect(-2, -fullHeight / 2, 4, fullHeight * ratio);
+                },
+            });
+        }
     }
 
     /**
@@ -305,14 +361,14 @@ export class VFXManager {
     showMBTITrait(parentSprite, trait) {
         const style = {
             fontFamily: 'Cinzel', // ✨ 1. Dom UI와 동일한 폰트 적용
-            fontSize: '16px', // ✨ 3. 크기를 절반으로 줄입니다. (원래 32px)
+            fontSize: '12px', // ✨ 3. 크기를 절반으로 줄입니다. (원래 32px) -> 12px로 변경
             color: '#ea580c',
             stroke: '#000000',
             strokeThickness: 5,
         };
 
         const traitText = this.scene.add
-            .text(parentSprite.x, parentSprite.y - 60, trait, style)
+            .text(parentSprite.x, parentSprite.y - 90, trait, style) // ✨ y 위치 조정 (60 -> 90)
             .setOrigin(0.5, 0.5);
         this.vfxLayer.add(traitText);
         this.scene.physics.add.existing(traitText); // ✨ 3. 물리 효과 적용
@@ -400,11 +456,21 @@ export class VFXManager {
         });
         this.activeTokenDisplays.clear();
         this.unitBars.forEach(bars => {
+            if (bars.healthBar.bar.currentTween) {
+                bars.healthBar.bar.currentTween.stop();
+            }
+            if (bars.barrierBar.bar.currentTween) {
+                bars.barrierBar.bar.currentTween.stop();
+            }
+            if (bars.aspirationBar.bar.currentTween) {
+                bars.aspirationBar.bar.currentTween.stop();
+            }
             bars.healthBar.container.destroy();
             bars.barrierBar.container.destroy();
             bars.aspirationBar.container.destroy();
         });
         this.unitBars.clear();
+        this.iconManager.shutdown(); // IconManager도 종료 시 정리
         debugLogEngine.log("VFXManager", "VFX 매니저를 종료합니다.");
     }
 }
