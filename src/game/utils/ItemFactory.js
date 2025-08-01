@@ -9,12 +9,12 @@ import { debugLogEngine } from './DebugLogEngine.js';
 class ItemFactory {
     constructor() {
         this.name = 'ItemFactory';
-        // 등급별 MBTI 효과 개수 설정
-        this.effectsPerGrade = {
+        // 등급별로 부여할 랜덤 옵션의 개수를 정의합니다.
+        this.optionsPerGrade = {
             NORMAL: 1,
             RARE: 2,
             EPIC: 3,
-            LEGENDARY: 4
+            LEGENDARY: 4 // 레전더리는 모든 옵션을 가집니다.
         };
         debugLogEngine.register(this);
     }
@@ -31,17 +31,12 @@ class ItemFactory {
             return null;
         }
 
-        // 1. 랜덤 접두사, 접미사 선택
-        const prefix = diceEngine.getRandomElement(itemAffixes.prefixes);
-        const suffix = diceEngine.getRandomElement(itemAffixes.suffixes);
-
-        // 2. 최종 아이템 객체 생성
         const newItem = {
             instanceId: uniqueIDManager.getNextId(),
             baseId: baseItemId,
-            name: `[${grade}] ${prefix.name} ${baseData.name} ${suffix.name}`,
+            name: `[${grade}] ${baseData.name}`,
             type: baseData.type,
-            grade,
+            grade: grade,
             synergy: baseData.synergy || null,
             illustrationPath: baseData.illustrationPath,
             stats: {},
@@ -50,45 +45,69 @@ class ItemFactory {
             weight: baseData.weight
         };
 
-        // 3. 기본 스탯 적용 (범위 내에서 랜덤 값 부여)
+        // 1. 기본 스탯 적용
         for (const [stat, range] of Object.entries(baseData.baseStats)) {
             newItem.stats[stat] = this._getRandomValue(range.min, range.max);
         }
 
-        // 4. 접두사/접미사 스탯 적용
-        [prefix, suffix].forEach(affix => {
-            const value = this._getRandomValue(affix.value.min, affix.value.max);
-            const statKey = affix.isPercentage ? `${affix.stat}Percentage` : affix.stat;
-            newItem.stats[statKey] = (newItem.stats[statKey] || 0) + value;
+        // 2. 부여할 수 있는 모든 옵션 풀 생성
+        const optionPool = [
+            { type: 'prefix', data: diceEngine.getRandomElement(itemAffixes.prefixes) },
+            { type: 'suffix', data: diceEngine.getRandomElement(itemAffixes.suffixes) },
+            { type: 'mbti', data: this._getRandomMbtiEffect() },
+            { type: 'sockets', data: { count: diceEngine.rollWithAdvantage(1, 3, 1) } }
+        ];
+
+        // 3. 옵션 풀을 무작위로 섞고 등급에 맞는 수만큼 선택
+        const shuffledPool = optionPool.sort(() => 0.5 - Math.random());
+        const optionsToApply = shuffledPool.slice(0, this.optionsPerGrade[grade]);
+
+        let prefixName = '';
+        let suffixName = '';
+
+        optionsToApply.forEach(option => {
+            switch (option.type) {
+                case 'prefix':
+                    prefixName = option.data.name;
+                    this._applyAffix(newItem, option.data);
+                    break;
+                case 'suffix':
+                    suffixName = option.data.name;
+                    this._applyAffix(newItem, option.data);
+                    break;
+                case 'mbti':
+                    newItem.mbtiEffects.push(option.data);
+                    break;
+                case 'sockets':
+                    for (let i = 0; i < option.data.count; i++) {
+                        newItem.sockets.push(null);
+                    }
+                    break;
+            }
         });
 
-        // --- ▼ [신규] 등급 기반 MBTI 효과 부여 로직 ▼ ---
-        const numberOfEffects = this.effectsPerGrade[grade] || 0;
-        if (numberOfEffects > 0) {
-            const allTraits = Object.keys(mbtiGradeEffects);
-            const shuffledTraits = allTraits.sort(() => 0.5 - Math.random());
-            const selectedTraits = shuffledTraits.slice(0, numberOfEffects);
-
-            selectedTraits.forEach(trait => {
-                const effectPool = mbtiGradeEffects[trait];
-                const selectedEffect = diceEngine.getRandomElement(effectPool);
-
-                const finalEffect = { ...selectedEffect };
-                finalEffect.value = this._getRandomValue(selectedEffect.value.min, selectedEffect.value.max);
-
-                newItem.mbtiEffects.push(finalEffect);
-            });
-        }
-
-        // --- ▼ [신규] 무작위 소켓 생성 로직 ▼ ---
-        const socketCount = Math.round(diceEngine.rollWithAdvantage(1, 3, 1));
-        for (let i = 0; i < socketCount; i++) {
-            newItem.sockets.push(null);
-        }
+        newItem.name = `[${grade}] ${prefixName} ${baseData.name} ${suffixName}`.replace(/\s+/g, ' ').trim();
 
         debugLogEngine.log(this.name, `새 아이템 생성: [${newItem.name}] (ID: ${newItem.instanceId})`);
         console.log(newItem);
         return newItem;
+    }
+
+    _applyAffix(item, affixData) {
+        const value = this._getRandomValue(affixData.value.min, affixData.value.max);
+        const statKey = affixData.isPercentage ? `${affixData.stat}Percentage` : affixData.stat;
+        item.stats[statKey] = (item.stats[statKey] || 0) + value;
+    }
+
+    _getRandomMbtiEffect() {
+        const allTraits = Object.keys(mbtiGradeEffects);
+        const randomTrait = diceEngine.getRandomElement(allTraits);
+        const effectPool = mbtiGradeEffects[randomTrait];
+        const selectedEffect = diceEngine.getRandomElement(effectPool);
+
+        const finalEffect = { ...selectedEffect };
+        finalEffect.value = this._getRandomValue(selectedEffect.value.min, selectedEffect.value.max);
+        return finalEffect;
     }
 
     /**
