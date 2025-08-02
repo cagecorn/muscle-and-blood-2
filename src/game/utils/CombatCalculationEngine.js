@@ -73,7 +73,8 @@ class CombatCalculationEngine {
         let comboCount = 0;
         if (skill.type === 'ACTIVE') {
             comboCount = comboManager.recordAttack(attacker.uniqueId, defender.uniqueId);
-            comboMultiplier = comboManager.getDamageMultiplier(comboCount);
+            // ✨ ComboManager의 변경된 함수에 맞게 인자를 전달하여 콤보 보너스를 포함한 최종 배율을 가져옵니다.
+            comboMultiplier = comboManager.getDamageMultiplier(attacker.uniqueId, comboCount, skill.tags || []);
         }
 
         // ✨ 1. 공격자의 배리어에 의한 데미지 증폭률을 먼저 계산합니다.

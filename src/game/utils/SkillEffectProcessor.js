@@ -11,6 +11,7 @@ import { yinYangEngine } from './YinYangEngine.js';
 import { sharedResourceEngine, SHARED_RESOURCE_TYPES } from './SharedResourceEngine.js';
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
+import { comboManager } from './ComboManager.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -138,6 +139,9 @@ class SkillEffectProcessor {
 
         this.vfxManager.showComboCount(comboCount);
         this.vfxManager.createBloodSplatter(target.sprite.x, target.sprite.y);
+
+        // ✨ [신규] 공격이 끝났으므로, 다음 공격의 콤보 연계를 위해 현재 스킬의 태그를 ComboManager에 기록합니다.
+        comboManager.updateLastSkillTags(unit.uniqueId, skill.tags || []);
 
         if (skill.generatesToken && Math.random() < skill.generatesToken.chance) {
             tokenEngine.addTokens(unit.uniqueId, skill.generatesToken.amount, `${skill.name} 효과`);
