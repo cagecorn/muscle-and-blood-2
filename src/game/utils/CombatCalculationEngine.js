@@ -24,6 +24,8 @@ import { FIXED_DAMAGE_TYPES } from './FixedDamageManager.js';
 // ✨ AIMemoryEngine 추가
 import { aiMemoryEngine } from './AIMemoryEngine.js';
 import { aspirationEngine } from './AspirationEngine.js';
+// ▼▼▼ [추가] 새로 만든 데미지 타입 매니저를 import 합니다. ▼▼▼
+import { damageTypeManager } from './DamageTypeManager.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -37,6 +39,13 @@ class CombatCalculationEngine {
      * @returns {number} 최종 적용될 데미지
      */
     calculateDamage(attacker = {}, defender = {}, skill = {}, instanceId, grade = 'NORMAL') {
+        // ▼▼▼ [추가] 데미지 계산 시작점에 이 코드를 추가합니다. ▼▼▼
+        const damageTypes = damageTypeManager.identifyDamageTypes(skill);
+        // 이제 'damageTypes' 배열에는 이 공격의 모든 속성 정보가 담겨 있습니다.
+        // 추후 이 정보를 사용해 특정 속성 저항 등을 계산할 수 있습니다.
+        // (예: if (damageTypes.includes(DAMAGE_TYPES.FIRE) && defender.fireResistance > 0) { ... })
+        // ▲▲▲ [추가 끝] ▲▲▲
+
         // ✨ --- [신규] 피해 무효화 효과 최우선 처리 --- ✨
         if (stackManager.hasStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY)) {
             stackManager.consumeStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY);
