@@ -146,10 +146,24 @@ export class UnitDetailDOM {
             </div>
         `;
         // --- ▲ [핵심 변경] 스탯 표시 영역 구조 변경 ---
+        // ✨ --- [신규] 클래스 패시브 표시 로직 추가 ---
+        let classPassiveHTML = '';
+        if (unitData.classPassive) {
+            classPassiveHTML = `
+                <div class="class-passive-section">
+                    <div class="section-title">클래스 패시브</div>
+                    <div class="passive-skill-item" data-tooltip="${unitData.classPassive.description}">
+                        <img src="${unitData.classPassive.iconPath}" class="passive-skill-icon"/>
+                        <span class="passive-skill-name">${unitData.classPassive.name}</span>
+                    </div>
+                </div>
+            `;
+        }
 
         leftSection.innerHTML = `
             ${gradeDisplayHTML}
             ${statsContainerHTML}
+            ${classPassiveHTML}
         `;
 
         const rightSection = document.createElement('div');

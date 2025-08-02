@@ -66,5 +66,17 @@ export const classSpecializations = {
                 modifiers: { stat: 'physicalEvadeChance', type: 'percentage', value: 0.03 }
             }
         }
+    ],
+    esper: [
+        {
+            tag: SKILL_TAGS.MIND,
+            description: "'정신' 태그 스킬 사용 시, 1턴간 상태이상 적용 확률 5% 증가 (중첩 가능)",
+            effect: {
+                id: 'esperMindBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.05 }
+            }
+        }
     ]
 };

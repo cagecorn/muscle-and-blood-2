@@ -36,5 +36,12 @@ export const classProficiencies = {
         SKILL_TAGS.CHARGE,
         SKILL_TAGS.THROWING,
     ],
+    esper: [
+        SKILL_TAGS.MAGIC,
+        SKILL_TAGS.RANGED,
+        SKILL_TAGS.DEBUFF,
+        SKILL_TAGS.PROHIBITION,
+        SKILL_TAGS.MIND,
+    ],
     // '좀비'와 같은 몬스터는 숙련도 보너스를 받지 않으므로 정의하지 않습니다.
 };

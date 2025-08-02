@@ -447,6 +447,34 @@ body {
     font-weight: bold;
 }
 
+/* --- 클래스 패시브 UI 스타일 --- */
+.class-passive-section {
+    margin-top: 15px;
+}
+
+.passive-skill-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(0,0,0,0.2);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: help;
+}
+
+.passive-skill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+
+.passive-skill-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+}
+
 .equip-slot {
     width: 80px;
     height: 100px;
