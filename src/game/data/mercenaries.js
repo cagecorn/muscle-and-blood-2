@@ -112,5 +112,33 @@ export const mercenaryData = {
             movement: 5,
             weight: 11
         }
+    },
+    esper: {
+        id: 'esper',
+        name: '에스퍼',
+        hireImage: 'assets/images/unit/esper-hire.png',
+        uiImage: 'assets/images/unit/esper-ui.png',
+        battleSprite: 'esper',
+        sprites: {
+            idle: 'esper',
+            attack: 'esper-attack',
+            hitted: 'esper-hitted',
+            cast: 'esper-cast',
+            'status-effects': 'esper-status-effects',
+        },
+        description: '"당신의 정신은 제 손바닥 위에서 춤추게 될 겁니다."',
+        baseStats: {
+            hp: 85, valor: 8, strength: 5, endurance: 6,
+            agility: 11, intelligence: 18, wisdom: 15, luck: 12,
+            attackRange: 3,
+            movement: 3,
+            weight: 15
+        },
+        classPassive: {
+            id: 'mindExplosion',
+            name: '정신 폭발',
+            description: '자신의 주위 3타일 내에 [마법] 숙련도를 가진 아군 유닛의 수만큼 자신의 지능이 3%씩 증가합니다.',
+            iconPath: 'assets/images/skills/mind-explosion.png'
+        }
     }
 };

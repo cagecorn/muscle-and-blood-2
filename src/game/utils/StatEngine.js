@@ -1,4 +1,7 @@
 import { itemEngine } from './ItemEngine.js';
+// ✨ classProficiencies를 import하여 숙련도 정보를 조회할 수 있도록 합니다.
+import { classProficiencies } from '../data/classProficiencies.js';
+import { SKILL_TAGS } from './SkillTagManager.js';
 
 /**
  * 용맹(Valor) 시스템의 계산을 전담하는 엔진입니다.
@@ -77,6 +80,42 @@ class StatEngine {
     constructor() {
         this.valorEngine = new ValorEngine();
         this.weightEngine = new WeightEngine();
+    }
+
+    /**
+     * 전투 시작 후 위치가 확정된 유닛들에게 동적인 패시브 효과를 적용합니다.
+     * @param {object} unit - 효과를 적용받을 유닛
+     * @param {Array<object>} allAllies - 모든 아군 유닛 목록
+     */
+    applyDynamicPassives(unit, allAllies) {
+        if (!unit.classPassive) return;
+
+        switch (unit.classPassive.id) {
+            case 'mindExplosion': {
+                let nearbyMagicUsers = 0;
+                allAllies.forEach(ally => {
+                    if (ally.uniqueId === unit.uniqueId) return;
+
+                    const distance = Math.abs(unit.gridX - ally.gridX) + Math.abs(unit.gridY - ally.gridY);
+                    if (distance <= 3) {
+                        const allyProficiencies = classProficiencies[ally.id] || [];
+                        if (allyProficiencies.includes(SKILL_TAGS.MAGIC)) {
+                            nearbyMagicUsers++;
+                        }
+                    }
+                });
+
+                if (nearbyMagicUsers > 0) {
+                    const intelligenceBonus = unit.baseStats.intelligence * (0.03 * nearbyMagicUsers);
+                    unit.finalStats.intelligence += intelligenceBonus;
+                    // 지능이 마법 공격력에 영향을 주므로, 관련 스탯을 다시 계산합니다.
+                    unit.finalStats.magicAttack = (unit.finalStats.intelligence * 1.5) + (unit.finalStats.magicAttack || 0);
+                    unit.finalStats.magicAttack *= (1 + (unit.finalStats.magicAttackPercentage || 0) / 100);
+                }
+                break;
+            }
+            // ... 다른 동적 패시브 case 추가 ...
+        }
     }
 
     /**

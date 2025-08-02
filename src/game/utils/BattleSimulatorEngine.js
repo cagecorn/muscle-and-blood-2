@@ -34,6 +34,7 @@ import { comboManager } from './ComboManager.js';
 // ✨ YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
 import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
+import { statEngine } from './StatEngine.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -119,10 +120,17 @@ export class BattleSimulatorEngine {
 
         this._setupUnits(allUnits);
 
+        // ✨ [신규] 유닛 배치 및 기본 스탯 계산 후, 동적 패시브 적용
         allUnits.forEach(unit => {
-            if (unit.name === '거너') {
-                aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
-            } else if (unit.name === '나노맨서') {
+            if (unit.team === 'ally') {
+                statEngine.applyDynamicPassives(unit, allies);
+            } else {
+                statEngine.applyDynamicPassives(unit, enemies);
+            }
+        });
+
+        allUnits.forEach(unit => {
+            if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
                 aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
             } else if (unit.name === '전사' || unit.name === '좀비') {
                 aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
