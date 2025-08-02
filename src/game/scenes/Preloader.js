@@ -141,6 +141,8 @@ export class Preloader extends Scene
         this.load.image('summon-scene-background', 'images/territory/summon-scene.png');
         // --- ✨ [추가] 스킬 슬롯 이미지를 로드합니다. ---
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
+        // ✨ [신규] 나노맨서 패시브 아이콘 추가
+        this.load.image('elemental-manifest', 'images/skills/elemental-manifest.png');
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
         this.load.image('stigma', 'images/skills/stigma.png');
         this.load.image('nanobeam', 'images/skills/nanobeam.png');

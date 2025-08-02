@@ -88,6 +88,12 @@ export const mercenaryData = {
             attackRange: 2,
             movement: 2,
             weight: 14
+        },
+        classPassive: {
+            id: 'elementalManifest',
+            name: '원소 구현',
+            description: '스킬을 사용할 때마다 랜덤한 속성의 자원 하나를 생산합니다.',
+            iconPath: 'assets/images/skills/elemental-manifest.png'
         }
     },
     flyingmen: {
