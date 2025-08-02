@@ -72,7 +72,7 @@ export class IconManager {
         const activeEffects = statusEffectManager.activeEffects.get(unitId) || [];
         const existingBuffIconIds = new Set(display.buffIcons.keys());
         const existingDebuffIconIds = new Set(display.debuffIcons.keys());
-        const iconSpacing = 22; // 아이콘 간격
+        const iconSpacing = 12; // 아이콘 간격 (기존 22에서 축소)
 
         const buffs = [];
         const debuffs = [];
@@ -122,16 +122,16 @@ export class IconManager {
                 const iconContainer = this.scene.add.container(0, 0);
                 const icon = this.scene.add
                     .image(0, 0, iconKey)
-                    .setScale(0.5)
+                    .setScale(0.04) // 크기 대폭 축소
                     .setAlpha(0.7);
                 const turnText = this.scene.add
-                    .text(0, 8, '', {
-                        fontSize: '12px',
+                    .text(5, 0, '', {
+                        fontSize: '10px',
                         color: '#fff',
                         stroke: '#000',
                         strokeThickness: 2,
                     })
-                    .setOrigin(0.5);
+                    .setOrigin(0, 0.5);
                 iconContainer.add([icon, turnText]);
                 display.buffsContainer.add(iconContainer);
                 iconData = { icon: iconContainer, text: turnText };
@@ -167,16 +167,16 @@ export class IconManager {
                 const iconContainer = this.scene.add.container(0, 0);
                 const icon = this.scene.add
                     .image(0, 0, iconKey)
-                    .setScale(0.5)
+                    .setScale(0.04) // 크기 대폭 축소
                     .setAlpha(0.7);
                 const turnText = this.scene.add
-                    .text(0, 8, '', {
-                        fontSize: '12px',
+                    .text(5, 0, '', {
+                        fontSize: '10px',
                         color: '#fff',
                         stroke: '#000',
                         strokeThickness: 2,
                     })
-                    .setOrigin(0.5);
+                    .setOrigin(0, 0.5);
                 iconContainer.add([icon, turnText]);
                 display.debuffsContainer.add(iconContainer);
                 iconData = { icon: iconContainer, text: turnText };

@@ -48,10 +48,10 @@ const path1 = pathfinderEngine.findPath(flyingman, { col: 1, row: 1 }, { col: 1,
 assert.strictEqual(path1, null, '테스트 1 실패: 플라잉맨이 점유된 칸으로의 경로를 생성했습니다.');
 console.log('✅ 테스트 1 통과: 플라잉맨은 점유된 칸에 도착할 수 없습니다.');
 
-// 테스트 2: 플라잉맨이 장애물이 있는 (1,2) 칸을 '통과'하여 (1,3)으로 갈 수 있는지 확인
+// 테스트 2: 플라잉맨이 장애물이 있는 (1,2) 칸을 '통과'하여 (1,3)으로 갈 수 없는지 확인
 const path2 = pathfinderEngine.findPath(flyingman, { col: 1, row: 1 }, { col: 1, row: 3 });
-assert(path2 && path2.length > 0, '테스트 2 실패: 플라잉맨이 점유된 칸을 통과하는 경로를 찾지 못했습니다.');
-console.log('✅ 테스트 2 통과: 플라잉맨은 점유된 칸을 통과할 수 있습니다.');
+assert.strictEqual(path2, null, '테스트 2 실패: 플라잉맨이 점유된 칸을 통과하는 경로를 생성했습니다.');
+console.log('✅ 테스트 2 통과: 플라잉맨은 점유된 칸을 통과할 수 없습니다.');
 
 // 테스트 3: 일반 유닛(전사)이 장애물이 있는 (1,2) 칸을 '통과'할 수 없는지 확인
 const path3 = pathfinderEngine.findPath(warrior, { col: 1, row: 1 }, { col: 1, row: 3 });
