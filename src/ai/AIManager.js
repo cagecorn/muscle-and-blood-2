@@ -1,6 +1,11 @@
 import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
 import { tokenEngine } from '../game/utils/TokenEngine.js';
 import { skillEngine } from '../game/utils/SkillEngine.js';
+import { createMeleeAI } from './behaviors/MeleeAI.js';
+import { createRangedAI } from './behaviors/RangedAI.js';
+import { createHealerAI } from './behaviors/createHealerAI.js';
+import { createFlyingmanAI } from './behaviors/createFlyingmanAI.js';
+import { createINTJ_AI } from './behaviors/createINTJ_AI.js';
 
 /**
  * 게임 내 모든 AI 유닛을 관리하고, 각 유닛의 행동 트리를 실행합니다.
@@ -9,6 +14,8 @@ class AIManager {
     constructor() {
         // key: unit.uniqueId, value: { instance: unit, behaviorTree: tree }
         this.unitData = new Map();
+        // 각 노드에 주입할 엔진 패키지를 보관합니다.
+        this.aiEngines = {};
         debugLogEngine.log('AIManager', 'AI 매니저가 초기화되었습니다.');
     }
 
@@ -21,21 +28,51 @@ class AIManager {
     }
 
     /**
-     * 새로운 AI 유닛과 해당 유닛이 사용할 행동 트리를 등록합니다.
-     * @param {object} unitInstance - AI에 의해 제어될 유닛
-     * @param {BehaviorTree} behaviorTree - 이 유닛이 사용할 BehaviorTree 인스턴스
+     * 유닛의 MBTI 아키타입이나 클래스에 맞는 행동 트리를 생성합니다.
+     * @param {object} unit
+     * @returns {BehaviorTree}
+     * @private
      */
-    registerUnit(unitInstance, behaviorTree) {
+    _createAIFromArchetype(unit) {
+        const mbti = unit.mbti;
+        if (!mbti) return createMeleeAI(this.aiEngines);
+
+        const mbtiString = (mbti.E > mbti.I ? 'E' : 'I') +
+                           (mbti.S > mbti.N ? 'S' : 'N') +
+                           (mbti.T > mbti.F ? 'T' : 'F') +
+                           (mbti.J > mbti.P ? 'J' : 'P');
+
+        switch (mbtiString) {
+            case 'INTJ':
+                return createINTJ_AI(this.aiEngines);
+            default:
+                if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
+                    return createRangedAI(this.aiEngines);
+                } else if (unit.name === '메딕') {
+                    return createHealerAI(this.aiEngines);
+                } else if (unit.name === '플라잉맨') {
+                    return createFlyingmanAI(this.aiEngines);
+                }
+                return createMeleeAI(this.aiEngines);
+        }
+    }
+
+    /**
+     * 새로운 AI 유닛을 등록하고 MBTI 아키타입에 맞는 행동 트리를 생성합니다.
+     * @param {object} unitInstance - AI에 의해 제어될 유닛
+     */
+    registerUnit(unitInstance) {
         if (!unitInstance || !unitInstance.uniqueId || this.unitData.has(unitInstance.uniqueId)) {
             debugLogEngine.warn('AIManager', '이미 등록되었거나 유효하지 않은 유닛입니다.');
             return;
         }
 
+        const behaviorTree = this._createAIFromArchetype(unitInstance);
         this.unitData.set(unitInstance.uniqueId, {
             instance: unitInstance,
             behaviorTree: behaviorTree,
         });
-        debugLogEngine.log('AIManager', `유닛 ID ${unitInstance.uniqueId} (${unitInstance.instanceName}) 등록 완료.`);
+        debugLogEngine.log('AIManager', `유닛 ID ${unitInstance.uniqueId} (${unitInstance.instanceName})에게 [${behaviorTree.root.constructor.name}] AI 등록 완료.`);
     }
 
     /**
