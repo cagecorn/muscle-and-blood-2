@@ -8,7 +8,8 @@ import { battleTagManager } from './BattleTagManager.js';
 import { turnOrderManager } from './TurnOrderManager.js';
 import { classSpecializations } from '../data/classSpecializations.js';
 import { yinYangEngine } from './YinYangEngine.js';
-import { sharedResourceEngine } from './SharedResourceEngine.js';
+import { sharedResourceEngine, SHARED_RESOURCE_TYPES } from './SharedResourceEngine.js';
+import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 
 /**
@@ -54,6 +55,9 @@ class SkillEffectProcessor {
 
         // 3. 공통 처리: 상태 효과 적용, 자원 생성
         this._handleCommonPostEffects(unit, target, skill, blackboard);
+
+        // ✨ [신규] 4. 클래스 패시브 발동 처리
+        this._handleClassPassiveTrigger(unit, skill);
     }
 
     _handleCommonPreEffects(unit, target, skill) {
@@ -81,6 +85,33 @@ class SkillEffectProcessor {
         // 상태 효과 적용
         if (skill.effect) {
             this._applyStatusEffects(unit, target, skill, blackboard);
+        }
+    }
+
+    /**
+     * 스킬 사용 후 발동하는 클래스 패시브를 처리합니다.
+     * @param {object} unit - 스킬을 사용한 유닛
+     * @param {object} skill - 사용된 스킬
+     * @private
+     */
+    _handleClassPassiveTrigger(unit, skill) {
+        if (!unit.classPassive) return;
+
+        switch (unit.classPassive.id) {
+            case 'elementalManifest': {
+                // 패시브, 전략 스킬은 자원 생성을 발동시키지 않습니다.
+                if (skill.type === 'PASSIVE' || skill.type === 'STRATEGY') break;
+
+                const resourceTypes = Object.keys(SHARED_RESOURCE_TYPES);
+                const randomResourceType = diceEngine.getRandomElement(resourceTypes);
+                sharedResourceEngine.addResource(unit.team, randomResourceType, 1);
+                debugLogEngine.log(
+                    this.constructor.name,
+                    `[${unit.instanceName}]의 [원소 구현] 패시브 발동! [${SHARED_RESOURCE_TYPES[randomResourceType]}] 자원 1개 생산.`
+                );
+                break;
+            }
+            // ... 다른 클래스 패시브 case 추가 ...
         }
     }
 
