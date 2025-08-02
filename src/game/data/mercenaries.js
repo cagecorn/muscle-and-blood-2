@@ -146,5 +146,34 @@ export const mercenaryData = {
             description: '자신의 주위 3타일 내에 [마법] 숙련도를 가진 아군 유닛의 수만큼 자신의 지능이 3%씩 증가합니다.',
             iconPath: 'assets/images/skills/mind-explosion.png'
         }
+    },
+    // ✨ [신규] 커맨더 클래스 데이터 추가
+    commander: {
+        id: 'commander',
+        name: '커맨더',
+        hireImage: 'assets/images/unit/commander-hire.png',
+        uiImage: 'assets/images/unit/commander-ui.png',
+        battleSprite: 'commander',
+        sprites: {
+            idle: 'commander',
+            attack: 'commander-attack',
+            hitted: 'commander-hitted',
+            cast: 'commander-cast',
+            'status-effects': 'commander-status-effects',
+        },
+        description: '"나의 방패는 동료를 위하고, 나의 검은 적을 향한다."',
+        baseStats: {
+            hp: 110, valor: 12, strength: 13, endurance: 11,
+            agility: 9, intelligence: 7, wisdom: 8, luck: 7,
+            attackRange: 2,
+            movement: 3,
+            weight: 18
+        },
+        classPassive: {
+            id: 'commandersShout',
+            name: '통솔자의 외침',
+            description: '[전략] 태그가 붙은 스킬의 재사용 대기시간이 1/10로 감소합니다.',
+            iconPath: 'assets/images/skills/commanders-shout.png'
+        }
     }
 };

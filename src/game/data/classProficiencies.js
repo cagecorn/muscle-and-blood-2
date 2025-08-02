@@ -43,5 +43,12 @@ export const classProficiencies = {
         SKILL_TAGS.PROHIBITION,
         SKILL_TAGS.MIND,
     ],
+    // ✨ [신규] 커맨더 숙련도 태그 추가
+    commander: [
+        SKILL_TAGS.MELEE,
+        SKILL_TAGS.PHYSICAL,
+        SKILL_TAGS.WILL,
+        SKILL_TAGS.STRATEGY,
+    ],
     // '좀비'와 같은 몬스터는 숙련도 보너스를 받지 않으므로 정의하지 않습니다.
 };

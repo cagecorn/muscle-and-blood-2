@@ -3,6 +3,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { tokenEngine } from './TokenEngine.js';
 import { cooldownManager } from './CooldownManager.js';
 import { sharedResourceEngine } from './SharedResourceEngine.js';
+import { SKILL_TAGS } from './SkillTagManager.js';
+import { mercenaryData } from '../data/mercenaries.js';
 
 // 스킬 종류와 해당 색상, 이름을 상수로 정의합니다.
 export const SKILL_TYPES = {
@@ -100,8 +102,17 @@ class SkillEngine {
         const currentUses = this.skillUsesThisTurn.get(unit.uniqueId) || 0;
         this.skillUsesThisTurn.set(unit.uniqueId, currentUses + 1);
 
-        if (skill.cooldown && skill.cooldown > 0) {
-            cooldownManager.setCooldown(unit.uniqueId, skill.id, skill.cooldown);
+        let finalCooldown = skill.cooldown;
+
+        // ✨ [신규] 커맨더 클래스 패시브 로직
+        const unitBaseData = mercenaryData[unit.id];
+        if (unitBaseData?.classPassive?.id === 'commandersShout' && skill.tags?.includes(SKILL_TAGS.STRATEGY)) {
+            finalCooldown = Math.ceil(skill.cooldown / 10);
+            debugLogEngine.log('SkillEngine', `[${unit.instanceName}]의 [통솔자의 외침] 패시브 발동! [${skill.name}] 쿨타임 ${skill.cooldown} -> ${finalCooldown}으로 감소.`);
+        }
+
+        if (finalCooldown && finalCooldown > 0) {
+            cooldownManager.setCooldown(unit.uniqueId, skill.id, finalCooldown);
         }
 
         debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost} 소모).`);

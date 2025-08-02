@@ -115,6 +115,18 @@ export class Preloader extends Scene
         this.load.image('esper-ui', 'images/unit/esper-ui.png');
         // --- ▲ [신규] 에스퍼 관련 이미지 로드 추가 ▲ ---
 
+        // --- ▼ [신규] 커맨더 관련 이미지 로드 추가 ▼ ---
+        this.load.image('commander', 'images/unit/commander.png');
+        // 업로드되지 않은 스프라이트는 기본 이미지를 재사용합니다.
+        this.load.image('commander-attack', 'images/unit/commander.png');
+        this.load.image('commander-hitted', 'images/unit/commander.png');
+        this.load.image('commander-cast', 'images/unit/commander.png');
+        this.load.image('commander-status-effects', 'images/unit/commander.png');
+        this.load.image('commander-hire', 'images/unit/commander-hire.png');
+        this.load.image('commander-ui', 'images/unit/commander-ui.png');
+        this.load.image('commanders-shout', 'images/skills/commanders-shout.png');
+        // --- ▲ [신규] 커맨더 관련 이미지 로드 추가 ▲ ---
+
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
 
@@ -178,7 +190,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'medic', 'nanomancer', 'flyingmen', 'esper', 'zombie', 'ancestor-peor',
+            'warrior', 'gunner', 'medic', 'nanomancer', 'flyingmen', 'esper', 'commander', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

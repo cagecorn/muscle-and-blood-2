@@ -51,6 +51,8 @@ class AIManager {
             default:
                 if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
                     return createRangedAI(this.aiEngines);
+                } else if (unit.name === '전사' || unit.name === '좀비' || unit.name === '커맨더') {
+                    return createMeleeAI(this.aiEngines);
                 } else if (unit.name === '메딕') {
                     return createHealerAI(this.aiEngines);
                 } else if (unit.name === '플라잉맨') {
@@ -64,13 +66,13 @@ class AIManager {
      * 새로운 AI 유닛을 등록하고 MBTI 아키타입에 맞는 행동 트리를 생성합니다.
      * @param {object} unitInstance - AI에 의해 제어될 유닛
      */
-    registerUnit(unitInstance) {
+    registerUnit(unitInstance, behaviorTreeOverride = null) {
         if (!unitInstance || !unitInstance.uniqueId || this.unitData.has(unitInstance.uniqueId)) {
             debugLogEngine.warn('AIManager', '이미 등록되었거나 유효하지 않은 유닛입니다.');
             return;
         }
 
-        const behaviorTree = this._createAIFromArchetype(unitInstance);
+        const behaviorTree = behaviorTreeOverride || this._createAIFromArchetype(unitInstance);
         this.unitData.set(unitInstance.uniqueId, {
             instance: unitInstance,
             behaviorTree: behaviorTree,
