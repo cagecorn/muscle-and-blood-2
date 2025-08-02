@@ -34,16 +34,22 @@ class StatusEffectManager {
         for (const [unitId, effects] of this.activeEffects.entries()) {
             const remainingEffects = [];
             for (const effect of effects) {
-                effect.duration--;
-                if (effect.duration > 0) {
-                    remainingEffects.push(effect);
-                } else {
-                    const effectDefinition = statusEffects[effect.id];
-                    if (effectDefinition && effectDefinition.onRemove) {
-                        const unit = this.findUnitById(unitId);
-                        if (unit) effectDefinition.onRemove(unit);
+                // duration이 숫자인 경우에만 감소시킵니다.
+                if (typeof effect.duration === 'number') {
+                    effect.duration--;
+                    if (effect.duration > 0) {
+                        remainingEffects.push(effect);
+                    } else {
+                        const effectDefinition = statusEffects[effect.id];
+                        if (effectDefinition && effectDefinition.onRemove) {
+                            const unit = this.findUnitById(unitId);
+                            if (unit) effectDefinition.onRemove(unit);
+                        }
+                        debugStatusEffectManager.logEffectExpired(unitId, effect);
                     }
-                    debugStatusEffectManager.logEffectExpired(unitId, effect);
+                } else {
+                    // duration이 없으면(스택 기반 효과 등) 그대로 유지합니다.
+                    remainingEffects.push(effect);
                 }
             }
             this.activeEffects.set(unitId, remainingEffects);
