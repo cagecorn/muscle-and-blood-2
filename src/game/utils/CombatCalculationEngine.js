@@ -48,11 +48,16 @@ class CombatCalculationEngine {
         const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);
         const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
 
+        // 1. 공격자의 공격력 버프/디버프 보정치를 가져옵니다.
+        const attackStatKey = isMagic ? 'magicAttack' : 'physicalAttack';
+        const attackBuffPercent = statusEffectManager.getModifierValue(attacker, attackStatKey);
+
         const baseAttack = isMagic
             ? (attacker.finalStats?.magicAttack || 0)
-            : isRanged
-                ? (attacker.finalStats?.rangedAttack || 0)
-                : (attacker.finalStats?.physicalAttack || 0);
+            : (attacker.finalStats?.physicalAttack || 0); // isRanged는 physicalAttack을 공유
+
+        // 2. 기본 공격력에 버프를 적용합니다.
+        const buffedAttack = baseAttack * (1 + attackBuffPercent);
 
         // 콤보 배율 계산을 위한 정보
         let comboMultiplier = 1.0;
@@ -67,7 +72,8 @@ class CombatCalculationEngine {
         if (amp > 1.0) {
             debugValorManager.logDamageAmplification(attacker, amp);
         }
-        const amplifiedAttack = baseAttack * amp;
+        // 3. 버프가 적용된 공격력을 기반으로 배리어 증폭을 계산합니다.
+        const amplifiedAttack = buffedAttack * amp;
 
         let finalSkill = skill;
         if (instanceId) {
@@ -76,8 +82,13 @@ class CombatCalculationEngine {
 
         // ✨ [신규] 방어력 관통 효과 적용
         const armorPen = finalSkill.armorPenetration || 0;
-        const defenseReductionPercent = statusEffectManager.getModifierValue(defender, 'physicalDefense');
-        const initialDefense = defender.finalStats?.physicalDefense || 0;
+        const defenseReductionPercent = statusEffectManager.getModifierValue(defender, isMagic ? 'magicDefense' : 'physicalDefense');
+
+        // 마법 공격일 경우 마법 방어력, 아닐 경우 물리 방어력을 사용합니다.
+        const initialDefense = isMagic
+            ? (defender.finalStats?.magicDefense || 0)
+            : (defender.finalStats?.physicalDefense || 0);
+
         const finalDefense = initialDefense * (1 + defenseReductionPercent) * (1 - armorPen);
 
         const damageMultiplier = finalSkill.damageMultiplier || 1.0;
@@ -117,37 +128,42 @@ class CombatCalculationEngine {
                 const resultTier = gradeManager.calculateCombatGrade(attacker, defender, attackType);
 
                 const roll = Math.random();
-                let chance = 0.05;
+                // 4. 공격자의 치명타 확률 버프를 가져와 기본 확률에 더합니다.
+                const critChanceBuff = statusEffectManager.getModifierValue(attacker, 'criticalChance');
 
                 switch (resultTier) {
-                    case 2:
-                        chance += (attacker.finalStats.criticalChance || 0) / 100;
+                    case 2: {
+                        const chance = 0.05 + ((attacker.finalStats.criticalChance || 0) / 100) + critChanceBuff;
                         if (roll < chance) {
                             hitType = '치명타';
                             combatMultiplier = 2.0;
                         }
                         break;
-                    case 1:
-                        chance += (attacker.finalStats.weaknessChance || 0) / 100;
+                    }
+                    case 1: {
+                        const chance = 0.05 + ((attacker.finalStats.weaknessChance || 0) / 100);
                         if (roll < chance) {
                             hitType = '약점';
                             combatMultiplier = 1.5;
                         }
                         break;
-                    case -1:
-                        chance += (defender.finalStats.mitigationChance || 0) / 100;
+                    }
+                    case -1: {
+                        const chance = 0.05 + ((defender.finalStats.mitigationChance || 0) / 100);
                         if (roll < chance) {
                             hitType = '완화';
                             combatMultiplier = 0.75;
                         }
                         break;
-                    case -2:
-                        chance += (defender.finalStats.blockChance || 0) / 100;
+                    }
+                    case -2: {
+                        const chance = 0.05 + ((defender.finalStats.blockChance || 0) / 100);
                         if (roll < chance) {
                             hitType = '막기';
                             combatMultiplier = 0.5;
                         }
                         break;
+                    }
                 }
             }
         }

@@ -1,3 +1,4 @@
+import { statusEffectManager } from "../utils/StatusEffectManager.js";
 import { stackManager } from "../utils/StackManager.js";
 import { FIXED_DAMAGE_TYPES } from "../utils/FixedDamageManager.js";
 
@@ -16,9 +17,19 @@ export const statusEffects = {
             unit.isStunned = true;
         },
         onRemove: (unit) => {
-            console.log(`${unit.instanceName}의 기절이 풀렸습니다.`);
-            unit.isStunned = false;
-            unit.justRecoveredFromStun = true;
+            console.log(`${unit.instanceName}의 기절 효과 중 하나가 해제됩니다.`);
+            // 현재 유닛에게 적용된 다른 'stun' 효과가 있는지 확인합니다.
+            const remainingStuns = (statusEffectManager.activeEffects.get(unit.uniqueId) || [])
+                .filter(effect => effect.id === 'stun').length;
+
+            // 남아있는 기절 효과가 없다면, 그때 상태를 해제합니다.
+            if (remainingStuns === 0) {
+                console.log(`${unit.instanceName}의 모든 기절이 풀렸습니다.`);
+                unit.isStunned = false;
+                unit.justRecoveredFromStun = true;
+            } else {
+                console.log(`${unit.instanceName}에게 아직 ${remainingStuns}개의 기절 효과가 남아있습니다.`);
+            }
         },
     },
     // 전투의 함성: 일시적으로 근접 공격 등급을 상승시킵니다.
