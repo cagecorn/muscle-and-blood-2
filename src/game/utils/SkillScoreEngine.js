@@ -40,6 +40,8 @@ class SkillScoreEngine {
         let situationScore = 0;
         // ✨ 2. 음양 보너스 점수를 위한 변수 추가
         let yinYangBonus = 0;
+        // ✨ [신규] MBTI 성향 점수 변수
+        let mbtiScore = 0;
         const situationLogs = [];
 
         if (skillData.tags) {
@@ -77,6 +79,22 @@ class SkillScoreEngine {
             }
         }
 
+        // ✨ [신규] INTP 성향 보너스
+        if (unit.mbti) {
+            const mbtiString = (unit.mbti.E > unit.mbti.I ? 'E' : 'I') +
+                (unit.mbti.S > unit.mbti.N ? 'S' : 'N') +
+                (unit.mbti.T > unit.mbti.F ? 'T' : 'F') +
+                (unit.mbti.J > unit.mbti.P ? 'J' : 'P');
+            if (mbtiString === 'INTP') {
+                if (skillData.tags?.includes(SKILL_TAGS.COMBO)) {
+                    mbtiScore += 15; // 콤보 스킬에 높은 추가 점수
+                }
+                if (skillData.tags?.includes(SKILL_TAGS.PRODUCTION)) {
+                    mbtiScore += 10; // 생산 스킬에도 추가 점수
+                }
+            }
+        }
+
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
         if (target && skillData.yinYangValue) {
             const targetBalance = yinYangEngine.getBalance(target.uniqueId);
@@ -96,7 +114,8 @@ class SkillScoreEngine {
         }
 
         // ✨ 4. 최종 점수 계산에 음양 보너스 합산
-        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus;
+        // ✨ 최종 점수 계산에 MBTI 보너스 합산
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore;
 
         // ✨ AI 기억 가중치 적용
         let finalScore = calculatedScore;
@@ -117,7 +136,7 @@ class SkillScoreEngine {
 
         debugYinYangManager.logScoreModification(
             skillData.name,
-            baseScore + tagScore + situationScore,
+            baseScore + tagScore + situationScore + mbtiScore,
             yinYangBonus,
             finalScore
         );
@@ -125,7 +144,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
