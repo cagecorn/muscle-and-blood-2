@@ -56,16 +56,18 @@ export class VFXManager {
         // ✨ 2. 체력/열망바 너비를 절반으로 줄입니다.
         const barWidth = 4;
         const barHeight = 80;
-        const xOffset = unit.sprite.displayWidth / 2 + barWidth;
+        const xOffset = unit.sprite.displayWidth / 2 + barWidth / 2;
+        const healthYOffset = 25;
+        const aspirationYOffset = 15;
 
         // 1. 체력 및 배리어 바 생성 (유닛 왼쪽)
         // ✨ 2. 투명도를 50%로 설정합니다.
-        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e, 0.5);
-        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700, 0.5);
+        const healthBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0x22c55e, 0.5, healthYOffset);
+        const barrierBar = this.createVerticalBar(unit.sprite, -xOffset, barHeight, barWidth, 0x282c34, 0xffd700, 0.5, healthYOffset);
 
         // 2. 열망 게이지 생성 (유닛 오른쪽)
         // ✨ 2. 투명도를 50%로 설정합니다.
-        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6, 0.5);
+        const aspirationBar = this.createVerticalBar(unit.sprite, xOffset, barHeight, barWidth, 0x282c34, 0x8b5cf6, 0.5, aspirationYOffset);
 
         this.unitBars.set(unitId, { healthBar, barrierBar, aspirationBar });
 
@@ -147,8 +149,8 @@ export class VFXManager {
      * @param {number} bgAlpha - 배경 투명도 (기본값 0.7)
      * @returns {{container: Phaser.GameObjects.Container, bar: Phaser.GameObjects.Graphics}}
      */
-    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor, bgAlpha = 0.7) {
-        const container = this.scene.add.container(parentSprite.x + xOffset, parentSprite.y);
+    createVerticalBar(parentSprite, xOffset, height, width, bgColor, barColor, bgAlpha = 0.7, yOffset = 0) {
+        const container = this.scene.add.container(parentSprite.x + xOffset, parentSprite.y - yOffset);
         this.vfxLayer.add(container);
 
         const bg = this.scene.add.graphics().fillStyle(bgColor, bgAlpha).fillRect(-width / 2, -height / 2, width, height);

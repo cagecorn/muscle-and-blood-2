@@ -105,20 +105,25 @@ export class IconManager {
         // 1. 버프 아이콘 처리 (왼쪽 컨테이너)
         buffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            // 경로를 assets/images/에서 시작하도록 수정합니다.
-            const iconKey = effectDef
-                ? effectDef.iconPath
-                    ? effectDef.iconPath.replace(/^assets\/images\//, '')
-                    : effect.id
-                : effect.illustrationPath.replace(/^assets\/images\//, ''); // 패시브 스킬의 illustrationPath 직접 사용
+            const iconKey =
+                effectDef && this.scene.textures.exists(effectDef.id)
+                    ? effectDef.id
+                    : effect.illustrationPath
+                        ? effect.illustrationPath.replace(/^assets\/images\//, '')
+                        : effect.id;
+
+            if (!this.scene.textures.exists(iconKey)) {
+                console.error(`아이콘 텍스처를 찾을 수 없습니다: ${iconKey}`);
+                return;
+            }
 
             let iconData = display.buffIcons.get(effect.instanceId);
             if (!iconData) {
                 const iconContainer = this.scene.add.container(0, 0);
                 const icon = this.scene.add
                     .image(0, 0, iconKey)
-                    .setScale(0.5) // 이미지 크기를 0.5로 키웁니다.
-                    .setAlpha(0.7); // 투명도를 0.7로 설정합니다.
+                    .setScale(0.5)
+                    .setAlpha(0.7);
                 const turnText = this.scene.add
                     .text(0, 8, '', {
                         fontSize: '12px',
@@ -132,8 +137,9 @@ export class IconManager {
                 iconData = { icon: iconContainer, text: turnText };
                 display.buffIcons.set(effect.instanceId, iconData);
             } else {
-                if (iconData.icon.list[0].texture.key !== iconKey)
+                if (iconData.icon.list[0].texture.key !== iconKey) {
                     iconData.icon.list[0].setTexture(iconKey);
+                }
             }
             iconData.text.setText(effect.duration);
             // 세로 나열
@@ -146,20 +152,23 @@ export class IconManager {
         // 2. 디버프 아이콘 처리 (오른쪽 컨테이너)
         debuffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            // 경로를 assets/images/에서 시작하도록 수정합니다.
-            const iconKey = effectDef
-                ? effectDef.iconPath
-                    ? effectDef.iconPath.replace(/^assets\/images\//, '')
-                    : effect.id
-                : effect.id;
+            const iconKey =
+                effectDef && this.scene.textures.exists(effectDef.id)
+                    ? effectDef.id
+                    : effect.id;
+
+            if (!this.scene.textures.exists(iconKey)) {
+                console.error(`아이콘 텍스처를 찾을 수 없습니다: ${iconKey}`);
+                return;
+            }
 
             let iconData = display.debuffIcons.get(effect.instanceId);
             if (!iconData) {
                 const iconContainer = this.scene.add.container(0, 0);
                 const icon = this.scene.add
                     .image(0, 0, iconKey)
-                    .setScale(0.5) // 이미지 크기를 0.5로 키웁니다.
-                    .setAlpha(0.7); // 투명도를 0.7로 설정합니다.
+                    .setScale(0.5)
+                    .setAlpha(0.7);
                 const turnText = this.scene.add
                     .text(0, 8, '', {
                         fontSize: '12px',
@@ -173,8 +182,9 @@ export class IconManager {
                 iconData = { icon: iconContainer, text: turnText };
                 display.debuffIcons.set(effect.instanceId, iconData);
             } else {
-                if (iconData.icon.list[0].texture.key !== iconKey)
+                if (iconData.icon.list[0].texture.key !== iconKey) {
                     iconData.icon.list[0].setTexture(iconKey);
+                }
             }
             iconData.text.setText(effect.duration);
             // 세로 나열
