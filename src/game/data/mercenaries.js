@@ -2,7 +2,6 @@ export const mercenaryData = {
     warrior: {
         id: 'warrior',
         name: '전사',
-        hireImage: 'assets/images/territory/warrior-hire.png',
         uiImage: 'assets/images/territory/warrior-ui.png',
         battleSprite: 'warrior',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -24,7 +23,6 @@ export const mercenaryData = {
     gunner: {
         id: 'gunner',
         name: '거너',
-        hireImage: 'assets/images/territory/gunner-hire.png',
         uiImage: 'assets/images/territory/gunner-ui.png',
         battleSprite: 'gunner',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -47,7 +45,6 @@ export const mercenaryData = {
     medic: {
         id: 'medic',
         name: '메딕',
-        hireImage: 'assets/images/territory/medic-hire.png',
         uiImage: 'assets/images/territory/medic-ui.png',
         battleSprite: 'medic',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -70,7 +67,6 @@ export const mercenaryData = {
     nanomancer: {
         id: 'nanomancer',
         name: '나노맨서',
-        hireImage: 'assets/images/unit/nanomancer-hire.png',
         uiImage: 'assets/images/unit/nanomancer-ui.png',
         battleSprite: 'nanomancer',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -99,7 +95,6 @@ export const mercenaryData = {
     flyingmen: {
         id: 'flyingmen',
         name: '플라잉맨',
-        hireImage: 'assets/images/unit/flyingmen-hire.png',
         uiImage: 'assets/images/unit/flyingmen-ui.png',
         battleSprite: 'flyingmen',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -122,15 +117,14 @@ export const mercenaryData = {
     esper: {
         id: 'esper',
         name: '에스퍼',
-        hireImage: 'assets/images/unit/esper-hire.png',
         uiImage: 'assets/images/unit/esper-ui.png',
         battleSprite: 'esper',
         sprites: {
             idle: 'esper',
-            attack: 'esper-attack',
-            hitted: 'esper-hitted',
-            cast: 'esper-cast',
-            'status-effects': 'esper-status-effects',
+            attack: 'esper',
+            hitted: 'esper',
+            cast: 'esper',
+            'status-effects': 'esper',
         },
         description: '"당신의 정신은 제 손바닥 위에서 춤추게 될 겁니다."',
         baseStats: {
@@ -151,15 +145,14 @@ export const mercenaryData = {
     commander: {
         id: 'commander',
         name: '커맨더',
-        hireImage: 'assets/images/unit/commander-hire.png',
         uiImage: 'assets/images/unit/commander-ui.png',
         battleSprite: 'commander',
         sprites: {
             idle: 'commander',
-            attack: 'commander-attack',
-            hitted: 'commander-hitted',
-            cast: 'commander-cast',
-            'status-effects': 'commander-status-effects',
+            attack: 'commander',
+            hitted: 'commander',
+            cast: 'commander',
+            'status-effects': 'commander',
         },
         description: '"나의 방패는 동료를 위하고, 나의 검은 적을 향한다."',
         baseStats: {

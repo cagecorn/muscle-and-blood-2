@@ -58,74 +58,23 @@ export class Preloader extends Scene
         // 로고 이미지를 로드합니다.
         this.load.image('logo', 'logo.png');
 
-        // 게임 씬에서 사용할 전사 이미지를 로드합니다.
+        // 유닛 기본 스프라이트 로드
         this.load.image('warrior', 'images/unit/warrior.png');
         this.load.image('gunner', 'images/unit/gunner.png');
-
-        // --- 전사의 행동별 스프라이트 로드 ---
-        this.load.image('warrior-attack', 'images/unit/warrior-attack.png');
-        this.load.image('warrior-hitted', 'images/unit/warrior-hitted.png');
-        this.load.image('warrior-cast', 'images/unit/warrior-cast.png');
-        // 상태이상 표현 스프라이트
-        this.load.image('warrior-status-effects', 'images/unit/warrior-status-effects.png');
-
-        // --- 거너의 행동별 스프라이트 로드 ---
-        this.load.image('gunner-attack', 'images/unit/gunner-attack.png');
-        this.load.image('gunner-hitted', 'images/unit/gunner-hitted.png');
-        this.load.image('gunner-cast', 'images/unit/gunner-cast.png');
-        this.load.image('gunner-status-effects', 'images/unit/gunner-status-effects.png');
-
-        // --- ▼ [신규] 메딕 관련 이미지 로드 추가 ▼ ---
         this.load.image('medic', 'images/unit/medic.png');
-        this.load.image('medic-attack', 'images/unit/medic-attack.png');
-        this.load.image('medic-hitted', 'images/unit/medic-hitted.png');
-        this.load.image('medic-cast', 'images/unit/medic-cast.png');
-        this.load.image('medic-status-effects', 'images/unit/medic-status-effects.png');
-        this.load.image('medic-hire', 'images/territory/medic-hire.png');
-        this.load.image('medic-ui', 'images/territory/medic-ui.png');
-        // --- ▲ [신규] 메딕 관련 이미지 로드 추가 ▲ ---
-
-        // --- ▼ [신규] 나노맨서 관련 이미지 로드 추가 ▼ ---
         this.load.image('nanomancer', 'images/unit/nanomancer.png');
-        this.load.image('nanomancer-attack', 'images/unit/nanomancer-attack.png');
-        this.load.image('nanomancer-hitted', 'images/unit/nanomancer-hitted.png');
-        this.load.image('nanomancer-cast', 'images/unit/nanomancer-cast.png');
-        this.load.image('nanomancer-status-effects', 'images/unit/nanomancer-status-effects.png');
-        this.load.image('nanomancer-hire', 'images/unit/nanomancer-hire.png');
-        this.load.image('nanomancer-ui', 'images/unit/nanomancer-ui.png');
-        // --- ▲ [신규] 나노맨서 관련 이미지 로드 추가 ▲ ---
-
-        // --- ▼ [신규] 플라잉맨 관련 이미지 로드 추가 ▼ ---
         this.load.image('flyingmen', 'images/unit/flyingmen.png');
-        this.load.image('flyingmen-attack', 'images/unit/flyingmen-attack.png');
-        this.load.image('flyingmen-hitted', 'images/unit/flyingmen-hitted.png');
-        this.load.image('flyingmen-cast', 'images/unit/flyingmen-cast.png');
-        this.load.image('flyingmen-status-effects', 'images/unit/flyingmen-status-effects.png');
-        this.load.image('flyingmen-hire', 'images/unit/flyingmen-hire.png');
-        this.load.image('flyingmen-ui', 'images/unit/flyingmen-ui.png');
-        // --- ▲ [신규] 플라잉맨 관련 이미지 로드 추가 ▲ ---
-
-        // --- ▼ [신규] 에스퍼 관련 이미지 로드 추가 ▼ ---
         this.load.image('esper', 'images/unit/esper.png');
-        this.load.image('esper-attack', 'images/unit/esper-attack.png');
-        this.load.image('esper-hitted', 'images/unit/esper-hitted.png');
-        this.load.image('esper-cast', 'images/unit/esper-cast.png');
-        this.load.image('esper-status-effects', 'images/unit/esper-status-effects.png');
-        this.load.image('esper-hire', 'images/unit/esper-hire.png');
-        this.load.image('esper-ui', 'images/unit/esper-ui.png');
-        // --- ▲ [신규] 에스퍼 관련 이미지 로드 추가 ▲ ---
-
-        // --- ▼ [신규] 커맨더 관련 이미지 로드 추가 ▼ ---
         this.load.image('commander', 'images/unit/commander.png');
-        // 업로드되지 않은 스프라이트는 기본 이미지를 재사용합니다.
-        this.load.image('commander-attack', 'images/unit/commander.png');
-        this.load.image('commander-hitted', 'images/unit/commander.png');
-        this.load.image('commander-cast', 'images/unit/commander.png');
-        this.load.image('commander-status-effects', 'images/unit/commander.png');
-        this.load.image('commander-hire', 'images/unit/commander-hire.png');
+
+        // UI용 이미지 로드
+        this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
+        this.load.image('gunner-ui', 'images/territory/gunner-ui.png');
+        this.load.image('medic-ui', 'images/territory/medic-ui.png');
+        this.load.image('nanomancer-ui', 'images/unit/nanomancer-ui.png');
+        this.load.image('flyingmen-ui', 'images/unit/flyingmen-ui.png');
+        this.load.image('esper-ui', 'images/unit/esper-ui.png');
         this.load.image('commander-ui', 'images/unit/commander-ui.png');
-        this.load.image('commanders-shout', 'images/skills/commanders-shout.png');
-        // --- ▲ [신규] 커맨더 관련 이미지 로드 추가 ▲ ---
 
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
@@ -135,11 +84,6 @@ export class Preloader extends Scene
 
         // --- 추가된 애셋들 ---
         this.load.image('tavern-scene', 'images/territory/tavern-scene.png');
-        this.load.image('hire-icon', 'images/territory/hire-icon.png');
-        this.load.image('warrior-hire', 'images/territory/warrior-hire.png');
-        this.load.image('gunner-hire', 'images/territory/gunner-hire.png');
-        this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
-        this.load.image('gunner-ui', 'images/territory/gunner-ui.png');
         this.load.image('dungeon-icon', 'images/territory/dungeon-icon.png');
         this.load.image('dungeon-scene', 'images/territory/dungeon-scene.png');
         this.load.image('cursed-forest', 'images/territory/cursed-forest.png');
@@ -159,6 +103,7 @@ export class Preloader extends Scene
         this.load.image('stigma', 'images/skills/stigma.png');
         this.load.image('nanobeam', 'images/skills/nanobeam.png');
         this.load.image('axe-strike', 'images/skills/axe-strike.png');
+        this.load.image('commanders-shout', 'images/skills/commanders-shout.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');

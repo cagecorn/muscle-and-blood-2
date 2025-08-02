@@ -16,12 +16,9 @@ export class TerritoryDOMEngine {
         this.container = document.getElementById('territory-container');
         this.grid = null;
         this.tavernView = null;
-        this.hireModal = null;
         this.unitDetailView = null;
 
         this.mercenaries = mercenaryData;
-        this.mercenaryList = Object.values(this.mercenaries);
-        this.currentMercenaryIndex = 0;
 
         this.createGrid();
         this.addBuilding(0, 0, 'tavern-icon', '[여관]');
@@ -210,21 +207,6 @@ export class TerritoryDOMEngine {
         tavernGrid.id = 'tavern-grid';
         this.tavernView.appendChild(tavernGrid);
 
-        const hireButton = document.createElement('div');
-        hireButton.className = 'tavern-button';
-        hireButton.style.backgroundImage = `url(assets/images/territory/hire-icon.png)`;
-        hireButton.addEventListener('click', () => {
-            this.showHireModal();
-        });
-        hireButton.addEventListener('mouseover', (event) => {
-            this.domEngine.showTooltip(event.clientX, event.clientY, '[용병 고용]');
-        });
-        hireButton.addEventListener('mouseout', () => {
-            this.domEngine.hideTooltip();
-        });
-
-        tavernGrid.appendChild(hireButton);
-
         // --- ▼ [신규] 랜덤 12명 고용 버튼 추가 ▼ ---
         const hireRandomButton = document.createElement('div');
         hireRandomButton.className = 'tavern-button';
@@ -255,89 +237,6 @@ export class TerritoryDOMEngine {
         // --- ▲ [신규] 랜덤 12명 고용 버튼 추가 ▲ ---
     }
 
-    showHireModal() {
-        if (this.hireModal) return;
-
-        this.hireModal = document.createElement('div');
-        // ✨ [수정] ID 대신 클래스를 사용합니다.
-        this.hireModal.className = 'modal-overlay';
-        
-        const modalContent = document.createElement('div');
-        modalContent.id = 'hire-modal-content';
-
-        const imageViewer = document.createElement('div');
-        imageViewer.id = 'hire-image-viewer';
-        
-        const mercenaryImage = document.createElement('img');
-        mercenaryImage.id = 'mercenary-image';
-
-        mercenaryImage.onclick = () => {
-            const baseMercenaryData = this.mercenaryList[this.currentMercenaryIndex];
-            const newInstance = mercenaryEngine.hireMercenary(baseMercenaryData, 'ally');
-            
-            this.hideHireModal();
-            this.showUnitDetails(newInstance);
-        };
-
-        const leftArrow = document.createElement('div');
-        leftArrow.className = 'hire-arrow';
-        leftArrow.innerText = '<';
-        leftArrow.onclick = () => this.changeMercenary(-1);
-
-        const rightArrow = document.createElement('div');
-        rightArrow.className = 'hire-arrow';
-        rightArrow.innerText = '>';
-        rightArrow.onclick = () => this.changeMercenary(1);
-
-        const closeButton = document.createElement('div');
-        closeButton.id = 'hire-modal-close';
-        closeButton.innerText = 'X';
-        closeButton.onclick = () => this.hideHireModal();
-        
-        const hireEnemyButton = document.createElement('div');
-        hireEnemyButton.id = 'hire-enemy-button';
-        hireEnemyButton.innerText = '[적군 생성]';
-        hireEnemyButton.onclick = (event) => {
-            const baseMercenaryData = this.mercenaryList[this.currentMercenaryIndex];
-            mercenaryEngine.hireMercenary(baseMercenaryData, 'enemy');
-            this.domEngine.showTooltip(event.clientX, event.clientY, `적군 ${baseMercenaryData.name} 생성됨!`);
-            setTimeout(() => this.domEngine.hideTooltip(), 1000);
-        };
-        
-        imageViewer.appendChild(leftArrow);
-        imageViewer.appendChild(mercenaryImage);
-        imageViewer.appendChild(rightArrow);
-
-        modalContent.appendChild(closeButton);
-        modalContent.appendChild(imageViewer);
-        modalContent.appendChild(hireEnemyButton);
-        this.hireModal.appendChild(modalContent);
-        this.container.appendChild(this.hireModal);
-
-        // ✨ [추가] fade-in 애니메이션을 트리거합니다.
-        requestAnimationFrame(() => {
-            this.hireModal.classList.add('visible');
-        });
-
-        this.hireModal.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            this.changeMercenary(event.deltaY > 0 ? 1 : -1);
-        });
-
-        this.updateMercenaryImage();
-    }
-    
-    hideHireModal() {
-        if (this.hireModal) {
-            // ✨ [수정] fade-out 애니메이션을 트리거하고, 끝나면 DOM에서 제거합니다.
-            this.hireModal.classList.remove('visible');
-            this.hireModal.addEventListener('transitionend', () => {
-                if (this.hireModal) this.hireModal.remove();
-                this.hireModal = null;
-            }, { once: true });
-        }
-    }
-
     hideTavernView() {
         if (this.tavernView) {
             this.tavernView.remove();
@@ -345,27 +244,6 @@ export class TerritoryDOMEngine {
         }
         this.container.style.backgroundImage = `url(assets/images/territory/city-1.png)`;
         this.grid.style.display = 'grid';
-    }
-
-    changeMercenary(direction) {
-        this.currentMercenaryIndex += direction;
-
-        if (this.currentMercenaryIndex >= this.mercenaryList.length) {
-            this.currentMercenaryIndex = 0;
-        } else if (this.currentMercenaryIndex < 0) {
-            this.currentMercenaryIndex = this.mercenaryList.length - 1;
-        }
-
-        this.updateMercenaryImage();
-    }
-
-    updateMercenaryImage() {
-        const mercenaryImage = document.getElementById('mercenary-image');
-        if (mercenaryImage) {
-            const newMercenary = this.mercenaryList[this.currentMercenaryIndex];
-            mercenaryImage.src = newMercenary.hireImage;
-            mercenaryImage.alt = newMercenary.name;
-        }
     }
 
     showUnitDetails(unitData) {
