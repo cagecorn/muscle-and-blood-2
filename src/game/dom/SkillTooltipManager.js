@@ -3,6 +3,7 @@ import { SKILL_TYPES } from '../utils/SkillEngine.js';
 import { classProficiencies } from '../data/classProficiencies.js';
 import { classSpecializations } from '../data/classSpecializations.js';
 import { mercenaryData } from '../data/mercenaries.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 /**
  * 스킬 카드 위에 마우스를 올렸을 때 TCG 스타일의 큰 툴팁을 표시하는 매니저
@@ -34,7 +35,7 @@ export class SkillTooltipManager {
         const rangeText = skillData.range !== undefined ? `사거리 ${skillData.range}` : '기본 사거리';
 
         tooltip.innerHTML = `
-            <div class="skill-illustration-large" style="background-image: url(${skillData.illustrationPath})"></div>
+            <div class="skill-illustration-large" style="background-image: url(${placeholderManager.getPath(skillData.illustrationPath)})"></div>
             <div class="skill-info-large">
                 <div class="skill-name-large">${skillNameHTML}</div>
                 <div class="skill-type-cost-large">

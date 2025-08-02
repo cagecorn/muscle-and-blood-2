@@ -1,3 +1,5 @@
+import { placeholderManager } from '../utils/PlaceholderManager.js';
+
 /**
  * 장비 아이템 위에 마우스를 올렸을 때 상세 정보 툴팁을 표시하는 매니저
  */
@@ -31,7 +33,7 @@ export class ItemTooltipManager {
         socketsHTML += '</div>';
 
         tooltip.innerHTML = `
-            <div class="item-illustration-large" style="background-image: url(${itemData.illustrationPath})"></div>
+            <div class="item-illustration-large" style="background-image: url(${placeholderManager.getPath(itemData.illustrationPath)})"></div>
             <div class="item-info-large">
                 <div class="item-name-large">${itemData.name}</div>
                 <div class="item-type-synergy-large">
