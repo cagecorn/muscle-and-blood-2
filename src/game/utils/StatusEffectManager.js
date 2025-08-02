@@ -151,6 +151,18 @@ class StatusEffectManager {
             return;
         }
 
+        if (!this.activeEffects.has(targetUnit.uniqueId)) {
+            this.activeEffects.set(targetUnit.uniqueId, []);
+        }
+        const activeEffectsOnTarget = this.activeEffects.get(targetUnit.uniqueId);
+
+        // 기존에 동일한 ID의 효과가 있다면 제거합니다.
+        const existingEffectIndex = activeEffectsOnTarget.findIndex(e => e.id === effectId);
+        if (existingEffectIndex !== -1) {
+            const removedEffect = activeEffectsOnTarget.splice(existingEffectIndex, 1)[0];
+            debugLogEngine.log('StatusEffectManager', `[${targetUnit.instanceName}]의 기존 [${removedEffect.sourceSkillName}] 효과를 제거하고 새 효과로 갱신합니다.`);
+        }
+
         const newEffect = {
             instanceId: this.nextEffectInstanceId++,
             ...sourceSkill.effect,
@@ -158,10 +170,7 @@ class StatusEffectManager {
             attackerId: attackerUnit ? attackerUnit.uniqueId : null,
         };
 
-        if (!this.activeEffects.has(targetUnit.uniqueId)) {
-            this.activeEffects.set(targetUnit.uniqueId, []);
-        }
-        this.activeEffects.get(targetUnit.uniqueId).push(newEffect);
+        activeEffectsOnTarget.push(newEffect);
 
         if (effectDefinition.onApply) {
             // 스택 정보 등 추가 데이터를 전달하기 위해 newEffect 전체를 인자로 넘깁니다.
