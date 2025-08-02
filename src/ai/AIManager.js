@@ -8,6 +8,8 @@ import { createFlyingmanAI } from './behaviors/createFlyingmanAI.js';
 import { createINTJ_AI } from './behaviors/createINTJ_AI.js';
 // ✨ [신규] INTP AI import
 import { createINTP_AI } from './behaviors/createINTP_AI.js';
+// ✨ [신규] ENTJ AI import
+import { createENTJ_AI } from './behaviors/createENTJ_AI.js';
 
 /**
  * 게임 내 모든 AI 유닛을 관리하고, 각 유닛의 행동 트리를 실행합니다.
@@ -48,6 +50,8 @@ class AIManager {
             case 'INTJ': return createINTJ_AI(this.aiEngines);
             // ✨ [신규] INTP 케이스 추가
             case 'INTP': return createINTP_AI(this.aiEngines);
+            // ✨ [신규] ENTJ 케이스 추가
+            case 'ENTJ': return createENTJ_AI(this.aiEngines);
             default:
                 if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
                     return createRangedAI(this.aiEngines);
