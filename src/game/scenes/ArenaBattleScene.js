@@ -4,6 +4,7 @@ import { CameraControlEngine } from '../utils/CameraControlEngine.js';
 import { partyEngine } from '../utils/PartyEngine.js';
 import { BattleSimulatorEngine } from '../utils/BattleSimulatorEngine.js';
 import { arenaManager } from '../utils/ArenaManager.js';
+import { logDownloader } from '../utils/LogDownloader.js'; // logDownloader import 추가
 
 export class ArenaBattleScene extends Scene {
     constructor() {
@@ -36,7 +37,15 @@ export class ArenaBattleScene extends Scene {
 
         this.battleSimulator.start(partyUnits, enemyUnits);
 
+        // ✨ 'L' 키를 누르면 로그를 다운로드하는 이벤트 리스너를 추가합니다.
+        this.input.keyboard.on('keydown-L', () => {
+            console.log("'L' 키가 눌렸습니다. 로그 다운로드를 시작합니다...");
+            logDownloader.download();
+        });
+
         this.events.on('shutdown', () => {
+            // 'keydown-L' 이벤트 리스너를 해제합니다.
+            this.input.keyboard.off('keydown-L');
             if (this.stageManager) this.stageManager.destroy();
             if (this.cameraControl) this.cameraControl.destroy();
             if (this.battleSimulator) this.battleSimulator.shutdown();

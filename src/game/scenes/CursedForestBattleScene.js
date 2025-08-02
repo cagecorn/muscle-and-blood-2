@@ -6,6 +6,7 @@ import { partyEngine } from '../utils/PartyEngine.js';
 import { monsterEngine } from '../utils/MonsterEngine.js';
 import { getMonsterBase } from '../data/monster.js';
 import { BattleSimulatorEngine } from '../utils/BattleSimulatorEngine.js';
+import { logDownloader } from '../utils/LogDownloader.js'; // logDownloader import 추가
 
 export class CursedForestBattleScene extends Scene {
     constructor() {
@@ -55,8 +56,15 @@ export class CursedForestBattleScene extends Scene {
         // BattleSimulatorEngine을 통해 전투를 시작합니다.
         this.battleSimulator.start(partyUnits, monsters);
 
+        // ✨ 'L' 키를 누르면 로그를 다운로드하는 이벤트 리스너를 추가합니다.
+        this.input.keyboard.on('keydown-L', () => {
+            console.log("'L' 키가 눌렸습니다. 로그 다운로드를 시작합니다...");
+            logDownloader.download();
+        });
 
         this.events.on('shutdown', () => {
+            // 'keydown-L' 이벤트 리스너를 해제합니다.
+            this.input.keyboard.off('keydown-L');
             ['dungeon-container', 'territory-container'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'block';
