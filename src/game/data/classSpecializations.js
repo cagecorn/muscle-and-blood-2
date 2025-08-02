@@ -78,5 +78,20 @@ export const classSpecializations = {
                 modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.05 }
             }
         }
+    ],
+    // ✨ [신규] 커맨더 특화 태그 추가
+    commander: [
+        {
+            tag: SKILL_TAGS.STRATEGY,
+            description: "'전략' 태그 스킬 사용 시, 주변 2칸 내 모든 아군의 용맹(Valor)이 1턴간 2 증가합니다.",
+            effect: {
+                id: 'commanderStrategyBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                isGlobal: false,
+                radius: 2,
+                modifiers: { stat: 'valor', type: 'flat', value: 2 }
+            }
+        }
     ]
 };

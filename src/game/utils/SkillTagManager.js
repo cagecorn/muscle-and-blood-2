@@ -44,4 +44,5 @@ export const SKILL_TAGS = {
     SPECIAL: '특수 스킬',// 특수 슬롯 전용 스킬
     MIND: '정신',       // ✨ 에스퍼를 위한 '정신' 태그
     COMBO: '콤보',      // ✨ INTP를 위한 '콤보' 태그
+    STRATEGY: '전략',   // ✨ 커맨더를 위한 '전략' 태그
 };

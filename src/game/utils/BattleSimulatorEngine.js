@@ -30,6 +30,7 @@ import { comboManager } from './ComboManager.js';
 import { yinYangEngine } from './YinYangEngine.js';
 import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
 import { statEngine } from './StatEngine.js';
+import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -127,7 +128,11 @@ export class BattleSimulatorEngine {
         // AI 엔진 패키지를 AIManager에 전달하고 각 유닛을 등록합니다.
         aiManager.aiEngines = this.aiEngines;
         allUnits.forEach(unit => {
-            aiManager.registerUnit(unit);
+            if (unit.name === '커맨더') {
+                aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
+            } else {
+                aiManager.registerUnit(unit);
+            }
         });
 
         this.turnQueue = turnOrderManager.createTurnQueue(allUnits);
