@@ -8,11 +8,6 @@ import { TerminationManager } from './TerminationManager.js';
 import { SummoningEngine } from './SummoningEngine.js';
 
 import { aiManager } from '../../ai/AIManager.js';
-import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
-import { createRangedAI } from '../../ai/behaviors/RangedAI.js';
-// ✨ 메딕을 위한 Healer AI를 import 합니다.
-import { createHealerAI } from '../../ai/behaviors/createHealerAI.js';
-import { createFlyingmanAI } from '../../ai/behaviors/createFlyingmanAI.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
@@ -129,16 +124,10 @@ export class BattleSimulatorEngine {
             }
         });
 
+        // AI 엔진 패키지를 AIManager에 전달하고 각 유닛을 등록합니다.
+        aiManager.aiEngines = this.aiEngines;
         allUnits.forEach(unit => {
-            if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
-                aiManager.registerUnit(unit, createRangedAI(this.aiEngines));
-            } else if (unit.name === '전사' || unit.name === '좀비') {
-                aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
-            } else if (unit.name === '메딕') {
-                aiManager.registerUnit(unit, createHealerAI(this.aiEngines));
-            } else if (unit.name === '플라잉맨') {
-                aiManager.registerUnit(unit, createFlyingmanAI(this.aiEngines));
-            }
+            aiManager.registerUnit(unit);
         });
 
         this.turnQueue = turnOrderManager.createTurnQueue(allUnits);

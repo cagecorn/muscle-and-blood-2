@@ -5,7 +5,6 @@ import { getMonsterBase } from '../data/monster.js';
 import { getSummonBase } from '../data/summon.js';
 // AI 매니저와 근접 AI를 불러와 소환된 유닛을 즉시 등록할 수 있도록 합니다.
 import { aiManager } from '../../ai/AIManager.js';
-import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 // 소환된 유닛을 토큰 시스템에 등록하기 위해 토큰 엔진을 불러옵니다.
 import { tokenEngine } from './TokenEngine.js';
 
@@ -74,10 +73,8 @@ class SummoningEngine {
         this.battleSimulator._setupUnits([summonedUnit]);
 
         // 5. AI 매니저에 새 유닛을 등록하여 즉시 행동 트리를 갖게 합니다.
-        if (summonedUnit.className === '전사' || summonedUnit.name === '선조 페오르') {
-            aiManager.registerUnit(summonedUnit, createMeleeAI(this.battleSimulator.aiEngines));
-            debugLogEngine.log('SummoningEngine', `${summonedUnit.instanceName}에게 MeleeAI를 등록했습니다.`);
-        }
+        aiManager.registerUnit(summonedUnit);
+        debugLogEngine.log('SummoningEngine', `${summonedUnit.instanceName} AI 등록`);
 
         // 6. 소환사에게 체력 페널티 적용
         const penalty = Math.round(summoner.finalStats.hp * (summonSkillData.healthCostPercent || 0.1)); // 기본 10%
