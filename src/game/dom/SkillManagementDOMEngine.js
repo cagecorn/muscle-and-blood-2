@@ -9,6 +9,7 @@ import { skillModifierEngine } from '../utils/SkillModifierEngine.js';
 import { SKILL_TAGS } from '../utils/SkillTagManager.js';
 import { mercenaryCardSelector } from '../utils/MercenaryCardSelector.js';
 import { mercenaryData } from '../data/mercenaries.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 export class SkillManagementDOMEngine {
     constructor(scene) {
@@ -245,7 +246,7 @@ export class SkillManagementDOMEngine {
             // 등급별 테두리 클래스를 부여합니다.
             slot.classList.add(`grade-${instanceData.grade.toLowerCase()}`);
 
-            slot.style.backgroundImage = `url(${modifiedSkill.illustrationPath})`;
+            slot.style.backgroundImage = `url(${placeholderManager.getPath(modifiedSkill.illustrationPath)})`;
             slot.dataset.instanceId = instanceId;
             slot.draggable = true;
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId, slotIndex: index });
@@ -302,7 +303,7 @@ export class SkillManagementDOMEngine {
             }
             // --- ▲ [신규] 장착 불가 카드 시각적 처리 ▲ ---
 
-            card.style.backgroundImage = `url(${data.illustrationPath})`;
+            card.style.backgroundImage = `url(${placeholderManager.getPath(data.illustrationPath)})`;
             card.draggable = true;
             card.dataset.instanceId = instance.instanceId;
             card.ondragstart = e => this.onDragStart(e, { source: 'inventory', instanceId: instance.instanceId });

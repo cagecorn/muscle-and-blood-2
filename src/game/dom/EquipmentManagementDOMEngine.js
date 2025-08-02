@@ -5,6 +5,7 @@ import { equipmentManager } from '../utils/EquipmentManager.js';
 import { itemInventoryManager } from '../utils/ItemInventoryManager.js';
 import { ItemTooltipManager } from './ItemTooltipManager.js';
 import { EQUIPMENT_SLOTS } from '../data/items.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 // 새로 만든 장비 자동 장착기를 불러옵니다.
 import { mercenaryEquipmentSelector } from '../utils/MercenaryEquipmentSelector.js';
 
@@ -164,7 +165,7 @@ export class EquipmentManagementDOMEngine {
         slot.ondrop = e => this.onDropOnSlot(e);
         
         if (item) {
-            slot.style.backgroundImage = `url(${item.illustrationPath})`;
+            slot.style.backgroundImage = `url(${placeholderManager.getPath(item.illustrationPath)})`;
             slot.draggable = true;
             slot.dataset.instanceId = item.instanceId;
             slot.ondragstart = e => this.onDragStart(e, { source: 'slot', instanceId: item.instanceId, slotType: slotType });
@@ -203,7 +204,7 @@ export class EquipmentManagementDOMEngine {
         inventory.forEach(item => {
             const itemCard = document.createElement('div');
             itemCard.className = `item-inventory-card grade-${item.grade.toLowerCase()}`;
-            itemCard.style.backgroundImage = `url(${item.illustrationPath})`;
+            itemCard.style.backgroundImage = `url(${placeholderManager.getPath(item.illustrationPath)})`;
             itemCard.draggable = true;
             itemCard.dataset.instanceId = item.instanceId;
             

@@ -29,7 +29,7 @@ export const itemBaseData = {
         id: 'baseballBat',
         name: '야구 방망이',
         type: EQUIPMENT_SLOTS.WEAPON,
-        illustrationPath: 'assets/images/item/baseball-bat.png',
+        illustrationPath: null,
         baseStats: {
             physicalAttack: { min: 6, max: 9 }
         },
