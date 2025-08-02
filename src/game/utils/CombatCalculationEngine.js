@@ -44,10 +44,15 @@ class CombatCalculationEngine {
             return { damage: 0, hitType: '무효', comboCount: 0 };
         }
 
+        // ✨ [핵심 수정] 마법, 원거리, 근접 순으로 공격 타입을 명확히 구분합니다.
+        const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);
         const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
-        const baseAttack = isRanged
-            ? (attacker.finalStats?.rangedAttack || 0)
-            : (attacker.finalStats?.physicalAttack || 0);
+
+        const baseAttack = isMagic
+            ? (attacker.finalStats?.magicAttack || 0)
+            : isRanged
+                ? (attacker.finalStats?.rangedAttack || 0)
+                : (attacker.finalStats?.physicalAttack || 0);
 
         // 콤보 배율 계산을 위한 정보
         let comboMultiplier = 1.0;
