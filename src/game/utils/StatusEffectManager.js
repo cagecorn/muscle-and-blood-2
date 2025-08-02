@@ -33,6 +33,8 @@ class StatusEffectManager {
     onTurnEnd() {
         for (const [unitId, effects] of this.activeEffects.entries()) {
             const remainingEffects = [];
+            const expiredEffects = [];
+
             for (const effect of effects) {
                 // duration이 숫자인 경우에만 감소시킵니다.
                 if (typeof effect.duration === 'number') {
@@ -40,19 +42,26 @@ class StatusEffectManager {
                     if (effect.duration > 0) {
                         remainingEffects.push(effect);
                     } else {
-                        const effectDefinition = statusEffects[effect.id];
-                        if (effectDefinition && effectDefinition.onRemove) {
-                            const unit = this.findUnitById(unitId);
-                            if (unit) effectDefinition.onRemove(unit);
-                        }
-                        debugStatusEffectManager.logEffectExpired(unitId, effect);
+                        expiredEffects.push(effect);
                     }
                 } else {
                     // duration이 없으면(스택 기반 효과 등) 그대로 유지합니다.
                     remainingEffects.push(effect);
                 }
             }
+
+            // 먼저 남은 효과로 상태를 업데이트합니다.
             this.activeEffects.set(unitId, remainingEffects);
+
+            // 이후 만료된 효과들의 onRemove를 호출합니다.
+            for (const effect of expiredEffects) {
+                const effectDefinition = statusEffects[effect.id];
+                if (effectDefinition && effectDefinition.onRemove) {
+                    const unit = this.findUnitById(unitId);
+                    if (unit) effectDefinition.onRemove(unit);
+                }
+                debugStatusEffectManager.logEffectExpired(unitId, effect);
+            }
         }
 
         // ✨ 아이언 윌 체력 회복 로직 추가
