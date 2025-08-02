@@ -203,6 +203,12 @@ export class BattleSimulatorEngine {
         while (this.isRunning && !this.isBattleOver()) {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
+            // ✨ AI가 현재 턴을 인식할 수 있도록 블랙보드에 기록
+            const aiData = aiManager.unitData.get(currentUnit.uniqueId);
+            if (aiData) {
+                aiData.behaviorTree.blackboard.set('currentTurnNumber', this.currentTurnNumber);
+            }
+
             // 턴 시작 시 콤보 정보를 초기화합니다.
             comboManager.startTurn(currentUnit.uniqueId);
 
