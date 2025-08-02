@@ -16,8 +16,13 @@ class LogDownloader {
 
         try {
             const replacer = (key, value) => {
-                if (key === 'sprite' || key === 'scene' || key === 'parent') {
+                // Phaser 게임 오브젝트나 순환 참조를 일으킬 수 있는 속성 필터링
+                if (key === 'sprite' || key === 'scene' || key === 'parent' || key === 'game' || key === 'sys') {
                     return '[Circular Reference]';
+                }
+                // 배열 내에서 'this'와 같은 자체 참조가 있다면 필터링 (일반적이지 않지만 방어 코딩)
+                if (value === window || value === document) {
+                    return '[Window/Document Object]';
                 }
                 return value;
             };
@@ -34,13 +39,17 @@ class LogDownloader {
             document.body.appendChild(a);
             a.click();
 
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // ✨ [수정] 다운로드 트리거 후 지연 시간을 두어 브라우저가 다운로드를 시작할 충분한 시간을 줍니다.
+            // 이후 객체 URL을 해제하고 요소를 제거합니다.
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100); // 100ms 지연
 
             debugLogEngine.log('LogDownloader', '로그 파일 다운로드를 성공적으로 시작했습니다.');
         } catch (error) {
             console.error('로그 다운로드 중 오류 발생:', error);
-            debugLogEngine.error('LogDownloader', '로그 파일 생성에 실패했습니다.', error);
+            debugLogEngine.error('LogDownloader', '로그 파일 생성에 실패했습니다. 개발자 콘솔을 확인해주세요.', error);
             alert('로그 파일을 생성하는 데 실패했습니다. 개발자 콘솔을 확인해주세요.');
         }
     }
