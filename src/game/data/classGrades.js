@@ -46,7 +46,6 @@ export const classGrades = {
         rangedDefense: 2,
         magicDefense: 3,
     },
-    // --- ▼ [신규] 플라잉맨 등급 추가 ▼ ---
     flyingmen: {
         meleeAttack: 3,
         rangedAttack: 1,
@@ -55,7 +54,24 @@ export const classGrades = {
         rangedDefense: 1,
         magicDefense: 2,
     },
-    // --- ▲ [신규] 플라잉맨 등급 추가 ▲ ---
+    // ✨ [신규] 에스퍼 등급 추가
+    esper: {
+        meleeAttack: 1,
+        rangedAttack: 2,
+        magicAttack: 3,
+        meleeDefense: 1,
+        rangedDefense: 2,
+        magicDefense: 3,
+    },
+    // ✨ [신규] 커맨더 등급 추가
+    commander: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 1,
+        meleeDefense: 3,
+        rangedDefense: 2,
+        magicDefense: 2,
+    },
     clown: {
         meleeAttack: 2,
         rangedAttack: 2,
@@ -70,9 +86,8 @@ export const classGrades = {
         magicAttack: 1,
         meleeDefense: 3,
         rangedDefense: 2,
-        magicDefense: 2, // 전사보다 마법 방어에 조금 더 강함
+        magicDefense: 2,
     },
-    // --- 다른 클래스 추가 예정 ---
     zombie: {
         meleeAttack: 2,
         rangedAttack: 1,
