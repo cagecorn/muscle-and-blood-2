@@ -12,6 +12,7 @@ import { sharedResourceEngine, SHARED_RESOURCE_TYPES } from './SharedResourceEng
 import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 import { comboManager } from './ComboManager.js';
+import { SKILL_TAGS } from './SkillTagManager.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -64,6 +65,11 @@ class SkillEffectProcessor {
     _handleCommonPreEffects(unit, target, skill) {
         battleTagManager.recordSkillUse(unit, target, skill);
         yinYangEngine.updateBalance(unit.uniqueId, skill.yinYangValue);
+
+        // ✨ '희생' 태그 스킬 사용 시 '강화 학습' 패시브 발동
+        if (skill.tags?.includes(SKILL_TAGS.SACRIFICE)) {
+            this.battleSimulator.triggerReinforcementLearning(unit, '희생 스킬 사용');
+        }
 
         if (skill.resourceCost) {
             sharedResourceEngine.spendResource(unit.team, skill.resourceCost);

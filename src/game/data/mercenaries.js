@@ -225,6 +225,12 @@ export const mercenaryData = {
             agility: 7, intelligence: 5, wisdom: 8, luck: 6,
             movement: 3,
             weight: 12
+        },
+        classPassive: {
+            id: 'reinforcementLearning',
+            name: '강화 학습',
+            description: '자신이 [희생] 태그 스킬을 사용하거나, 아군이 사망할 때마다 [강화 학습] 버프를 1 얻습니다. 이 버프는 중첩될 때마다 모든 기본 스탯(힘, 인내 등)을 1씩 올려주며, 전투가 끝나면 사라집니다.',
+            iconPath: 'assets/images/skills/reinforcement-learning.png'
         }
     }
 };

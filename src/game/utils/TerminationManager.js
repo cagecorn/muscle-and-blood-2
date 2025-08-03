@@ -49,6 +49,8 @@ class TerminationManager {
                 if (unit.currentHp > 0) {
                     if (unit.team === deadUnit.team) {
                         aspirationEngine.addAspiration(unit.uniqueId, -20, '아군 사망');
+                        // ✨ 아군 사망 시 '강화 학습' 패시브 발동
+                        this.battleSimulator.triggerReinforcementLearning(unit, '아군 사망');
                     } else {
                         aspirationEngine.addAspiration(unit.uniqueId, 20, '적군 처치');
                     }

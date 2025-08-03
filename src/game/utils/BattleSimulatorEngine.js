@@ -31,6 +31,7 @@ import { yinYangEngine } from './YinYangEngine.js';
 import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngine import
 import { statEngine } from './StatEngine.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
+import { EFFECT_TYPES } from './EffectTypes.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -83,6 +84,36 @@ export class BattleSimulatorEngine {
         this.currentTurnIndex = 0;
         // --- ✨ 전체 턴 수를 추적하는 변수 ---
         this.currentTurnNumber = 1;
+    }
+
+    /**
+     * 안드로이드의 '강화 학습' 패시브를 발동시켜 버프 스택을 쌓습니다.
+     * @param {object} unit - 패시브를 발동할 유닛 (안드로이드)
+     * @param {string} reason - 발동 사유 (로그용)
+     */
+    triggerReinforcementLearning(unit, reason) {
+        if (!unit || unit.classPassive?.id !== 'reinforcementLearning') return;
+
+        const effects = statusEffectManager.activeEffects.get(unit.uniqueId) || [];
+        let learningEffect = effects.find(e => e.id === 'reinforcementLearningBuff');
+
+        if (learningEffect) {
+            learningEffect.stack = (learningEffect.stack || 0) + 1;
+        } else {
+            const newEffect = {
+                id: 'reinforcementLearningBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 99,
+                stack: 1,
+                modifiers: {}
+            };
+            statusEffectManager.addEffect(unit, { name: '강화 학습', effect: newEffect }, unit);
+        }
+
+        if (this.vfxManager) {
+            this.vfxManager.showEffectName(unit.sprite, '강화 학습', '#f59e0b');
+        }
+        console.log(`%c[Passive] ${unit.instanceName}의 [${reason}]으로 '강화 학습' 스택이 쌓입니다.`, "color: #f59e0b; font-weight: bold;");
     }
 
     start(allies, enemies) {

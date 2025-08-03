@@ -53,6 +53,25 @@ class CombatCalculationEngine {
             return { damage: 0, hitType: '무효', comboCount: 0 };
         }
 
+        // ✨ [신규] '강화 학습' 버프 스택에 따른 스탯 보너스 적용
+        const applyReinforcementLearning = (unit) => {
+            const effects = statusEffectManager.activeEffects.get(unit.uniqueId) || [];
+            const learningEffect = effects.find(e => e.id === 'reinforcementLearningBuff');
+            if (learningEffect && learningEffect.stack > 0) {
+                const boost = learningEffect.stack;
+                const boostedStats = { ...unit.finalStats };
+                boostedStats.physicalAttack += boost * 1.5;
+                boostedStats.magicAttack += boost * 1.5;
+                boostedStats.physicalDefense += boost * 1.2;
+                boostedStats.magicDefense += boost * 1.2;
+                return boostedStats;
+            }
+            return unit.finalStats;
+        };
+
+        const attackerStats = applyReinforcementLearning(attacker);
+        const defenderStats = applyReinforcementLearning(defender);
+
         // ✨ [핵심 수정] 마법, 원거리, 근접 순으로 공격 타입을 명확히 구분합니다.
         const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);
         const isRanged = skill.tags?.includes(SKILL_TAGS.RANGED) && skill.tags?.includes(SKILL_TAGS.PHYSICAL);
@@ -62,8 +81,8 @@ class CombatCalculationEngine {
         const attackBuffPercent = statusEffectManager.getModifierValue(attacker, attackStatKey);
 
         const baseAttack = isMagic
-            ? (attacker.finalStats?.magicAttack || 0)
-            : (attacker.finalStats?.physicalAttack || 0); // isRanged는 physicalAttack을 공유
+            ? (attackerStats?.magicAttack || 0)
+            : (attackerStats?.physicalAttack || 0); // isRanged는 physicalAttack을 공유
 
         // 2. 기본 공격력에 버프를 적용합니다.
         const buffedAttack = baseAttack * (1 + attackBuffPercent);
@@ -96,8 +115,8 @@ class CombatCalculationEngine {
 
         // 마법 공격일 경우 마법 방어력, 아닐 경우 물리 방어력을 사용합니다.
         const initialDefense = isMagic
-            ? (defender.finalStats?.magicDefense || 0)
-            : (defender.finalStats?.physicalDefense || 0);
+            ? (defenderStats?.magicDefense || 0)
+            : (defenderStats?.physicalDefense || 0);
 
         const finalDefense = initialDefense * (1 + defenseReductionPercent) * (1 - armorPen);
 
@@ -229,8 +248,14 @@ class CombatCalculationEngine {
             }
         }
 
-        // 디버그 로그에 finalDefense 사용하도록 수정
-        debugCombatLogManager.logAttackCalculation(attacker, defender, skillDamage, finalDamage, finalDefense);
+        // 디버그 로그에 강화된 스탯을 반영하도록 수정
+        debugCombatLogManager.logAttackCalculation(
+            { ...attacker, finalStats: attackerStats },
+            { ...defender, finalStats: defenderStats },
+            skillDamage,
+            finalDamage,
+            finalDefense
+        );
         return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
     }
 

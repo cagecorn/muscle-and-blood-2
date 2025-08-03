@@ -165,6 +165,13 @@ export const statusEffects = {
         name: '광대의 농담',
         iconPath: 'assets/images/skills/clown-s-joke.png',
     },
+    // ✨ [신규] 강화 학습 버프 효과 추가
+    reinforcementLearningBuff: {
+        id: 'reinforcementLearningBuff',
+        name: '강화 학습',
+        iconPath: 'assets/images/skills/reinforcement-learning.png',
+        // 이 버프는 스택만 쌓고, 실제 스탯 보너스는 CombatCalculationEngine에서 동적으로 계산됩니다.
+    },
     flyingmenChargeBonus: {
         id: 'flyingmenChargeBonus',
         name: '신속',
