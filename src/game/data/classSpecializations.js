@@ -108,5 +108,20 @@ export const classSpecializations = {
                 ]
             }
         }
+    ],
+    android: [
+        {
+            tag: SKILL_TAGS.SACRIFICE,
+            description: "'희생' 태그 스킬 사용 시, 자신은 최대 체력의 5% 피해를 입고 주변 2칸 내 모든 아군에게 1턴간 '받는 데미지 10% 감소' 효과를 부여합니다.",
+            effect: {
+                id: 'androidSacrificeBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                isGlobal: false, // 광역이지만 전체는 아님
+                radius: 2,       // 주변 2칸
+                selfDamage: { type: 'percentage', value: 0.05 }, // 자신에게 주는 피해
+                modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.10 }
+            }
+        }
     ]
 };

@@ -64,6 +64,14 @@ export const classGrades = {
         rangedDefense: 1,
         magicDefense: 1,
     },
+    android: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 1,
+        meleeDefense: 3,
+        rangedDefense: 2,
+        magicDefense: 2, // 전사보다 마법 방어에 조금 더 강함
+    },
     // --- 다른 클래스 추가 예정 ---
     zombie: {
         meleeAttack: 2,

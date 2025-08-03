@@ -205,5 +205,26 @@ export const mercenaryData = {
             description: '주위 3타일 내 디버프에 걸린 유닛 하나당 자신의 치명타율 5%, 약점 공격 확률 5%, 공격력 5%가 증가합니다 (아군, 적군 포함).',
             iconPath: 'assets/images/skills/clown-s-joke.png'
         }
+    },
+    android: {
+        id: 'android',
+        name: '안드로이드',
+        ai_archetype: 'melee', // 기본 AI는 전사와 동일한 근접 타입
+        uiImage: 'assets/images/unit/android-ui.png',
+        battleSprite: 'android',
+        sprites: {
+            idle: 'android',
+            attack: 'android',
+            hitted: 'android',
+            cast: 'android',
+            'status-effects': 'android',
+        },
+        description: '"나의 파괴는, 모두의 생존을 위함이다."',
+        baseStats: {
+            hp: 110, valor: 12, strength: 14, endurance: 14,
+            agility: 7, intelligence: 5, wisdom: 8, luck: 6,
+            movement: 3,
+            weight: 12
+        }
     }
 };
