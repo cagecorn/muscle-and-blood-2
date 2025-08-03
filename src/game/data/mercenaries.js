@@ -2,6 +2,7 @@ export const mercenaryData = {
     warrior: {
         id: 'warrior',
         name: '전사',
+        ai_archetype: 'melee',
         uiImage: 'assets/images/territory/warrior-ui.png',
         battleSprite: 'warrior',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -23,6 +24,7 @@ export const mercenaryData = {
     gunner: {
         id: 'gunner',
         name: '거너',
+        ai_archetype: 'ranged',
         uiImage: 'assets/images/territory/gunner-ui.png',
         battleSprite: 'gunner',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -45,6 +47,7 @@ export const mercenaryData = {
     medic: {
         id: 'medic',
         name: '메딕',
+        ai_archetype: 'healer',
         uiImage: 'assets/images/territory/medic-ui.png',
         battleSprite: 'medic',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -67,6 +70,7 @@ export const mercenaryData = {
     nanomancer: {
         id: 'nanomancer',
         name: '나노맨서',
+        ai_archetype: 'ranged',
         uiImage: 'assets/images/unit/nanomancer-ui.png',
         battleSprite: 'nanomancer',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -95,6 +99,7 @@ export const mercenaryData = {
     flyingmen: {
         id: 'flyingmen',
         name: '플라잉맨',
+        ai_archetype: 'assassin',
         uiImage: 'assets/images/unit/flyingmen-ui.png',
         battleSprite: 'flyingmen',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일
@@ -117,6 +122,7 @@ export const mercenaryData = {
     esper: {
         id: 'esper',
         name: '에스퍼',
+        ai_archetype: 'ranged',
         uiImage: 'assets/images/unit/esper-ui.png',
         battleSprite: 'esper',
         sprites: {
@@ -145,6 +151,7 @@ export const mercenaryData = {
     commander: {
         id: 'commander',
         name: '커맨더',
+        ai_archetype: 'melee',
         uiImage: 'assets/images/unit/commander-ui.png',
         battleSprite: 'commander',
         sprites: {
