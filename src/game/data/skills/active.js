@@ -564,4 +564,82 @@ export const activeSkills = {
     },
     // --- ▲ [신규] '낙인' 스킬을 DEBUFF에서 ACTIVE로 이동 및 수정 ▲ ---
     // --- ▲ [신규] 크리티컬 샷 스킬 추가 ▲ ---
+    // --- ▼ [신규] 끌어당기기 스킬 추가 ▼ ---
+    pulling: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'pulling',
+            name: '끌어당기기',
+            type: 'ACTIVE',
+            requiredClass: 'clown',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.BIND, SKILL_TAGS.KINETIC],
+            cost: 3,
+            targetType: 'enemy',
+            description: '5타일 내의 적을 자신의 바로 앞으로 끌어옵니다. (쿨타임 5턴)',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 5,
+            pull: true
+        },
+        RARE: {
+            id: 'pulling',
+            name: '끌어당기기 [R]',
+            type: 'ACTIVE',
+            requiredClass: 'clown',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.BIND, SKILL_TAGS.KINETIC],
+            cost: 3,
+            targetType: 'enemy',
+            description: '5타일 내의 적을 자신의 바로 앞으로 끌어오고, 1턴간 이동력을 1 감소시킵니다. (쿨타임 5턴)',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 5,
+            pull: true,
+            effect: {
+                id: 'slow',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 1,
+                modifiers: { stat: 'movement', type: 'flat', value: -1 }
+            }
+        },
+        EPIC: {
+            id: 'pulling',
+            name: '끌어당기기 [E]',
+            type: 'ACTIVE',
+            requiredClass: 'clown',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.BIND, SKILL_TAGS.KINETIC],
+            cost: 2,
+            targetType: 'enemy',
+            description: '5타일 내의 적을 자신의 바로 앞으로 끌어오고, 1턴간 이동력을 1 감소시킵니다. (쿨타임 4턴)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 5,
+            pull: true,
+            effect: {
+                id: 'slow',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 1,
+                modifiers: { stat: 'movement', type: 'flat', value: -1 }
+            }
+        },
+        LEGENDARY: {
+            id: 'pulling',
+            name: '끌어당기기 [L]',
+            type: 'ACTIVE',
+            requiredClass: 'clown',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.BIND, SKILL_TAGS.KINETIC],
+            cost: 2,
+            targetType: 'enemy',
+            description: '5타일 내의 적을 자신의 바로 앞으로 끌어오고, 2턴간 [속박](이동 불가) 상태로 만듭니다. (쿨타임 4턴)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 5,
+            pull: true,
+            effect: {
+                id: 'bind',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2
+            }
+        }
+    },
+    // --- ▲ [신규] 끌어당기기 스킬 추가 ▲ ---
 };

@@ -32,6 +32,25 @@ export const statusEffects = {
             }
         },
     },
+    // ✨ [신규] 이동력 감소(slow) 및 속박(bind) 효과 추가
+    slow: {
+        id: 'slow',
+        name: '둔화',
+        description: '이동력이 감소합니다.',
+        iconPath: 'assets/images/status-effects/slow.png',
+    },
+    bind: {
+        id: 'bind',
+        name: '속박',
+        description: '이동할 수 없습니다.',
+        iconPath: 'assets/images/status-effects/bind.png',
+        onApply: (unit) => {
+            unit.isBound = true;
+        },
+        onRemove: (unit) => {
+            unit.isBound = false;
+        },
+    },
     // 전투의 함성: 일시적으로 근접 공격 등급을 상승시킵니다.
     battleCryBuff: {
         id: 'battleCryBuff',

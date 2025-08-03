@@ -152,6 +152,9 @@ class SkillEffectProcessor {
         if (skill.push > 0) {
             await formationEngine.pushUnit(target, unit, skill.push, this.animationEngine);
         }
+        if (skill.pull) {
+            await formationEngine.pullUnit(target, unit, this.animationEngine);
+        }
         if (skill.restoresBarrierPercent && unit.maxBarrier > 0) {
             const healAmount = Math.round(unit.maxBarrier * skill.restoresBarrierPercent);
             unit.currentBarrier = Math.min(unit.maxBarrier, unit.currentBarrier + healAmount);
