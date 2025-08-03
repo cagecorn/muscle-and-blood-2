@@ -10,6 +10,8 @@ import { createINTJ_AI } from './behaviors/createINTJ_AI.js';
 import { createINTP_AI } from './behaviors/createINTP_AI.js';
 // ✨ [신규] ENTJ AI import
 import { createENTJ_AI } from './behaviors/createENTJ_AI.js';
+// ✨ 용병 데이터에서 ai_archetype을 참조합니다.
+import { mercenaryData } from '../game/data/mercenaries.js';
 
 /**
  * 게임 내 모든 AI 유닛을 관리하고, 각 유닛의 행동 트리를 실행합니다.
@@ -39,31 +41,37 @@ class AIManager {
      */
     _createAIFromArchetype(unit) {
         const mbti = unit.mbti;
-        if (!mbti) return createMeleeAI(this.aiEngines);
+        if (mbti) {
+            const mbtiString = (mbti.E > mbti.I ? 'E' : 'I') +
+                               (mbti.S > mbti.N ? 'S' : 'N') +
+                               (mbti.T > mbti.F ? 'T' : 'F') +
+                               (mbti.J > mbti.P ? 'J' : 'P');
 
-        const mbtiString = (mbti.E > mbti.I ? 'E' : 'I') +
-                           (mbti.S > mbti.N ? 'S' : 'N') +
-                           (mbti.T > mbti.F ? 'T' : 'F') +
-                           (mbti.J > mbti.P ? 'J' : 'P');
-
-        switch (mbtiString) {
-            case 'INTJ': return createINTJ_AI(this.aiEngines);
-            // ✨ [신규] INTP 케이스 추가
-            case 'INTP': return createINTP_AI(this.aiEngines);
-            // ✨ [신규] ENTJ 케이스 추가
-            case 'ENTJ': return createENTJ_AI(this.aiEngines);
-            default:
-                if (unit.name === '거너' || unit.name === '나노맨서' || unit.name === '에스퍼') {
-                    return createRangedAI(this.aiEngines);
-                } else if (unit.name === '전사' || unit.name === '좀비' || unit.name === '커맨더') {
-                    return createMeleeAI(this.aiEngines);
-                } else if (unit.name === '메딕') {
-                    return createHealerAI(this.aiEngines);
-                } else if (unit.name === '플라잉맨') {
-                    return createFlyingmanAI(this.aiEngines);
-                }
-                return createMeleeAI(this.aiEngines);
+            switch (mbtiString) {
+                case 'INTJ': return createINTJ_AI(this.aiEngines);
+                case 'INTP': return createINTP_AI(this.aiEngines);
+                case 'ENTJ': return createENTJ_AI(this.aiEngines);
+                // 다른 MBTI 유형은 여기서 추가 가능
+            }
         }
+
+        const unitBaseData = mercenaryData[unit.id];
+        if (unitBaseData && unitBaseData.ai_archetype) {
+            switch (unitBaseData.ai_archetype) {
+                case 'ranged':
+                    return createRangedAI(this.aiEngines);
+                case 'healer':
+                    return createHealerAI(this.aiEngines);
+                case 'assassin':
+                    return createFlyingmanAI(this.aiEngines);
+                case 'melee':
+                default:
+                    return createMeleeAI(this.aiEngines);
+            }
+        }
+
+        // 모든 조건에 해당하지 않으면 기본적으로 근접 AI 사용
+        return createMeleeAI(this.aiEngines);
     }
 
     /**
