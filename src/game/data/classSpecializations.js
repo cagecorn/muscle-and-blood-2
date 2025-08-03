@@ -93,5 +93,20 @@ export const classSpecializations = {
                 modifiers: { stat: 'valor', type: 'flat', value: 2 }
             }
         }
+    ],
+    clown: [
+        {
+            tag: SKILL_TAGS.BIND,
+            description: "'속박' 태그 스킬 사용 시, 1턴간 치명타율 2% 및 상태이상 적용 확률 4%가 증가합니다 (중첩 가능).",
+            effect: {
+                id: 'clownBindBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: [
+                    { stat: 'criticalChance', type: 'percentage', value: 0.02 },
+                    { stat: 'statusEffectApplication', type: 'percentage', value: 0.04 }
+                ]
+            }
+        }
     ]
 };

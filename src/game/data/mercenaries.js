@@ -175,5 +175,28 @@ export const mercenaryData = {
             description: '[전략] 태그가 붙은 스킬의 재사용 대기시간이 1/10로 감소합니다.',
             iconPath: 'assets/images/skills/commanders-shout.png'
         }
+    },
+    // ✨ [신규] 광대 클래스 데이터 추가
+    clown: {
+        id: 'clown',
+        name: '광대',
+        ai_archetype: 'assassin',
+        uiImage: 'assets/images/unit/clown-ui.png',
+        battleSprite: 'clown',
+        sprites: {
+            idle: 'clown',
+            attack: 'clown',
+            hitted: 'clown',
+            cast: 'clown',
+            'status-effects': 'clown',
+        },
+        description: '"가장 화려한 무대는 가장 큰 비극 위에 피어나는 법이지."',
+        baseStats: {
+            hp: 95, valor: 8, strength: 10, endurance: 7,
+            agility: 16, intelligence: 10, wisdom: 8, luck: 15,
+            attackRange: 2,
+            movement: 4,
+            weight: 9
+        }
     }
 };
