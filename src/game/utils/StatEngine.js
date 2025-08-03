@@ -2,6 +2,9 @@ import { itemEngine } from './ItemEngine.js';
 // ✨ classProficiencies를 import하여 숙련도 정보를 조회할 수 있도록 합니다.
 import { classProficiencies } from '../data/classProficiencies.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
+// ✨ statusEffectManager와 EFFECT_TYPES를 import 합니다.
+import { statusEffectManager } from './StatusEffectManager.js';
+import { EFFECT_TYPES } from './EffectTypes.js';
 
 /**
  * 용맹(Valor) 시스템의 계산을 전담하는 엔진입니다.
@@ -80,6 +83,55 @@ class StatEngine {
     constructor() {
         this.valorEngine = new ValorEngine();
         this.weightEngine = new WeightEngine();
+    }
+
+    /**
+     * ✨ [신규] 턴 시작 시 발동하는 동적 패시브를 처리합니다.
+     * @param {object} unit - 현재 턴인 유닛
+     * @param {Array<object>} allUnits - 전장의 모든 유닛
+     */
+    handleTurnStartPassives(unit, allUnits) {
+        if (!unit.classPassive) return;
+
+        switch (unit.classPassive.id) {
+            case 'clownsJoke': {
+                let debuffedCount = 0;
+                const radius = 3;
+
+                allUnits.forEach(target => {
+                    if (target.currentHp <= 0) return;
+                    const distance = Math.abs(unit.gridX - target.gridX) + Math.abs(unit.gridY - target.gridY);
+                    if (distance <= radius) {
+                        const effects = statusEffectManager.activeEffects.get(target.uniqueId) || [];
+                        if (effects.some(e => e.type === EFFECT_TYPES.DEBUFF)) {
+                            debuffedCount++;
+                        }
+                    }
+                });
+
+                if (debuffedCount > 0) {
+                    const critBonus = 0.05 * debuffedCount;
+                    const weaknessBonus = 0.05 * debuffedCount;
+                    const attackBonus = 0.05 * debuffedCount;
+
+                    const buffEffect = {
+                        id: 'clownsJokeBuff',
+                        type: EFFECT_TYPES.BUFF,
+                        duration: 1,
+                        modifiers: [
+                            { stat: 'criticalChance', type: 'percentage', value: critBonus },
+                            { stat: 'weaknessChance', type: 'percentage', value: weaknessBonus },
+                            { stat: 'physicalAttackPercentage', type: 'percentage', value: attackBonus },
+                            { stat: 'magicAttackPercentage', type: 'percentage', value: attackBonus }
+                        ]
+                    };
+
+                    statusEffectManager.addEffect(unit, { name: '광대의 농담', effect: buffEffect }, unit);
+                }
+                break;
+            }
+            // ... 다른 턴 시작 패시브 case 추가 ...
+        }
     }
 
     /**

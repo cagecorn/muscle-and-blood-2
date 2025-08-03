@@ -140,6 +140,12 @@ export const statusEffects = {
         name: '과부하',
         iconPath: 'assets/images/skills/nanobeam.png',
     },
+    // ✨ 광대의 농담 버프 효과 추가
+    clownsJokeBuff: {
+        id: 'clownsJokeBuff',
+        name: '광대의 농담',
+        iconPath: 'assets/images/skills/clown-s-joke.png',
+    },
     flyingmenChargeBonus: {
         id: 'flyingmenChargeBonus',
         name: '신속',
