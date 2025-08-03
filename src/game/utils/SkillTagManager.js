@@ -45,4 +45,5 @@ export const SKILL_TAGS = {
     MIND: '정신',       // ✨ 에스퍼를 위한 '정신' 태그
     COMBO: '콤보',      // ✨ INTP를 위한 '콤보' 태그
     STRATEGY: '전략',   // ✨ 커맨더를 위한 '전략' 태그
+    BIND: '속박',      // ✨ 광대를 위한 '속박' 태그
 };

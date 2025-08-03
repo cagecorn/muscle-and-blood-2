@@ -56,6 +56,14 @@ export const classGrades = {
         magicDefense: 2,
     },
     // --- ▲ [신규] 플라잉맨 등급 추가 ▲ ---
+    clown: {
+        meleeAttack: 2,
+        rangedAttack: 2,
+        magicAttack: 1,
+        meleeDefense: 2,
+        rangedDefense: 1,
+        magicDefense: 1,
+    },
     // --- 다른 클래스 추가 예정 ---
     zombie: {
         meleeAttack: 2,
