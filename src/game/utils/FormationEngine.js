@@ -283,6 +283,46 @@ class FormationEngine {
             }
         }
     }
+
+    /**
+     * ✨ [신규] 특정 유닛을 공격자 주변의 빈 칸으로 끌어당깁니다.
+     * @param {object} targetUnit - 끌려올 대상 유닛
+     * @param {object} pullerUnit - 끌어당기는 유닛
+     * @param {AnimationEngine} animationEngine - 애니메이션 엔진
+     * @returns {Promise<void>}
+     */
+    async pullUnit(targetUnit, pullerUnit, animationEngine) {
+        if (!targetUnit || !pullerUnit) return;
+
+        const { gridX, gridY } = pullerUnit;
+        const directions = [
+            { col: 0, row: -1 }, { col: 0, row: 1 }, { col: -1, row: 0 }, { col: 1, row: 0 },
+            { col: -1, row: -1 }, { col: 1, row: -1 }, { col: -1, row: 1 }, { col: 1, row: 1 }
+        ];
+
+        let bestCell = null;
+        let minDistance = Infinity;
+
+        for (const dir of directions) {
+            const checkCol = gridX + dir.col;
+            const checkRow = gridY + dir.row;
+            const cell = this.grid.getCell(checkCol, checkRow);
+
+            if (cell && !cell.isOccupied) {
+                const dist = Math.abs(targetUnit.gridX - checkCol) + Math.abs(targetUnit.gridY - checkRow);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    bestCell = cell;
+                }
+            }
+        }
+
+        if (bestCell) {
+            await this.moveUnitOnGrid(targetUnit, { col: bestCell.col, row: bestCell.row }, animationEngine, 400);
+        } else {
+            debugLogEngine.log('FormationEngine', `끌어당기기 실패: ${pullerUnit.instanceName} 주변에 빈 공간이 없습니다.`);
+        }
+    }
 }
 
 export const formationEngine = new FormationEngine();
