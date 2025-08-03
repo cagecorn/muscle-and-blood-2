@@ -197,6 +197,13 @@ export const mercenaryData = {
             attackRange: 2,
             movement: 4,
             weight: 9
+        },
+        // ✨ 클래스 패시브 정보 추가
+        classPassive: {
+            id: 'clownsJoke',
+            name: '광대의 농담',
+            description: '주위 3타일 내 디버프에 걸린 유닛 하나당 자신의 치명타율 5%, 약점 공격 확률 5%, 공격력 5%가 증가합니다 (아군, 적군 포함).',
+            iconPath: 'assets/images/skills/clown-s-joke.png'
         }
     }
 };

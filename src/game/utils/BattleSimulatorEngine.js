@@ -211,6 +211,11 @@ export class BattleSimulatorEngine {
 
             // 턴 시작 시 콤보 정보를 초기화합니다.
             comboManager.startTurn(currentUnit.uniqueId);
+            
+            // ✨ [신규] 턴 시작 시 동적 패시브 효과를 적용합니다.
+            if (currentUnit && currentUnit.currentHp > 0) {
+                statEngine.handleTurnStartPassives(currentUnit, this.turnQueue);
+            }
 
             // 현재 턴 표시를 위해 턴 순서 UI 업데이트
             this.turnQueue.forEach((u, index) => u.isTurnActive = (index === this.currentTurnIndex));
