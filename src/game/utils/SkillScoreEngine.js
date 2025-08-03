@@ -93,6 +93,15 @@ class SkillScoreEngine {
                     mbtiScore += 10; // 생산 스킬에도 추가 점수
                 }
             }
+
+            // ✨ ENTP 성향 보너스
+            if (mbtiString === 'ENTP') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.DELAY)) mbtiScore += 20;
+                if (tags.includes(SKILL_TAGS.KINETIC)) mbtiScore += 20;
+                if (tags.includes(SKILL_TAGS.BIND)) mbtiScore += 25; // 끌어당기기 스킬 선호
+                if (skillData.type === 'DEBUFF') mbtiScore += 15;
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
