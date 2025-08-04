@@ -14,6 +14,8 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { comboManager } from './ComboManager.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { EFFECT_TYPES } from './EffectTypes.js'; // EFFECT_TYPES import 추가
+// ✨ 1. StatEngine을 import하여 스탯을 재계산할 수 있도록 합니다.
+import { statEngine } from './StatEngine.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -246,7 +248,35 @@ class SkillEffectProcessor {
         skill.tags.forEach(tag => {
             const spec = specializations.find(s => s.tag === tag);
             if (spec) {
-                statusEffectManager.addEffect(unit, { name: `특화 보너스: ${spec.tag}`, effect: spec.effect }, unit);
+                // ✨ [핵심 수정] 메카닉의 소환 특화 보너스를 위한 별도 로직 추가
+                if (spec.effect.id === 'mechanicSummonBonus') {
+                    // SummoningEngine을 통해 현재 유닛이 소환한 모든 소환수의 ID를 가져옵니다.
+                    const summons = this.summoningEngine.getSummons(unit.uniqueId);
+                    if (summons && summons.size > 0) {
+                        debugLogEngine.log('SkillEffectProcessor', `[${unit.instanceName}]의 [소환술 특화] 발동! 소환수 ${summons.size}기 강화 시작.`);
+
+                        // 각 소환수 ID에 대해 실제 유닛 객체를 찾아 스탯을 강화합니다.
+                        summons.forEach(summonId => {
+                            const summonUnit = this.battleSimulator.turnQueue.find(u => u.uniqueId === summonId);
+                            if (summonUnit && summonUnit.currentHp > 0) {
+                                // 1. 모든 기본 스탯을 5%씩 증가시킵니다.
+                                for (const stat in summonUnit.baseStats) {
+                                    if (typeof summonUnit.baseStats[stat] === 'number') {
+                                        summonUnit.baseStats[stat] *= 1.05;
+                                    }
+                                }
+                                // 2. StatEngine을 사용하여 finalStats를 다시 계산합니다.
+                                summonUnit.finalStats = statEngine.calculateStats(summonUnit, summonUnit.baseStats);
+
+                                // 3. 시각 효과(VFX)를 표시하여 강화되었음을 알립니다.
+                                this.vfxManager.showEffectName(summonUnit.sprite, '유닛 강화!', '#f59e0b');
+                            }
+                        });
+                    }
+                } else {
+                    // 메카닉 외 다른 클래스의 일반적인 특화 효과 적용
+                    statusEffectManager.addEffect(unit, { name: `특화 보너스: ${spec.tag}`, effect: spec.effect }, unit);
+                }
                 debugLogEngine.log('SkillEffectProcessor', `${unit.instanceName}가 특화 태그 [${spec.tag}] 보너스 획득!`);
             }
         });
