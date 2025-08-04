@@ -109,6 +109,8 @@ export class Preloader extends Scene
         this.load.image('skill-slot', 'images/skills/skill-slot.png');
         // ✨ [신규] 나노맨서 패시브 아이콘 추가
         this.load.image('elemental-manifest', 'images/skills/elemental-manifest.png');
+        // ✨ [신규] 메카닉 패시브 아이콘 추가
+        this.load.image('mechanical-enhancement', 'images/skills/mechanical-enhancement.png');
         this.load.image('clown-s-joke', 'images/skills/clown-s-joke.png'); // ✨ 광대 패시브 아이콘 추가
         // --- ▼ [신규] 역병 의사 패시브 아이콘 추가 ▼ ---
         this.load.image('antidote', 'images/skills/antidote.png');

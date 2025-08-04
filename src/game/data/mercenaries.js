@@ -64,7 +64,15 @@ export const mercenaryData = {
             attackRange: 1,
             movement: 2,
             weight: 16
+        },
+        // --- ▼ 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'mechanicalEnhancement',
+            name: '기계 강화',
+            description: '자신의 소환물에 자기 자신의 모든 스탯 10%를 더해줍니다.(이동거리, 사정거리, 등급은 제외)',
+            iconPath: 'assets/images/skills/mechanical-enhancement.png'
         }
+        // --- ▲ 클래스 패시브 정보 추가 ▲ ---
     },
     medic: {
         id: 'medic',

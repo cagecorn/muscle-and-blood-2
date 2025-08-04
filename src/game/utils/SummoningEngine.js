@@ -7,6 +7,8 @@ import { getSummonBase } from '../data/summon.js';
 import { aiManager } from '../../ai/AIManager.js';
 // 소환된 유닛을 토큰 시스템에 등록하기 위해 토큰 엔진을 불러옵니다.
 import { tokenEngine } from './TokenEngine.js';
+// 소환수의 최종 스탯 계산을 위해 스탯 엔진을 불러옵니다.
+import { statEngine } from './StatEngine.js';
 
 /**
  * 전투 중 유닛 소환을 담당하는 엔진
@@ -62,7 +64,32 @@ class SummoningEngine {
         // 소환수는 소환사와 같은 팀으로 생성됩니다.
         const summonedUnit = monsterEngine.spawnMonster(monsterBase, summoner.team);
 
-        // 생성 직후 토큰 엔진에 등록하여 바로 행동할 수 있게 합니다.
+        // --- ▼ 메카닉 클래스 패시브: 소환수 스탯 강화 ▼ ---
+        if (summoner.classPassive?.id === 'mechanicalEnhancement') {
+            const statsToInherit = [
+                'hp', 'valor', 'strength', 'endurance', 'agility', 'intelligence', 'wisdom', 'luck',
+                'physicalAttack', 'magicAttack', 'physicalDefense', 'magicDefense', 'criticalChance',
+                'criticalDamageMultiplier'
+            ];
+
+            let bonusApplied = false;
+            statsToInherit.forEach(stat => {
+                if (summoner.finalStats[stat]) {
+                    const bonus = summoner.finalStats[stat] * 0.10;
+                    summonedUnit.baseStats[stat] = (summonedUnit.baseStats[stat] || 0) + bonus;
+                    bonusApplied = true;
+                }
+            });
+
+            if (bonusApplied) {
+                // 강화된 기본 스탯을 기반으로 최종 스탯을 즉시 재계산합니다.
+                summonedUnit.finalStats = statEngine.calculateStats(summonedUnit, summonedUnit.baseStats);
+                debugLogEngine.log('SummoningEngine', `[기계 강화] 패시브 발동! ${summoner.instanceName}의 능력치 10%를 ${summonedUnit.instanceName}에게 부여합니다.`);
+            }
+        }
+        // --- ▲ 메카닉 클래스 패시브: 소환수 스탯 강화 ▲ ---
+
+        // 강화 적용 후 토큰 엔진에 등록하여 바로 행동할 수 있게 합니다.
         tokenEngine.registerUnit(summonedUnit);
 
         // 3. 소환수 전장 배치
