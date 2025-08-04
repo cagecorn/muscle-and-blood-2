@@ -30,6 +30,14 @@ export const classGrades = {
         rangedDefense: 3,
         magicDefense: 1,
     },
+    mechanic: {
+        meleeAttack: 2,
+        rangedAttack: 1,
+        magicAttack: 2,
+        meleeDefense: 2,
+        rangedDefense: 2,
+        magicDefense: 2,
+    },
     medic: {
         meleeAttack: 1,
         rangedAttack: 1,

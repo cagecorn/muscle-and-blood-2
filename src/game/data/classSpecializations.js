@@ -31,6 +31,19 @@ export const classSpecializations = {
             }
         }
     ],
+    mechanic: [
+        {
+            tag: SKILL_TAGS.SUMMON,
+            description: "'소환' 태그 스킬 사용 시, 자신이 소환한 모든 소환물의 모든 스탯을 5%씩 영구적으로 향상시킵니다.",
+            effect: {
+                id: 'mechanicSummonBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 99,
+                isGlobal: true,
+                modifiers: { stat: 'all_stats', type: 'percentage', value: 0.05 }
+            }
+        }
+    ],
     medic: [
         {
             tag: SKILL_TAGS.HEAL,

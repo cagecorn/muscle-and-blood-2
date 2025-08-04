@@ -18,6 +18,13 @@ export const classProficiencies = {
         SKILL_TAGS.KINETIC,
         SKILL_TAGS.FIXED,
     ],
+    mechanic: [
+        SKILL_TAGS.MELEE,
+        SKILL_TAGS.PHYSICAL,
+        SKILL_TAGS.SUMMON,
+        SKILL_TAGS.AID,
+        SKILL_TAGS.BUFF,
+    ],
     medic: [
         SKILL_TAGS.AID,
         SKILL_TAGS.HEAL,
