@@ -1,6 +1,7 @@
 import { equipmentManager } from './EquipmentManager.js';
 import { synergySets } from '../data/items.js';
-import { itemFactory } from './ItemFactory.js';
+// 기존에는 아이템을 항상 새로 생성했지만, 실제 인벤토리 정보를 참조하도록 수정
+import { itemInventoryManager } from './ItemInventoryManager.js';
 
 /**
  * 장비로 인한 스탯 보너스를 계산하는 엔진
@@ -9,7 +10,11 @@ class ItemEngine {
     getBonusStatsFromEquipment(unitData) {
         const bonusStats = {};
         const equippedItemIds = equipmentManager.getEquippedItems(unitData.uniqueId);
-        const equippedItems = equippedItemIds.map(id => itemFactory.createItem('axe', 'LEGENDARY'));
+        // 캐시된 인스턴스나 인벤토리에서 실제 장착된 아이템 정보를 가져옵니다.
+        const equippedItems = equippedItemIds.map(id => {
+            if (!id) return null;
+            return equipmentManager.itemInstanceCache.get(id) || itemInventoryManager.getItem(id);
+        });
 
         // 1. 아이템 자체 스탯 합산
         equippedItems.forEach(item => {

@@ -17,9 +17,10 @@ const phasermsg = () => {
 }   
 
 export default defineConfig({
-    // Set the base path so assets resolve correctly when served from the
-    // repository root on GitHub Pages or similar static hosts.
-    base: '/H-M-B/',
+    // GitHub Pages 등 특정 하위 경로에 배포할 때만 아래 설정을 사용하세요.
+    // base: '/H-M-B/',
+    // 일반적인 환경에서는 상대 경로를 사용하여 어디서든 빌드 결과가 동작하도록 합니다.
+    base: './',
     logLevel: 'warn',
     build: {
         rollupOptions: {

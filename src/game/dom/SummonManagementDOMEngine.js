@@ -253,7 +253,7 @@ export class SummonManagementDOMEngine {
             // 인벤토리 목록에서만 제거하여 장착 후에도 스킬 데이터를 참조할 수 있게 합니다.
             skillInventoryManager.removeSkillFromInventoryList(draggedInstanceId);
             if (targetInstanceId) {
-                ownedSkillsManager.equipSkill(unitId, targetSlotIndex, draggedInstanceId);
+                // 빈 슬롯이 아니었다면, 기존 스킬을 인벤토리로 되돌립니다.
                 this.addSkillToInventory(targetInstanceId);
             }
         } else if (this.draggedData.source === 'slot') {
