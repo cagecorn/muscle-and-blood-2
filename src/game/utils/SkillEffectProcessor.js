@@ -216,7 +216,8 @@ class SkillEffectProcessor {
         }
 
         if (target.currentHp <= 0) {
-            this.terminationManager.handleUnitDeath(target);
+            // 아래와 같이 두 번째 인자로 공격자(unit)를 전달합니다.
+            this.terminationManager.handleUnitDeath(target, unit);
         }
     }
 

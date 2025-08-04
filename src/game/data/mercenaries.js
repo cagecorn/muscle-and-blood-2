@@ -43,7 +43,15 @@ export const mercenaryData = {
             attackRange: 3,
             movement: 3,
             weight: 12
+        },
+        // --- ▼ [신규] 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'evasiveManeuver',
+            name: '회피 기동',
+            description: '적을 죽일 시, 3턴간 회피율이 8% 오릅니다. 이 버프는 최대 3번까지 중첩됩니다.',
+            iconPath: 'assets/images/skills/evasive-maneuver.png'
         }
+        // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
     },
     mechanic: {
         id: 'mechanic',
