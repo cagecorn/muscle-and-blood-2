@@ -254,7 +254,15 @@ export const mercenaryData = {
             attackRange: 1, // 사거리 1
             movement: 3,    // 이동거리 3
             weight: 13
+        },
+        // --- ▼ [신규] 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'antidote',
+            name: '해독제',
+            description: '스킬을 쓸 때마다, 자신 주위 3타일의 아군 1명의 디버프, 상태이상을 해제합니다. 해제할 대상이 없다면 자기 자신을 해독합니다.',
+            iconPath: 'assets/images/skills/antidote.png'
         }
+        // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
     }
     // --- ▲ [신규] 역병 의사 클래스 데이터 추가 ▲ ---
 };

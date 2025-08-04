@@ -13,6 +13,7 @@ import { diceEngine } from './DiceEngine.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 import { comboManager } from './ComboManager.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
+import { EFFECT_TYPES } from './EffectTypes.js'; // EFFECT_TYPES import 추가
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -118,6 +119,51 @@ class SkillEffectProcessor {
                 );
                 break;
             }
+            // --- ▼ [신규] '해독제' 패시브 로직 추가 ▼ ---
+            case 'antidote': {
+                const radius = 3;
+                const allies = this.battleSimulator.turnQueue.filter(
+                    u => u.team === unit.team && u.uniqueId !== unit.uniqueId && u.currentHp > 0
+                );
+
+                let targetToCleanse = null;
+
+                // 1. 주변 아군 중 디버프가 있는 아군 탐색
+                const nearbyAllies = allies.filter(ally => {
+                    const distance = Math.abs(unit.gridX - ally.gridX) + Math.abs(unit.gridY - ally.gridY);
+                    return distance <= radius;
+                });
+
+                const debuffedAllies = nearbyAllies.filter(ally => {
+                    const effects = statusEffectManager.activeEffects.get(ally.uniqueId) || [];
+                    return effects.some(e => e.type === EFFECT_TYPES.DEBUFF || e.type === EFFECT_TYPES.STATUS_EFFECT);
+                });
+
+                if (debuffedAllies.length > 0) {
+                    // 디버프 걸린 아군 중 무작위 한 명 선택
+                    targetToCleanse = diceEngine.getRandomElement(debuffedAllies);
+                } else {
+                    // 주변에 대상이 없으면 자기 자신을 확인
+                    const selfEffects = statusEffectManager.activeEffects.get(unit.uniqueId) || [];
+                    if (selfEffects.some(e => e.type === EFFECT_TYPES.DEBUFF || e.type === EFFECT_TYPES.STATUS_EFFECT)) {
+                        targetToCleanse = unit;
+                    }
+                }
+
+                // 2. 대상이 있으면 디버프 1개 제거
+                if (targetToCleanse) {
+                    const success = statusEffectManager.removeOneDebuff(targetToCleanse);
+                    if (success) {
+                        debugLogEngine.log(
+                            this.constructor.name,
+                            `[${unit.instanceName}]의 [해독제] 패시브 발동! [${targetToCleanse.instanceName}]의 해로운 효과 1개를 제거했습니다.`
+                        );
+                        this.vfxManager.showEffectName(targetToCleanse.sprite, '정화', '#60a5fa');
+                    }
+                }
+                break;
+            }
+            // --- ▲ [신규] '해독제' 패시브 로직 추가 ▲ ---
             // ... 다른 클래스 패시브 case 추가 ...
         }
     }
