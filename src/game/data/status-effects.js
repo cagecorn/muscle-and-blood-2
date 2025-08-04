@@ -1,6 +1,7 @@
 import { statusEffectManager } from "../utils/StatusEffectManager.js";
 import { stackManager } from "../utils/StackManager.js";
 import { FIXED_DAMAGE_TYPES } from "../utils/FixedDamageManager.js";
+import { EFFECT_TYPES } from "../utils/EffectTypes.js"; // EFFECT_TYPES import 추가
 
 /**
  * 모든 상태 효과의 정의를 담는 데이터베이스입니다.
@@ -51,6 +52,16 @@ export const statusEffects = {
             unit.isBound = false;
         },
     },
+    // --- ▼ [신규] 회피 기동 버프 효과 추가 ▼ ---
+    evasiveManeuverBuff: {
+        id: 'evasiveManeuverBuff',
+        name: '회피 기동',
+        type: EFFECT_TYPES.BUFF, // 이 효과는 버프입니다.
+        iconPath: 'assets/images/skills/evasive-maneuver.png',
+        maxStacks: 3, // 최대 3번 중첩 가능
+        modifiers: { stat: 'physicalEvadeChance', type: 'percentage', value: 0.08 } // 물리 회피율 8% 증가
+    },
+    // --- ▲ [신규] 회피 기동 버프 효과 추가 ▲ ---
     // 전투의 함성: 일시적으로 근접 공격 등급을 상승시킵니다.
     battleCryBuff: {
         id: 'battleCryBuff',
