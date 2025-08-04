@@ -16,6 +16,8 @@ import { createENTP_AI } from './behaviors/createENTP_AI.js';
 import { createINFJ_AI } from './behaviors/createINFJ_AI.js';
 // ✨ [추가] INFP AI import
 import { createINFP_AI } from './behaviors/createINFP_AI.js';
+// ✨ [신규] ENFP AI import
+import { createENFP_AI } from './behaviors/createENFP_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
 
@@ -62,11 +64,14 @@ class AIManager {
                 case 'INFJ': return createINFJ_AI(this.aiEngines);
                 // ✨ [추가] INFP 케이스 추가
                 case 'INFP': return createINFP_AI(this.aiEngines);
+                // ✨ [신규] ENFP 케이스 추가
+                case 'ENFP': return createENFP_AI(this.aiEngines);
                 // 다른 MBTI 유형은 여기서 추가 가능
             }
         }
 
         const unitBaseData = mercenaryData[unit.id];
+        // ✨ [수정] 거너(gunner)가 ai_archetype을 사용하도록 수정
         if (unitBaseData && unitBaseData.ai_archetype) {
             switch (unitBaseData.ai_archetype) {
                 case 'ranged':
@@ -75,6 +80,9 @@ class AIManager {
                     return createHealerAI(this.aiEngines);
                 case 'assassin':
                     return createFlyingmanAI(this.aiEngines);
+                // ✨ [신규] 거너가 ENFP AI를 사용하도록 연결
+                case 'gunner':
+                    return createENFP_AI(this.aiEngines);
                 case 'melee':
                 default:
                     return createMeleeAI(this.aiEngines);
