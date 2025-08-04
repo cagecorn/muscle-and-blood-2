@@ -22,10 +22,12 @@ class DebugAIManager {
     /**
      * 노드 평가 결과를 로그로 남깁니다.
      * @param {string} result - 노드의 평가 결과 (SUCCESS, FAILURE, RUNNING)
+     * @param {string} [message] - 추가적인 디버그 메시지
      */
-    logNodeResult(result) {
+    logNodeResult(result, message = '') {
         const color = result === 'SUCCESS' ? '#22c55e' : (result === 'FAILURE' ? '#ef4444' : '#3b82f6');
-        debugLogEngine.log(this.name, `%c결과: ${result}`, `color: ${color}; font-weight: bold;`);
+        const logMessage = message ? `결과: ${result} (${message})` : `결과: ${result}`;
+        debugLogEngine.log(this.name, `%c${logMessage}`, `color: ${color}; font-weight: bold;`);
         console.groupEnd();
     }
 
