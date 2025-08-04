@@ -123,5 +123,19 @@ export const classSpecializations = {
                 modifiers: { stat: 'damageReduction', type: 'percentage', value: 0.10 }
             }
         }
+    ],
+    // --- ▼ [신규] 역병 의사 특화 태그 추가 ▼ ---
+    plagueDoctor: [
+        {
+            tag: SKILL_TAGS.POISON,
+            description: "'독' 태그 스킬 사용 시, 1턴간 상태이상 적용 확률 5% 증가 (중첩 가능)",
+            effect: {
+                id: 'poisonAttributeBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.05 }
+            }
+        }
     ]
+    // --- ▲ [신규] 역병 의사 특화 태그 추가 ▲ ---
 };
