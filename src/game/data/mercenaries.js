@@ -24,7 +24,8 @@ export const mercenaryData = {
     gunner: {
         id: 'gunner',
         name: '거너',
-        ai_archetype: 'ranged',
+        // ✨ [수정] ai_archetype을 'gunner'로 명시하여 ENFP AI와 연결
+        ai_archetype: 'gunner',
         uiImage: 'assets/images/territory/gunner-ui.png',
         battleSprite: 'gunner',
         // ✨ 모든 행동 스프라이트를 기본(idle)으로 통일

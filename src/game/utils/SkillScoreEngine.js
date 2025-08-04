@@ -102,6 +102,15 @@ class SkillScoreEngine {
                 if (tags.includes(SKILL_TAGS.BIND)) mbtiScore += 25; // 끌어당기기 스킬 선호
                 if (skillData.type === 'DEBUFF') mbtiScore += 15;
             }
+
+            // ✨ [신규] ENFP 성향 보너스
+            if (mbtiString === 'ENFP') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.FIXED)) mbtiScore += 30; // 확정 스킬 매우 선호
+                if (tags.includes(SKILL_TAGS.COMBO)) mbtiScore += 25; // 콤보 스킬 선호
+                if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 20; // 돌진 스킬도 선호
+                if (tags.includes(SKILL_TAGS.KINETIC)) mbtiScore += 15; // 관성(넉백) 스킬 선호
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
