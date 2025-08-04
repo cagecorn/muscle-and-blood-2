@@ -44,6 +44,28 @@ export const mercenaryData = {
             weight: 12
         }
     },
+    mechanic: {
+        id: 'mechanic',
+        name: '메카닉',
+        ai_archetype: 'ranged',
+        uiImage: 'assets/images/unit/mechanic-ui.png',
+        battleSprite: 'mechanic',
+        sprites: {
+            idle: 'mechanic',
+            attack: 'mechanic',
+            hitted: 'mechanic',
+            cast: 'mechanic',
+            'status-effects': 'mechanic',
+        },
+        description: '"나의 창조물들이 전장을 파괴할 것이다."',
+        baseStats: {
+            hp: 100, valor: 8, strength: 12, endurance: 10,
+            agility: 8, intelligence: 12, wisdom: 10, luck: 8,
+            attackRange: 1,
+            movement: 2,
+            weight: 16
+        }
+    },
     medic: {
         id: 'medic',
         name: '메딕',

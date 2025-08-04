@@ -47,4 +47,5 @@ export const SKILL_TAGS = {
     STRATEGY: '전략',   // ✨ 커맨더를 위한 '전략' 태그
     BIND: '속박',      // ✨ 광대를 위한 '속박' 태그
     SACRIFICE: '희생', // ✨ 안드로이드를 위한 '희생' 태그
+    SUMMON: '소환',     // ✨ 소환수를 다루는 태그
 };
