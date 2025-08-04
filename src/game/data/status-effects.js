@@ -177,5 +177,13 @@ export const statusEffects = {
         name: '신속',
         iconPath: 'assets/images/skills/charge.png',
     },
+    // --- ▼ [신규] 역병 의사 특화 보너스 효과 추가 ▼ ---
+    poisonAttributeBonus: {
+        id: 'poisonAttributeBonus',
+        name: '맹독 확산',
+        description: '상태이상 적용 확률이 증가합니다.',
+        iconPath: 'assets/images/skills/antidote.png', // 임시 아이콘, 추후 전용 아이콘으로 교체 가능
+    },
+    // --- ▲ [신규] 역병 의사 특화 보너스 효과 추가 ▲ ---
     // --- ▲ [신규] 클래스 특화 보너스 효과 추가 ▲ ---
 };
