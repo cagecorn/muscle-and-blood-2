@@ -68,6 +68,8 @@ export class Preloader extends Scene
         this.load.image('commander', 'images/unit/commander.png');
         this.load.image('clown', 'images/unit/clown.png'); // 추가
         this.load.image('android', 'images/unit/android.png'); // 추가
+        // ✨ [추가] 역병 의사 스프라이트 로드
+        this.load.image('plague-doctor', 'images/unit/plague-doctor.png');
 
         // UI용 이미지 로드
         this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
@@ -79,6 +81,8 @@ export class Preloader extends Scene
         this.load.image('commander-ui', 'images/unit/commander-ui.png');
         this.load.image('clown-ui', 'images/unit/clown-ui.png'); // 추가
         this.load.image('android-ui', 'images/unit/android-ui.png'); // 추가
+        // ✨ [추가] 역병 의사 UI 이미지 로드
+        this.load.image('plague-doctor-ui', 'images/unit/plague-doctor-ui.png');
 
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
@@ -140,7 +144,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'medic', 'nanomancer', 'flyingmen', 'esper', 'commander', 'clown', 'android', 'zombie', 'ancestor-peor',
+            'warrior', 'gunner', 'medic', 'nanomancer', 'flyingmen', 'esper', 'commander', 'clown', 'android', 'plague-doctor', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

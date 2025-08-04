@@ -232,5 +232,29 @@ export const mercenaryData = {
             description: '자신이 [희생] 태그 스킬을 사용하거나, 아군이 사망할 때마다 [강화 학습] 버프를 1 얻습니다. 이 버프는 중첩될 때마다 모든 기본 스탯(힘, 인내 등)을 1씩 올려주며, 전투가 끝나면 사라집니다.',
             iconPath: 'assets/images/skills/reinforcement-learning.png'
         }
+    },
+    // --- ▼ [신규] 역병 의사 클래스 데이터 추가 ▼ ---
+    plagueDoctor: {
+        id: 'plagueDoctor',
+        name: '역병 의사',
+        ai_archetype: 'healer', // 기본 AI는 메딕과 유사한 'healer' 타입
+        uiImage: 'assets/images/unit/plague-doctor-ui.png',
+        battleSprite: 'plague-doctor',
+        sprites: {
+            idle: 'plague-doctor',
+            attack: 'plague-doctor',
+            hitted: 'plague-doctor',
+            cast: 'plague-doctor',
+            'status-effects': 'plague-doctor',
+        },
+        description: '"죽음이야말로 가장 확실한 치료법이지."',
+        baseStats: {
+            hp: 85, valor: 6, strength: 8, endurance: 7,
+            agility: 11, intelligence: 14, wisdom: 13, luck: 11,
+            attackRange: 1, // 사거리 1
+            movement: 3,    // 이동거리 3
+            weight: 13
+        }
     }
+    // --- ▲ [신규] 역병 의사 클래스 데이터 추가 ▲ ---
 };
