@@ -115,6 +115,17 @@ export const classGrades = {
     },
     // --- ▲ [신규] 역병 의사 등급 추가 ▲ ---
 
+    // --- ▼ [신규] 팔라딘 등급 추가 ▼ ---
+    paladin: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 2,
+        meleeDefense: 3,
+        rangedDefense: 2,
+        magicDefense: 3,
+    },
+    // --- ▲ [신규] 팔라딘 등급 추가 ▲ ---
+
     // --- ▼ [신규] 센티넬 등급 추가 ▼ ---
     sentinel: {
         meleeAttack: 2,

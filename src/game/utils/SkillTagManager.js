@@ -49,4 +49,5 @@ export const SKILL_TAGS = {
     SACRIFICE: '희생', // ✨ 안드로이드를 위한 '희생' 태그
     SUMMON: '소환',     // ✨ 소환수를 다루는 태그
     GUARDIAN: '가디언', // ✨ 센티넬을 위한 '가디언' 태그
+    AURA: '오라',       // ✨ 팔라딘을 위한 '오라' 태그
 };

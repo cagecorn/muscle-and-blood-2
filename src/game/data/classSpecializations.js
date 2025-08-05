@@ -152,6 +152,24 @@ export const classSpecializations = {
     ],
     // --- ▲ [신규] 역병 의사 특화 태그 추가 ▲ ---
 
+    // --- ▼ [신규] 팔라딘 특화 태그 추가 ▼ ---
+    paladin: [
+        {
+            tag: SKILL_TAGS.AURA,
+            description: "'오라' 태그 스킬 사용 시, 2턴간 자신의 모든 방어력이 10% 증가합니다.",
+            effect: {
+                id: 'paladinAuraBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: [
+                    { stat: 'physicalDefense', type: 'percentage', value: 0.10 },
+                    { stat: 'magicDefense', type: 'percentage', value: 0.10 }
+                ]
+            }
+        }
+    ],
+    // --- ▲ [신규] 팔라딘 특화 태그 추가 ▲ ---
+
     // --- ▼ [신규] 센티넬 특화 태그 추가 ▼ ---
     sentinel: [
         {

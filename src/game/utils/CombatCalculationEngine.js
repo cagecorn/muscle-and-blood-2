@@ -224,8 +224,27 @@ class CombatCalculationEngine {
         const damageAfterGrade = initialDamage * combatMultiplier;
 
         // ✨ 방어자의 받는 데미지 증가/감소 효과 적용
-        const damageReductionPercent = statusEffectManager.getModifierValue(defender, 'damageReduction');
+        let damageReductionPercent = statusEffectManager.getModifierValue(defender, 'damageReduction');
         const damageIncreasePercent = statusEffectManager.getModifierValue(defender, 'damageIncrease');
+
+        // --- ▼ [신규] 팔라딘 '성역의 오라' 패시브 로직 추가 ▼ ---
+        if (this.battleSimulator) {
+            const allies = this.battleSimulator.turnQueue.filter(u => u.team === defender.team && u.currentHp > 0);
+            const paladinsNearby = allies.filter(ally =>
+                ally.classPassive?.id === 'sanctuaryAura' &&
+                Math.abs(ally.gridX - defender.gridX) + Math.abs(ally.gridY - defender.gridY) <= 2
+            );
+            if (paladinsNearby.length > 0) {
+                const auraReduction = 0.10 * paladinsNearby.length;
+                damageReductionPercent += auraReduction;
+                debugLogEngine.log(
+                    'CombatCalculationEngine',
+                    `[성역의 오라] 효과! ${paladinsNearby.length}명의 팔라딘에 의해 피해량 ${auraReduction * 100}% 감소.`
+                );
+            }
+        }
+        // --- ▲ [신규] 팔라딘 '성역의 오라' 패시브 로직 추가 ▲ ---
+
         // ✨ 아이언 윌 패시브 효과 계산
         const ironWillReduction = this.calculateIronWillReduction(defender);
 
