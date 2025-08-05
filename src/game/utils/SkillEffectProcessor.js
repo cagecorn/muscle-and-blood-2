@@ -328,12 +328,34 @@ class SkillEffectProcessor {
             }
         }
     
+        // --- ▼ [신규] '팔라딘의 인도' 패시브 로직 추가 ▼ ---
+        let finalEffect = skill.effect;
+        if (unit.classPassive?.id === 'paladinsGuide' && skill.tags?.includes(SKILL_TAGS.AURA) && finalEffect?.modifiers) {
+            // 원본 effect 객체를 변경하지 않기 위해 깊은 복사를 수행합니다.
+            finalEffect = JSON.parse(JSON.stringify(skill.effect));
+
+            const applyBonus = modifier => {
+                if (typeof modifier.value === 'number') {
+                    modifier.value *= 1.2;
+                }
+            };
+
+            if (Array.isArray(finalEffect.modifiers)) {
+                finalEffect.modifiers.forEach(applyBonus);
+            } else {
+                applyBonus(finalEffect.modifiers);
+            }
+            debugLogEngine.log(this.constructor.name, `[팔라딘의 인도] 패시브 발동! [${skill.name}] 스킬 효과 20% 증가.`);
+            this.vfxManager.showEffectName(unit.sprite, '팔라딘의 인도', '#f0e68c');
+        }
+        // --- ▲ [신규] '팔라딘의 인도' 패시브 로직 추가 ▲ ---
+
         baseTargets.forEach(currentTarget => {
             const roll = Math.random();
-            if (skill.effect.chance === undefined || roll < skill.effect.chance) {
-                statusEffectManager.addEffect(currentTarget, skill, unit);
+            if (finalEffect.chance === undefined || roll < finalEffect.chance) {
+                statusEffectManager.addEffect(currentTarget, { ...skill, effect: finalEffect }, unit);
             } else {
-                debugLogEngine.log('SkillEffectProcessor', `[${skill.name}]의 효과 발동 실패 (확률: ${skill.effect.chance}, 주사위: ${roll.toFixed(2)})`);
+                debugLogEngine.log('SkillEffectProcessor', `[${skill.name}]의 효과 발동 실패 (확률: ${finalEffect.chance}, 주사위: ${roll.toFixed(2)})`);
             }
         });
     }

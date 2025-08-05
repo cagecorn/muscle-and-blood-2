@@ -346,10 +346,10 @@ export const mercenaryData = {
             weight: 19
         },
         classPassive: {
-            id: 'sanctuaryAura',
-            name: '성역의 오라',
-            description: '자신 주위 2타일 내의 모든 아군은 받는 피해량이 10% 감소합니다.',
-            iconPath: 'assets/images/skills/magic-shield.png' // 임시 아이콘
+            id: 'paladinsGuide',
+            name: '팔라딘의 인도',
+            description: '팔라딘의 [오라] 태그 스킬의 효과가 20% 증가합니다.',
+            iconPath: 'assets/images/skills/paladins-guide.png'
         }
     },
     // --- ▲ [신규] 팔라딘 클래스 데이터 추가 ▲ ---
