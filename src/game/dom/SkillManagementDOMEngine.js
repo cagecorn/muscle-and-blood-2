@@ -296,6 +296,7 @@ export class SkillManagementDOMEngine {
 
         inventory.forEach(instance => {
             const data = skillInventoryManager.getSkillData(instance.skillId, instance.grade);
+            if (!data) return;
             const card = document.createElement('div');
             card.className = `skill-inventory-card ${data.type.toLowerCase()}-card grade-${instance.grade.toLowerCase()}`;
 
