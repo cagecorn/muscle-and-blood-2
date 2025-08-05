@@ -33,6 +33,7 @@ import { statEngine } from './StatEngine.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 import { EFFECT_TYPES } from './EffectTypes.js';
 import { BattleSpeedManager } from './BattleSpeedManager.js';
+import { NarrationUIManager } from '../dom/NarrationUIManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -62,6 +63,7 @@ export class BattleSimulatorEngine {
         // 턴 순서 UI 매니저
         this.turnOrderUI = new TurnOrderUIManager();
         this.sharedResourceUI = new SharedResourceUIManager();
+        this.narrationUI = new NarrationUIManager();
         
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
@@ -78,6 +80,7 @@ export class BattleSimulatorEngine {
             // ✨ AI가 소환 엔진을 사용할 수 있도록 패키지에 포함합니다.
             summoningEngine: this.summoningEngine,
             battleSimulator: this,
+            narrationEngine: this.narrationUI,
         };
 
         // ✨ AspirationEngine에 battleSimulator 참조 설정
@@ -178,6 +181,7 @@ export class BattleSimulatorEngine {
         // 턴 순서 UI 초기화
         this.turnOrderUI.show(this.turnQueue);
         this.sharedResourceUI.show();
+        this.narrationUI.show('전투 시작!', 1500);
 
         // --- ✨ 첫 턴 시작 시 토큰 지급 ---
         tokenEngine.addTokensForNewTurn();
@@ -370,6 +374,9 @@ export class BattleSimulatorEngine {
         }
         if (this.sharedResourceUI) {
             this.sharedResourceUI.destroy();
+        }
+        if (this.narrationUI) {
+            this.narrationUI.destroy();
         }
     }
 }

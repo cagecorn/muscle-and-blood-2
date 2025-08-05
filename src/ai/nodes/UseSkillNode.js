@@ -15,6 +15,7 @@ class UseSkillNode extends Node {
         this.delayEngine = engines.delayEngine;
         this.skillEngine = engines.skillEngine || skillEngine;
         this.vfxManager = engines.vfxManager;
+        this.narrationEngine = engines.narrationEngine;
         // SkillEffectProcessor를 초기화합니다.
         this.skillEffectProcessor = new SkillEffectProcessor(engines);
     }
@@ -45,6 +46,10 @@ class UseSkillNode extends Node {
 
         // 최종 사용할 스킬 데이터를 준비합니다 (숙련도 보너스 적용)
         const finalSkill = this._applyProficiency(unit, modifiedSkill);
+
+        if (this.narrationEngine) {
+            this.narrationEngine.show(`${unit.instanceName}이(가) [${skillTarget.instanceName}]에게 [${finalSkill.name}]을(를) 사용합니다.`);
+        }
 
         // 스킬 사용 기록
         this.skillEngine.recordSkillUse(unit, finalSkill);

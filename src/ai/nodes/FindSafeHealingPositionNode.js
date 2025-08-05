@@ -5,10 +5,11 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
  * 아군을 치유하면서 적에게서 안전한 위치를 탐색합니다.
  */
 class FindSafeHealingPositionNode extends Node {
-    constructor({ formationEngine, pathfinderEngine }) {
+    constructor({ formationEngine, pathfinderEngine, narrationEngine }) {
         super();
         this.formationEngine = formationEngine;
         this.pathfinderEngine = pathfinderEngine;
+        this.narrationEngine = narrationEngine;
     }
 
     async evaluate(unit, blackboard) {
@@ -20,6 +21,10 @@ class FindSafeHealingPositionNode extends Node {
         if (!targetAlly) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '치유 대상 아군 없음');
             return NodeState.FAILURE;
+        }
+
+        if (this.narrationEngine) {
+            this.narrationEngine.show(`${unit.instanceName}이(가) [${targetAlly.instanceName}]을(를) 치유하기 위해 안전한 위치를 찾습니다.`);
         }
 
         const cells = this.formationEngine.grid.gridCells.filter(

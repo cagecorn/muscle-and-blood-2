@@ -5,15 +5,24 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
  * 전투가 잠잠할 때 유리한 위치로 이동하기 위한 위치를 탐색합니다.
  */
 class FindSafeRepositionNode extends Node {
-    constructor({ formationEngine, pathfinderEngine }) {
+    constructor({ formationEngine, pathfinderEngine, narrationEngine }) {
         super();
         this.formationEngine = formationEngine;
         this.pathfinderEngine = pathfinderEngine;
+        this.narrationEngine = narrationEngine;
     }
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const enemies = blackboard.get('enemyUnits');
+        if (this.narrationEngine) {
+            const isThreatened = blackboard.get('isThreatened');
+            if (isThreatened) {
+                this.narrationEngine.show(`${unit.instanceName}이(가) 위협을 피해 안전한 위치로 후퇴합니다.`);
+            } else {
+                this.narrationEngine.show(`${unit.instanceName}이(가) 다음 행동을 위해 유리한 위치로 이동합니다.`);
+            }
+        }
         const cells = this.formationEngine.grid.gridCells.filter(
             cell => !cell.isOccupied || (cell.col === unit.gridX && cell.row === unit.gridY)
         );
