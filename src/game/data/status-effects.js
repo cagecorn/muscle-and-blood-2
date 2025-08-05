@@ -234,4 +234,19 @@ export const statusEffects = {
     },
     // --- ▲ [신규] 역병 의사 특화 보너스 효과 추가 ▲ ---
     // --- ▲ [신규] 클래스 특화 보너스 효과 추가 ▲ ---
+
+    // --- ▼ [신규] 다크나이트 패시브 및 특화 효과 추가 ▼ ---
+    despairAuraDebuff: {
+        id: 'despairAuraDebuff',
+        name: '절망의 오라',
+        type: EFFECT_TYPES.DEBUFF,
+        iconPath: 'assets/images/skills/curse-of-darkness.png',
+        description: '공격력과 방어력이 5% 감소합니다.'
+    },
+    darkKnightDarkBonus: {
+        id: 'darkKnightDarkBonus',
+        name: '어둠 흡수',
+        iconPath: 'assets/images/skills/curse-of-darkness.png',
+    },
+    // --- ▲ [신규] 다크나이트 패시브 및 특화 효과 추가 ▲ ---
 };
