@@ -383,6 +383,37 @@ export const mercenaryData = {
             iconPath: 'assets/images/skills/eye-of-guard.png',
             effect: sentinelSkills.sentryDuty.effect
         }
-    }
+    },
     // --- ▲ [신규] 센티넬 클래스 데이터 추가 ▲ ---
+
+    // --- ▼ [신규] 해커 클래스 데이터 추가 ▼ ---
+    hacker: {
+        id: 'hacker',
+        name: '해커',
+        ai_archetype: 'melee', // 기본 AI는 근접 타입으로 설정
+        uiImage: 'assets/images/unit/hacker-ui.png',
+        battleSprite: 'hacker',
+        sprites: {
+            idle: 'hacker',
+            attack: 'hacker',
+            hitted: 'hacker',
+            cast: 'hacker',
+            'status-effects': 'hacker',
+        },
+        description: '"네놈의 시스템은 이제 제 겁니다."',
+        baseStats: {
+            hp: 90, valor: 7, strength: 12, endurance: 8,
+            agility: 14, intelligence: 15, wisdom: 9, luck: 11,
+            attackRange: 2,
+            movement: 3,
+            weight: 14
+        },
+        classPassive: {
+            id: 'hackersInvade',
+            name: '해커의 침입',
+            description: '해커의 디버프에 걸린 상대는 1턴간 지속되는 랜덤 디버프 하나를 추가로 받습니다.',
+            iconPath: 'assets/images/skills/hacker\'s-invade.png'
+        }
+    }
+    // --- ▲ [신규] 해커 클래스 데이터 추가 ▲ ---
 };

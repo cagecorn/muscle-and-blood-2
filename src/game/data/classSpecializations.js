@@ -186,6 +186,21 @@ export const classSpecializations = {
                 ]
             }
         }
-    ]
+    ],
     // --- ▲ [신규] 센티넬 특화 태그 추가 ▲ ---
+
+    // --- ▼ [신규] 해커 특화 태그 추가 ▼ ---
+    hacker: [
+        {
+            tag: SKILL_TAGS.PROHIBITION,
+            description: "'금지' 태그 스킬 사용 시, 1턴간 자신의 상태이상 적용 확률이 8% 증가합니다. (중첩 가능)",
+            effect: {
+                id: 'hackerProhibitionBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.08 }
+            }
+        }
+    ]
+    // --- ▲ [신규] 해커 특화 태그 추가 ▲ ---
 };

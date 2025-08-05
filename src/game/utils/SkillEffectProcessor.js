@@ -16,6 +16,8 @@ import { SKILL_TAGS } from './SkillTagManager.js';
 import { EFFECT_TYPES } from './EffectTypes.js'; // EFFECT_TYPES import 추가
 // ✨ 1. StatEngine을 import하여 스탯을 재계산할 수 있도록 합니다.
 import { statEngine } from './StatEngine.js';
+// 상태 효과 데이터베이스를 통해 해커 패시브에 사용할 디버프를 조회합니다.
+import { statusEffects } from '../data/status-effects.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -95,6 +97,29 @@ class SkillEffectProcessor {
         // 상태 효과 적용
         if (skill.effect) {
             this._applyStatusEffects(unit, target, skill, blackboard);
+
+            // --- ▼ [신규] '해커의 침입' 패시브 발동 로직 ▼ ---
+            if (unit.classPassive?.id === 'hackersInvade' && skill.type === 'DEBUFF') {
+                const allDebuffs = Object.values(statusEffects).filter(
+                    e => e.type === EFFECT_TYPES.DEBUFF && e.id !== skill.effect.id
+                );
+
+                if (allDebuffs.length > 0) {
+                    const randomDebuff = diceEngine.getRandomElement(allDebuffs);
+                    const bonusDebuffSkill = {
+                        name: `[침입] ${randomDebuff.name}`,
+                        effect: { ...randomDebuff, duration: 1 }
+                    };
+                    statusEffectManager.addEffect(target, bonusDebuffSkill, unit);
+
+                    debugLogEngine.log(
+                        this.constructor.name,
+                        `[해커의 침입] 패시브 발동! ${target.instanceName}에게 [${randomDebuff.name}] 추가 적용.`
+                    );
+                    this.vfxManager.showEffectName(unit.sprite, '해커의 침입!', '#22c55e');
+                }
+            }
+            // --- ▲ [신규] '해커의 침입' 패시브 발동 로직 ▲ ---
         }
     }
 

@@ -134,6 +134,17 @@ export const classGrades = {
         meleeDefense: 3,
         rangedDefense: 3,
         magicDefense: 2,
-    }
+    },
     // --- ▲ [신규] 센티넬 등급 추가 ▲ ---
+
+    // --- ▼ [신규] 해커 등급 추가 ▼ ---
+    hacker: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 3,
+        meleeDefense: 1,
+        rangedDefense: 2,
+        magicDefense: 2,
+    }
+    // --- ▲ [신규] 해커 등급 추가 ▲ ---
 };
