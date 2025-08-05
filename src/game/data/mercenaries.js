@@ -1,4 +1,5 @@
 import { sentinelSkills } from './skills/sentinel.js';
+import { darkKnightSkills } from './skills/darkKnight.js';
 
 export const mercenaryData = {
     warrior: {
@@ -453,6 +454,32 @@ export const mercenaryData = {
             description: '매번 자신의 최대 체력의 20%에 해당하는 누적 데미지를 입으면, 1턴간 [투명화] 상태가 되어 회피율이 50% 상승합니다.',
             iconPath: 'assets/images/skills/ghosting.png'
         }
-    }
+    },
     // --- ▲ [신규] 고스트 클래스 데이터 추가 ▲ ---
+
+    // --- ▼ [신규] 다크나이트 클래스 데이터 추가 ▼ ---
+    darkKnight: {
+        id: 'darkKnight',
+        name: '다크나이트',
+        ai_archetype: 'melee', // ESFP 아키타입과 연결될 수 있습니다.
+        uiImage: 'assets/images/unit/dark-knight-ui.png',
+        battleSprite: 'dark-night',
+        sprites: {
+            idle: 'dark-night',
+            attack: 'dark-night',
+            hitted: 'dark-night',
+            cast: 'dark-night',
+            'status-effects': 'dark-night',
+        },
+        description: '"절망의 심연에서, 너의 빛은 스러지리라."',
+        baseStats: {
+            hp: 115, valor: 12, strength: 14, endurance: 13,
+            agility: 8, intelligence: 8, wisdom: 6, luck: 8,
+            attackRange: 1,
+            movement: 3,
+            weight: 19
+        },
+        classPassive: { ...darkKnightSkills.despairAura }
+    }
+    // --- ▲ [신규] 다크나이트 클래스 데이터 추가 ▲ ---
 };

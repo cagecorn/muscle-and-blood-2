@@ -156,6 +156,16 @@ export const classGrades = {
         meleeDefense: 1,
         rangedDefense: 1,
         magicDefense: 1,
-    }
+    },
     // --- ▲ [신규] 고스트 등급 추가 ▲ ---
+    // --- ▼ [신규] 다크나이트 등급 추가 ▼ ---
+    darkKnight: {
+        meleeAttack: 3,  // 근접 공격 강함
+        rangedAttack: 1, // 원거리 공격 약함
+        magicAttack: 2,  // 마법(오라) 보통
+        meleeDefense: 3, // 근접 방어 강함
+        rangedDefense: 1, // 원거리 방어 약함
+        magicDefense: 2  // 마법 방어 보통
+    }
+    // --- ▲ [신규] 다크나이트 등급 추가 ▲ ---
 };
