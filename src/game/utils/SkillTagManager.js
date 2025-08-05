@@ -48,4 +48,5 @@ export const SKILL_TAGS = {
     BIND: '속박',      // ✨ 광대를 위한 '속박' 태그
     SACRIFICE: '희생', // ✨ 안드로이드를 위한 '희생' 태그
     SUMMON: '소환',     // ✨ 소환수를 다루는 태그
+    GUARDIAN: '가디언', // ✨ 센티넬을 위한 '가디언' 태그
 };

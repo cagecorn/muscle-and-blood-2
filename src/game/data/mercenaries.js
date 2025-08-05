@@ -1,3 +1,5 @@
+import { sentinelSkills } from './skills/sentinel.js';
+
 export const mercenaryData = {
     warrior: {
         id: 'warrior',
@@ -302,6 +304,38 @@ export const mercenaryData = {
             iconPath: 'assets/images/skills/antidote.png'
         }
         // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
-    }
+    },
     // --- ▲ [신규] 역병 의사 클래스 데이터 추가 ▲ ---
+
+    // --- ▼ [신규] 센티넬 클래스 데이터 추가 ▼ ---
+    sentinel: {
+        id: 'sentinel',
+        name: '센티넬',
+        ai_archetype: 'melee',
+        uiImage: 'assets/images/unit/sentinel-ui.png',
+        battleSprite: 'sentinel',
+        sprites: {
+            idle: 'sentinel',
+            attack: 'sentinel',
+            hitted: 'sentinel',
+            cast: 'sentinel',
+            'status-effects': 'sentinel',
+        },
+        description: '"이 방벽을 넘을 순 없다."',
+        baseStats: {
+            hp: 130, valor: 12, strength: 14, endurance: 16,
+            agility: 6, intelligence: 5, wisdom: 8, luck: 7,
+            movement: 3,
+            attackRange: 1,
+            weight: 20
+        },
+        classPassive: {
+            id: 'sentryDuty',
+            name: '전방 주시',
+            description: '센티넬에게 공격받은 적은 전투가 끝날 때까지 [전방 주시] 디버프를 받습니다. 이 디버프는 센티넬에게 가하는 피해량을 5% 감소시키며, 최대 3번까지 중첩됩니다.',
+            iconPath: 'assets/images/skills/eye-of-guard.png',
+            effect: sentinelSkills.sentryDuty.effect
+        }
+    }
+    // --- ▲ [신규] 센티넬 클래스 데이터 추가 ▲ ---
 };
