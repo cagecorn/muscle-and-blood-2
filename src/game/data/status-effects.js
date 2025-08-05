@@ -210,6 +210,16 @@ export const statusEffects = {
         modifiers: { stat: 'physicalEvadeChance', type: 'percentage', value: 0.50 }
     },
     // --- ▲ [신규] 투명화 버프 효과 추가 ▲ ---
+    // --- ▼ [신규] 저거너트 버프 효과 추가 ▼ ---
+    juggernautBuff: {
+        id: 'juggernautBuff',
+        name: '저거너트',
+        type: EFFECT_TYPES.BUFF,
+        iconPath: 'assets/images/skills/flyingmen\'s-charge.png',
+        description: '이동 거리에 비례하여 방어력이 증가합니다.',
+        // modifiers는 MoveToTargetNode에서 동적으로 계산하여 적용합니다.
+    },
+    // --- ▲ [신규] 저거너트 버프 효과 추가 ▲ ---
     flyingmenChargeBonus: {
         id: 'flyingmenChargeBonus',
         name: '신속',

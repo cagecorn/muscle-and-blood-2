@@ -174,7 +174,15 @@ export const mercenaryData = {
             attackRange: 1,
             movement: 5,
             weight: 11
+        },
+        // --- ▼ [신규] 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'juggernaut',
+            name: '저거너트',
+            description: '타일을 이동할 때마다, 1칸당 방어력이 3%씩 1턴간 증가하는 버프를 얻습니다.',
+            iconPath: 'assets/images/skills/flyingmen\'s-charge.png'
         }
+        // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
     },
     esper: {
         id: 'esper',
