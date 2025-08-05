@@ -356,6 +356,15 @@ class SkillEffectProcessor {
     }
     
     _applyStatusEffects(unit, target, skill, blackboard) {
+        // 이미 쓰러진 대상에게는 상태 효과를 적용하지 않습니다.
+        if (target.currentHp <= 0) {
+            debugLogEngine.log(
+                'SkillEffectProcessor',
+                `[${target.instanceName}]은(는) 이미 쓰러져서 상태 효과를 적용할 수 없습니다.`
+            );
+            return;
+        }
+
         const baseTargets = [target];
         // 다중 타겟 처리
         if (skill.numberOfTargets && skill.numberOfTargets > 1) {
