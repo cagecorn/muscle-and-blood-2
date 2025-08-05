@@ -139,6 +139,16 @@ class SkillScoreEngine {
                 if (skillData.type === 'BUFF') mbtiScore += 40; // 버프 스킬 선호
                 if (skillData.type === 'AID') mbtiScore += 30; // 지원 스킬 선호
             }
+            // --- ▼ [신규] ESTP 성향 보너스 ▼ ---
+            if (mbtiString === 'ESTP') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 40; // 돌진 매우 선호
+                if (tags.includes(SKILL_TAGS.COMBO)) mbtiScore += 30; // 콤보 선호
+                if (tags.includes(SKILL_TAGS.SACRIFICE)) mbtiScore += 50; // 희생 스킬 최우선
+                if (tags.includes(SKILL_TAGS.WILL_GUARD)) mbtiScore -= 30; // 방어 스킬 비선호
+                if (skillData.type === 'BUFF' && skillData.targetType === 'self') mbtiScore -= 20; // 자기 대상 버프 비선호
+            }
+            // --- ▲ [신규] ESTP 성향 보너스 ▲ ---
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
