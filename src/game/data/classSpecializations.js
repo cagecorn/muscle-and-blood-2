@@ -149,6 +149,25 @@ export const classSpecializations = {
                 modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.05 }
             }
         }
-    ]
+    ],
     // --- ▲ [신규] 역병 의사 특화 태그 추가 ▲ ---
+
+    // --- ▼ [신규] 센티넬 특화 태그 추가 ▼ ---
+    sentinel: [
+        {
+            tag: SKILL_TAGS.GUARDIAN,
+            description: "'가디언' 태그 스킬 사용 시, 1턴간 자신의 모든 방어 등급(+1)이 오릅니다.",
+            effect: {
+                id: 'sentinelGuardianBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 1,
+                modifiers: [
+                    { stat: 'meleeDefense', type: 'flat', value: 1 },
+                    { stat: 'rangedDefense', type: 'flat', value: 1 },
+                    { stat: 'magicDefense', type: 'flat', value: 1 }
+                ]
+            }
+        }
+    ]
+    // --- ▲ [신규] 센티넬 특화 태그 추가 ▲ ---
 };

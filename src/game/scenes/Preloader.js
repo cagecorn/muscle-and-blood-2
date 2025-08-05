@@ -71,6 +71,8 @@ export class Preloader extends Scene
         this.load.image('android', 'images/unit/android.png'); // 추가
         // ✨ [추가] 역병 의사 스프라이트 로드
         this.load.image('plague-doctor', 'images/unit/plague-doctor.png');
+        // ✨ [추가] 센티넬 스프라이트 로드
+        this.load.image('sentinel', 'images/unit/sentinel.png');
 
         // UI용 이미지 로드
         this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
@@ -85,6 +87,8 @@ export class Preloader extends Scene
         this.load.image('android-ui', 'images/unit/android-ui.png'); // 추가
         // ✨ [추가] 역병 의사 UI 이미지 로드
         this.load.image('plague-doctor-ui', 'images/unit/plague-doctor-ui.png');
+        // ✨ [추가] 센티넬 UI 이미지 로드
+        this.load.image('sentinel-ui', 'images/unit/sentinel-ui.png');
 
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
@@ -115,6 +119,8 @@ export class Preloader extends Scene
         // --- ▼ [신규] 역병 의사 패시브 아이콘 추가 ▼ ---
         this.load.image('antidote', 'images/skills/antidote.png');
         // --- ▲ [신규] 역병 의사 패시브 아이콘 추가 ▲ ---
+        // --- ✨ [추가] 센티넬 패시브 아이콘 로드 ---
+        this.load.image('eye-of-guard', 'images/skills/eye-of-guard.png');
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
         this.load.image('stigma', 'images/skills/stigma.png');
         this.load.image('nanobeam', 'images/skills/nanobeam.png');
@@ -151,7 +157,7 @@ export class Preloader extends Scene
     {
         // 전투 씬에서 사용될 주요 이미지들의 텍스처 필터링 모드를 설정하여 품질을 향상시킵니다.
         const battleTextures = [
-            'warrior', 'gunner', 'mechanic', 'medic', 'nanomancer', 'flyingmen', 'esper', 'commander', 'clown', 'android', 'plague-doctor', 'zombie', 'ancestor-peor',
+            'warrior', 'gunner', 'mechanic', 'medic', 'nanomancer', 'flyingmen', 'esper', 'commander', 'clown', 'android', 'plague-doctor', 'sentinel', 'zombie', 'ancestor-peor',
             'battle-stage-cursed-forest', 'battle-stage-arena'
         ];
 

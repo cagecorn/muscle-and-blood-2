@@ -112,6 +112,17 @@ export const classGrades = {
         meleeDefense: 2, // 근접 방어는 보통
         rangedDefense: 2, // 원거리 방어도 보통
         magicDefense: 3, // 마법 저항력은 높음
-    }
+    },
     // --- ▲ [신규] 역병 의사 등급 추가 ▲ ---
+
+    // --- ▼ [신규] 센티넬 등급 추가 ▼ ---
+    sentinel: {
+        meleeAttack: 2,
+        rangedAttack: 1,
+        magicAttack: 1,
+        meleeDefense: 3,
+        rangedDefense: 3,
+        magicDefense: 2,
+    }
+    // --- ▲ [신규] 센티넬 등급 추가 ▲ ---
 };
