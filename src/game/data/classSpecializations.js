@@ -211,6 +211,20 @@ export const classSpecializations = {
             description: "'처형' 태그 스킬로 적을 처치했을 경우, 자신의 토큰을 1개 회복합니다.",
             // 이 효과는 SkillEffectProcessor에서 직접 처리됩니다.
         }
-    ]
+    ],
     // --- ▲ [신규] 고스트 특화 태그 추가 ▲ ---
+    // --- ▼ [신규] 다크나이트 특화 태그 추가 ▼ ---
+    darkKnight: [
+        {
+            tag: SKILL_TAGS.DARK,
+            description: "'어둠' 태그 스킬 사용 시, 2턴간 자신의 생명력 흡수율이 5% 증가합니다.",
+            effect: {
+                id: 'darkKnightDarkBonus',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: { stat: 'lifeSteal', type: 'percentage', value: 0.05 }
+            }
+        }
+    ]
+    // --- ▲ [신규] 다크나이트 특화 태그 추가 ▲ ---
 };
