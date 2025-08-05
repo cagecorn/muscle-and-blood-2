@@ -1289,6 +1289,33 @@ body {
     line-height: 1;
 }
 
+.combat-right-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+#battle-speed-button {
+    background-color: #2a2a2a;
+    border: 1px solid #888;
+    color: #f0e68c;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: bold;
+    width: 60px;
+    padding: 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+#battle-speed-button:hover {
+    background-color: #f0e68c;
+    color: #2a2a2a;
+}
+
 .combat-portrait-panel {
     width: 100px;
     height: 100px;
@@ -1296,8 +1323,7 @@ body {
     background-position: center;
     border: 2px solid #888;
     border-radius: 5px;
-    background-size: 200%; 
-    margin-left: 20px; /* 좌측 패널과의 간격 */
+    background-size: 200%;
 }
 
 

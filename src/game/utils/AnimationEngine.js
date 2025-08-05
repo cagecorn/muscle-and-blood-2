@@ -1,5 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
-import { delayEngine } from './DelayEngine.js';
+import { battleSpeedManager } from './BattleSpeedManager.js';
 
 /**
  * Phaser의 tween을 사용하여 게임 오브젝트에 부드러운 애니메이션 효과를 적용하는 엔진
@@ -51,11 +51,12 @@ export class AnimationEngine {
      */
     moveTo(target, x, y, duration = 500, onUpdateCallback = null) {
         return new Promise(resolve => {
+            const finalDuration = duration / battleSpeedManager.getMultiplier();
             const tweenConfig = {
                 targets: target,
                 x: x,
                 y: y,
-                duration: duration,
+                duration: finalDuration,
                 ease: 'Sine.easeInOut',
                 onComplete: () => {
                     resolve();

@@ -12,7 +12,7 @@ import { cooldownManager } from '../utils/CooldownManager.js';
  * 재사용하여 최소한의 조작만 수행합니다.
  */
 export class CombatUIManager {
-    constructor() {
+    constructor(battleSpeedManager) {
         this.container = document.getElementById('combat-ui-container');
         if (!this.container) {
             this.container = document.createElement('div');
@@ -20,6 +20,7 @@ export class CombatUIManager {
             document.getElementById('ui-container').appendChild(this.container);
         }
         
+        this.battleSpeedManager = battleSpeedManager;
         this.currentUnitId = null; // 현재 표시 중인 유닛 ID
         this.skillIcons = [];      // 스킬 아이콘 요소들을 저장할 배열
 
@@ -82,12 +83,25 @@ export class CombatUIManager {
         infoPanel.appendChild(topRow);
         infoPanel.appendChild(bottomRow);
 
-        // 2. 오른쪽 초상화 패널
+        // 2. 오른쪽 패널 (초상화 + 속도 버튼)
         this.portraitPanel = document.createElement('div');
         this.portraitPanel.className = 'combat-portrait-panel';
 
+        this.speedButton = document.createElement('button');
+        this.speedButton.id = 'battle-speed-button';
+        this.speedButton.innerText = '1x';
+        this.speedButton.onclick = () => {
+            const newSpeed = this.battleSpeedManager.cycleSpeed();
+            this.speedButton.innerText = `${newSpeed}x`;
+        };
+
+        const rightPanel = document.createElement('div');
+        rightPanel.className = 'combat-right-panel';
+        rightPanel.appendChild(this.portraitPanel);
+        rightPanel.appendChild(this.speedButton);
+
         this.container.appendChild(infoPanel);
-        this.container.appendChild(this.portraitPanel);
+        this.container.appendChild(rightPanel);
     }
 
     /**
