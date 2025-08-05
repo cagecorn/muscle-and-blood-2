@@ -26,9 +26,12 @@ export class SkillTooltipManager {
         let description = skillData.description;
 
         let skillNameHTML = skillData.name;
-        if (skillData.requiredClass && mercenaryData[skillData.requiredClass]) {
-            const className = mercenaryData[skillData.requiredClass].name;
-            skillNameHTML += ` <span style="font-size: 14px; color: #ffc107;">[${className} 전용]</span>`;
+        if (skillData.requiredClass) {
+            const required = Array.isArray(skillData.requiredClass) ? skillData.requiredClass : [skillData.requiredClass];
+            if (required.length > 0) {
+                const classNames = required.map(id => mercenaryData[id] ? mercenaryData[id].name : id).join('/');
+                skillNameHTML += ` <span style="font-size: 14px; color: #ffc107;">[${classNames} 전용]</span>`;
+            }
         }
 
         // 사거리 텍스트: 없으면 "기본 사거리"로 표시
