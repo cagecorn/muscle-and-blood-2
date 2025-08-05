@@ -147,7 +147,18 @@ class CombatCalculationEngine {
         // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
         const skillDamage = amplifiedAttack * damageMultiplier;
 
-        const initialDamage = Math.max(1, skillDamage - finalDefense);
+        let initialDamage = Math.max(1, skillDamage - finalDefense);
+
+        // --- 센티넬 패시브 데미지 감소 로직 추가 ---
+        const sentryDutyEffects = (statusEffectManager.activeEffects.get(attacker.uniqueId) || [])
+            .filter(e => e.id === 'sentryDutyDebuff' && e.attackerId === defender.uniqueId);
+
+        if (sentryDutyEffects.length > 0) {
+            const reduction = sentryDutyEffects[0].modifiers.value * sentryDutyEffects[0].stack;
+            initialDamage *= (1 + reduction); // value가 음수이므로 덧셈
+            debugLogEngine.log('CombatCalculationEngine', `[전방 주시] 효과로 ${defender.instanceName}에게 가하는 피해 ${reduction * 100}% 감소`);
+        }
+        // --- 로직 추가 끝 ---
 
         // --- ✨ 전투 판정 로직 수정 ---
         let hitType = null;

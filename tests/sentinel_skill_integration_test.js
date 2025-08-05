@@ -1,8 +1,11 @@
 import assert from 'assert';
-import { mercenaryData } from '../src/game/data/mercenaries.js';
-import { statEngine } from '../src/game/utils/StatEngine.js';
-import { statusEffectManager } from '../src/game/utils/StatusEffectManager.js';
-import { EFFECT_TYPES } from '../src/game/utils/EffectTypes.js';
+
+globalThis.indexedDB = { open: () => ({}) };
+
+const { mercenaryData } = await import('../src/game/data/mercenaries.js');
+const { statEngine } = await import('../src/game/utils/StatEngine.js');
+const { statusEffectManager } = await import('../src/game/utils/StatusEffectManager.js');
+const { combatCalculationEngine } = await import('../src/game/utils/CombatCalculationEngine.js');
 
 console.log('--- 센티넬 클래스 통합 테스트 시작 ---');
 
@@ -22,12 +25,21 @@ const sentinel = {
     uniqueId: 1,
     ...sentinelBase
 };
+sentinel.team = 'ally';
+sentinel.finalStats = finalStats;
+sentinel.currentBarrier = 0;
+sentinel.maxBarrier = 0;
+
 const attacker = {
     uniqueId: 2,
-    instanceName: 'Test Attacker'
+    instanceName: 'Test Attacker',
+    team: 'enemy',
+    finalStats: { physicalAttack: 40 },
+    currentBarrier: 0,
+    maxBarrier: 0
 };
 
-// 가짜 공격 상황 시뮬레이션 (실제로는 BattleSimulatorEngine에서 처리)
+// 가짜 공격 상황 시뮬레이션
 const passiveEffect = sentinel.classPassive.effect;
 statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
 
@@ -38,12 +50,21 @@ assert.strictEqual(attackerEffects[0].id, 'sentryDutyDebuff', '디버프 ID가 �
 // 스택 중첩 테스트
 statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
 statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
-statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel); // 4번째, 중첩 안되어야 함
+statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel); // 4번째, 최대 스택 유지
 
 attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
-// 참고: 현재 StatusEffectManager는 스택을 별도로 관리하지 않고 덮어쓰므로, 길이는 1이 됩니다.
-// 스택킹 로직은 CombatCalculationEngine에서 처리됩니다. 이 테스트는 디버프 적용 여부만 확인합니다.
-assert.strictEqual(attackerEffects.length, 1, '디버프는 중첩되어도 하나만 존재해야 합니다.');
+assert.strictEqual(attackerEffects.length, 1, '디버프는 스택이 증가하더라도 하나만 존재해야 합니다.');
+assert.strictEqual(attackerEffects[0].stack, 3, '디버프 스택이 3까지 누적되어야 합니다.');
+
+// 데미지 감소 확인
+const baseSkill = { name: 'Test Strike', tags: ['물리'], damageMultiplier: 1.0 };
+statusEffectManager.activeEffects.clear();
+let baseDamage = combatCalculationEngine.calculateDamage(attacker, sentinel, baseSkill).damage;
+statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
+statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
+statusEffectManager.addEffect(attacker, { name: sentinel.classPassive.name, effect: passiveEffect }, sentinel);
+const reducedDamage = combatCalculationEngine.calculateDamage(attacker, sentinel, baseSkill).damage;
+assert.strictEqual(reducedDamage, Math.round(baseDamage * 0.85), '3스택 시 데미지가 15% 감소해야 합니다.');
 
 console.log('✅ 클래스 패시브 테스트 통과');
 console.log('--- 모든 센티넬 테스트 완료 ---');
