@@ -32,6 +32,7 @@ import { aspirationEngine } from './AspirationEngine.js'; // ✨ AspirationEngin
 import { statEngine } from './StatEngine.js';
 import { createMeleeAI } from '../../ai/behaviors/MeleeAI.js';
 import { EFFECT_TYPES } from './EffectTypes.js';
+import { BattleSpeedManager } from './BattleSpeedManager.js';
 
 // 그림자 생성을 담당하는 매니저
 import { ShadowManager } from './ShadowManager.js';
@@ -54,8 +55,10 @@ export class BattleSimulatorEngine {
         this.summoningEngine = new SummoningEngine(scene, this);
         // 소환 엔진을 참조하는 종료 매니저를 초기화합니다.
         this.terminationManager = new TerminationManager(scene, this.summoningEngine, this);
+        // 전투 속도 매니저
+        this.battleSpeedManager = new BattleSpeedManager();
         // 전투 중 유닛 정보를 표시할 UI 매니저
-        this.combatUI = new CombatUIManager();
+        this.combatUI = new CombatUIManager(this.battleSpeedManager);
         // 턴 순서 UI 매니저
         this.turnOrderUI = new TurnOrderUIManager();
         this.sharedResourceUI = new SharedResourceUIManager();
@@ -121,6 +124,8 @@ export class BattleSimulatorEngine {
         this.isRunning = true;
 
         aiManager.clear();
+
+        this.battleSpeedManager.reset();
         cooldownManager.reset();
         this.summoningEngine.reset();
         // ✨ [수정] 각 팀의 자원을 개별적으로 초기화

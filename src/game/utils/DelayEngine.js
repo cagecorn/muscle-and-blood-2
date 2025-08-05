@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { battleSpeedManager } from './BattleSpeedManager.js'; // 전투 속도 적용
 
 /**
  * 지정된 시간만큼 코드 실행을 '홀딩'하는 기능을 제공하는 엔진
@@ -14,8 +15,9 @@ class DelayEngine {
      * @returns {Promise<void>}
      */
     hold(duration) {
+        const finalDuration = duration / battleSpeedManager.getMultiplier();
         return new Promise(resolve => {
-            setTimeout(resolve, duration);
+            setTimeout(resolve, finalDuration);
         });
     }
 }
