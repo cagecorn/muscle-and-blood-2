@@ -14,11 +14,13 @@ export const sentinelSkills = {
             type: EFFECT_TYPES.DEBUFF,
             duration: 99, // 전투 내내 지속
             maxStacks: 3,
-            modifiers: {
-                stat: 'damageToSentinel', // 센티넬에게 가하는 데미지
-                type: 'percentage',
-                value: -0.05
-            }
+            modifiers: [
+                {
+                    stat: 'damageToSentinel', // 센티넬에게 가하는 데미지
+                    type: 'percentage',
+                    value: -0.05
+                }
+            ]
         }
     }
 };

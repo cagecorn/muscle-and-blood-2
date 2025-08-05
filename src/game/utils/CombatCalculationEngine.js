@@ -154,9 +154,19 @@ class CombatCalculationEngine {
             .filter(e => e.id === 'sentryDutyDebuff' && e.attackerId === defender.uniqueId);
 
         if (sentryDutyEffects.length > 0) {
-            const reduction = sentryDutyEffects[0].modifiers.value * sentryDutyEffects[0].stack;
-            initialDamage *= (1 + reduction); // value가 음수이므로 덧셈
-            debugLogEngine.log('CombatCalculationEngine', `[전방 주시] 효과로 ${defender.instanceName}에게 가하는 피해 ${reduction * 100}% 감소`);
+            const sentryEffect = sentryDutyEffects[0];
+            const modifier = Array.isArray(sentryEffect.modifiers)
+                ? sentryEffect.modifiers.find(m => m.stat === 'damageToSentinel')
+                : sentryEffect.modifiers;
+
+            if (modifier && modifier.value && sentryEffect.stack) {
+                const reduction = modifier.value * sentryEffect.stack;
+                initialDamage *= (1 + reduction); // value가 음수이므로 덧셈
+                debugLogEngine.log(
+                    'CombatCalculationEngine',
+                    `[전방 주시] 효과로 ${(defender.instanceName || defender.name)}에게 가하는 피해 ${(reduction * 100).toFixed(0)}% 감소`
+                );
+            }
         }
         // --- 로직 추가 끝 ---
 
