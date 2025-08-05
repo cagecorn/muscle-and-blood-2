@@ -75,6 +75,7 @@ export class Preloader extends Scene
         this.load.image('sentinel', 'images/unit/sentinel.png');
         // ✨ [추가] 팔라딘 스프라이트 로드
         this.load.image('paladin', 'images/unit/paladin.png');
+        this.load.image('hacker', 'images/unit/hacker.png');
 
         // UI용 이미지 로드
         this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
@@ -93,6 +94,7 @@ export class Preloader extends Scene
         this.load.image('sentinel-ui', 'images/unit/sentinel-ui.png');
         // ✨ [추가] 팔라딘 UI 이미지 로드
         this.load.image('paladin-ui', 'images/unit/paladin-ui.png');
+        this.load.image('hacker-ui', 'images/unit/hacker-ui.png');
 
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');
@@ -139,6 +141,7 @@ export class Preloader extends Scene
         this.load.image('nanobeam', 'images/skills/nanobeam.png');
         this.load.image('axe-strike', 'images/skills/axe-strike.png');
         this.load.image('commanders-shout', 'images/skills/commanders-shout.png');
+        this.load.image('hacker\'s-invade', 'images/skills/hacker\'s-invade.png');
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');

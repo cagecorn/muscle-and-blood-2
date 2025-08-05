@@ -183,6 +183,14 @@ export const statusEffects = {
         iconPath: 'assets/images/skills/reinforcement-learning.png',
         // 이 버프는 스택만 쌓고, 실제 스탯 보너스는 CombatCalculationEngine에서 동적으로 계산됩니다.
     },
+    // --- ▼ [신규] 해커의 침입 패시브 효과 추가 ▼ ---
+    hackersInvade: {
+        id: 'hackersInvade',
+        name: '해커의 침입',
+        iconPath: 'assets/images/skills/hacker\'s-invade.png',
+        // onApply는 SkillEffectProcessor에서 처리합니다.
+    },
+    // --- ▲ [신규] 해커의 침입 패시브 효과 추가 ▲ ---
     // --- ▼ [신규] 전방 주시 디버프 효과 추가 ▼ ---
     sentryDutyDebuff: {
         id: 'sentryDutyDebuff',

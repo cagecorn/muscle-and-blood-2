@@ -102,5 +102,15 @@ export const classProficiencies = {
         SKILL_TAGS.GUARDIAN,
     ],
     // --- ▲ [신규] 센티넬 숙련도 태그 추가 ▲ ---
+
+    // --- ▼ [신규] 해커 숙련도 태그 추가 ▼ ---
+    hacker: [
+        SKILL_TAGS.MELEE,
+        SKILL_TAGS.MAGIC,
+        SKILL_TAGS.DEBUFF,
+        SKILL_TAGS.PROHIBITION,
+        SKILL_TAGS.DELAY,
+    ],
+    // --- ▲ [신규] 해커 숙련도 태그 추가 ▲ ---
     // '좀비'와 같은 몬스터는 숙련도 보너스를 받지 않으므로 정의하지 않습니다.
 };
