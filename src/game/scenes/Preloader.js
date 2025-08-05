@@ -73,6 +73,8 @@ export class Preloader extends Scene
         this.load.image('plague-doctor', 'images/unit/plague-doctor.png');
         // ✨ [추가] 센티넬 스프라이트 로드
         this.load.image('sentinel', 'images/unit/sentinel.png');
+        // ✨ [추가] 팔라딘 스프라이트 로드
+        this.load.image('paladin', 'images/unit/paladin.png');
 
         // UI용 이미지 로드
         this.load.image('warrior-ui', 'images/territory/warrior-ui.png');
@@ -89,6 +91,8 @@ export class Preloader extends Scene
         this.load.image('plague-doctor-ui', 'images/unit/plague-doctor-ui.png');
         // ✨ [추가] 센티넬 UI 이미지 로드
         this.load.image('sentinel-ui', 'images/unit/sentinel-ui.png');
+        // ✨ [추가] 팔라딘 UI 이미지 로드
+        this.load.image('paladin-ui', 'images/unit/paladin-ui.png');
 
         // 영지 씬에 사용할 배경 이미지를 로드합니다.
         this.load.image('city-1', 'images/territory/city-1.png');

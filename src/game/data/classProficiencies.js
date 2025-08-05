@@ -83,6 +83,16 @@ export const classProficiencies = {
     ],
     // --- ▲ [신규] 역병 의사 숙련도 태그 추가 ▲ ---
 
+    // --- ▼ [신규] 팔라딘 숙련도 태그 추가 ▼ ---
+    paladin: [
+        SKILL_TAGS.MELEE,
+        SKILL_TAGS.PHYSICAL,
+        SKILL_TAGS.WILL,
+        SKILL_TAGS.AID,
+        SKILL_TAGS.AURA,
+    ],
+    // --- ▲ [신규] 팔라딘 숙련도 태그 추가 ▲ ---
+
     // --- ▼ [신규] 센티넬 숙련도 태그 추가 ▼ ---
     sentinel: [
         SKILL_TAGS.MELEE,

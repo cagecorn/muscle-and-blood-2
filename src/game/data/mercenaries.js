@@ -323,6 +323,37 @@ export const mercenaryData = {
     },
     // --- ▲ [신규] 역병 의사 클래스 데이터 추가 ▲ ---
 
+    // --- ▼ [신규] 팔라딘 클래스 데이터 추가 ▼ ---
+    paladin: {
+        id: 'paladin',
+        name: '팔라딘',
+        ai_archetype: 'melee', // 기본 AI는 근접 타입, 아군 중심으로 이동하는 AI와 잘 맞습니다.
+        uiImage: 'assets/images/unit/paladin-ui.png',
+        battleSprite: 'paladin',
+        sprites: {
+            idle: 'paladin',
+            attack: 'paladin',
+            hitted: 'paladin',
+            cast: 'paladin',
+            'status-effects': 'paladin',
+        },
+        description: '"신념의 빛으로 아군을 보호하리라."',
+        baseStats: {
+            hp: 125, valor: 10, strength: 13, endurance: 13,
+            agility: 7, intelligence: 8, wisdom: 11, luck: 8,
+            attackRange: 2,
+            movement: 3,
+            weight: 19
+        },
+        classPassive: {
+            id: 'sanctuaryAura',
+            name: '성역의 오라',
+            description: '자신 주위 2타일 내의 모든 아군은 받는 피해량이 10% 감소합니다.',
+            iconPath: 'assets/images/skills/magic-shield.png' // 임시 아이콘
+        }
+    },
+    // --- ▲ [신규] 팔라딘 클래스 데이터 추가 ▲ ---
+
     // --- ▼ [신규] 센티넬 클래스 데이터 추가 ▼ ---
     sentinel: {
         id: 'sentinel',
