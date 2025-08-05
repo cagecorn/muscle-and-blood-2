@@ -202,7 +202,20 @@ class AIManager {
             const prevSkillsUsedSize = (blackboard.get('usedSkillsThisTurn') || new Set()).size;
             const wasMoved = blackboard.get('hasMovedThisTurn');
 
-            await data.behaviorTree.execute(unit, allUnits, enemyUnits);
+            // --- ▼ [핵심 수정] 혼란 상태 체크 및 타겟 교체 ▼ ---
+            let currentAllies = allUnits.filter(u => u.team === unit.team && u.currentHp > 0);
+            let currentEnemies = allUnits.filter(u => u.team !== unit.team && u.currentHp > 0);
+
+            if (unit.isConfused) {
+                // 혼란 상태일 경우, 아군을 적으로, 적을 아군으로 인식하게 만듭니다.
+                [currentAllies, currentEnemies] = [currentEnemies, currentAllies];
+                if (this.aiEngines.vfxManager) {
+                    this.aiEngines.vfxManager.showEffectName(unit.sprite, '혼란!', '#f43f5e');
+                }
+            }
+            // --- ▲ [핵심 수정] 혼란 상태 체크 및 타겟 교체 ▲ ---
+
+            await data.behaviorTree.execute(unit, allUnits, currentEnemies);
 
             const currentTokens = tokenEngine.getTokens(unit.uniqueId);
             const currentSkillsUsedSize = (blackboard.get('usedSkillsThisTurn') || new Set()).size;
