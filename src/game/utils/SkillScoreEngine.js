@@ -132,6 +132,13 @@ class SkillScoreEngine {
                 if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 30; // 돌진 선호
                 if (tags.includes(SKILL_TAGS.MELEE)) mbtiScore += 15;
             }
+            // ✨ [신규] ESFJ 성향 보너스
+            if (mbtiString === 'ESFJ') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.AURA)) mbtiScore += 50; // 오라 스킬 최우선
+                if (skillData.type === 'BUFF') mbtiScore += 40; // 버프 스킬 선호
+                if (skillData.type === 'AID') mbtiScore += 30; // 지원 스킬 선호
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
