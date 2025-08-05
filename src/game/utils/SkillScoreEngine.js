@@ -149,6 +149,16 @@ class SkillScoreEngine {
                 if (skillData.type === 'BUFF' && skillData.targetType === 'self') mbtiScore -= 20; // 자기 대상 버프 비선호
             }
             // --- ▲ [신규] ESTP 성향 보너스 ▲ ---
+
+            // --- ▼ [신규] ESFP 성향 보너스 ▼ ---
+            if (mbtiString === 'ESFP') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.AURA)) mbtiScore += 60; // 오라 스킬 최우선
+                if (skillData.type === 'DEBUFF') mbtiScore += 40; // 광역 디버프 선호
+                if (tags.includes(SKILL_TAGS.KINETIC)) mbtiScore += 20; // 관성(밀치기) 선호
+                if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 25; // 돌진 선호
+            }
+            // --- ▲ [신규] ESFP 성향 보너스 ▲ ---
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가

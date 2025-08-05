@@ -32,6 +32,8 @@ import { createISTP_AI } from './behaviors/createISTP_AI.js';
 import { createISFP_AI } from './behaviors/createISFP_AI.js';
 // ✨ ESTP AI import 추가
 import { createESTP_AI } from './behaviors/createESTP_AI.js';
+// ✨ ESFP AI import 추가
+import { createESFP_AI } from './behaviors/createESFP_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
 
@@ -94,6 +96,8 @@ class AIManager {
                 case 'ISFP': return createISFP_AI(this.aiEngines);
                 // ✨ [신규] ESTP 케이스 추가
                 case 'ESTP': return createESTP_AI(this.aiEngines);
+                // ✨ [신규] ESFP 케이스 추가
+                case 'ESFP': return createESFP_AI(this.aiEngines);
                 // 다른 MBTI 유형은 여기서 추가 가능
             }
         }
