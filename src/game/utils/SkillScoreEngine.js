@@ -125,6 +125,13 @@ class SkillScoreEngine {
                 if (tags.includes(SKILL_TAGS.AID)) mbtiScore += 40; // 지원 스킬도 매우 선호
                 if (tags.includes(SKILL_TAGS.WILL_GUARD)) mbtiScore += 30; // 보호막 스킬 선호
             }
+            // ✨ [신규] ESTJ 성향 보너스
+            if (mbtiString === 'ESTJ') {
+                const tags = skillData.tags || [];
+                if (skillData.type === 'DEBUFF') mbtiScore += 50; // 디버프가 최우선
+                if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 30; // 돌진 선호
+                if (tags.includes(SKILL_TAGS.MELEE)) mbtiScore += 15;
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가

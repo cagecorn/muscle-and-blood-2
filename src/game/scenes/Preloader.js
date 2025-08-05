@@ -122,6 +122,9 @@ export class Preloader extends Scene
         // --- ▼ [신규] 메딕 패시브 아이콘 추가 ▼ ---
         this.load.image('first-aid', 'images/skills/first-aid.png');
         // --- ▲ [신규] 메딕 패시브 아이콘 추가 ▲ ---
+        // --- ▼ [신규] 전사 패시브 아이콘 추가 ▼ ---
+        this.load.image('bravery', 'images/skills/bravery.png');
+        // --- ▲ [신규] 전사 패시브 아이콘 추가 ▲ ---
         // --- ✨ [추가] 센티넬 패시브 아이콘 로드 ---
         this.load.image('eye-of-guard', 'images/skills/eye-of-guard.png');
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
