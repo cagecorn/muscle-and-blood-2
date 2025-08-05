@@ -47,13 +47,14 @@ export class UnitDetailDOM {
             P: `**P (인식)**\n- 선호 스킬: 변칙적인 비숙련 스킬\n- 선호 장비: 특수 효과(MBTI 효과)가 붙은 아이템\n- 열망 붕괴: 토큰 소모가 없는 스킬을 사용해 변수를 만들려 합니다.`
         };
 
-        // 툴팁 텍스트를 조합합니다.
-        let fullTooltipText = "## MBTI 행동 패턴\n\n";
+        // =======================================================================
+        // ✨ 1. [수정] MBTI 툴팁 내용을 구체적인 설명으로 변경합니다.
+        // =======================================================================
+        let fullTooltipText = "## MBTI 행동 패턴\n\n**[선호도]**\n";
         if (mbtiString) {
-            fullTooltipText += `**[선호도]**\n${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}\n\n`;
-            // MBTI 스택 버프 로직 제거로 인해 관련 툴팁도 제거합니다.
-            // fullTooltipText += `**[슬롯 버프]**\n- 1번 스킬: ${mbtiSlotBuffs[mbtiString[0]]}\n- 2번 스킬: ${mbtiSlotBuffs[mbtiString[1]]}\n- 3번 스킬: ${mbtiSlotBuffs[mbtiString[2]]}\n- 4번 스킬: ${mbtiSlotBuffs[mbtiString[3]]}`;
+            fullTooltipText += `${mbtiTooltips[mbtiString[0]]}\n${mbtiTooltips[mbtiString[1]]}\n${mbtiTooltips[mbtiString[2]]}\n${mbtiTooltips[mbtiString[3]]}`;
         }
+        // =======================================================================
 
         const overlay = document.createElement('div');
         // ✨ [수정] ID 대신 클래스를 사용합니다.
@@ -88,7 +89,19 @@ export class UnitDetailDOM {
         const leftSection = document.createElement('div');
         leftSection.className = 'detail-section left';
 
-        // ✨ --- 등급 표시 로직 추가 ---
+        // =======================================================================
+        // ✨ 2 & 3. [수정] 클래스 패시브 HTML을 초상화(unit-portrait) 내부로 이동합니다.
+        // =======================================================================
+        let classPassiveHTML = '';
+        if (unitData.classPassive) {
+            classPassiveHTML = `
+                <div class="class-passive-section" data-tooltip="${unitData.classPassive.description}">
+                    <img src="${unitData.classPassive.iconPath}" class="passive-skill-icon"/>
+                    <span class="passive-skill-name">${unitData.classPassive.name}</span>
+                </div>
+            `;
+        }
+
         const gradeDisplayHTML = `
             <div class="unit-grades-container">
                 <div class="unit-grades left">
@@ -97,6 +110,7 @@ export class UnitDetailDOM {
                     <div class="grade-item" data-tooltip="마법 공격 등급: 마법 공격 시 효율을 나타냅니다. 마법사 클래스의 핵심 능력치입니다.">🔮 ${grades.magicAttack || 1}</div>
                 </div>
                 <div class="unit-portrait" style="background-image: url(${unitData.uiImage})">
+                    ${classPassiveHTML}
                     <div class="proficiency-tags-container">
                         ${proficiencies.map(tag => `<span class="proficiency-tag">${tag}</span>`).join('')}
                         ${specializations.map(spec => `<span class="specialization-tag" data-tooltip="${spec.description}">${spec.tag}</span>`).join('')}
@@ -110,7 +124,7 @@ export class UnitDetailDOM {
                 </div>
             </div>
         `;
-
+        
         // --- ▼ [핵심 변경] 스탯 표시 영역 구조 변경 ---
         const statsContainerHTML = `
             <div class="stats-container">
@@ -145,26 +159,14 @@ export class UnitDetailDOM {
                 </div>
             </div>
         `;
-        // --- ▲ [핵심 변경] 스탯 표시 영역 구조 변경 ---
-        // ✨ --- [신규] 클래스 패시브 표시 로직 추가 ---
-        let classPassiveHTML = '';
-        if (unitData.classPassive) {
-            classPassiveHTML = `
-                <div class="class-passive-section">
-                    <div class="section-title">클래스 패시브</div>
-                    <div class="passive-skill-item" data-tooltip="${unitData.classPassive.description}">
-                        <img src="${unitData.classPassive.iconPath}" class="passive-skill-icon"/>
-                        <span class="passive-skill-name">${unitData.classPassive.name}</span>
-                    </div>
-                </div>
-            `;
-        }
-
+        // =======================================================================
+        // ✨ [수정] 클래스 패시브 섹션이 위로 이동했으므로 여기서는 제거합니다.
+        // =======================================================================
         leftSection.innerHTML = `
             ${gradeDisplayHTML}
             ${statsContainerHTML}
-            ${classPassiveHTML}
         `;
+        // =======================================================================
 
         const rightSection = document.createElement('div');
         rightSection.className = 'detail-section right';
