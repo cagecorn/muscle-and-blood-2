@@ -22,6 +22,8 @@ import { createENFP_AI } from './behaviors/createENFP_AI.js';
 import { createISTJ_AI } from './behaviors/createISTJ_AI.js';
 // ✨ [신규] ISFJ AI import
 import { createISFJ_AI } from './behaviors/createISFJ_AI.js';
+// ✨ [신규] ESTJ AI import
+import { createESTJ_AI } from './behaviors/createESTJ_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
 
@@ -74,6 +76,8 @@ class AIManager {
                 case 'ISTJ': return createISTJ_AI(this.aiEngines);
                 // ✨ [신규] ISFJ 케이스 추가
                 case 'ISFJ': return createISFJ_AI(this.aiEngines);
+                // ✨ [신규] ESTJ 케이스 추가
+                case 'ESTJ': return createESTJ_AI(this.aiEngines);
                 // 다른 MBTI 유형은 여기서 추가 가능
             }
         }

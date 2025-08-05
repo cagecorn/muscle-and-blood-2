@@ -26,6 +26,7 @@ import { aiMemoryEngine } from './AIMemoryEngine.js';
 import { aspirationEngine } from './AspirationEngine.js';
 // ▼▼▼ [추가] 새로 만든 데미지 타입 매니저를 import 합니다. ▼▼▼
 import { damageTypeManager } from './DamageTypeManager.js';
+import { debugLogEngine } from './DebugLogEngine.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -68,9 +69,31 @@ class CombatCalculationEngine {
             }
             return unit.finalStats;
         };
+        const applyBraveryPassive = (unit, baseStats) => {
+            if (unit.classPassive?.id !== 'bravery') return baseStats;
 
-        const attackerStats = applyReinforcementLearning(attacker);
-        const defenderStats = applyReinforcementLearning(defender);
+            const battleSimulator = this.battleSimulator;
+            if (!battleSimulator) return baseStats;
+
+            const enemies = battleSimulator.turnQueue.filter(u => u.team !== unit.team && u.currentHp > 0);
+            const nearbyEnemies = enemies.filter(enemy => {
+                const distance = Math.abs(unit.gridX - enemy.gridX) + Math.abs(unit.gridY - enemy.gridY);
+                return distance <= 2;
+            });
+
+            if (nearbyEnemies.length > 0) {
+                const boost = nearbyEnemies.length * 0.04;
+                const boostedStats = { ...baseStats };
+                boostedStats.physicalAttack *= (1 + boost);
+                boostedStats.physicalDefense *= (1 + boost);
+                debugLogEngine.log('CombatCalculationEngine', `[대담함] 패시브 발동! 주변 ${nearbyEnemies.length}명의 적에 의해 공/방 ${(boost * 100).toFixed(0)}% 증가.`);
+                return boostedStats;
+            }
+            return baseStats;
+        };
+
+        const attackerStats = applyBraveryPassive(attacker, applyReinforcementLearning(attacker));
+        const defenderStats = applyBraveryPassive(defender, applyReinforcementLearning(defender));
 
         // ✨ [핵심 수정] 마법, 원거리, 근접 순으로 공격 타입을 명확히 구분합니다.
         const isMagic = skill.tags?.includes(SKILL_TAGS.MAGIC);

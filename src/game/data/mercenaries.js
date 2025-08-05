@@ -21,7 +21,15 @@ export const mercenaryData = {
             agility: 8, intelligence: 5, wisdom: 5, luck: 7,
             movement: 3,
             weight: 10
+        },
+        // --- ▼ [신규] 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'bravery',
+            name: '대담함',
+            description: '주위 2타일 내의 적 유닛 수만큼 공격력과 방어력이 4%씩 증가합니다.',
+            iconPath: 'assets/images/skills/bravery.png'
         }
+        // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
     },
     gunner: {
         id: 'gunner',
