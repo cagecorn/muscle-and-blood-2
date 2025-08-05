@@ -65,11 +65,14 @@ class MercenaryCardSelector {
                 const tags = card.tags || [];
                 let score = 100;
 
-                // --- ▼ [핵심 수정] 클래스 제한 로직 추가 ▼ ---
-                if (card.requiredClass && card.requiredClass !== mercenary.id) {
-                    return { instance: inst, score: 0 };
+                // --- ▼ [핵심 수정] 클래스 제한 로직 수정 ▼ ---
+                if (card.requiredClass) {
+                    const required = Array.isArray(card.requiredClass) ? card.requiredClass : [card.requiredClass];
+                    if (!required.includes(mercenary.id)) {
+                        return { instance: inst, score: 0 };
+                    }
                 }
-                // --- ▲ [핵심 수정] 클래스 제한 로직 추가 ▲ ---
+                // --- ▲ [핵심 수정] 클래스 제한 로직 수정 ▲ ---
 
                 const isProficientOrSpecialized = tags.some(tag => proficiencies.includes(tag) || specializations.includes(tag));
                 if (isProficientOrSpecialized) {
