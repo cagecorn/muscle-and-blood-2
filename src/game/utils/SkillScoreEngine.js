@@ -6,6 +6,8 @@ import { statusEffectManager } from './StatusEffectManager.js';
 import { SCORE_BY_TYPE, SCORE_BY_TAG } from '../data/skillScores.js';
 // ✨ AIMemoryEngine과 Debug 매니저 추가
 import { aiMemoryEngine } from './AIMemoryEngine.js';
+// ✨ 1. 아키타입 기억 엔진을 새로 import 합니다.
+import { archetypeMemoryEngine } from './ArchetypeMemoryEngine.js';
 import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
 // ✨ 1. YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
@@ -183,19 +185,42 @@ class SkillScoreEngine {
         // ✨ 최종 점수 계산에 MBTI 보너스 합산
         const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore;
 
-        // ✨ AI 기억 가중치 적용
+        // ✨ AI 기억 가중치 적용 로직을 수정합니다.
         let finalScore = calculatedScore;
         if (target && target.team !== unit.team) {
-            const memory = await aiMemoryEngine.getMemory(unit.uniqueId);
-            const targetMemory = memory[`target_${target.uniqueId}`];
-            if (targetMemory) {
-                const attackType = this.getAttackTypeFromSkillTags(skillData.tags);
-                if (attackType) {
-                    const weight = targetMemory[`${attackType}_weight`] || 1.0;
-                    if (weight !== 1.0) {
-                        finalScore *= weight;
-                        debugAIMemoryManager.logScoreModification(skillData.name, calculatedScore, weight, finalScore);
+            const attackType = this.getAttackTypeFromSkillTags(skillData.tags);
+            if (attackType) {
+                // 1. 개인의 직접 경험(AIMemoryEngine)을 먼저 조회합니다.
+                const personalMemory = await aiMemoryEngine.getMemory(unit.uniqueId);
+                const targetPersonalMemory = personalMemory[`target_${target.uniqueId}`];
+                let weight = 1.0;
+                let memorySource = '기본';
+
+                if (targetPersonalMemory && targetPersonalMemory[`${attackType}_weight`] !== undefined) {
+                    weight = targetPersonalMemory[`${attackType}_weight`];
+                    memorySource = '개인 기억';
+                } else {
+                    // 2. 개인 경험이 없다면, 아키타입의 집단 지성(ArchetypeMemoryEngine)을 조회합니다.
+                    const mbtiString = this._getMBTIString(unit); // MBTI 문자열을 가져오는 헬퍼 함수
+                    if (mbtiString) {
+                        const archetypeMemory = await archetypeMemoryEngine.getMemory(mbtiString);
+                        const targetArchetypeMemory = archetypeMemory[`target_${target.id}`]; // 상대의 클래스 ID 기준
+                        if (targetArchetypeMemory && targetArchetypeMemory[`${attackType}_weight`] !== undefined) {
+                            weight = targetArchetypeMemory[`${attackType}_weight`];
+                            memorySource = '아키타입 기억';
+                        }
                     }
+                }
+
+                if (weight !== 1.0) {
+                    finalScore *= weight;
+                    // 디버그 로그를 수정하여 어떤 기억을 참조했는지 표시
+                    debugAIMemoryManager.logScoreModification(
+                        `[${memorySource}] ${skillData.name}`,
+                        calculatedScore,
+                        weight,
+                        finalScore
+                    );
                 }
             }
         }
@@ -215,6 +240,16 @@ class SkillScoreEngine {
         );
 
         return finalScore;
+    }
+
+    // ✨ MBTI 문자열을 가져오는 헬퍼 함수를 추가합니다.
+    _getMBTIString(unit) {
+        if (!unit.mbti) return null;
+        const m = unit.mbti;
+        return (m.E > m.I ? 'E' : 'I') +
+               (m.S > m.N ? 'S' : 'N') +
+               (m.T > m.F ? 'T' : 'F') +
+               (m.J > m.P ? 'J' : 'P');
     }
 
     // ✨ 스킬 태그로부터 공격 타입을 알아내는 헬퍼 함수
