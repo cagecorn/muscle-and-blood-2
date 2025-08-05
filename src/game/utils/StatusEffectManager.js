@@ -156,11 +156,18 @@ class StatusEffectManager {
         }
         const activeEffectsOnTarget = this.activeEffects.get(targetUnit.uniqueId);
 
-        // 기존에 동일한 ID의 효과가 있다면 제거합니다.
+        // 기존에 동일한 ID의 효과가 있다면 처리합니다.
         const existingEffectIndex = activeEffectsOnTarget.findIndex(e => e.id === effectId);
         if (existingEffectIndex !== -1) {
-            const removedEffect = activeEffectsOnTarget.splice(existingEffectIndex, 1)[0];
-            debugLogEngine.log('StatusEffectManager', `[${targetUnit.instanceName}]의 기존 [${removedEffect.sourceSkillName}] 효과를 제거하고 새 효과로 갱신합니다.`);
+            const existingEffect = activeEffectsOnTarget[existingEffectIndex];
+            if (effectId === 'sentryDutyDebuff') {
+                existingEffect.stack = Math.min((existingEffect.stack || 1) + 1, sourceSkill.effect.maxStacks || 1);
+                debugLogEngine.log('StatusEffectManager', `[${targetUnit.instanceName}]의 [${effectDefinition.name}] 스택이 ${existingEffect.stack}이 되었습니다.`);
+                return;
+            } else {
+                const removedEffect = activeEffectsOnTarget.splice(existingEffectIndex, 1)[0];
+                debugLogEngine.log('StatusEffectManager', `[${targetUnit.instanceName}]의 기존 [${removedEffect.sourceSkillName}] 효과를 제거하고 새 효과로 갱신합니다.`);
+            }
         }
 
         const newEffect = {
@@ -168,6 +175,7 @@ class StatusEffectManager {
             ...sourceSkill.effect,
             sourceSkillName: sourceSkill.name,
             attackerId: attackerUnit ? attackerUnit.uniqueId : null,
+            stack: sourceSkill.effect.maxStacks ? 1 : undefined,
         };
 
         activeEffectsOnTarget.push(newEffect);

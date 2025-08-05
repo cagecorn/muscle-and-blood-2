@@ -67,7 +67,7 @@ export const mercenaryData = {
     mechanic: {
         id: 'mechanic',
         name: '메카닉',
-        ai_archetype: 'ranged',
+        ai_archetype: 'enfj',
         uiImage: 'assets/images/unit/mechanic-ui.png',
         battleSprite: 'mechanic',
         sprites: {

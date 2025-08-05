@@ -34,6 +34,8 @@ import { createISFP_AI } from './behaviors/createISFP_AI.js';
 import { createESTP_AI } from './behaviors/createESTP_AI.js';
 // ✨ ESFP AI import 추가
 import { createESFP_AI } from './behaviors/createESFP_AI.js';
+// ✨ [신규] ENFJ AI import
+import { createENFJ_AI } from './behaviors/createENFJ_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
 
@@ -82,6 +84,7 @@ class AIManager {
                 case 'INFP': return createINFP_AI(this.aiEngines);
                 // ✨ [신규] ENFP 케이스 추가
                 case 'ENFP': return createENFP_AI(this.aiEngines);
+                case 'ENFJ': return createENFJ_AI(this.aiEngines);
                 // ✨ [신규] ISTJ 케이스 추가
                 case 'ISTJ': return createISTJ_AI(this.aiEngines);
                 // ✨ [신규] ISFJ 케이스 추가
@@ -115,6 +118,8 @@ class AIManager {
                 // ✨ [신규] 거너가 ENFP AI를 사용하도록 연결
                 case 'gunner':
                     return createENFP_AI(this.aiEngines);
+                case 'enfj':
+                    return createENFJ_AI(this.aiEngines);
                 case 'melee':
                 default:
                     return createMeleeAI(this.aiEngines);
