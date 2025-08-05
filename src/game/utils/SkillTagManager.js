@@ -51,4 +51,5 @@ export const SKILL_TAGS = {
     GUARDIAN: '가디언', // ✨ 센티넬을 위한 '가디언' 태그
     AURA: '오라',       // ✨ 팔라딘을 위한 '오라' 태그
     COUNTER: '반격',    // ✨ ISTP를 위한 '반격' 태그
+    EXECUTE: '처형',    // ✨ 고스트를 위한 '처형' 태그
 };

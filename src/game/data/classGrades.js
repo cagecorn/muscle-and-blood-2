@@ -145,6 +145,17 @@ export const classGrades = {
         meleeDefense: 1,
         rangedDefense: 2,
         magicDefense: 2,
-    }
+    },
     // --- ▲ [신규] 해커 등급 추가 ▲ ---
+
+    // --- ▼ [신규] 고스트 등급 추가 ▼ ---
+    ghost: {
+        meleeAttack: 3,
+        rangedAttack: 1,
+        magicAttack: 1,
+        meleeDefense: 1,
+        rangedDefense: 1,
+        magicDefense: 1,
+    }
+    // --- ▲ [신규] 고스트 등급 추가 ▲ ---
 };
