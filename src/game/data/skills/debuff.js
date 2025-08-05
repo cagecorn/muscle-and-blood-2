@@ -21,11 +21,13 @@ export const debuffSkills = {
                 id: 'shieldBreak',
                 type: EFFECT_TYPES.DEBUFF,
                 duration: 3,
-                modifiers: {
-                    stat: 'damageIncrease',
-                    type: 'percentage',
-                    value: 0.15 // 4순위 기준 기본값
-                }
+                modifiers: [ // 객체에서 배열로 수정
+                    {
+                        stat: 'damageIncrease',
+                        type: 'percentage',
+                        value: 0.15 // 4순위 기준 기본값
+                    }
+                ]
             }
         },
         // RARE 등급: 토큰 소모량 감소
@@ -44,11 +46,13 @@ export const debuffSkills = {
                 id: 'shieldBreak',
                 type: EFFECT_TYPES.DEBUFF,
                 duration: 3,
-                modifiers: {
-                    stat: 'damageIncrease',
-                    type: 'percentage',
-                    value: 0.15
-                }
+                modifiers: [ // 객체에서 배열로 수정
+                    {
+                        stat: 'damageIncrease',
+                        type: 'percentage',
+                        value: 0.15
+                    }
+                ]
             }
         },
         // EPIC 등급: 방어력 감소 효과 추가

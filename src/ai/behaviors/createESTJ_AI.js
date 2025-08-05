@@ -42,18 +42,15 @@ function createESTJ_AI(engines = {}) {
             new FindLowestHealthEnemyNode(engines),
             new FindPriorityTargetNode(engines)
         ]),
-        // 2. 결정된 타겟을 대상으로 행동 개시
+        // 2. 결정된 타겟을 대상으로 행동 개시 (Selector로 감싸 둘 중 하나만 실행되도록 수정)
         new SelectorNode([
-            // 2-1. 디버프 -> 공격 연계 시도
+            // 2-1. 디버프 스킬 사용 시도
             new SequenceNode([
                 new FindSkillByTagNode(SKILL_TAGS.DEBUFF, engines),
                 new FindTargetBySkillTypeNode(engines),
                 executeSkillBranch,
-                new FindBestSkillByScoreNode(engines),
-                new FindTargetBySkillTypeNode(engines),
-                executeSkillBranch
             ]),
-            // 2-2. 디버프가 없으면 바로 공격
+            // 2-2. 디버프가 없거나 실패하면 바로 공격
             new SequenceNode([
                 new FindBestSkillByScoreNode(engines),
                 new FindTargetBySkillTypeNode(engines),

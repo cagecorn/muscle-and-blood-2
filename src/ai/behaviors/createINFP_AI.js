@@ -39,18 +39,6 @@ function createINFP_AI(engines = {}) {
         ])
     ]);
 
-    // 대상을 블랙보드의 특정 키('skillTarget')로 설정하는 헬퍼 노드
-    const setSkillTarget = (key) => ({
-        async evaluate(_unit, blackboard) {
-            const target = blackboard.get(key);
-            if (target) {
-                blackboard.set('skillTarget', target);
-                return 'SUCCESS';
-            }
-            return 'FAILURE';
-        }
-    });
-
     const rootNode = new SelectorNode([
         // 1순위: 생존 본능
         new SequenceNode([
@@ -65,14 +53,12 @@ function createINFP_AI(engines = {}) {
             // 2-1: 적 메딕에게 '낙인' 시도
             new SequenceNode([
                 new FindEnemyMedicNode(engines),
-                setSkillTarget('enemyMedic'),
                 new FindBestSkillByScoreNode(engines), // SkillScoreEngine이 PROHIBITION 태그에 높은 점수를 주도록 설정
                 executeSkillBranch
             ]),
             // 2-2: 위협적인 버프를 가진 적에게 디버프
             new SequenceNode([
                 new FindBuffedEnemyNode(engines), // 예: 전투의 함성 버프를 가진 적
-                setSkillTarget('buffedEnemy'),
                 new FindBestSkillByScoreNode(engines), // DEBUFF 스킬 선호
                 executeSkillBranch
             ]),
@@ -81,7 +67,6 @@ function createINFP_AI(engines = {}) {
         // 3순위: 아군 지원
         new SequenceNode([
             new FindNearestAllyInDangerNode(0.6), // 체력 60% 이하 아군 탐색
-            setSkillTarget('allyInDanger'),
             new FindBestSkillByScoreNode(engines), // HEAL, AID 스킬 선호
             executeSkillBranch
         ]),
