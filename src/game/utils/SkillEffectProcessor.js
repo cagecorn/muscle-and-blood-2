@@ -228,7 +228,23 @@ class SkillEffectProcessor {
             return;
         }
 
-        const healAmount = Math.round(unit.finalStats.wisdom * (skill.healMultiplier || 0));
+        let healAmount = Math.round(unit.finalStats.wisdom * (skill.healMultiplier || 0));
+
+        // --- ▼ [신규] 메딕 '응급처치' 패시브 로직 추가 ▼ ---
+        if (unit.classPassive?.id === 'firstAid' &&
+            skill.tags?.includes(SKILL_TAGS.HEAL) &&
+            (target.currentHp / target.finalStats.hp) <= 0.25)
+        {
+            const bonusHeal = healAmount * 0.25;
+            healAmount += bonusHeal;
+            debugLogEngine.log(
+                this.constructor.name,
+                `[${unit.instanceName}]의 [응급처치] 패시브 발동! 치유량 +25% (${bonusHeal.toFixed(0)})`
+            );
+            this.vfxManager.showEffectName(unit.sprite, '응급처치!', '#22c55e');
+        }
+        // --- ▲ [신규] 메딕 '응급처치' 패시브 로직 추가 ▲ ---
+
         if (healAmount > 0) {
             target.currentHp = Math.min(target.finalStats.hp, target.currentHp + healAmount);
             this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y, `+${healAmount}`, '#22c55e');
