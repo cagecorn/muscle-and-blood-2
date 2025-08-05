@@ -100,6 +100,18 @@ export const statusEffects = {
         name: '숯돌 갈기',
         iconPath: 'assets/images/skills/grindstone.png',
     },
+    huntSenseBuff: {
+        id: 'huntSenseBuff',
+        name: '사냥꾼의 감각',
+        description: '다음 3턴간 치명타 확률이 25% 증가합니다.',
+        iconPath: 'assets/images/icons/buffs/hunt-sense.png',
+        duration: 3,
+        type: EFFECT_TYPES.BUFF,
+        stats: {
+            critChance: 0.25,
+        },
+        tags: ['buff', 'crit'],
+    },
     // 치료 불가 디버프
     stigma: {
         id: 'stigma',
