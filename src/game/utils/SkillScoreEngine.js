@@ -111,6 +111,13 @@ class SkillScoreEngine {
                 if (tags.includes(SKILL_TAGS.CHARGE)) mbtiScore += 20; // 돌진 스킬도 선호
                 if (tags.includes(SKILL_TAGS.KINETIC)) mbtiScore += 15; // 관성(넉백) 스킬 선호
             }
+            // ✨ [신규] ISTJ 성향 보너스
+            if (mbtiString === 'ISTJ') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.WILL_GUARD)) mbtiScore += 40; // 의지 방패 매우 선호
+                if (skillData.type === 'BUFF') mbtiScore += 30; // 버프 스킬 선호
+                if (tags.includes(SKILL_TAGS.AURA)) mbtiScore += 25; // 오라 스킬 선호
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
