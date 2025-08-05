@@ -1,12 +1,17 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
+// --- ▼ [신규] 상태 효과 적용을 위한 모듈 import ▼ ---
+import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../../game/utils/EffectTypes.js';
+// --- ▲ [신규] 상태 효과 적용을 위한 모듈 import ▲ ---
 
 class MoveToTargetNode extends Node {
-    constructor({ animationEngine, cameraControl }) {
+    constructor({ animationEngine, cameraControl, vfxManager }) { // vfxManager 추가
         super();
         this.animationEngine = animationEngine;
         this.cameraControl = cameraControl;
+        this.vfxManager = vfxManager; // vfxManager 저장
     }
 
     async evaluate(unit, blackboard) {
@@ -65,6 +70,31 @@ class MoveToTargetNode extends Node {
             finalCell.isOccupied = true;
             finalCell.sprite = unit.sprite;
         }
+
+        // --- ▼ [핵심 추가] 저거너트 패시브 발동 로직 ▼ ---
+        if (unit.classPassive?.id === 'juggernaut' && movePath.length > 0) {
+            const defenseBonus = movePath.length * 0.03;
+            const effects = statusEffectManager.activeEffects.get(unit.uniqueId) || [];
+            let existingBuff = effects.find(e => e.id === 'juggernautBuff');
+
+            if (existingBuff) {
+                existingBuff.modifiers.forEach(mod => mod.value += defenseBonus);
+                existingBuff.duration = 1;
+            } else {
+                const buffEffect = {
+                    id: 'juggernautBuff',
+                    type: EFFECT_TYPES.BUFF,
+                    duration: 1,
+                    modifiers: [
+                        { stat: 'physicalDefense', type: 'percentage', value: defenseBonus },
+                        { stat: 'magicDefense', type: 'percentage', value: defenseBonus }
+                    ]
+                };
+                statusEffectManager.addEffect(unit, { name: '저거너트', effect: buffEffect }, unit);
+            }
+            this.vfxManager.showEffectName(unit.sprite, '저거너트!', '#22c55e');
+        }
+        // --- ▲ [핵심 추가] 저거너트 패시브 발동 로직 ▲ ---
 
         // 이동 완료 플래그 설정
         blackboard.set('hasMovedThisTurn', true);

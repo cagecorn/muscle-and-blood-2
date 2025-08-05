@@ -139,6 +139,9 @@ export class Preloader extends Scene
         // --- ✨ [추가] 센티넬 패시브 아이콘 로드 ---
         this.load.image('eye-of-guard', 'images/skills/eye-of-guard.png');
         this.load.image('ghosting', 'images/skills/ghosting.png');
+        // --- ▼ [신규] 플라잉맨 패시브 아이콘 추가 ▼ ---
+        this.load.image('juggernaut', 'images/skills/flyingmen\'s-charge.png');
+        // --- ▲ [신규] 플라잉맨 패시브 아이콘 추가 ▲ ---
         this.load.image('suppress-shot', 'images/skills/suppress-shot.png');
         this.load.image('stigma', 'images/skills/stigma.png');
         this.load.image('nanobeam', 'images/skills/nanobeam.png');
