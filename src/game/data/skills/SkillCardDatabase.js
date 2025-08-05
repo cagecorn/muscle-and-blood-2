@@ -1,7 +1,7 @@
 import { activeSkills } from './active.js';
 import { buffSkills } from './buff.js';
 import { debuffSkills } from './debuff.js';
-import { passiveSkills } from './passive.js';
+// import { passiveSkills } from './passive.js'; // passive skills are intentionally excluded
 import { aidSkills } from './aid.js';
 import { summonSkills } from './summon.js';
 import { strategySkills } from './strategy.js';
@@ -12,7 +12,7 @@ export const skillCardDatabase = {
     ...activeSkills,
     ...buffSkills,
     ...debuffSkills,
-    ...passiveSkills,
+    // ...passiveSkills, // passive skills are intentionally excluded from card generation
     ...aidSkills,
     ...summonSkills,
     ...strategySkills,
