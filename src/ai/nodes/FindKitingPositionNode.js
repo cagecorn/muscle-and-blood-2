@@ -4,11 +4,12 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 // 최적의 카이팅(거리두기) 위치를 찾는 노드
 class FindKitingPositionNode extends Node {
     // visionManager를 의존성으로 추가합니다.
-    constructor({ formationEngine, pathfinderEngine, visionManager }) {
+    constructor({ formationEngine, pathfinderEngine, visionManager, narrationEngine }) {
         super();
         this.formationEngine = formationEngine;
         this.pathfinderEngine = pathfinderEngine;
         this.visionManager = visionManager; // VisionManager 인스턴스 저장
+        this.narrationEngine = narrationEngine;
     }
 
     async evaluate(unit, blackboard) {
@@ -23,6 +24,10 @@ class FindKitingPositionNode extends Node {
         if (!target) {
             debugAIManager.logNodeResult(NodeState.FAILURE, "카이팅할 주 대상 없음");
             return NodeState.FAILURE;
+        }
+
+        if (this.narrationEngine) {
+            this.narrationEngine.show(`${unit.instanceName}이(가) [${target.instanceName}]와(과) 거리를 벌리기 위해 이동합니다.`);
         }
 
         const attackRange = unit.finalStats.attackRange || 3;

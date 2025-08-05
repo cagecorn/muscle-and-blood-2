@@ -1902,3 +1902,28 @@ body {
     filter: grayscale(80%);
     cursor: not-allowed;
 }
+
+/* --- 나레이션 패널 스타일 --- */
+#narration-container {
+    position: absolute;
+    bottom: 130px; /* 전투 UI 바로 위에 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-top: 2px solid #666;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 15px;
+    z-index: 199; /* 전투 UI(200) 바로 아래 */
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+}
+
+.narration-text {
+    margin: 0;
+    color: #f0e68c; /* 밝은 노란색 */
+    font-size: 16px;
+    font-style: italic;
+    text-shadow: 1px 1px 2px #000;
+}
