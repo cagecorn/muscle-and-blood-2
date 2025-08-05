@@ -115,6 +115,23 @@ export const statusEffects = {
             console.log(`${unit.instanceName}의 [치료 금지] 효과가 해제됩니다.`);
         },
     },
+    // --- ▼ [신규] 혼란 효과 추가 ▼ ---
+    confusion: {
+        id: 'confusion',
+        name: '혼란',
+        type: EFFECT_TYPES.STATUS_EFFECT,
+        description: '제어 불능 상태가 되어 아군을 공격합니다.',
+        iconPath: 'assets/images/skills/confusion.png', // 스킬 아이콘 재사용
+        onApply: (unit) => {
+            unit.isConfused = true;
+            console.log(`%c[상태이상] ${unit.instanceName}이(가) 혼란에 빠졌습니다!`, "color: #f43f5e;");
+        },
+        onRemove: (unit) => {
+            unit.isConfused = false;
+            console.log(`%c[상태이상] ${unit.instanceName}이(가) 혼란에서 벗어났습니다.`, "color: #a3e635;");
+        },
+    },
+    // --- ▲ [신규] 혼란 효과 추가 ▲ ---
     // --- ▼ [신규] 윌 가드 효과 추가 ▼ ---
     willGuard: {
         id: 'willGuard',

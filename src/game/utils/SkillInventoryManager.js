@@ -48,6 +48,8 @@ class SkillInventoryManager {
                 this.addSkillById('willGuard', grade);
                 // ✨ [신규] 마이티 쉴드 카드 지급
                 this.addSkillById('mightyShield', grade);
+                // ✨ 컨퓨전 스킬 카드 지급 추가
+                this.addSkillById('confusion', grade);
             }
         });
 
