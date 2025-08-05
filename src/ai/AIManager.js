@@ -26,6 +26,8 @@ import { createISFJ_AI } from './behaviors/createISFJ_AI.js';
 import { createESTJ_AI } from './behaviors/createESTJ_AI.js';
 // ✨ [신규] ESFJ AI import
 import { createESFJ_AI } from './behaviors/createESFJ_AI.js';
+// ✨ ISTP AI import 추가
+import { createISTP_AI } from './behaviors/createISTP_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
 
@@ -82,6 +84,8 @@ class AIManager {
                 case 'ESTJ': return createESTJ_AI(this.aiEngines);
                 // ✨ [신규] ESFJ 케이스 추가
                 case 'ESFJ': return createESFJ_AI(this.aiEngines);
+                // ✨ [신규] ISTP 케이스 추가
+                case 'ISTP': return createISTP_AI(this.aiEngines);
                 // 다른 MBTI 유형은 여기서 추가 가능
             }
         }
@@ -152,6 +156,9 @@ class AIManager {
     async executeTurn(unit, allUnits, enemyUnits) {
         const data = this.unitData.get(unit.uniqueId);
         if (!data) return;
+
+        // --- \u25BC [핵심 추가] 턴 시작 시 피격 기록 초기화 \u25BC ---
+        unit.wasAttackedBy = null;
 
         // ✨ [신규] 턴 시작 시, 전략적 상황을 계산하여 블랙보드에 업데이트
         const blackboard = data.behaviorTree.blackboard;

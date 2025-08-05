@@ -280,6 +280,9 @@ class CombatCalculationEngine {
             finalDamage,
             finalDefense
         );
+        // --- \u25BC [핵심 추가] 피격 사실을 방어자에게 기록 \u25BC ---
+        defender.wasAttackedBy = attacker.uniqueId;
+
         return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
     }
 
