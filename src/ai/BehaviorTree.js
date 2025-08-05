@@ -25,6 +25,11 @@ class BehaviorTree {
         this.blackboard.set('allUnits', allUnits);
         this.blackboard.set('enemyUnits', enemyUnits);
 
+        // --- ▼ [버그 수정] 누락된 아군 목록을 블랙보드에 추가합니다. ▼ ---
+        const allyUnits = allUnits.filter(u => u.team === unit.team && u.currentHp > 0);
+        this.blackboard.set('allyUnits', allyUnits);
+        // --- ▲ [버그 수정] ▲ ---
+
         // 루트 노드부터 평가를 시작합니다.
         await this.root.evaluate(unit, this.blackboard);
     }
