@@ -200,6 +200,16 @@ export const statusEffects = {
         description: '이 유닛은 센티넬에게 가하는 피해량이 감소합니다.',
     },
     // --- ▲ [신규] 전방 주시 디버프 효과 추가 ▲ ---
+    // --- ▼ [신규] 투명화 버프 효과 추가 ▼ ---
+    ghostingBuff: {
+        id: 'ghostingBuff',
+        name: '투명화',
+        type: EFFECT_TYPES.BUFF,
+        iconPath: 'assets/images/skills/ghosting.png',
+        description: '회피율이 50% 상승합니다.',
+        modifiers: { stat: 'physicalEvadeChance', type: 'percentage', value: 0.50 }
+    },
+    // --- ▲ [신규] 투명화 버프 효과 추가 ▲ ---
     flyingmenChargeBonus: {
         id: 'flyingmenChargeBonus',
         name: '신속',

@@ -206,6 +206,11 @@ export class BattleSimulatorEngine {
             }
 
             unit.currentHp = unit.finalStats.hp;
+            // --- ▼ [신규] 고스트 패시브를 위한 누적 데미지 변수 초기화 ▼ ---
+            if (unit.classPassive?.id === 'ghosting') {
+                unit.cumulativeDamageTaken = 0;
+            }
+            // --- ▲ [신규] 고스트 패시브를 위한 누적 데미지 변수 초기화 ▲ ---
             // ✨ 배리어 상태 초기화
             unit.maxBarrier = unit.finalStats.maxBarrier;
             unit.currentBarrier = unit.finalStats.currentBarrier;

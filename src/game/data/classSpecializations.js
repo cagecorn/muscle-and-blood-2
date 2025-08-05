@@ -201,6 +201,16 @@ export const classSpecializations = {
                 modifiers: { stat: 'statusEffectApplication', type: 'percentage', value: 0.08 }
             }
         }
-    ]
+    ],
     // --- ▲ [신규] 해커 특화 태그 추가 ▲ ---
+
+    // --- ▼ [신규] 고스트 특화 태그 추가 ▼ ---
+    ghost: [
+        {
+            tag: SKILL_TAGS.EXECUTE,
+            description: "'처형' 태그 스킬로 적을 처치했을 경우, 자신의 토큰을 1개 회복합니다.",
+            // 이 효과는 SkillEffectProcessor에서 직접 처리됩니다.
+        }
+    ]
+    // --- ▲ [신규] 고스트 특화 태그 추가 ▲ ---
 };

@@ -214,6 +214,25 @@ class SkillEffectProcessor {
         if (damageToHp > 0) {
             target.currentHp -= damageToHp;
             this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y + 10, damageToHp, '#ff4d4d', hitType);
+
+            // --- ▼ [신규] 고스트 '투명화' 패시브 로직 ▼ ---
+            if (target.classPassive?.id === 'ghosting') {
+                target.cumulativeDamageTaken += damageToHp;
+                const threshold = target.finalStats.hp * 0.20;
+
+                if (target.cumulativeDamageTaken >= threshold) {
+                    target.cumulativeDamageTaken = 0;
+                    const buffEffect = {
+                        id: 'ghostingBuff',
+                        type: EFFECT_TYPES.BUFF,
+                        duration: 1,
+                        sourceSkillName: '투명화'
+                    };
+                    statusEffectManager.addEffect(target, { name: '투명화', effect: buffEffect }, target);
+                    this.vfxManager.showEffectName(target.sprite, '투명화!', '#a78bfa');
+                }
+            }
+            // --- ▲ [신규] 고스트 '투명화' 패시브 로직 ▲ ---
         }
 
         this.vfxManager.showComboCount(comboCount);
@@ -243,6 +262,13 @@ class SkillEffectProcessor {
         if (target.currentHp <= 0) {
             // 아래와 같이 두 번째 인자로 공격자(unit)를 전달합니다.
             this.terminationManager.handleUnitDeath(target, unit);
+
+            // --- ▼ [신규] 고스트 '처형' 특화 토큰 회복 로직 ▼ ---
+            if (skill.tags?.includes(SKILL_TAGS.EXECUTE) &&
+                classSpecializations[unit.id]?.some(s => s.tag === SKILL_TAGS.EXECUTE)) {
+                tokenEngine.addTokens(unit.uniqueId, 1, '처형 특화');
+            }
+            // --- ▲ [신규] 고스트 '처형' 특화 토큰 회복 로직 ▲ ---
         }
     }
 
@@ -291,7 +317,7 @@ class SkillEffectProcessor {
             const spec = specializations.find(s => s.tag === tag);
             if (spec) {
                 // ✨ [핵심 수정] 메카닉의 소환 특화 보너스를 위한 별도 로직 추가
-                if (spec.effect.id === 'mechanicSummonBonus') {
+                if (spec.effect?.id === 'mechanicSummonBonus') {
                     // SummoningEngine을 통해 현재 유닛이 소환한 모든 소환수의 ID를 가져옵니다.
                     const summons = this.summoningEngine.getSummons(unit.uniqueId);
                     if (summons && summons.size > 0) {
@@ -315,7 +341,7 @@ class SkillEffectProcessor {
                             }
                         });
                     }
-                } else {
+                } else if (spec.effect) {
                     // 메카닉 외 다른 클래스의 일반적인 특화 효과 적용
                     statusEffectManager.addEffect(unit, { name: `특화 보너스: ${spec.tag}`, effect: spec.effect }, unit);
                 }

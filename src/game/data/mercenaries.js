@@ -414,6 +414,37 @@ export const mercenaryData = {
             description: '해커의 디버프에 걸린 상대는 1턴간 지속되는 랜덤 디버프 하나를 추가로 받습니다.',
             iconPath: 'assets/images/skills/hacker\'s-invade.png'
         }
-    }
+    },
     // --- ▲ [신규] 해커 클래스 데이터 추가 ▲ ---
+
+    // --- ▼ [신규] 고스트 클래스 데이터 추가 ▼ ---
+    ghost: {
+        id: 'ghost',
+        name: '고스트',
+        ai_archetype: 'assassin',
+        uiImage: 'assets/images/unit/ghost-ui.png',
+        battleSprite: 'ghost',
+        sprites: {
+            idle: 'ghost',
+            attack: 'ghost',
+            hitted: 'ghost',
+            cast: 'ghost',
+            'status-effects': 'ghost',
+        },
+        description: '"보이는 것은 실체 없는 환영뿐일지니."',
+        baseStats: {
+            hp: 85, valor: 8, strength: 16, endurance: 7,
+            agility: 15, intelligence: 5, wisdom: 6, luck: 14,
+            attackRange: 1,
+            movement: 4,
+            weight: 11
+        },
+        classPassive: {
+            id: 'ghosting',
+            name: '투명화',
+            description: '매번 자신의 최대 체력의 20%에 해당하는 누적 데미지를 입으면, 1턴간 [투명화] 상태가 되어 회피율이 50% 상승합니다.',
+            iconPath: 'assets/images/skills/ghosting.png'
+        }
+    }
+    // --- ▲ [신규] 고스트 클래스 데이터 추가 ▲ ---
 };
