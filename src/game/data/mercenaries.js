@@ -106,7 +106,15 @@ export const mercenaryData = {
             attackRange: 2,
             movement: 2,
             weight: 18
+        },
+        // --- ▼ [신규] 클래스 패시브 정보 추가 ▼ ---
+        classPassive: {
+            id: 'firstAid',
+            name: '응급처치',
+            description: '체력이 25% 이하인 아군을 대상으로 사용하는 [치유] 태그 스킬의 효과가 25% 증가합니다.',
+            iconPath: 'assets/images/skills/first-aid.png'
         }
+        // --- ▲ [신규] 클래스 패시브 정보 추가 ▲ ---
     },
     nanomancer: {
         id: 'nanomancer',

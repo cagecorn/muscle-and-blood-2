@@ -118,6 +118,13 @@ class SkillScoreEngine {
                 if (skillData.type === 'BUFF') mbtiScore += 30; // 버프 스킬 선호
                 if (tags.includes(SKILL_TAGS.AURA)) mbtiScore += 25; // 오라 스킬 선호
             }
+            // ✨ [신규] ISFJ 성향 보너스
+            if (mbtiString === 'ISFJ') {
+                const tags = skillData.tags || [];
+                if (tags.includes(SKILL_TAGS.HEAL)) mbtiScore += 50; // 치유가 최우선
+                if (tags.includes(SKILL_TAGS.AID)) mbtiScore += 40; // 지원 스킬도 매우 선호
+                if (tags.includes(SKILL_TAGS.WILL_GUARD)) mbtiScore += 30; // 보호막 스킬 선호
+            }
         }
 
         // ✨ 3. 음양 시스템 점수 계산 로직 추가
