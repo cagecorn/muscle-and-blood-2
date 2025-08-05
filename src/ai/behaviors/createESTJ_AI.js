@@ -11,6 +11,7 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindPriorityTargetNode from '../nodes/FindPriorityTargetNode.js';
 import FindLowestHealthEnemyNode from '../nodes/FindLowestHealthEnemyNode.js';
 import FindSkillByTagNode from '../nodes/FindSkillByTagNode.js';
+import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 
 /**
@@ -36,26 +37,37 @@ function createESTJ_AI(engines = {}) {
         ])
     ]);
 
-    const rootNode = new SequenceNode([
-        // 1. 점사할 타겟을 먼저 결정 (가장 체력 낮은 적 > 우선순위 적)
-        new SelectorNode([
-            new FindLowestHealthEnemyNode(engines),
-            new FindPriorityTargetNode(engines)
-        ]),
-        // 2. 결정된 타겟을 대상으로 행동 개시 (Selector로 감싸 둘 중 하나만 실행되도록 수정)
-        new SelectorNode([
-            // 2-1. 디버프 스킬 사용 시도
-            new SequenceNode([
-                new FindSkillByTagNode(SKILL_TAGS.DEBUFF, engines),
-                new FindTargetBySkillTypeNode(engines),
-                executeSkillBranch,
+    // 최상위 노드를 SelectorNode로 구성하여
+    // 공격 실패 시에도 다른 대안을 시도할 수 있도록 합니다.
+    const rootNode = new SelectorNode([
+        // 1순위: 타겟을 정하고 공격을 시도하는 전체 시퀀스
+        new SequenceNode([
+            // 1-1. 점사할 타겟을 먼저 결정
+            new SelectorNode([
+                new FindLowestHealthEnemyNode(engines),
+                new FindPriorityTargetNode(engines)
             ]),
-            // 2-2. 디버프가 없거나 실패하면 바로 공격
-            new SequenceNode([
-                new FindBestSkillByScoreNode(engines),
-                new FindTargetBySkillTypeNode(engines),
-                executeSkillBranch
+            // 1-2. 결정된 타겟을 대상으로 행동 개시
+            new SelectorNode([
+                // 디버프 스킬 사용 시도
+                new SequenceNode([
+                    new FindSkillByTagNode(SKILL_TAGS.DEBUFF, engines),
+                    new FindTargetBySkillTypeNode(engines),
+                    executeSkillBranch,
+                ]),
+                // 디버프가 없거나 실패하면 바로 공격
+                new SequenceNode([
+                    new FindBestSkillByScoreNode(engines),
+                    new FindTargetBySkillTypeNode(engines),
+                    executeSkillBranch
+                ])
             ])
+        ]),
+        // 2순위: 공격할 수 없다면 안전한 위치로 이동하여 턴을 낭비하지 않습니다.
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindSafeRepositionNode(engines),
+            new MoveToTargetNode(engines)
         ])
     ]);
 

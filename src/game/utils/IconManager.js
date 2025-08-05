@@ -90,6 +90,7 @@ export class IconManager {
         equipped.forEach(instId => {
             if (!instId) return;
             const inst = skillInventoryManager.getInstanceData(instId);
+            if (!inst) return; // 인스턴스 데이터가 없을 경우를 대비
             const skillData = skillInventoryManager.getSkillData(inst.skillId, inst.grade);
             if (skillData && skillData.type === 'PASSIVE') {
                 buffs.push({
