@@ -223,6 +223,32 @@ export const aidSkills = {
                 stack: { type: 'DAMAGE_IMMUNITY', amount: 5 }
             }
         }
-    }
+    },
     // --- ▲ [신규] 마이티 쉴드 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 맹독 바르기 스킬 추가 ▼ ---
+    applyPoison: {
+        yinYangValue: +1,
+        NORMAL: {
+            id: 'applyPoison',
+            name: '맹독 바르기',
+            type: 'AID',
+            requiredClass: ['plagueDoctor'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.BUFF, SKILL_TAGS.POISON, SKILL_TAGS.PRODUCTION],
+            cost: 1,
+            targetType: 'ally',
+            description: '아군 하나의 무기에 독을 발라, 2턴간 공격 시 50% 확률로 적을 [중독]시킵니다. [독] 자원을 1 생산합니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 2,
+            generatesResource: { type: 'POISON', amount: 1 },
+            effect: {
+                id: 'poisonWeapon',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                poisonChance: 0.5 // 중독 확률 (나중에 CombatCalculationEngine에서 처리)
+            }
+        }
+    },
+    // --- ▲ [신규] 맹독 바르기 스킬 추가 ▲ ---
 };

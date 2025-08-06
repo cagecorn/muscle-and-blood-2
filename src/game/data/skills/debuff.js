@@ -180,4 +180,24 @@ export const debuffSkills = {
         }
     },
     // --- ▲ [신규] 컨퓨전 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 시스템 해킹 스킬 추가 ▼ ---
+    systemHack: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'systemHack',
+            name: '시스템 해킹',
+            type: 'DEBUFF',
+            requiredClass: ['hacker'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.PROHIBITION, SKILL_TAGS.MIND, SKILL_TAGS.SPECIAL],
+            cost: 2,
+            targetType: 'enemy',
+            description: '적의 시스템을 교란하여 1턴간 [무장 해제] 상태로 만듭니다. (공격/스킬 사용 불가)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            effect: { id: 'disarm', type: EFFECT_TYPES.DEBUFF, duration: 1 }
+        }
+    },
+    // --- ▲ [신규] 시스템 해킹 스킬 추가 ▲ ---
 };
