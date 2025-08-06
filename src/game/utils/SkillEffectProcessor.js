@@ -14,6 +14,7 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { comboManager } from './ComboManager.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { EFFECT_TYPES } from './EffectTypes.js'; // EFFECT_TYPES import 추가
+// ▼▼▼ [추가] areaOfEffectEngine을 import 합니다. ▼▼▼
 import { areaOfEffectEngine } from './AreaOfEffectEngine.js';
 // ✨ 1. StatEngine을 import하여 스탯을 재계산할 수 있도록 합니다.
 import { statEngine } from './StatEngine.js';
@@ -30,6 +31,8 @@ class SkillEffectProcessor {
         this.terminationManager = engines.terminationManager;
         this.summoningEngine = engines.summoningEngine;
         this.battleSimulator = engines.battleSimulator;
+        // ▼▼▼ [수정] delayEngine을 직접 참조하도록 추가합니다. ▼▼▼
+        this.delayEngine = engines.delayEngine;
     }
 
     /**
@@ -202,15 +205,18 @@ class SkillEffectProcessor {
         // ▼▼▼ [수정] 마법 스킬일 경우 공격 애니메이션을 다르게 처리합니다. ▼▼▼
         if (skill.tags?.includes(SKILL_TAGS.MAGIC)) {
             this.vfxManager.createMagicImpact(target.sprite.x, target.sprite.y, 'placeholder');
-            await this.battleSimulator.delayEngine.hold(300);
+            // ▼▼▼ [수정] this.battleSimulator.delayEngine을 this.delayEngine으로 변경합니다. ▼▼▼
+            await this.delayEngine.hold(300);
         } else {
             await this.animationEngine.attack(unit.sprite, target.sprite);
         }
         // ▲▲▲ [수정] ▲▲▲
 
+        spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
+
         if (skill.type !== 'ACTIVE') return;
 
-        // ▼▼▼ [핵심 수정] 단일 타겟과 광역 타겟을 모두 처리하도록 로직 수정 ▼▼▼
+        // ▼▼▼ [수정] 단일/광역 타겟 처리 로직 ▼▼▼
         let finalTargets = [target];
 
         if (skill.aoe) {
@@ -227,8 +233,6 @@ class SkillEffectProcessor {
         }
 
         for (const currentTarget of finalTargets) {
-            spriteEngine.changeSpriteForDuration(currentTarget, 'hitted', 300);
-
             const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(unit, currentTarget, skill, instanceId, grade);
 
             const damageToBarrier = Math.min(currentTarget.currentBarrier, totalDamage);
@@ -276,7 +280,7 @@ class SkillEffectProcessor {
                 }
             }
         }
-        // ▲▲▲ [핵심 수정] 종료 ▲▲▲
+        // ▲▲▲ [수정] 종료 ▲▲▲
 
         // ✨ [신규] 공격이 끝났으므로, 다음 공격의 콤보 연계를 위해 현재 스킬의 태그를 ComboManager에 기록합니다.
         comboManager.updateLastSkillTags(unit.uniqueId, skill.tags || []);
