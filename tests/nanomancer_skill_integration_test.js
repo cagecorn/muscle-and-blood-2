@@ -36,6 +36,14 @@ const iceballBase = {
     }
 };
 
+// 신규 4대 원소 스킬 (NORMAL 등급만 존재)
+const elementalBases = [
+    { id: 'lightningStrike', cost: 3, cooldown: 3, range: 4, effect: { id: 'shock', duration: 2 } },
+    { id: 'stoneBlast', cost: 3, cooldown: 3, range: 4, effect: { id: 'weaken', duration: 2 } },
+    { id: 'holyLight', cost: 3, cooldown: 3, range: 4, effect: { id: 'vulnerable', duration: 2 } },
+    { id: 'shadowBolt', cost: 3, cooldown: 3, range: 4, effect: { id: 'drain', duration: 2 } }
+];
+
 const expectedDamage = [1.3, 1.2, 1.1, 1.0];
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
@@ -84,6 +92,16 @@ for (const grade of grades) {
     } else {
         assert(!skill.centerTargetEffect, 'Center effect should only exist in Legendary');
     }
+}
+
+// 신규 4대 원소 스킬 검증
+for (const base of elementalBases) {
+    const skill = skillModifierEngine.getModifiedSkill(base, 'NORMAL');
+    assert.strictEqual(skill.cost, base.cost, `${base.id} cost failed`);
+    assert.strictEqual(skill.cooldown, base.cooldown, `${base.id} cooldown failed`);
+    assert.strictEqual(skill.range, base.range, `${base.id} range failed`);
+    assert.strictEqual(skill.effect.id, base.effect.id, `${base.id} effect id mismatch`);
+    assert.strictEqual(skill.effect.duration, base.effect.duration, `${base.id} duration failed`);
 }
 
 console.log('Nanomancer skills integration test passed.');

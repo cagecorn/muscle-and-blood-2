@@ -827,6 +827,88 @@ export const activeSkills = {
     },
     // --- ▲ [신규] 아이스볼 스킬 추가 ▲ ---
 
+    // --- ▼ [신규] 4대 원소 마법 스킬 추가 (NORMAL 등급) ▼ ---
+    lightningStrike: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'lightningStrike',
+            name: '라이트닝 스트라이크',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.WIND, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '번개 구체를 날려 십자(5칸) 범위의 적들에게 {{damage}}% 마법 피해를 주고, 2턴간 [감전] 효과를 부여합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 0.8, max: 1.1 },
+            effect: { id: 'shock', type: EFFECT_TYPES.DEBUFF, duration: 2 }
+        }
+    },
+
+    stoneBlast: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'stoneBlast',
+            name: '스톤 블라스트',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.EARTH, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '바위 파편을 날려 십자(5칸) 범위의 적들에게 {{damage}}% 마법 피해를 주고, 2턴간 [약화] 효과를 부여합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 0.8, max: 1.1 },
+            effect: { id: 'weaken', type: EFFECT_TYPES.DEBUFF, duration: 2 }
+        }
+    },
+
+    holyLight: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'holyLight',
+            name: '홀리 라이트',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '성스러운 빛으로 십자(5칸) 범위의 적들에게 {{damage}}% 마법 피해를 주고, 2턴간 [취약] 상태로 만듭니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 0.8, max: 1.1 },
+            effect: { id: 'vulnerable', type: EFFECT_TYPES.DEBUFF, duration: 2 }
+        }
+    },
+
+    shadowBolt: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'shadowBolt',
+            name: '섀도우 볼트',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.DARK, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '어둠의 구체를 날려 십자(5칸) 범위의 적들에게 {{damage}}% 마법 피해를 주고, 2턴간 [정기 흡수] 효과를 부여합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 0.8, max: 1.1 },
+            effect: { id: 'drain', type: EFFECT_TYPES.DEBUFF, duration: 2 }
+        }
+    },
+    // --- ▲ [신규] 4대 원소 마법 스킬 추가 (NORMAL 등급) ▲ ---
+
     // --- ▼ [신규] 관통 사격 스킬 추가 ▼ ---
     piercingShot: {
         yinYangValue: -3,
