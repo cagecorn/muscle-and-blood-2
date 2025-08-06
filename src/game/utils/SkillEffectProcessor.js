@@ -14,6 +14,7 @@ import { debugLogEngine } from './DebugLogEngine.js';
 import { comboManager } from './ComboManager.js';
 import { SKILL_TAGS } from './SkillTagManager.js';
 import { EFFECT_TYPES } from './EffectTypes.js'; // EFFECT_TYPES import 추가
+import { areaOfEffectEngine } from './AreaOfEffectEngine.js';
 // ✨ 1. StatEngine을 import하여 스탯을 재계산할 수 있도록 합니다.
 import { statEngine } from './StatEngine.js';
 // 상태 효과 데이터베이스를 통해 해커 패시브에 사용할 디버프를 조회합니다.
@@ -200,56 +201,82 @@ class SkillEffectProcessor {
 
         // ▼▼▼ [수정] 마법 스킬일 경우 공격 애니메이션을 다르게 처리합니다. ▼▼▼
         if (skill.tags?.includes(SKILL_TAGS.MAGIC)) {
-            // 마법사는 제자리에서 시전하는 느낌을 주기 위해 이동 애니메이션을 생략하고,
-            // 대신 타겟 위치에 바로 파티클 효과를 생성합니다.
             this.vfxManager.createMagicImpact(target.sprite.x, target.sprite.y, 'placeholder');
-            // 약간의 딜레이를 주어 효과가 보일 시간을 확보합니다.
             await this.battleSimulator.delayEngine.hold(300);
         } else {
-            // 기존의 물리 공격 애니메이션
             await this.animationEngine.attack(unit.sprite, target.sprite);
         }
         // ▲▲▲ [수정] ▲▲▲
 
-        spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
-
         if (skill.type !== 'ACTIVE') return;
 
-        const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(unit, target, skill, instanceId, grade);
-        
-        const damageToBarrier = Math.min(target.currentBarrier, totalDamage);
-        const damageToHp = totalDamage - damageToBarrier;
+        // ▼▼▼ [핵심 수정] 단일 타겟과 광역 타겟을 모두 처리하도록 로직 수정 ▼▼▼
+        let finalTargets = [target];
 
-        if (damageToBarrier > 0) {
-            target.currentBarrier -= damageToBarrier;
-            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y - 10, damageToBarrier, '#ffd700', hitType);
+        if (skill.aoe) {
+            const targetCellPos = { col: target.gridX, row: target.gridY };
+            const affectedCells = areaOfEffectEngine.getAffectedCells(skill.aoe.shape, targetCellPos, skill.aoe.radius || skill.aoe.length, unit);
+
+            const allUnits = this.battleSimulator.turnQueue;
+            const affectedEnemies = allUnits.filter(u =>
+                u.team !== unit.team &&
+                u.currentHp > 0 &&
+                affectedCells.some(cell => cell.col === u.gridX && cell.row === u.gridY)
+            );
+            finalTargets = affectedEnemies.length > 0 ? affectedEnemies : [];
         }
-        if (damageToHp > 0) {
-            target.currentHp -= damageToHp;
-            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y + 10, damageToHp, '#ff4d4d', hitType);
 
-            // --- ▼ [신규] 고스트 '투명화' 패시브 로직 ▼ ---
-            if (target.classPassive?.id === 'ghosting') {
-                target.cumulativeDamageTaken += damageToHp;
-                const threshold = target.finalStats.hp * 0.20;
+        for (const currentTarget of finalTargets) {
+            spriteEngine.changeSpriteForDuration(currentTarget, 'hitted', 300);
 
-                if (target.cumulativeDamageTaken >= threshold) {
-                    target.cumulativeDamageTaken = 0;
-                    const buffEffect = {
-                        id: 'ghostingBuff',
-                        type: EFFECT_TYPES.BUFF,
-                        duration: 1,
-                        sourceSkillName: '투명화'
-                    };
-                    statusEffectManager.addEffect(target, { name: '투명화', effect: buffEffect }, target);
-                    this.vfxManager.showEffectName(target.sprite, '투명화!', '#a78bfa');
+            const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(unit, currentTarget, skill, instanceId, grade);
+
+            const damageToBarrier = Math.min(currentTarget.currentBarrier, totalDamage);
+            const damageToHp = totalDamage - damageToBarrier;
+
+            if (damageToBarrier > 0) {
+                currentTarget.currentBarrier -= damageToBarrier;
+                this.vfxManager.createDamageNumber(currentTarget.sprite.x, currentTarget.sprite.y - 10, damageToBarrier, '#ffd700', hitType);
+            }
+            if (damageToHp > 0) {
+                currentTarget.currentHp -= damageToHp;
+                this.vfxManager.createDamageNumber(currentTarget.sprite.x, currentTarget.sprite.y + 10, damageToHp, '#ff4d4d', hitType);
+
+                if (currentTarget.classPassive?.id === 'ghosting') {
+                    currentTarget.cumulativeDamageTaken += damageToHp;
+                    const threshold = currentTarget.finalStats.hp * 0.20;
+
+                    if (currentTarget.cumulativeDamageTaken >= threshold) {
+                        currentTarget.cumulativeDamageTaken = 0;
+                        const buffEffect = {
+                            id: 'ghostingBuff',
+                            type: EFFECT_TYPES.BUFF,
+                            duration: 1,
+                            sourceSkillName: '투명화'
+                        };
+                        statusEffectManager.addEffect(currentTarget, { name: '투명화', effect: buffEffect }, currentTarget);
+                        this.vfxManager.showEffectName(currentTarget.sprite, '투명화!', '#a78bfa');
+                    }
                 }
             }
-            // --- ▲ [신규] 고스트 '투명화' 패시브 로직 ▲ ---
-        }
 
-        this.vfxManager.showComboCount(comboCount);
-        this.vfxManager.createBloodSplatter(target.sprite.x, target.sprite.y);
+            this.vfxManager.showComboCount(comboCount);
+            this.vfxManager.createBloodSplatter(currentTarget.sprite.x, currentTarget.sprite.y);
+
+            if (skill.centerTargetEffect && currentTarget.uniqueId === target.uniqueId) {
+                statusEffectManager.addEffect(currentTarget, { name: skill.name, effect: skill.centerTargetEffect }, unit);
+            }
+
+            if (currentTarget.currentHp <= 0) {
+                this.terminationManager.handleUnitDeath(currentTarget, unit);
+
+                if (skill.tags?.includes(SKILL_TAGS.EXECUTE) &&
+                    classSpecializations[unit.id]?.some(s => s.tag === SKILL_TAGS.EXECUTE)) {
+                    tokenEngine.addTokens(unit.uniqueId, 1, '처형 특화');
+                }
+            }
+        }
+        // ▲▲▲ [핵심 수정] 종료 ▲▲▲
 
         // ✨ [신규] 공격이 끝났으므로, 다음 공격의 콤보 연계를 위해 현재 스킬의 태그를 ComboManager에 기록합니다.
         comboManager.updateLastSkillTags(unit.uniqueId, skill.tags || []);
@@ -272,17 +299,6 @@ class SkillEffectProcessor {
             this.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y - 10, `+${healAmount}`, '#ffd700', '배리어');
         }
 
-        if (target.currentHp <= 0) {
-            // 아래와 같이 두 번째 인자로 공격자(unit)를 전달합니다.
-            this.terminationManager.handleUnitDeath(target, unit);
-
-            // --- ▼ [신규] 고스트 '처형' 특화 토큰 회복 로직 ▼ ---
-            if (skill.tags?.includes(SKILL_TAGS.EXECUTE) &&
-                classSpecializations[unit.id]?.some(s => s.tag === SKILL_TAGS.EXECUTE)) {
-                tokenEngine.addTokens(unit.uniqueId, 1, '처형 특화');
-            }
-            // --- ▲ [신규] 고스트 '처형' 특화 토큰 회복 로직 ▲ ---
-        }
     }
 
     async _processAidSkill(unit, target, skill) {

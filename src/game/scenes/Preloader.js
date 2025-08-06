@@ -157,6 +157,9 @@ export class Preloader extends Scene
         this.load.image('axe-strike', 'images/skills/axe-strike.png');
         this.load.image('commanders-shout', 'images/skills/commanders-shout.png');
         this.load.image('hacker\'s-invade', 'images/skills/hacker\'s-invade.png');
+        // ▼▼▼ [추가] 관통 사격 스킬 아이콘 로드 ▼▼▼
+        this.load.image('impale-shot', 'images/skills/impale-shot.png');
+        // ▲▲▲ [추가] 관통 사격 스킬 아이콘 로드 ▲▲▲
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');

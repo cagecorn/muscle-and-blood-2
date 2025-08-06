@@ -49,6 +49,44 @@ const huntSenseBase = {
 };
 // --- ▲ [신규] 사냥꾼의 감각 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 관통 사격 테스트 데이터 추가 ▼ ---
+const piercingShotBase = {
+    NORMAL: {
+        id: 'piercingShot',
+        cost: 3,
+        cooldown: 3,
+        range: 4,
+        aoe: { shape: 'LINE', length: 3 },
+        damageMultiplier: { min: 0.8, max: 1.0 }
+    },
+    RARE: {
+        id: 'piercingShot',
+        cost: 3,
+        cooldown: 2,
+        range: 4,
+        aoe: { shape: 'LINE', length: 3 },
+        damageMultiplier: { min: 0.9, max: 1.1 }
+    },
+    EPIC: {
+        id: 'piercingShot',
+        cost: 2,
+        cooldown: 2,
+        range: 5,
+        aoe: { shape: 'LINE', length: 3 },
+        damageMultiplier: { min: 1.0, max: 1.2 }
+    },
+    LEGENDARY: {
+        id: 'piercingShot',
+        cost: 2,
+        cooldown: 2,
+        range: 5,
+        aoe: { shape: 'LINE', length: 3 },
+        damageMultiplier: { min: 1.0, max: 1.2 },
+        armorPenetration: 0.25
+    }
+};
+// --- ▲ [신규] 관통 사격 테스트 데이터 추가 ▲ ---
+
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 // 1. 데미지 계수 테스트
@@ -105,5 +143,26 @@ for (const grade of grades) {
     assert(Math.abs(critMod.value - 0.15) < 1e-6, `Crit chance modifier failed for grade ${grade}`);
 }
 // --- ▲ [신규] 사냥꾼의 감각 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 관통 사격 테스트 로직 추가 ▼ ---
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(piercingShotBase[grade], grade);
+
+    const expectedCost = (grade === 'EPIC' || grade === 'LEGENDARY') ? 2 : 3;
+    const expectedCooldown = grade === 'NORMAL' ? 3 : 2;
+    const expectedRange = (grade === 'NORMAL' || grade === 'RARE') ? 4 : 5;
+
+    assert.strictEqual(skill.cost, expectedCost, `Piercing Shot cost failed for grade ${grade}`);
+    assert.strictEqual(skill.cooldown, expectedCooldown, `Piercing Shot cooldown failed for grade ${grade}`);
+    assert.strictEqual(skill.range, expectedRange, `Piercing Shot range failed for grade ${grade}`);
+    assert(skill.aoe && skill.aoe.shape === 'LINE' && skill.aoe.length === 3, `Piercing Shot AOE failed for grade ${grade}`);
+
+    if (grade === 'LEGENDARY') {
+        assert(Math.abs((skill.armorPenetration || 0) - 0.25) < 1e-6, 'Piercing Shot armor penetration failed for LEGENDARY');
+    } else {
+        assert.strictEqual(skill.armorPenetration, undefined, `Piercing Shot armor penetration should be undefined for grade ${grade}`);
+    }
+}
+// --- ▲ [신규] 관통 사격 테스트 로직 추가 ▲ ---
 
 console.log('Gunner skills integration test passed.');
