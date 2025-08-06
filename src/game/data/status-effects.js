@@ -33,6 +33,14 @@ export const statusEffects = {
             }
         },
     },
+    burn: {
+        id: 'burn',
+        name: '화상',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '턴이 끝날 때마다 최대 체력의 5%만큼 화염 피해를 받습니다.',
+        iconPath: 'assets/images/status-effects/burn.png',
+        // onApply, onRemove는 지금 당장 필요 없지만, 나중에 확장할 수 있습니다.
+    },
     // ✨ [신규] 이동력 감소(slow) 및 속박(bind) 효과 추가
     slow: {
         id: 'slow',
