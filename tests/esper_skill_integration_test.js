@@ -50,6 +50,20 @@ const fireballBase = {
     }
 };
 
+const iceballBase = {
+    NORMAL: { id: 'iceball', cost: 3, cooldown: 3, range: 4, effect: { id: 'frost', duration: 2 } },
+    RARE: { id: 'iceball', cost: 3, cooldown: 2, range: 4, effect: { id: 'frost', duration: 2 } },
+    EPIC: { id: 'iceball', cost: 3, cooldown: 2, range: 5, effect: { id: 'frost', duration: 3 } },
+    LEGENDARY: {
+        id: 'iceball',
+        cost: 3,
+        cooldown: 2,
+        range: 5,
+        effect: { id: 'frost', duration: 3 },
+        centerTargetEffect: { id: 'bind', duration: 1 }
+    }
+};
+
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 for (const grade of grades) {
@@ -77,6 +91,21 @@ for (const grade of grades) {
     assert.strictEqual(skill.effect.duration, expected.effect.duration, `Fireball duration failed for ${grade}`);
     if (grade === 'LEGENDARY') {
         assert(skill.centerTargetEffect && skill.centerTargetEffect.id === 'stun', 'Legendary center stun missing');
+    } else {
+        assert(!skill.centerTargetEffect, 'Center effect should only exist in Legendary');
+    }
+}
+
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(iceballBase[grade], grade);
+    const expected = iceballBase[grade];
+    assert.strictEqual(skill.cost, expected.cost, `Iceball cost failed for ${grade}`);
+    assert.strictEqual(skill.cooldown, expected.cooldown, `Iceball cooldown failed for ${grade}`);
+    assert.strictEqual(skill.range, expected.range, `Iceball range failed for ${grade}`);
+    assert.strictEqual(skill.effect.id, 'frost', 'Iceball effect id mismatch');
+    assert.strictEqual(skill.effect.duration, expected.effect.duration, `Iceball duration failed for ${grade}`);
+    if (grade === 'LEGENDARY') {
+        assert(skill.centerTargetEffect && skill.centerTargetEffect.id === 'bind', 'Legendary center bind missing');
     } else {
         assert(!skill.centerTargetEffect, 'Center effect should only exist in Legendary');
     }
