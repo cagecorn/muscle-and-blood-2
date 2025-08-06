@@ -16,8 +16,17 @@ class FindSafeRepositionNode extends Node {
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
         const enemies = blackboard.get('enemyUnits');
+
+        // ✨ [핵심 추가] 현재 위협받고 있는지(isThreatened) 확인하는 로직
+        const isThreatened = blackboard.get('isThreatened');
+
+        // 만약 적이 있는데 위협받는 상황이 아니라면, 굳이 후퇴하지 않고 전투를 지속합니다.
+        if (enemies && enemies.length > 0 && !isThreatened) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '전투 중 불필요한 재배치는 수행하지 않음');
+            return NodeState.FAILURE;
+        }
+
         if (this.narrationEngine) {
-            const isThreatened = blackboard.get('isThreatened');
             if (isThreatened) {
                 this.narrationEngine.show(`${unit.instanceName}이(가) 위협을 피해 안전한 위치로 후퇴합니다.`);
             } else {
@@ -49,8 +58,8 @@ class FindSafeRepositionNode extends Node {
             const distToNearestEnemy = nearestEnemy ?
                 Math.abs(cell.col - nearestEnemy.gridX) + Math.abs(cell.row - nearestEnemy.gridY) : 0;
 
-            // 안전 거리 확보, 이동 최소화, 교전 거리 유지 간의 균형을 맞춥니다.
-            const score = (minEnemyDist * 1.5) - (travelDist * 0.5) - (distToNearestEnemy * 0.8);
+            // 🔁 [수정] 점수 계산 로직을 수정하여 너무 멀리 도망가지 않도록 합니다.
+            const score = (minEnemyDist * 1.2) - (travelDist * 0.5) - (distToNearestEnemy * 1.2);
 
             if (score > maxScore) {
                 maxScore = score;
