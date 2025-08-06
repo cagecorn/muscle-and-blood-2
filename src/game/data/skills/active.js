@@ -978,4 +978,87 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 관통 사격 스킬 추가 ▲ ---
+    // --- ▼ [신규] 더블 스트라이크 스킬 추가 ▼ ---
+    doubleStrike: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'doubleStrike',
+            name: '더블 스트라이크',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.COMBO],
+            cost: 2,
+            targetType: 'enemy',
+            description: '적을 80%의 위력으로 두 번 연속 공격합니다.',
+            illustrationPath: 'assets/images/skills/double-strike.png',
+            cooldown: 0,
+            range: 1,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            hitCount: 2
+        },
+        RARE: {
+            id: 'doubleStrike',
+            name: '더블 스트라이크 [R]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.COMBO],
+            cost: 1,
+            targetType: 'enemy',
+            description: '적을 80%의 위력으로 두 번 연속 공격합니다.',
+            illustrationPath: 'assets/images/skills/double-strike.png',
+            cooldown: 0,
+            range: 1,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            hitCount: 2
+        },
+        EPIC: {
+            id: 'doubleStrike',
+            name: '더블 스트라이크 [E]',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.COMBO],
+            cost: 1,
+            targetType: 'enemy',
+            description: '적을 80%의 위력으로 두 번 연속 공격하며, 매 타격 시 2턴간 방어력을 5% 감소시킵니다.',
+            illustrationPath: 'assets/images/skills/double-strike.png',
+            cooldown: 0,
+            range: 1,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            hitCount: 2,
+            effect: {
+                id: 'armorBreak',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+                stackable: true,
+                modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.05 }
+            }
+        },
+        LEGENDARY: {
+            id: 'doubleStrike',
+            name: '더블 스트라이크 [L]',
+            type: 'ACTIVE',
+            tags: [
+                SKILL_TAGS.ACTIVE,
+                SKILL_TAGS.PHYSICAL,
+                SKILL_TAGS.MELEE,
+                SKILL_TAGS.COMBO,
+                SKILL_TAGS.PRODUCTION
+            ],
+            cost: 1,
+            targetType: 'enemy',
+            description:
+                '적을 80%의 위력으로 두 번 연속 공격하며, 매 타격 시 방어력을 5% 감소시키고 [철] 자원을 1 생산합니다.',
+            illustrationPath: 'assets/images/skills/double-strike.png',
+            cooldown: 0,
+            range: 1,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            hitCount: 2,
+            effect: {
+                id: 'armorBreak',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+                stackable: true,
+                modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.05 }
+            },
+            generatesResource: { type: 'IRON', amount: 1 }
+        }
+    },
+    // --- ▲ [신규] 더블 스트라이크 스킬 추가 ▲ ---
 };

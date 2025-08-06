@@ -117,6 +117,58 @@ const throwingAxeBase = {
     }
 };
 
+// --- ▼ [신규] 더블 스트라이크 테스트 데이터 추가 ▼ ---
+const doubleStrikeBase = {
+    NORMAL: {
+        id: 'doubleStrike',
+        type: 'ACTIVE',
+        cost: 2,
+        cooldown: 0,
+        damageMultiplier: { min: 0.75, max: 0.85 },
+        hitCount: 2
+    },
+    RARE: {
+        id: 'doubleStrike',
+        type: 'ACTIVE',
+        cost: 1,
+        cooldown: 0,
+        damageMultiplier: { min: 0.75, max: 0.85 },
+        hitCount: 2
+    },
+    EPIC: {
+        id: 'doubleStrike',
+        type: 'ACTIVE',
+        cost: 1,
+        cooldown: 0,
+        damageMultiplier: { min: 0.75, max: 0.85 },
+        hitCount: 2,
+        effect: {
+            id: 'armorBreak',
+            type: 'DEBUFF',
+            duration: 2,
+            stackable: true,
+            modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.05 }
+        }
+    },
+    LEGENDARY: {
+        id: 'doubleStrike',
+        type: 'ACTIVE',
+        cost: 1,
+        cooldown: 0,
+        damageMultiplier: { min: 0.75, max: 0.85 },
+        hitCount: 2,
+        effect: {
+            id: 'armorBreak',
+            type: 'DEBUFF',
+            duration: 2,
+            stackable: true,
+            modifiers: { stat: 'physicalDefense', type: 'percentage', value: -0.05 }
+        },
+        generatesResource: { type: 'IRON', amount: 1 }
+    }
+};
+// --- ▲ [신규] 더블 스트라이크 테스트 데이터 추가 ▲ ---
+
 const ironWillBase = {
     rankModifiers: [0.39, 0.36, 0.33, 0.30],
     NORMAL: { maxReduction: 0.30, hpRegen: 0 },
@@ -284,6 +336,34 @@ for (const grade of grades) {
     assert(meleeMod && meleeMod.value === 1, `meleeAttack modifier missing or incorrect for grade ${grade}`);
 }
 // --- ▲ [신규] 전투의 함성 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 더블 스트라이크 테스트 로직 추가 ▼ ---
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(doubleStrikeBase[grade], grade);
+
+    assert.strictEqual(skill.hitCount, 2, `Double Strike hit count failed for grade ${grade}`);
+    assert.strictEqual(skill.cost, doubleStrikeBase[grade].cost, `Double Strike cost failed for grade ${grade}`);
+
+    if (grade === 'EPIC' || grade === 'LEGENDARY') {
+        const mod = skill.effect.modifiers;
+        const value = Array.isArray(mod) ? mod.find(m => m.stat === 'physicalDefense')?.value : mod?.value;
+        assert(value && Math.abs(value + 0.05) < 1e-6, `Double Strike effect failed for grade ${grade}`);
+    } else {
+        assert(!skill.effect, `Double Strike should have no effect for grade ${grade}`);
+    }
+
+    if (grade === 'LEGENDARY') {
+        assert(
+            skill.generatesResource &&
+            skill.generatesResource.type === 'IRON' &&
+            skill.generatesResource.amount === 1,
+            'Double Strike resource generation failed'
+        );
+    } else {
+        assert(!skill.generatesResource, `Double Strike should not generate resources for grade ${grade}`);
+    }
+}
+// --- ▲ [신규] 더블 스트라이크 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
 for (const grade of grades) {
