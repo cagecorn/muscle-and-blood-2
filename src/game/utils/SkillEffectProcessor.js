@@ -62,7 +62,13 @@ class SkillEffectProcessor {
                 break;
                 // ▲▲▲ [수정] 완료 ▲▲▲
             case 'AID':
-                await this._processAidSkill(unit, target, skill);
+                // ▼▼▼ [신규] '부패의 손길'을 위한 분기 처리 ▼▼▼
+                if (skill.id === 'handOfCorruption') {
+                    await this._processHandOfCorruptionSkill(unit, target, skill);
+                } else {
+                    await this._processAidSkill(unit, target, skill);
+                }
+                // ▲▲▲ [신규] 추가 완료 ▲▲▲
                 break;
             case 'SUMMON':
                 await this._processSummonSkill(unit, skill);
@@ -209,6 +215,26 @@ class SkillEffectProcessor {
         }
     }
 
+    // --- [신규] '부패의 손길' 전용 처리 메서드 ---
+    async _processHandOfCorruptionSkill(unit, target, skill) {
+        spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
+        await this.animationEngine.attack(unit.sprite, target.sprite);
+
+        if (unit.team === target.team) {
+            // 아군 대상: 모든 해로운 효과 제거
+            const removedCount = statusEffectManager.removeAllDebuffs(target);
+            if (removedCount > 0) {
+                this.vfxManager.showEffectName(target.sprite, '정화', '#22c55e');
+            }
+        } else {
+            // 적군 대상: 모든 이로운 효과 제거
+            const removedCount = statusEffectManager.removeAllBuffs(target);
+            if (removedCount > 0) {
+                this.vfxManager.showEffectName(target.sprite, '버프 해제!', '#f97316');
+            }
+        }
+    }
+
     async _processOffensiveSkill(unit, target, skill, instanceId, grade) {
         spriteEngine.changeSpriteForDuration(unit, 'attack', 600);
 
@@ -314,46 +340,27 @@ class SkillEffectProcessor {
                     grade
                 );
 
-                const damageToBarrier = Math.min(currentTarget.currentBarrier, totalDamage);
-                const damageToHp = totalDamage - damageToBarrier;
+                // ▼▼▼ [신규] '링크 프로토콜' 피해 공유 로직 ▼▼▼
+                const effects = statusEffectManager.activeEffects.get(currentTarget.uniqueId) || [];
+                const linkEffect = effects.find(e => e.id === 'linkProtocolBuff');
 
-                if (damageToBarrier > 0) {
-                    currentTarget.currentBarrier -= damageToBarrier;
-                    this.vfxManager.createDamageNumber(
-                        currentTarget.sprite.x,
-                        currentTarget.sprite.y - 10,
-                        damageToBarrier,
-                        '#ffd700',
-                        hitType
-                    );
-                }
-                if (damageToHp > 0) {
-                    currentTarget.currentHp -= damageToHp;
-                    this.vfxManager.createDamageNumber(
-                        currentTarget.sprite.x,
-                        currentTarget.sprite.y + 10,
-                        damageToHp,
-                        '#ff4d4d',
-                        hitType
-                    );
+                if (linkEffect && linkEffect.attackerId) {
+                    const caster = this.battleSimulator.turnQueue.find(u => u.uniqueId === linkEffect.attackerId);
+                    if (caster && caster.currentHp > 0) {
+                        const damageToTarget = Math.ceil(totalDamage * 0.5);
+                        const damageToCaster = totalDamage - damageToTarget;
 
-                    if (currentTarget.classPassive?.id === 'ghosting') {
-                        currentTarget.cumulativeDamageTaken += damageToHp;
-                        const threshold = currentTarget.finalStats.hp * 0.20;
-
-                        if (currentTarget.cumulativeDamageTaken >= threshold) {
-                            currentTarget.cumulativeDamageTaken = 0;
-                            const buffEffect = {
-                                id: 'ghostingBuff',
-                                type: EFFECT_TYPES.BUFF,
-                                duration: 1,
-                                sourceSkillName: '투명화'
-                            };
-                            statusEffectManager.addEffect(currentTarget, { name: '투명화', effect: buffEffect }, currentTarget);
-                            this.vfxManager.showEffectName(currentTarget.sprite, '투명화!', '#a78bfa');
-                        }
+                        this._applyDamage(caster, damageToCaster, '링크', '#9333ea');
+                        this._applyDamage(currentTarget, damageToTarget, hitType, '#ff4d4d');
+                    } else {
+                        // 시전자가 죽었으면 일반 피해 적용
+                        this._applyDamage(currentTarget, totalDamage, hitType);
                     }
+                } else {
+                    // 버프가 없으면 일반 피해 적용
+                    this._applyDamage(currentTarget, totalDamage, hitType);
                 }
+                // ▲▲▲ [신규] 추가 완료 ▲▲▲
 
                 this.vfxManager.showComboCount(comboCount);
                 this.vfxManager.createBloodSplatter(currentTarget.sprite.x, currentTarget.sprite.y);
@@ -381,6 +388,42 @@ class SkillEffectProcessor {
         }
         // ▲▲▲ [핵심 수정] 종료 ▲▲▲
 
+        // ▼▼▼ [신규] '도탄 사격' 로직 ▼▼▼
+        if (skill.id === 'ricochetShot') {
+            const primaryTarget = target;
+            const otherEnemies = this.battleSimulator.turnQueue.filter(
+                u => u.team !== unit.team && u.currentHp > 0 && u.uniqueId !== primaryTarget.uniqueId
+            );
+
+            // 주 대상 주변 3칸 내의 적들을 후보로 선정
+            const candidates = otherEnemies.filter(enemy => {
+                const distance = Math.abs(primaryTarget.gridX - enemy.gridX) + Math.abs(primaryTarget.gridY - enemy.gridY);
+                return distance <= 3;
+            });
+
+            // 최대 2명에게 튕김
+            const ricochetTargets = diceEngine.getRandomElement(candidates, 2);
+
+            for (const ricochetTarget of ricochetTargets) {
+                await this.delayEngine.hold(200);
+
+                // 도탄 시각 효과 (임시)
+                this.vfxManager.createMagicImpact(ricochetTarget.sprite.x, ricochetTarget.sprite.y, 'placeholder');
+
+                const ricochetSkill = {
+                    ...skill,
+                    damageMultiplier:
+                        ((skill.damageMultiplier.min + skill.damageMultiplier.max) / 2) * 0.5
+                };
+                const { damage: ricochetDamage, hitType: ricochetHitType } =
+                    combatCalculationEngine.calculateDamage(unit, ricochetTarget, ricochetSkill, instanceId, grade);
+
+                this._applyDamage(ricochetTarget, ricochetDamage, ricochetHitType);
+                if (ricochetTarget.currentHp <= 0) this.terminationManager.handleUnitDeath(ricochetTarget, unit);
+            }
+        }
+        // ▲▲▲ [신규] 추가 완료 ▲▲▲
+
         if (hitCount > 1 && skill.effect) {
             delete skill.effect;
         }
@@ -406,6 +449,33 @@ class SkillEffectProcessor {
             this.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y - 10, `+${healAmount}`, '#ffd700', '배리어');
         }
 
+    }
+
+    // --- [신규] 피해 적용 로직을 별도 메서드로 추출 ---
+    _applyDamage(target, damage, hitType, color = '#ff4d4d') {
+        const damageToBarrier = Math.min(target.currentBarrier, damage);
+        const damageToHp = damage - damageToBarrier;
+
+        if (damageToBarrier > 0) {
+            target.currentBarrier -= damageToBarrier;
+            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y - 10, damageToBarrier, '#ffd700', hitType);
+        }
+        if (damageToHp > 0) {
+            target.currentHp -= damageToHp;
+            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y + 10, damageToHp, color, hitType);
+
+            if (target.classPassive?.id === 'ghosting') {
+                target.cumulativeDamageTaken = (target.cumulativeDamageTaken || 0) + damageToHp;
+                const threshold = target.finalStats.hp * 0.20;
+
+                if (target.cumulativeDamageTaken >= threshold) {
+                    target.cumulativeDamageTaken = 0;
+                    const buffEffect = { id: 'ghostingBuff', type: EFFECT_TYPES.BUFF, duration: 1, sourceSkillName: '투명화' };
+                    statusEffectManager.addEffect(target, { name: '투명화', effect: buffEffect }, target);
+                    this.vfxManager.showEffectName(target.sprite, '투명화!', '#a78bfa');
+                }
+            }
+        }
     }
 
     async _processAidSkill(unit, target, skill) {
