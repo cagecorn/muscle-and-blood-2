@@ -21,6 +21,7 @@ class Blackboard {
         this.set('enemiesInAttackRange', []);
 
         // --- ⚔️ 전술적 상황 판단 정보 ---
+        // ✨ [추가] AI가 현재 위협받고 있는지 여부를 나타내는 플래그를 추가합니다.
         this.set('isThreatened', false);
         this.set('squadAdvantage', 0);
         this.set('enemyHealerUnit', null);
