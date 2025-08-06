@@ -55,7 +55,7 @@ class ItemFactory {
             { type: 'prefix', data: diceEngine.getRandomElement(itemAffixes.prefixes) },
             { type: 'suffix', data: diceEngine.getRandomElement(itemAffixes.suffixes) },
             { type: 'mbti', data: this._getRandomMbtiEffect() },
-            { type: 'sockets', data: { count: diceEngine.rollWithAdvantage(1, 3, 1) } }
+            { type: 'sockets', data: { count: diceEngine.rollWithAdvantage(0, 3, 1) } }
         ];
 
         // 3. 옵션 풀을 무작위로 섞고 등급에 맞는 수만큼 선택
@@ -78,11 +78,11 @@ class ItemFactory {
                 case 'mbti':
                     newItem.mbtiEffects.push(option.data);
                     break;
-                case 'sockets':
-                    for (let i = 0; i < option.data.count; i++) {
-                        newItem.sockets.push(null);
-                    }
+                case 'sockets': {
+                    const socketCount = Math.floor(Math.max(0, Math.min(3, option.data.count)));
+                    newItem.sockets.push(...Array(socketCount).fill(null));
                     break;
+                }
             }
         });
 

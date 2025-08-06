@@ -118,6 +118,15 @@ export const gemData = {
             [EQUIPMENT_SLOTS.ARMOR]: { stat: 'frostResistance', value: { min: 5, max: 8 } }
         },
         illustrationPath: 'assets/images/placeholder.png'
+    },
+    massiveFireGem: {
+        id: 'massiveFireGem',
+        name: '거대한 불의 보석',
+        effects: {
+            [EQUIPMENT_SLOTS.WEAPON]: { stat: 'fireDamage', value: { min: 20, max: 25 } },
+            [EQUIPMENT_SLOTS.ARMOR]: { stat: 'fireResistance', value: { min: 10, max: 15 } }
+        },
+        illustrationPath: 'assets/images/placeholder.png'
     }
     // ... 다른 보석들 추가 ...
 };
