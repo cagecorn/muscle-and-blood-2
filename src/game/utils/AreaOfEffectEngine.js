@@ -20,7 +20,7 @@ class AreaOfEffectEngine {
      * @param {number} radius - 효과의 반경 (또는 길이)
      * @returns {Array<object>} - 영향을 받는 셀 객체의 배열
      */
-    getAffectedCells(shape, targetCellPos, radius) {
+    getAffectedCells(shape, targetCellPos, radius, unit) {
         let affectedCells = [];
 
         switch (shape) {
@@ -30,10 +30,11 @@ class AreaOfEffectEngine {
             case 'CROSS':
                 affectedCells = this._getCrossArea(targetCellPos, radius);
                 break;
-            // 추후 'LINE', 'CONE' 등 다른 모양 추가 가능
+            case 'LINE':
+                affectedCells = this._getLineArea(unit, targetCellPos, radius);
+                break;
             default:
                 debugLogEngine.warn('AreaOfEffectEngine', `알 수 없는 범위 형태: ${shape}`);
-                // 기본적으로는 중심 셀만 반환
                 const centerCell = formationEngine.grid.getCell(targetCellPos.col, targetCellPos.row);
                 if (centerCell) {
                     affectedCells.push(centerCell);
@@ -96,6 +97,44 @@ class AreaOfEffectEngine {
                 if (cell) {
                     cells.push(cell);
                 }
+            }
+        }
+        return cells;
+    }
+
+    /**
+     * LINE (직선/대각선) 형태의 범위를 계산합니다.
+     * @param {object} startUnit - 시전자
+     * @param {object} targetPos - 목표 지점 (방향 결정용)
+     * @param {number} length - 선의 길이
+     * @returns {Array<object>}
+     * @private
+     */
+    _getLineArea(startUnit, targetPos, length) {
+        const cells = [];
+        const startPos = { col: startUnit.gridX, row: startUnit.gridY };
+
+        const dx = targetPos.col - startPos.col;
+        const dy = targetPos.row - startPos.row;
+        const dir = {
+            col: Math.sign(dx),
+            row: Math.sign(dy)
+        };
+
+        if (dir.col === 0 && dir.row === 0) {
+            return [];
+        }
+
+        for (let i = 0; i < length; i++) {
+            const currentPos = {
+                col: startPos.col + i * dir.col,
+                row: startPos.row + i * dir.row
+            };
+            const cell = formationEngine.grid.getCell(currentPos.col, currentPos.row);
+            if (cell) {
+                cells.push(cell);
+            } else {
+                break;
             }
         }
         return cells;

@@ -826,4 +826,74 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 아이스볼 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 관통 사격 스킬 추가 ▼ ---
+    piercingShot: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'piercingShot',
+            name: '관통 사격',
+            type: 'ACTIVE',
+            requiredClass: ['gunner'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '목표를 향해 3칸짜리 일직선 관통탄을 발사하여 경로상의 모든 적에게 {{damage}}%의 물리 피해를 줍니다.',
+            illustrationPath: 'assets/images/skills/impale-shot.png',
+            cooldown: 3,
+            range: 4,
+            aoe: {
+                shape: 'LINE',
+                length: 3
+            },
+            damageMultiplier: { min: 0.8, max: 1.0 }
+        },
+        RARE: {
+            id: 'piercingShot',
+            name: '관통 사격 [R]',
+            type: 'ACTIVE',
+            requiredClass: ['gunner'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '목표를 향해 3칸짜리 일직선 관통탄을 발사하여 경로상의 모든 적에게 {{damage}}%의 물리 피해를 줍니다. (쿨타임 1 감소)',
+            illustrationPath: 'assets/images/skills/impale-shot.png',
+            cooldown: 2,
+            range: 4,
+            aoe: { shape: 'LINE', length: 3 },
+            damageMultiplier: { min: 0.9, max: 1.1 }
+        },
+        EPIC: {
+            id: 'piercingShot',
+            name: '관통 사격 [E]',
+            type: 'ACTIVE',
+            requiredClass: ['gunner'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.SPECIAL],
+            cost: 2,
+            targetType: 'enemy',
+            description: '목표를 향해 3칸짜리 일직선 관통탄을 발사하여 경로상의 모든 적에게 {{damage}}%의 물리 피해를 줍니다. (비용 1 감소)',
+            illustrationPath: 'assets/images/skills/impale-shot.png',
+            cooldown: 2,
+            range: 5,
+            aoe: { shape: 'LINE', length: 3 },
+            damageMultiplier: { min: 1.0, max: 1.2 }
+        },
+        LEGENDARY: {
+            id: 'piercingShot',
+            name: '관통 사격 [L]',
+            type: 'ACTIVE',
+            requiredClass: ['gunner'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.SPECIAL],
+            cost: 2,
+            targetType: 'enemy',
+            description: '목표를 향해 3칸짜리 일직선 관통탄을 발사하여 경로상의 모든 적에게 {{damage}}%의 물리 피해를 주고, 대상의 방어력을 25% 무시합니다.',
+            illustrationPath: 'assets/images/skills/impale-shot.png',
+            cooldown: 2,
+            range: 5,
+            aoe: { shape: 'LINE', length: 3 },
+            damageMultiplier: { min: 1.0, max: 1.2 },
+            armorPenetration: 0.25
+        }
+    },
+    // --- ▲ [신규] 관통 사격 스킬 추가 ▲ ---
 };
