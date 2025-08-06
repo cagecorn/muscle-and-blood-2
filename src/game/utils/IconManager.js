@@ -5,6 +5,7 @@ import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from './OwnedSkillsManager.js';
 import { skillInventoryManager } from './SkillInventoryManager.js';
 import { EFFECT_TYPES } from './EffectTypes.js';
+import { placeholderManager } from './PlaceholderManager.js';
 
 /**
  * 상태 효과 아이콘을 생성하고 관리하는 엔진
@@ -106,16 +107,26 @@ export class IconManager {
         // 1. 버프 아이콘 처리 (왼쪽 컨테이너)
         buffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            const iconKey =
-                effectDef && this.scene.textures.exists(effectDef.id)
-                    ? effectDef.id
-                    : effect.illustrationPath
-                        ? effect.illustrationPath.replace(/^assets\/images\//, '')
-                        : effect.id;
+
+            // ▼▼▼ [수정] 아이콘 경로 확인 및 리포팅 로직 ▼▼▼
+            let iconKey = effect.id;
+            let iconPath = effectDef?.iconPath || effect.illustrationPath;
+
+            // PlaceholderManager를 통해 최종 경로를 얻고, 없으면 리포트합니다.
+            const expectedPath = `assets/images/status-effects/${effect.id}.png`;
+            iconPath = placeholderManager.getPath(iconPath, expectedPath);
+
+            // illustrationPath가 있을 경우 key를 경로에서 추출
+            if (iconPath && iconPath !== 'assets/images/placeholder.png') {
+                iconKey = iconPath.split('/').pop().split('.')[0];
+            } else if (!this.scene.textures.exists(iconKey)) {
+                iconKey = 'placeholder';
+            }
+            // ▲▲▲ [수정] 완료 ▲▲▲
 
             if (!this.scene.textures.exists(iconKey)) {
                 console.error(`아이콘 텍스처를 찾을 수 없습니다: ${iconKey}`);
-                return;
+                iconKey = 'placeholder'; // 최종 안전장치
             }
 
             let iconData = display.buffIcons.get(effect.instanceId);
@@ -153,14 +164,24 @@ export class IconManager {
         // 2. 디버프 아이콘 처리 (오른쪽 컨테이너)
         debuffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
-            const iconKey =
-                effectDef && this.scene.textures.exists(effectDef.id)
-                    ? effectDef.id
-                    : effect.id;
+
+            // ▼▼▼ [수정] 아이콘 경로 확인 및 리포팅 로직 (디버프에도 동일하게 적용) ▼▼▼
+            let iconKey = effect.id;
+            let iconPath = effectDef?.iconPath;
+
+            const expectedPath = `assets/images/status-effects/${effect.id}.png`;
+            iconPath = placeholderManager.getPath(iconPath, expectedPath);
+
+            if (iconPath && iconPath !== 'assets/images/placeholder.png') {
+                iconKey = iconPath.split('/').pop().split('.')[0];
+            } else if (!this.scene.textures.exists(iconKey)) {
+                iconKey = 'placeholder';
+            }
+            // ▲▲▲ [수정] 완료 ▲▲▲
 
             if (!this.scene.textures.exists(iconKey)) {
                 console.error(`아이콘 텍스처를 찾을 수 없습니다: ${iconKey}`);
-                return;
+                iconKey = 'placeholder'; // 최종 안전장치
             }
 
             let iconData = display.debuffIcons.get(effect.instanceId);

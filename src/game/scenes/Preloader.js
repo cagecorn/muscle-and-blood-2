@@ -185,16 +185,20 @@ export class Preloader extends Scene
         this.load.image('placeholder', 'images/placeholder.png');
         // ▲▲▲ [추가] 마법 효과용 플레이스홀더 이미지 로드 ▲▲▲
 
-        // ▼▼▼ [추가] 아이스볼 및 동상 아이콘 로드 ▼▼▼
+        // ▼▼▼ [추가] 아이스볼 아이콘 로드 ▼▼▼
         this.load.image('ice-ball', 'images/skills/ice-ball.png');
-        this.load.image('frost', 'images/status-effects/frost.png');
-        // ▲▲▲ [추가] 아이스볼 및 동상 아이콘 로드 ▲▲▲
+        // ▲▲▲ [추가] 아이스볼 아이콘 로드 ▲▲▲
 
-        // 상태 효과 아이콘 로드
+        // ▼▼▼ [수정] 상태 효과 아이콘 자동 로드 ▼▼▼
+        // statusEffects 객체를 순회하며 정의된 모든 아이콘을 자동으로 로드합니다.
         Object.values(statusEffects).forEach(e => {
-            const path = e.iconPath.replace(/^assets\//, '');
-            this.load.image(e.id, path);
+            if (e.iconPath) {
+                // e.id를 고유 키로 사용하여 이미지를 로드합니다. (예: 'stun', 'frost')
+                const path = e.iconPath.replace(/^assets\//, '');
+                this.load.image(e.id, path);
+            }
         });
+        // ▲▲▲ [수정] 완료 ▲▲▲
     }
 
     create ()
