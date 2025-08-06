@@ -10,6 +10,8 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindLowestHealthAllyNode from '../nodes/FindLowestHealthAllyNode.js';
 import FindAllyToBuffNode from '../nodes/FindAllyToBuffNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ISFJ: 용감한 수호자 아키타입 행동 트리 (메딕)
@@ -49,7 +51,14 @@ function createISFJ_AI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 3순위: 안전한 위치로 재배치
+        // 3순위: 행동이 없다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 4순위: 전진도 불가능하면 안전한 위치로 재배치
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

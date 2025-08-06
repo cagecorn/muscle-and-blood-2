@@ -13,6 +13,8 @@ import FindLowestHealthEnemyNode from '../nodes/FindLowestHealthEnemyNode.js';
 import FindSkillByTagNode from '../nodes/FindSkillByTagNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ESTJ: 엄격한 관리자 아키타입 행동 트리 (전사)
@@ -63,7 +65,14 @@ function createESTJ_AI(engines = {}) {
                 ])
             ])
         ]),
-        // 2순위: 공격할 수 없다면 안전한 위치로 이동하여 턴을 낭비하지 않습니다.
+        // 2순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 3순위: 전진도 불가능할 때만 안전한 위치로 이동하여 턴을 낭비하지 않습니다.
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

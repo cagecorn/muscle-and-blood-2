@@ -9,6 +9,8 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ISTJ: 청렴한 논리주의자 아키타입 행동 트리 (센티넬)
@@ -48,22 +50,30 @@ function createISTJ_AI(engines = {}) {
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
-            new IsSkillInRangeNode(engines), // 사거리 내에 있을 때만 SUCCESS
-            new UseSkillNode(engines)       // 이동 없이 즉시 사용
+            new IsSkillInRangeNode(engines),
+            new UseSkillNode(engines)
         ]),
 
-        // 3순위: 초기 위치 선정 (아직 이동 안했을 경우)
-        new SequenceNode([
-            new HasNotMovedNode(),
-            new FindSafeRepositionNode(engines),
-            new MoveToTargetNode(engines)
-        ]),
-
-        // 4순위: 일반적인 근접 공격 (최후의 수단)
+        // 3순위: 일반적인 근접 공격 (이동 포함)
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
+        ]),
+
+        // 4순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+
+        // 5순위: 전진도 불가능하면 안전한 위치로 이동
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindSafeRepositionNode(engines),
+            new MoveToTargetNode(engines)
         ]),
     ]);
 

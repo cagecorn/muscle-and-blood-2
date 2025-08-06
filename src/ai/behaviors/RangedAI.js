@@ -12,6 +12,8 @@ import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 function createRangedAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
@@ -24,15 +26,19 @@ function createRangedAI(engines = {}) {
         ])
     ]);
     
-    // --- 기본 행동 (최후의 보루) ---
+    // --- 기본 행동 로직 ---
     const basicActionBranch = new SelectorNode([
-        // 1. 주 공격 로직
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        // 2. 공격할 수 없으면 안전한 위치로 재배치
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

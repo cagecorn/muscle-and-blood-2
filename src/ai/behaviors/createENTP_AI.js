@@ -11,6 +11,8 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 // ✨ ENTP 전용으로 만든 신규 노드들을 import 합니다.
 import FindHighValueTargetNode from '../nodes/FindHighValueTargetNode.js';
 import FindPullPositionNode from '../nodes/FindPullPositionNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ENTP: 변론가 아키타입 행동 트리
@@ -56,7 +58,14 @@ function createENTP_AI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 4순위: 모든 행동이 불가능할 때의 안전한 재배치
+        // 4순위: 모든 행동이 불가능했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 5순위: 전진도 실패했다면 안전한 재배치
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

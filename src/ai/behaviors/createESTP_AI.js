@@ -12,6 +12,8 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindLowestHealthEnemyNode from '../nodes/FindLowestHealthEnemyNode.js';
 // 새로 만든 노드를 import 합니다.
 import IsHealthAboveThresholdNode from '../nodes/IsHealthAboveThresholdNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ESTP: 모험을 즐기는 사업가 아키타입 행동 트리 (플라잉맨)
@@ -49,7 +51,14 @@ function createESTP_AI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 3순위: 최후의 수단으로 위치 재조정
+        // 3순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 4순위: 최후의 수단으로 위치 재조정
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

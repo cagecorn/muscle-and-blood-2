@@ -10,6 +10,8 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindSafeHealingPositionNode from '../nodes/FindSafeHealingPositionNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 function createHealerAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
@@ -29,13 +31,17 @@ function createHealerAI(engines = {}) {
     
     // --- 기본 행동 (최후의 보루) ---
     const basicActionBranch = new SelectorNode([
-        // 1. 아군 지원(힐/버프) 또는 적 공격(디버프/공격) 시도
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
-        // 2. 할 수 있는 스킬이 없으면 안전한 위치로 재배치
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

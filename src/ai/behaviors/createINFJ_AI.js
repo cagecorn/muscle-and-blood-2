@@ -11,6 +11,8 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
 import FindPriorityTargetNode from '../nodes/FindPriorityTargetNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * INFJ: 옹호자 아키타입 행동 트리
@@ -61,7 +63,14 @@ function createINFJ_AI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 4순위: 안전한 위치로 재배치
+        // 4순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 5순위: 전진도 불가능하면 안전한 위치로 재배치
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
