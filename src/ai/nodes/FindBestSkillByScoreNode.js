@@ -13,6 +13,7 @@ import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 class FindBestSkillByScoreNode extends Node {
     constructor(engines = {}) {
         super();
+        this.name = 'FindBestSkillByScoreNode';
         this.skillEngine = engines.skillEngine || skillEngine;
         this.skillScoreEngine = engines.skillScoreEngine || skillScoreEngine;
     }
