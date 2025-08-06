@@ -27,6 +27,32 @@ export class VFXManager {
         debugLogEngine.log('VFXManager', 'VFX 매니저가 초기화되었습니다.');
     }
 
+    // ▼▼▼ [신규] 마법 공격 파티클 효과 메서드 추가 ▼▼▼
+    /**
+     * 마법 공격의 임팩트 효과를 파티클로 생성합니다.
+     * @param {number} x - 효과가 나타날 x 좌표
+     * @param {number} y - 효과가 나타날 y 좌표
+     * @param {string} textureKey - 사용할 파티클 텍스처 키 (예: 'placeholder')
+     */
+    createMagicImpact(x, y, textureKey = 'placeholder') {
+        const particles = this.scene.add.particles(x, y, textureKey, {
+            speed: 0, // 파티클이 날아가지 않고 제자리에서 효과를 냅니다.
+            scale: { start: 0, end: 0.5, ease: 'Quad.easeOut' }, // 0에서 시작해 0.5배 크기로 커집니다.
+            alpha: { start: 1, end: 0, ease: 'Quad.easeIn' },   // 100% 불투명도에서 시작해 투명해집니다.
+            lifespan: 600, // 0.6초 동안 지속됩니다.
+            blendMode: 'ADD', // 빛나는 효과를 위해 ADD 블렌드 모드를 사용합니다.
+            emitting: false
+        });
+        particles.explode(1); // 파티클 1개를 즉시 터뜨립니다.
+        this.vfxLayer.add(particles);
+
+        // 파티클 객체가 자동으로 소멸되도록 타이머를 설정합니다.
+        this.scene.time.delayedCall(1000, () => {
+            particles.destroy();
+        });
+    }
+    // ▲▲▲ [신규] 마법 공격 파티클 효과 메서드 추가 ▲▲▲
+
     // ✨ createBloodSplatter 함수 추가
     createBloodSplatter(x, y) {
         const particles = this.scene.add.particles(x, y, 'red-particle', {

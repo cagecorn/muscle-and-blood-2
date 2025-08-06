@@ -197,7 +197,20 @@ class SkillEffectProcessor {
 
     async _processOffensiveSkill(unit, target, skill, instanceId, grade) {
         spriteEngine.changeSpriteForDuration(unit, 'attack', 600);
-        await this.animationEngine.attack(unit.sprite, target.sprite);
+
+        // ▼▼▼ [수정] 마법 스킬일 경우 공격 애니메이션을 다르게 처리합니다. ▼▼▼
+        if (skill.tags?.includes(SKILL_TAGS.MAGIC)) {
+            // 마법사는 제자리에서 시전하는 느낌을 주기 위해 이동 애니메이션을 생략하고,
+            // 대신 타겟 위치에 바로 파티클 효과를 생성합니다.
+            this.vfxManager.createMagicImpact(target.sprite.x, target.sprite.y, 'placeholder');
+            // 약간의 딜레이를 주어 효과가 보일 시간을 확보합니다.
+            await this.battleSimulator.delayEngine.hold(300);
+        } else {
+            // 기존의 물리 공격 애니메이션
+            await this.animationEngine.attack(unit.sprite, target.sprite);
+        }
+        // ▲▲▲ [수정] ▲▲▲
+
         spriteEngine.changeSpriteForDuration(target, 'hitted', 300);
 
         if (skill.type !== 'ACTIVE') return;
