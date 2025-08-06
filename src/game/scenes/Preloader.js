@@ -2,6 +2,7 @@ import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.es
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { imageSizeManager } from '../utils/ImageSizeManager.js';
 import { statusEffects } from '../data/status-effects.js';
+import { placeholderManager } from '../utils/PlaceholderManager.js';
 
 export class Preloader extends Scene
 {
@@ -209,6 +210,11 @@ export class Preloader extends Scene
                 this.textures.get(key).setFilter(Phaser.Textures.FilterMode.TRILINEAR);
             }
         });
+
+        // ▼▼▼ [신규] 이 코드를 create 메서드의 맨 마지막에 추가해주세요. ▼▼▼
+        // 모든 로딩이 끝난 후, 누락된 스킬 이미지 리포트를 콘솔에 출력합니다.
+        placeholderManager.reportMissingAssets();
+        // ▲▲▲ [신규] 추가 완료 ▲▲▲
 
         // 모든 애셋이 로드되면 영지 씬으로 전환합니다.
         this.scene.start('TerritoryScene');

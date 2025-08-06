@@ -1,5 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { skillCardDatabase } from '../data/skills/SkillCardDatabase.js';
+import { placeholderManager } from './PlaceholderManager.js';
 
 /**
  * 플레이어가 획득한 모든 스킬 카드의 인벤토리를 관리하는 엔진
@@ -126,23 +127,31 @@ class SkillInventoryManager {
     }
 
     /** 스킬 ID와 등급으로 스킬 데이터 조회
-     *  일부 스킬은 등급 구분 없이 정의되어 있으므로
-     *  해당 경우에는 등급과 관계없이 기본 데이터를 반환합니다.
+     * 요청한 등급이 없으면 NORMAL 등급으로 대체(Fallback)합니다.
+     * 이미지 경로가 없으면 PlaceholderManager에 기대 경로를 알려줍니다.
      */
     getSkillData(skillId, grade = 'NORMAL') {
         const entry = skillCardDatabase[skillId];
         if (!entry) return null;
-        // 등급별 데이터가 존재하면 기본 데이터와 병합하여 반환합니다.
-        if (entry[grade]) {
-            const baseData = { ...entry };
-            delete baseData.NORMAL;
-            delete baseData.RARE;
-            delete baseData.EPIC;
-            delete baseData.LEGENDARY;
-            return { ...baseData, ...entry[grade] };
+
+        // [수정] 요청한 등급이 없으면 NORMAL로, NORMAL도 없으면 그냥 entry로 대체
+        const gradeData = entry[grade] || entry['NORMAL'] || entry;
+
+        const baseData = { ...entry };
+        delete baseData.NORMAL;
+        delete baseData.RARE;
+        delete baseData.EPIC;
+        delete baseData.LEGENDARY;
+        
+        const finalSkillData = { ...baseData, ...gradeData };
+
+        // [신규] 네이밍 규칙에 따라 이미지 경로를 확인하고, 없으면 리포트하도록 전달
+        if (!finalSkillData.illustrationPath) {
+            const expectedPath = `assets/images/skills/${finalSkillData.id}.png`;
+            finalSkillData.illustrationPath = placeholderManager.getPath(null, expectedPath);
         }
-        // 등급 없이 정의된 경우 전체 객체를 그대로 반환
-        return entry;
+
+        return finalSkillData;
     }
 
     getInstanceData(instanceId) {
