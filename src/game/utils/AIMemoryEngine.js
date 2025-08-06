@@ -8,30 +8,36 @@ class AIMemoryEngine {
         this.db = null;
         this.dbName = 'AIMemoryDB';
         this.storeName = 'combatMemory';
-        this.initDB();
+        // [수정] 생성자에서 초기화 Promise를 생성하고 저장합니다.
+        this.initPromise = this._initializeDB();
     }
 
     /**
      * IndexedDB를 초기화하고 객체 저장소를 생성합니다.
      */
-    initDB() {
-        const request = indexedDB.open(this.dbName, 1);
+    // [수정] initDB를 Promise를 반환하는 내부 메서드로 변경
+    _initializeDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, 1);
 
-        request.onupgradeneeded = (event) => {
-            this.db = event.target.result;
-            if (!this.db.objectStoreNames.contains(this.storeName)) {
-                this.db.createObjectStore(this.storeName, { keyPath: 'id' });
-            }
-        };
+            request.onupgradeneeded = (event) => {
+                this.db = event.target.result;
+                if (!this.db.objectStoreNames.contains(this.storeName)) {
+                    this.db.createObjectStore(this.storeName, { keyPath: 'id' });
+                }
+            };
 
-        request.onsuccess = (event) => {
-            this.db = event.target.result;
-            console.log('[AIMemoryEngine] IndexedDB가 성공적으로 초기화되었습니다.');
-        };
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                console.log('[AIMemoryEngine] IndexedDB가 성공적으로 초기화되었습니다.');
+                resolve(this.db);
+            };
 
-        request.onerror = (event) => {
-            console.error('[AIMemoryEngine] IndexedDB 초기화 오류:', event.target.errorCode);
-        };
+            request.onerror = (event) => {
+                console.error('[AIMemoryEngine] IndexedDB 초기화 오류:', event.target.errorCode);
+                reject(event.target.error);
+            };
+        });
     }
 
     /**
@@ -39,7 +45,10 @@ class AIMemoryEngine {
      * @param {number} attackerId - 공격자 유닛의 고유 ID
      * @returns {Promise<object>} - 대상 ID를 키로 갖는 가중치 객체
      */
-    getMemory(attackerId) {
+    async getMemory(attackerId) {
+        // [신규] DB가 준비될 때까지 기다립니다.
+        await this.initPromise;
+
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 return resolve(null);
@@ -68,6 +77,8 @@ class AIMemoryEngine {
      * @param {string} hitType - 전투 결과 ('치명타', '약점', '완화', '막기')
      */
     async updateMemory(attackerId, targetId, attackType, hitType) {
+        // [신규] DB가 준비될 때까지 기다립니다.
+        await this.initPromise;
         if (!this.db || !attackType || !hitType) return;
 
         const memory = await this.getMemory(attackerId);
