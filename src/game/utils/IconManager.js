@@ -108,18 +108,21 @@ export class IconManager {
         buffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
 
-            // ▼▼▼ [수정] 아이콘 경로 확인 및 리포팅 로직 ▼▼▼
+            // ▼▼▼ [수정] 아이콘 경로 및 키 결정 로직 ▼▼▼
             let iconKey = effect.id;
-            let iconPath = effectDef?.iconPath || effect.illustrationPath;
+            let iconPath =
+                effectDef?.iconPath ||
+                effect.illustrationPath ||
+                effectDef?.illustrationPath;
 
-            // PlaceholderManager를 통해 최종 경로를 얻고, 없으면 리포트합니다.
             const expectedPath = `assets/images/status-effects/${effect.id}.png`;
             iconPath = placeholderManager.getPath(iconPath, expectedPath);
 
-            // illustrationPath가 있을 경우 key를 경로에서 추출
-            if (iconPath && iconPath !== 'assets/images/placeholder.png') {
+            if (iconPath && iconPath.includes('/')) {
                 iconKey = iconPath.split('/').pop().split('.')[0];
-            } else if (!this.scene.textures.exists(iconKey)) {
+            }
+
+            if (!this.scene.textures.exists(iconKey)) {
                 iconKey = 'placeholder';
             }
             // ▲▲▲ [수정] 완료 ▲▲▲
@@ -165,16 +168,18 @@ export class IconManager {
         debuffs.forEach((effect, index) => {
             const effectDef = statusEffects[effect.id] || skillCardDatabase[effect.id];
 
-            // ▼▼▼ [수정] 아이콘 경로 확인 및 리포팅 로직 (디버프에도 동일하게 적용) ▼▼▼
+            // ▼▼▼ [수정] 디버프 아이콘에도 동일한 키 결정 로직 적용 ▼▼▼
             let iconKey = effect.id;
             let iconPath = effectDef?.iconPath;
 
             const expectedPath = `assets/images/status-effects/${effect.id}.png`;
             iconPath = placeholderManager.getPath(iconPath, expectedPath);
 
-            if (iconPath && iconPath !== 'assets/images/placeholder.png') {
+            if (iconPath && iconPath.includes('/')) {
                 iconKey = iconPath.split('/').pop().split('.')[0];
-            } else if (!this.scene.textures.exists(iconKey)) {
+            }
+
+            if (!this.scene.textures.exists(iconKey)) {
                 iconKey = 'placeholder';
             }
             // ▲▲▲ [수정] 완료 ▲▲▲
