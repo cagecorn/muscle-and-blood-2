@@ -52,6 +52,20 @@ class SkillScoreEngine {
             });
         }
 
+        // 공격 스킬 기본 가중치 및 마무리 보너스
+        if (skillData.type === 'ACTIVE') {
+            baseScore *= 1.5;
+            if (target && target.currentHp < target.finalStats.hp * 0.4) {
+                situationScore += 20;
+                situationLogs.push('마무리:+20');
+            }
+        }
+
+        // 체력이 충분할 때 방어/지원 스킬 점수 감소
+        if ((skillData.type === 'BUFF' || skillData.type === 'AID') && unit.currentHp > unit.finalStats.hp * 0.8) {
+            baseScore *= 0.5;
+        }
+
         const lowHealthAllies = allies.filter(a => a.currentHp / a.finalStats.hp <= 0.5).length;
         if (lowHealthAllies > 0 && (skillData.tags.includes(SKILL_TAGS.HEAL) || skillData.tags.includes(SKILL_TAGS.AID))) {
             const bonus = lowHealthAllies * 15;

@@ -83,6 +83,49 @@ class PathfinderEngine {
         return null;
     }
 
+    /**
+     * 대상 주위에서 스킬을 사용할 수 있는 최적의 타일까지의 경로를 계산합니다.
+     * @param {object} unit - 이동 주체 유닛
+     * @param {object} skill - 사용하려는 스킬 데이터
+     * @param {object} target - 공격 대상 유닛
+     * @returns {Array<object>|null} - 이동 경로 또는 null (이동 불가)
+     */
+    findBestPathToAttack(unit, skill, target) {
+        const grid = this.formationEngine?.grid;
+        if (!grid || !skill || !target) return null;
+
+        const skillRange = skill.range ?? 1;
+        const moveRange = unit.finalStats.movement || 0;
+        const start = { col: unit.gridX, row: unit.gridY };
+        const targetPos = { col: target.gridX, row: target.gridY };
+
+        const candidateTiles = [];
+        for (let r = 0; r < grid.rows; r++) {
+            for (let c = 0; c < grid.cols; c++) {
+                const cell = grid.getCell(c, r);
+                if (!cell) continue;
+                if (cell.isOccupied && !(c === start.col && r === start.row)) continue;
+                const distance = Math.abs(c - targetPos.col) + Math.abs(r - targetPos.row);
+                if (distance <= skillRange) {
+                    candidateTiles.push({ col: c, row: r });
+                }
+            }
+        }
+
+        const reachable = [];
+        for (const tile of candidateTiles) {
+            const path = this.findPath(unit, start, tile);
+            if (path && path.length <= moveRange) {
+                reachable.push({ path });
+            }
+        }
+
+        if (reachable.length === 0) return null;
+
+        reachable.sort((a, b) => a.path.length - b.path.length);
+        return reachable[0].path;
+    }
+
     _retracePath(startNode, endNode) {
         const path = [];
         let currentNode = endNode;

@@ -7,11 +7,11 @@ import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import FindTargetBySkillTypeNode from '../nodes/FindTargetBySkillTypeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
-import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import IsTargetTooCloseNode from '../nodes/IsTargetTooCloseNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
 
 function createRangedAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
@@ -19,9 +19,7 @@ function createRangedAI(engines = {}) {
         new SequenceNode([new IsSkillInRangeNode(engines), new UseSkillNode(engines)]),
         new SequenceNode([
             new HasNotMovedNode(),
-            new FindPathToSkillRangeNode(engines),
-            new MoveToTargetNode(engines),
-            new IsSkillInRangeNode(engines),
+            new MoveToUseSkillNode(engines),
             new UseSkillNode(engines)
         ])
     ]);
