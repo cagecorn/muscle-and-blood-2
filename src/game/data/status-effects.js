@@ -33,6 +33,7 @@ export const statusEffects = {
             }
         },
     },
+    // ▼▼▼ [신규] 화상, 동상 효과 추가 ▼▼▼
     burn: {
         id: 'burn',
         name: '화상',
@@ -49,6 +50,7 @@ export const statusEffects = {
         iconPath: 'assets/images/status-effects/frost.png',
         modifiers: { stat: 'movement', type: 'flat', value: -1 } // 이동력 1 감소
     },
+    // ▲▲▲ [신규] 추가 완료 ▲▲▲
     // ✨ [신규] 이동력 감소(slow) 및 속박(bind) 효과 추가
     slow: {
         id: 'slow',
