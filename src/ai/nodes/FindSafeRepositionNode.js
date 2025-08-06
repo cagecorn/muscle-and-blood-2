@@ -5,11 +5,12 @@ import { debugAIManager } from '../../game/debug/DebugAIManager.js';
  * 전투가 잠잠할 때 유리한 위치로 이동하기 위한 위치를 탐색합니다.
  */
 class FindSafeRepositionNode extends Node {
-    constructor({ formationEngine, pathfinderEngine, narrationEngine }) {
+    constructor({ formationEngine, pathfinderEngine, narrationEngine, targetManager }) {
         super();
         this.formationEngine = formationEngine;
         this.pathfinderEngine = pathfinderEngine;
         this.narrationEngine = narrationEngine;
+        this.targetManager = targetManager;
     }
 
     async evaluate(unit, blackboard) {
@@ -30,6 +31,9 @@ class FindSafeRepositionNode extends Node {
         let bestCell = null;
         let maxScore = -Infinity;
 
+        // 가장 가까운 적을 찾습니다.
+        const nearestEnemy = this.targetManager.findNearestEnemy(unit, enemies);
+
         cells.forEach(cell => {
             let minEnemyDist = Infinity;
             if (enemies && enemies.length > 0) {
@@ -40,7 +44,14 @@ class FindSafeRepositionNode extends Node {
             }
 
             const travelDist = Math.abs(cell.col - unit.gridX) + Math.abs(cell.row - unit.gridY);
-            const score = minEnemyDist - travelDist * 0.5;
+
+            // 가장 가까운 적과의 거리를 계산하여, 지나치게 멀어지지 않도록 합니다.
+            const distToNearestEnemy = nearestEnemy ?
+                Math.abs(cell.col - nearestEnemy.gridX) + Math.abs(cell.row - nearestEnemy.gridY) : 0;
+
+            // 안전 거리 확보, 이동 최소화, 교전 거리 유지 간의 균형을 맞춥니다.
+            const score = (minEnemyDist * 1.5) - (travelDist * 0.5) - (distToNearestEnemy * 0.8);
+
             if (score > maxScore) {
                 maxScore = score;
                 bestCell = cell;
@@ -55,7 +66,10 @@ class FindSafeRepositionNode extends Node {
             );
             if (path && path.length > 0) {
                 blackboard.set('movementPath', path);
-                debugAIManager.logNodeResult(NodeState.SUCCESS, `재배치 위치 (${bestCell.col}, ${bestCell.row}) 경로 설정`);
+                debugAIManager.logNodeResult(
+                    NodeState.SUCCESS,
+                    `재배치 위치 (${bestCell.col}, ${bestCell.row}) 경로 설정 (Score: ${maxScore.toFixed(2)})`
+                );
                 return NodeState.SUCCESS;
             }
         }
