@@ -3,6 +3,35 @@ import { SKILL_TAGS } from '../../utils/SkillTagManager.js';
 
 // 버프 스킬 데이터 정의
 export const buffSkills = {
+    // --- ▼ [신규] 집결의 뿔피리 스킬 추가 ▼ ---
+    rallyingHorn: {
+        yinYangValue: +4,
+        NORMAL: {
+            id: 'rallyingHorn',
+            name: '집결의 뿔피리',
+            type: 'BUFF',
+            requiredClass: ['commander', 'paladin'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.AURA, SKILL_TAGS.WILL, SKILL_TAGS.STRATEGY],
+            cost: 2,
+            targetType: 'self',
+            description: '전장에 있는 모든 아군에게 3턴간 [용맹] 스탯을 +2 증가시키는 버프를 부여합니다.',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 0,
+            effect: {
+                id: 'rallyingHornBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                isGlobal: true,
+                modifiers: {
+                    stat: 'valor',
+                    type: 'flat',
+                    value: 2
+                }
+            }
+        }
+    },
+    // --- ▲ [신규] 집결의 뿔피리 스킬 추가 ▲ ---
     stoneSkin: {
         yinYangValue: +2,
         // NORMAL 등급: 기본 효과

@@ -20,6 +20,15 @@ const knockbackShotBase = {
 
 // --- ▲ [신규] 넉백샷 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 도탄 사격 테스트 데이터 추가 ▼ ---
+const ricochetShotBase = {
+    NORMAL: { id: 'ricochetShot', cost: 2, cooldown: 2, range: 3, damageMultiplier: { min: 0.75, max: 0.85 } },
+    RARE: { id: 'ricochetShot', cost: 2, cooldown: 2, range: 3, damageMultiplier: { min: 0.75, max: 0.85 } },
+    EPIC: { id: 'ricochetShot', cost: 2, cooldown: 2, range: 3, damageMultiplier: { min: 0.75, max: 0.85 } },
+    LEGENDARY: { id: 'ricochetShot', cost: 2, cooldown: 2, range: 3, damageMultiplier: { min: 0.75, max: 0.85 } }
+};
+// --- ▲ [신규] 도탄 사격 테스트 데이터 추가 ▲ ---
+
 // --- ▼ [신규] 사냥꾼의 감각 테스트 데이터 추가 ▼ ---
 const huntSenseBase = {
     NORMAL: {
@@ -180,6 +189,16 @@ for (const grade of grades) {
     assert.strictEqual(skill.push, expectedPush, `Knockback push failed for ${grade}`);
 }
 // --- ▲ [신규] 넉백샷 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 도탄 사격 테스트 로직 추가 ▼ ---
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(ricochetShotBase[grade], grade);
+    assert(skill.damageMultiplier && typeof skill.damageMultiplier === 'object');
+    assert.strictEqual(skill.range, 3, `Ricochet range failed for ${grade}`);
+    assert.strictEqual(skill.cooldown, 2, `Ricochet cooldown failed for ${grade}`);
+    assert.strictEqual(skill.cost, 2, `Ricochet cost failed for ${grade}`);
+}
+// --- ▲ [신규] 도탄 사격 테스트 로직 추가 ▲ ---
 
 
 // --- ▼ [신규] 사냥꾼의 감각 테스트 로직 추가 ▼ ---

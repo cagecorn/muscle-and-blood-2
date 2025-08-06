@@ -223,6 +223,27 @@ export const activeSkills = {
         }
     },
 
+    // --- ▼ [신규] 도탄 사격 스킬 추가 ▼ ---
+    ricochetShot: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'ricochetShot',
+            name: '도탄 사격',
+            type: 'ACTIVE',
+            requiredClass: ['gunner'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.KINETIC],
+            cost: 2,
+            targetType: 'enemy',
+            description: '주 대상에게 80%의 피해를 주고, 주변의 다른 적 최대 2명에게 튕겨 40%의 피해를 입힙니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 3,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            // 도탄 효과는 SkillEffectProcessor에서 별도 로직 구현 필요
+        }
+    },
+    // --- ▲ [신규] 도탄 사격 스킬 추가 ▲ ---
+
     // --- ▼ [신규] 나노빔 스킬 추가 ▼ ---
     nanobeam: {
         yinYangValue: -1,

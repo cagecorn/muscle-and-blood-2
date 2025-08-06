@@ -291,6 +291,73 @@ export const aidSkills = {
             selfDamage: { type: 'percentage', value: 0.10 },
             restoresBarrierPercent: 0.30 // 배리어 회복 효과
         }
+    },
+
+    // --- ▼ [신규] 링크 프로토콜, 부패의 손길, 긴급 수리 스킬 추가 ▼ ---
+    linkProtocol: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'linkProtocol',
+            name: '링크 프로토콜',
+            type: 'AID',
+            requiredClass: ['android'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.BUFF, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.SACRIFICE],
+            cost: 2,
+            targetType: 'ally',
+            description: '아군 한 명과 자신을 연결합니다. 3턴 동안 대상이 받는 모든 피해의 50%를 자신이 대신 받습니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            effect: {
+                id: 'linkProtocolBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                // 실제 피해 공유 로직은 CombatCalculationEngine에서 처리 필요
+            }
+        }
+    },
+
+    handOfCorruption: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'handOfCorruption',
+            name: '부패의 손길',
+            type: 'AID',
+            requiredClass: ['plagueDoctor'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.DEBUFF, SKILL_TAGS.HEAL, SKILL_TAGS.PROHIBITION],
+            cost: 2,
+            targetType: 'all',
+            description: '아군에게 사용하면 모든 디버프를 제거하고, 적에게 사용하면 모든 버프를 제거합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 2,
+            // 이 스킬의 효과는 SkillEffectProcessor에서 분기 처리 필요
+        }
+    },
+
+    emergencyRepair: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'emergencyRepair',
+            name: '긴급 수리',
+            type: 'AID',
+            requiredClass: ['mechanic'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.HEAL, SKILL_TAGS.BUFF, SKILL_TAGS.SUMMON],
+            cost: 2,
+            targetType: 'ally',
+            description: '아군 소환수 하나의 체력을 즉시 50% 회복시키고, 2턴간 공격력을 25% 증가시킵니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            healMultiplier: 0.5,
+            effect: {
+                id: 'emergencyRepairBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: { stat: 'physicalAttack', type: 'percentage', value: 0.25 }
+            }
+        }
     }
+    // --- ▲ [신규] 링크 프로토콜, 부패의 손길, 긴급 수리 스킬 추가 ▲ ---
     // --- ▲ [신규] 안드로이드 전용 지원 스킬 2종 추가 ▲ ---
 };
