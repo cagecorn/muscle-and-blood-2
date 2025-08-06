@@ -16,6 +16,8 @@ import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 // 새로 만든 노드를 import 합니다.
 import IsTargetHealthBelowThresholdNode from '../nodes/IsTargetHealthBelowThresholdNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ISFP: 호기심 많은 예술가 아키타입 행동 트리 (고스트)
@@ -70,7 +72,14 @@ function createISFP_AI(engines = {}) {
             ])
         ]),
 
-        // 4순위: 소극적인 위치 재선정
+        // 4순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 5순위: 전진이 불가능하면 소극적인 위치 재선정
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

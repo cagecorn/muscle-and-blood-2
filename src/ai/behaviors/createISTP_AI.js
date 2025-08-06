@@ -12,6 +12,8 @@ import FindLowestHealthEnemyNode from '../nodes/FindLowestHealthEnemyNode.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 import WasAttackedRecentlyNode from '../nodes/WasAttackedRecentlyNode.js';
 import FindAttackerNode from '../nodes/FindAttackerNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * ISTP: 만능 재주꾼 아키타입 행동 트리
@@ -51,7 +53,14 @@ function createISTP_AI(engines = {}) {
             executeSkillBranch
         ]),
 
-        // 3순위: 소극적인 위치 재선정
+        // 3순위: 공격 기회가 없다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 4순위: 전진도 어렵다면 소극적인 위치 재선정
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

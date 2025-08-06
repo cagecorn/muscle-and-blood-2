@@ -14,6 +14,8 @@ import FindEnemyMedicNode from '../nodes/FindEnemyMedicNode.js';
 import FindBuffedEnemyNode from '../nodes/FindBuffedEnemyNode.js';
 import FindNearestAllyInDangerNode from '../nodes/FindNearestAllyInDangerNode.js';
 import FindKitingPositionNode from '../nodes/FindKitingPositionNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * INFP: 중재자 아키타입 행동 트리
@@ -73,17 +75,28 @@ function createINFP_AI(engines = {}) {
 
         // 4순위: 안전한 기본 공격 (카이팅)
         new SequenceNode([
-            new FindTargetBySkillTypeNode(engines), // 일반적인 타겟 선정
+            new FindTargetBySkillTypeNode(engines),
             new SelectorNode([
-                 // 이미 안전하면 바로 공격
                 executeSkillBranch,
-                // 안전하지 않으면 카이팅 위치로 이동
                 new SequenceNode([
                     new HasNotMovedNode(),
                     new FindKitingPositionNode(engines),
                     new MoveToTargetNode(engines)
                 ])
             ])
+        ]),
+        // 5순위: 공격도 카이팅도 불가능하면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 6순위: 전진마저 불가능하면 안전한 위치로 후퇴
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindSafeRepositionNode(engines),
+            new MoveToTargetNode(engines)
         ])
     ]);
 

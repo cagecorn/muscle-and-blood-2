@@ -13,6 +13,8 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import FindYinYangTargetNode from '../nodes/FindYinYangTargetNode.js';
 import FindUniqueDebuffTargetNode from '../nodes/FindUniqueDebuffTargetNode.js';
 import FindAllyMagicClusterNode from '../nodes/FindAllyMagicClusterNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * INTJ: 전략가 아키타입 행동 트리
@@ -58,12 +60,18 @@ function createINTJ_AI(engines = {}) {
             new MoveToTargetNode(engines)
         ]),
         
-        // 4순위: 기본 원거리 공격 또는 안전한 위치로 재배치
+        // 4순위: 기본 원거리 공격 → 전진 → 재배치
         new SelectorNode([
             new SequenceNode([
                 new FindBestSkillByScoreNode(engines),
                 new FindYinYangTargetNode(engines),
                 executeSkillBranch
+            ]),
+            new SequenceNode([
+                new HasNotMovedNode(),
+                new FindTargetNode(engines),
+                new FindPathToTargetNode(engines),
+                new MoveToTargetNode(engines)
             ]),
             new SequenceNode([
                 new HasNotMovedNode(),

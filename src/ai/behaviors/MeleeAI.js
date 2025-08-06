@@ -14,6 +14,7 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import { NodeState } from '../nodes/Node.js';
 import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
+import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
 /**
  * MeleeAI: 근접 공격형 AI 행동 트리 (개선 버전)
@@ -77,8 +78,21 @@ function createMeleeAI(engines = {}) {
 
         // 4순위: 기본 공격 (가장 가까운 적)
         new SequenceNode([
-            new FindTargetNode(engines), // TargetManager의 기본 findNearestEnemy 사용
+            new FindTargetNode(engines),
             executeSkillBranch
+        ]),
+        // 5순위: 공격에 실패했다면 적을 향해 전진
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindTargetNode(engines),
+            new FindPathToTargetNode(engines),
+            new MoveToTargetNode(engines)
+        ]),
+        // 6순위: 전진도 불가능하면 안전한 위치로 이동
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindSafeRepositionNode(engines),
+            new MoveToTargetNode(engines)
         ])
     ]);
 

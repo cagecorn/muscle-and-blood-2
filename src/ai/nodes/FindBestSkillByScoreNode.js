@@ -4,6 +4,8 @@ import { ownedSkillsManager } from '../../game/utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js';
 import { skillEngine } from '../../game/utils/SkillEngine.js';
 import { skillScoreEngine } from '../../game/utils/SkillScoreEngine.js';
+import { activeSkills } from '../../game/data/skills/active.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 
 /**
  * 사용 가능한 스킬 중 SkillScoreEngine으로 계산된 점수가 가장 높은 스킬을 찾는 노드
@@ -41,6 +43,18 @@ class FindBestSkillByScoreNode extends Node {
                 if (currentScore > maxScore) {
                     maxScore = currentScore;
                     bestSkill = { skillData, instanceId };
+                }
+            }
+        }
+
+        if (maxScore <= 0) {
+            const attackSkillData = activeSkills.attack?.NORMAL || skillInventoryManager.getSkillData('attack', 'NORMAL');
+            if (attackSkillData && this.skillEngine.canUseSkill(unit, attackSkillData)) {
+                const attackInstance = skillInventoryManager.getInventory().find(inst => inst.skillId === 'attack');
+                if (attackInstance) {
+                    bestSkill = { skillData: attackSkillData, instanceId: attackInstance.instanceId };
+                    maxScore = 1;
+                    debugLogEngine.log(this.name, `[${unit.instanceName}]이(가) 다른 스킬 대신 기본 '공격'을 선택합니다.`);
                 }
             }
         }
