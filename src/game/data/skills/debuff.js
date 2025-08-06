@@ -101,6 +101,93 @@ export const debuffSkills = {
             }
         }
     },
+    // --- ▼ [신규] 집중 포화 스킬 추가 ▼ ---
+    focusFire: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'focusFire',
+            name: '집중 포화',
+            type: 'DEBUFF',
+            requiredClass: ['gunner', 'commander'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.STRATEGY, SKILL_TAGS.SPECIAL],
+            cost: 0, // 자원만 소모
+            targetType: 'enemy',
+            description: '대상의 약점을 아군에게 공유합니다. 3턴간 대상이 받는 모든 피해가 15% 증가합니다. (소모 자원: 철 2)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 5,
+            resourceCost: { type: 'IRON', amount: 2 },
+            effect: { id: 'focusFireMark', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        },
+        RARE: {
+            id: 'focusFire',
+            name: '집중 포화 [R]',
+            type: 'DEBUFF',
+            requiredClass: ['gunner', 'commander'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.STRATEGY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '대상의 약점을 아군에게 공유합니다. 3턴간 대상이 받는 모든 피해가 20% 증가합니다. (소모 자원: 철 2)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 5,
+            resourceCost: { type: 'IRON', amount: 2 },
+            effect: {
+                id: 'focusFireMark',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 3,
+                modifiers: { stat: 'damageIncrease', type: 'percentage', value: 0.20 } // 피해량 증가
+            }
+        },
+        EPIC: {
+            id: 'focusFire',
+            name: '집중 포화 [E]',
+            type: 'DEBUFF',
+            requiredClass: ['gunner', 'commander'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.STRATEGY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '대상의 약점을 아군에게 공유합니다. 3턴간 대상이 받는 모든 피해가 25% 증가하고, 물리 방어력이 10% 감소합니다. (소모 자원: 철 2)',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 6,
+            resourceCost: { type: 'IRON', amount: 2 },
+            effect: {
+                id: 'focusFireMark',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 3,
+                modifiers: [ // 두 가지 효과
+                    { stat: 'damageIncrease', type: 'percentage', value: 0.25 },
+                    { stat: 'physicalDefense', type: 'percentage', value: -0.10 }
+                ]
+            }
+        },
+        LEGENDARY: {
+            id: 'focusFire',
+            name: '집중 포화 [L]',
+            type: 'DEBUFF',
+            requiredClass: ['gunner', 'commander'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.STRATEGY, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '대상의 약점을 아군에게 공유합니다. 4턴간 대상이 받는 모든 피해가 30% 증가하고, 모든 방어력이 15% 감소합니다. (소모 자원: 철 1)',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 6,
+            resourceCost: { type: 'IRON', amount: 1 }, // 비용 감소
+            effect: {
+                id: 'focusFireMark',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 4, // 지속시간 증가
+                modifiers: [
+                    { stat: 'damageIncrease', type: 'percentage', value: 0.30 },
+                    { stat: 'physicalDefense', type: 'percentage', value: -0.15 },
+                    { stat: 'magicDefense', type: 'percentage', value: -0.15 }
+                ]
+            }
+        }
+    },
+    // --- ▲ [신규] 집중 포화 스킬 추가 ▲ ---
     // --- ▼ [신규] 컨퓨전 스킬 추가 ▼ ---
     confusion: {
         yinYangValue: +4, // 전장을 뒤흔드는 강력한 양(Yang)의 기술로 +4의 높은 점수를 부여했습니다.

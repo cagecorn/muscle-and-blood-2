@@ -87,6 +87,58 @@ const piercingShotBase = {
 };
 // --- ▲ [신규] 관통 사격 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 집중 포화 테스트 데이터 추가 ▼ ---
+const focusFireBase = {
+    NORMAL: {
+        id: 'focusFire',
+        cost: 0,
+        cooldown: 4,
+        range: 5,
+        resourceCost: { type: 'IRON', amount: 2 },
+        effect: { id: 'focusFireMark', duration: 3 }
+    },
+    RARE: {
+        id: 'focusFire',
+        cost: 0,
+        cooldown: 4,
+        range: 5,
+        resourceCost: { type: 'IRON', amount: 2 },
+        effect: { id: 'focusFireMark', duration: 3, modifiers: { stat: 'damageIncrease', type: 'percentage', value: 0.20 } }
+    },
+    EPIC: {
+        id: 'focusFire',
+        cost: 0,
+        cooldown: 3,
+        range: 6,
+        resourceCost: { type: 'IRON', amount: 2 },
+        effect: {
+            id: 'focusFireMark',
+            duration: 3,
+            modifiers: [
+                { stat: 'damageIncrease', type: 'percentage', value: 0.25 },
+                { stat: 'physicalDefense', type: 'percentage', value: -0.10 }
+            ]
+        }
+    },
+    LEGENDARY: {
+        id: 'focusFire',
+        cost: 0,
+        cooldown: 3,
+        range: 6,
+        resourceCost: { type: 'IRON', amount: 1 },
+        effect: {
+            id: 'focusFireMark',
+            duration: 4,
+            modifiers: [
+                { stat: 'damageIncrease', type: 'percentage', value: 0.30 },
+                { stat: 'physicalDefense', type: 'percentage', value: -0.15 },
+                { stat: 'magicDefense', type: 'percentage', value: -0.15 }
+            ]
+        }
+    }
+};
+// --- ▲ [신규] 집중 포화 테스트 데이터 추가 ▲ ---
+
 const grades = ['NORMAL', 'RARE', 'EPIC', 'LEGENDARY'];
 
 // 1. 데미지 계수 테스트
@@ -164,5 +216,34 @@ for (const grade of grades) {
     }
 }
 // --- ▲ [신규] 관통 사격 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 집중 포화 테스트 로직 추가 ▼ ---
+for (const grade of grades) {
+    const skill = skillModifierEngine.getModifiedSkill(focusFireBase[grade], grade);
+
+    const expectedAmount = grade === 'LEGENDARY' ? 1 : 2;
+    const expectedDuration = grade === 'LEGENDARY' ? 4 : 3;
+
+    assert.strictEqual(skill.resourceCost.amount, expectedAmount, `Focus Fire resource cost failed for grade ${grade}`);
+    assert.strictEqual(skill.effect.duration, expectedDuration, `Focus Fire duration failed for grade ${grade}`);
+
+    if (grade !== 'NORMAL') {
+        const mods = Array.isArray(skill.effect.modifiers) ? skill.effect.modifiers : [skill.effect.modifiers];
+        const dmgMod = mods.find(m => m.stat === 'damageIncrease');
+        const expectedDmg = grade === 'RARE' ? 0.20 : grade === 'EPIC' ? 0.25 : 0.30;
+        assert(dmgMod && Math.abs(dmgMod.value - expectedDmg) < 1e-6, `Focus Fire damage modifier failed for grade ${grade}`);
+
+        if (grade === 'EPIC' || grade === 'LEGENDARY') {
+            const defMod = mods.find(m => m.stat === 'physicalDefense');
+            const expectedDef = grade === 'EPIC' ? -0.10 : -0.15;
+            assert(defMod && Math.abs(defMod.value - expectedDef) < 1e-6, `Focus Fire physical defense mod failed for grade ${grade}`);
+        }
+        if (grade === 'LEGENDARY') {
+            const mdefMod = mods.find(m => m.stat === 'magicDefense');
+            assert(mdefMod && Math.abs(mdefMod.value + 0.15) < 1e-6, 'Focus Fire magic defense mod failed for LEGENDARY');
+        }
+    }
+}
+// --- ▲ [신규] 집중 포화 테스트 로직 추가 ▲ ---
 
 console.log('Gunner skills integration test passed.');

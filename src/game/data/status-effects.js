@@ -407,6 +407,16 @@ export const statusEffects = {
         iconPath: null, // 무효화
         onApply: (unit) => { unit.isBuffImmune = true; },
         onRemove: (unit) => { unit.isBuffImmune = false; }
+    },
+    // --- ▼ [신규] '약점 노출' 디버프 효과 추가 ▼ ---
+    focusFireMark: {
+        id: 'focusFireMark',
+        name: '약점 노출',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '이 유닛은 모든 공격으로부터 추가 피해를 받습니다.',
+        iconPath: null, // 나중에 전용 아이콘 추가
+        // 'damageIncrease' modifier를 사용하여 CombatCalculationEngine에서 자동으로 처리되도록 합니다.
+        modifiers: { stat: 'damageIncrease', type: 'percentage', value: 0.15 } // 기본 15% 추가 피해
     }
     // --- ▲ [신규] 추가 완료 ▲ ---
 };
