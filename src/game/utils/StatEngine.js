@@ -142,6 +142,9 @@ class StatEngine {
     applyDynamicPassives(unit, allAllies) {
         if (!unit.classPassive) return;
 
+        // 패시브로 인해 증가한 스탯을 임시 저장합니다.
+        const passiveBonus = {};
+
         switch (unit.classPassive.id) {
             case 'mindExplosion': {
                 let nearbyMagicUsers = 0;
@@ -159,14 +162,24 @@ class StatEngine {
 
                 if (nearbyMagicUsers > 0) {
                     const intelligenceBonus = unit.baseStats.intelligence * (0.03 * nearbyMagicUsers);
-                    unit.finalStats.intelligence += intelligenceBonus;
-                    // 지능이 마법 공격력에 영향을 주므로, 관련 스탯을 다시 계산합니다.
-                    unit.finalStats.magicAttack = (unit.finalStats.intelligence * 1.5) + (unit.finalStats.magicAttack || 0);
-                    unit.finalStats.magicAttack *= (1 + (unit.finalStats.magicAttackPercentage || 0) / 100);
+                    passiveBonus.intelligence = (passiveBonus.intelligence || 0) + intelligenceBonus;
                 }
                 break;
             }
             // ... 다른 동적 패시브 case 추가 ...
+        }
+
+        // 계산된 모든 패시브 보너스를 한 번에 적용합니다.
+        for (const [stat, value] of Object.entries(passiveBonus)) {
+            unit.finalStats[stat] = (unit.finalStats[stat] || 0) + value;
+        }
+
+        // 지능 보너스가 있다면 파생 스탯을 다시 계산합니다.
+        if (passiveBonus.intelligence) {
+            const multiplier = 1 + (unit.finalStats.magicAttackPercentage || 0) / 100;
+            const baseMagicAttack = (unit.finalStats.magicAttack || 0) / multiplier;
+            const newBase = baseMagicAttack + passiveBonus.intelligence * 1.5;
+            unit.finalStats.magicAttack = newBase * multiplier;
         }
     }
 
