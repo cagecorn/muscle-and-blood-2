@@ -9,11 +9,11 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import IsHealthBelowThresholdNode from '../nodes/IsHealthBelowThresholdNode.js';
 import FindTargetNode from '../nodes/FindTargetNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
-import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import IsSkillInRangeNode from '../nodes/IsSkillInRangeNode.js';
 import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import { NodeState } from '../nodes/Node.js';
+import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
 
 /**
  * MeleeAI: 근접 공격형 AI 행동 트리 (개선 버전)
@@ -48,9 +48,7 @@ function createMeleeAI(engines = {}) {
             ]),
             new SequenceNode([
                 new HasNotMovedNode(),
-                new FindPathToSkillRangeNode(engines),
-                new MoveToTargetNode(engines),
-                new IsSkillInRangeNode(engines),
+                new MoveToUseSkillNode(engines),
                 new UseSkillNode(engines)
             ])
         ])
