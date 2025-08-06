@@ -25,7 +25,7 @@ class FindBestSkillByScoreNode extends Node {
         const enemies = blackboard.get('enemyUnits') || [];
 
         let bestSkill = null;
-        let maxScore = -1;
+        let maxScore = -Infinity;
 
         for (const instanceId of equippedSkillInstances) {
             if (!instanceId || usedSkills.has(instanceId)) continue;
@@ -35,6 +35,9 @@ class FindBestSkillByScoreNode extends Node {
 
             if (this.skillEngine.canUseSkill(unit, skillData)) {
                 const currentScore = await this.skillScoreEngine.calculateScore(unit, skillData, target, allies, enemies);
+                if (currentScore <= 0) {
+                    continue;
+                }
                 if (currentScore > maxScore) {
                     maxScore = currentScore;
                     bestSkill = { skillData, instanceId };
