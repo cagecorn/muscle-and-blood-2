@@ -336,4 +336,47 @@ export const statusEffects = {
         iconPath: 'assets/images/skills/curse-of-darkness.png',
     },
     // --- ▲ [신규] 다크나이트 패시브 및 특화 효과 추가 ▲ ---
+
+    // --- ▼ [신규] 5가지 신규 상태이상 및 버프 효과 추가 ▼ ---
+    disarm: {
+        id: 'disarm',
+        name: '무장 해제',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '공격 및 스킬 사용이 불가능합니다.',
+        iconPath: null, // 시스템 해킹
+        onApply: (unit) => { unit.isDisarmed = true; },
+        onRemove: (unit) => { unit.isDisarmed = false; }
+    },
+
+    poisonWeapon: {
+        id: 'poisonWeapon',
+        name: '맹독 부여',
+        type: EFFECT_TYPES.BUFF,
+        description: '다음 공격 시 50% 확률로 적을 [중독]시킵니다.',
+        iconPath: null, // 맹독 바르기
+    },
+
+    poison: {
+        id: 'poison',
+        name: '중독',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '턴 종료 시 최대 체력의 8%만큼 지속 피해를 입고, 받는 치유량이 25% 감소합니다.',
+        iconPath: null, // 맹독 구름
+        modifiers: { stat: 'healingReceived', type: 'percentage', value: -0.25 }
+        // 지속 피해 로직은 나중에 StatusEffectManager.js에서 별도 처리가 필요합니다.
+    },
+
+    adrenaline: {
+        id: 'adrenaline',
+        name: '아드레날린',
+        type: EFFECT_TYPES.BUFF,
+        description: '공격력이 25% 증가하고, 행동 순서가 더 빨리 돌아옵니다.',
+        iconPath: null, // 아드레날린 주사
+        modifiers: [
+            { stat: 'physicalAttack', type: 'percentage', value: 0.25 },
+            { stat: 'magicAttack', type: 'percentage', value: 0.25 },
+            { stat: 'turnValue', type: 'percentage', value: -0.30 } // 턴 순서 값 30% 감소 (빨라짐)
+        ]
+    },
+    // --- ▲ [신규] 추가 완료 ▲ ---
 };

@@ -1061,4 +1061,63 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 더블 스트라이크 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 암살 일격, 맹독 구름, 아드레날린 주사 스킬 추가 ▼ ---
+    assassinate: {
+        yinYangValue: -5,
+        NORMAL: {
+            id: 'assassinate',
+            name: '암살 일격',
+            type: 'ACTIVE',
+            requiredClass: ['clown', 'ghost'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.EXECUTE, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '적에게 100%의 물리 피해를 주고, 대상에게 걸린 해로운 효과 하나당 20%의 추가 피해를 입힙니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 1,
+            damageMultiplier: { min: 0.9, max: 1.1 },
+            damagePerDebuff: 0.2 // 디버프당 20% 추가 데미지 (나중에 CombatCalculationEngine에서 이 값을 사용)
+        }
+    },
+
+    poisonCloud: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'poisonCloud',
+            name: '맹독 구름',
+            type: 'ACTIVE',
+            requiredClass: ['plagueDoctor'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.POISON, SKILL_TAGS.DEBUFF, SKILL_TAGS.AURA],
+            cost: 0, // 자원만 소모
+            targetType: 'enemy',
+            description: '넓은(3x3) 범위에 독안개를 살포하여 3턴간 [중독] 효과를 부여합니다. (소모 자원: 독 2)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            resourceCost: { type: 'POISON', amount: 2 },
+            aoe: { shape: 'SQUARE', radius: 1 },
+            effect: { id: 'poison', type: EFFECT_TYPES.DEBUFF, duration: 3 }
+        }
+    },
+
+    adrenalineShot: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'adrenalineShot',
+            name: '아드레날린 주사',
+            type: 'AID', // 지원 스킬이지만 액티브로도 분류 가능
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.BUFF],
+            cost: 3,
+            targetType: 'ally',
+            description: '아군 하나의 [둔화]와 [속박]을 즉시 해제하고, 2턴간 [아드레날린] 버프를 부여합니다.',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 1,
+            cleanses: ['slow', 'bind'], // 해제할 상태이상 목록 (나중에 SkillEffectProcessor에서 처리)
+            effect: { id: 'adrenaline', type: EFFECT_TYPES.BUFF, duration: 2 }
+        }
+    },
+    // --- ▲ [신규] 암살 일격, 맹독 구름, 아드레날린 주사 스킬 추가 ▲ ---
 };
