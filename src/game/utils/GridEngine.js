@@ -61,3 +61,46 @@ export class GridEngine {
         return this.gridCells.find(cell => cell.col === col && cell.row === row);
     }
 }
+
+/**
+ * 시작 위치에서 이동력 범위 내에 도달 가능한 모든 타일을 반환합니다.
+ * @param {{col:number,row:number}} start 시작 타일 좌표
+ * @param {number} moveRange 이동력(칸 수)
+ * @param {object} grid 탐색할 그리드 객체
+ * @returns {Array<{col:number,row:number}>}
+ */
+export function getReachableTiles(start, moveRange, grid) {
+    if (!grid) return [];
+
+    const visited = new Set();
+    const queue = [{ col: start.col, row: start.row, dist: 0 }];
+    const tiles = [];
+
+    visited.add(`${start.col},${start.row}`);
+
+    while (queue.length > 0) {
+        const { col, row, dist } = queue.shift();
+        tiles.push({ col, row });
+        if (dist >= moveRange) continue;
+
+        const directions = [
+            { x: 0, y: 1 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: -1, y: 0 }
+        ];
+
+        for (const dir of directions) {
+            const nc = col + dir.x;
+            const nr = row + dir.y;
+            const key = `${nc},${nr}`;
+            if (visited.has(key)) continue;
+            const cell = grid.getCell(nc, nr);
+            if (!cell || cell.isOccupied) continue;
+            visited.add(key);
+            queue.push({ col: nc, row: nr, dist: dist + 1 });
+        }
+    }
+
+    return tiles;
+}
