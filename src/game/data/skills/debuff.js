@@ -200,4 +200,23 @@ export const debuffSkills = {
         }
     },
     // --- ▲ [신규] 시스템 해킹 스킬 추가 ▲ ---
+
+    nullify: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'nullify',
+            name: '무효화',
+            type: 'DEBUFF',
+            requiredClass: ['hacker'],
+            tags: [SKILL_TAGS.DEBUFF, SKILL_TAGS.RANGED, SKILL_TAGS.MIND, SKILL_TAGS.PROHIBITION],
+            cost: 2,
+            targetType: 'enemy',
+            description: '적 하나의 모든 이로운 버프를 해제합니다. 대상이 버프를 가지고 있지 않았다면, 대신 1턴간 [바이러스] 상태로 만듭니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 4,
+            removesAllBuffs: true, // 버프 제거 플래그
+            fallbackEffect: { id: 'virus', type: EFFECT_TYPES.DEBUFF, duration: 1 } // 대체 효과
+        }
+    }
 };

@@ -251,4 +251,46 @@ export const aidSkills = {
         }
     },
     // --- ▲ [신규] 맹독 바르기 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 안드로이드 전용 지원 스킬 2종 추가 ▼ ---
+    overdrive: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'overdrive',
+            name: '오버드라이브',
+            type: 'AID',
+            requiredClass: ['android'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.BUFF, SKILL_TAGS.SACRIFICE],
+            cost: 3,
+            targetType: 'ally',
+            description: '자신의 최대 체력 10%를 소모하여 아군 하나의 모든 스킬 쿨타임을 1턴 감소시키고, 3턴간 [특수 스킬] 위력을 20% 증폭시킵니다.',
+            illustrationPath: null,
+            cooldown: 6,
+            range: 2,
+            selfDamage: { type: 'percentage', value: 0.10 }, // 자기 피해
+            cooldownReduction: { amount: 1 }, // 쿨타임 감소 효과
+            effect: { id: 'overdrive', type: EFFECT_TYPES.BUFF, duration: 3 }
+        }
+    },
+
+    nobleSacrifice: {
+        yinYangValue: +4,
+        NORMAL: {
+            id: 'nobleSacrifice',
+            name: '고귀한 희생',
+            type: 'AID',
+            requiredClass: ['android'],
+            tags: [SKILL_TAGS.AID, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.SACRIFICE, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'ally',
+            description: '자신의 최대 체력 10%를 소모하여 아군 하나의 용맹 배리어를 최대치의 30%만큼 즉시 회복시킵니다. (소모 자원: 철 3)',
+            illustrationPath: null,
+            cooldown: 0,
+            range: 2,
+            resourceCost: { type: 'IRON', amount: 3 },
+            selfDamage: { type: 'percentage', value: 0.10 },
+            restoresBarrierPercent: 0.30 // 배리어 회복 효과
+        }
+    }
+    // --- ▲ [신규] 안드로이드 전용 지원 스킬 2종 추가 ▲ ---
 };

@@ -379,4 +379,34 @@ export const statusEffects = {
         ]
     },
     // --- ▲ [신규] 추가 완료 ▲ ---
+
+    // --- ▼ [신규] 3가지 신규 버프/디버프 효과 추가 ▼ ---
+    overdrive: {
+        id: 'overdrive',
+        name: '오버드라이브',
+        type: EFFECT_TYPES.BUFF,
+        description: '[특수 스킬]의 최종 위력이 20% 증가합니다.',
+        iconPath: null, // 오버드라이브
+        // 'specialSkillPower'와 같은 커스텀 modifier는 나중에 CombatCalculationEngine에서 참조하여 계산합니다.
+        modifiers: { stat: 'specialSkillPower', type: 'percentage', value: 0.20 }
+    },
+
+    nobleSacrifice: {
+        id: 'nobleSacrifice',
+        name: '고귀한 희생',
+        type: EFFECT_TYPES.BUFF,
+        description: '용맹 배리어를 회복받았습니다.',
+        iconPath: null, // 고귀한 희생
+    },
+
+    virus: {
+        id: 'virus',
+        name: '바이러스',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '이 유닛은 버프 효과를 받을 수 없습니다.',
+        iconPath: null, // 무효화
+        onApply: (unit) => { unit.isBuffImmune = true; },
+        onRemove: (unit) => { unit.isBuffImmune = false; }
+    }
+    // --- ▲ [신규] 추가 완료 ▲ ---
 };
