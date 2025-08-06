@@ -4,6 +4,48 @@ import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 
 // 액티브 스킬 데이터 정의
 export const activeSkills = {
+    // --- ▼ [신규] 회전 베기 스킬 추가 ▼ ---
+    spinningSlash: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'spinningSlash',
+            name: '회전 베기',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.PRODUCTION, SKILL_TAGS.AURA, SKILL_TAGS.WIND],
+            cost: 3,
+            targetType: 'enemy', // 자신 주부의 적을 대상으로 함
+            description: '자신의 주위 4타일(상하좌우)에 있는 모든 적군을 70%의 물리 데미지로 공격하고, [바람] 자원을 1개 생산합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 0, // 자신을 중심으로 하므로 사거리는 0
+            aoe: { shape: 'CROSS', radius: 1 }, // 십자 형태 범위
+            damageMultiplier: { min: 0.65, max: 0.75 }, // 70% 데미지
+            generatesResource: { type: 'WIND', amount: 1 }
+        }
+    },
+    // --- ▲ [신규] 회전 베기 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 대지 가르기 스킬 추가 ▼ ---
+    earthSplitter: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'earthSplitter',
+            name: '대지 가르기',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.PRODUCTION, SKILL_TAGS.EARTH],
+            cost: 3,
+            targetType: 'enemy',
+            description: '자신으로부터 3타일 일지선상의 모든 적군에게 70%의 물리 데미지를 주고, [대지] 자원을 1개 생산합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 3, // 스킬 사거리
+            aoe: { shape: 'LINE', length: 3 }, // 직선 형태 범위
+            damageMultiplier: { min: 0.65, max: 0.75 }, // 70% 데미지
+            generatesResource: { type: 'EARTH', amount: 1 }
+        }
+    },
+    // --- ▲ [신규] 대지 가르기 스킬 추가 ▲ ---
+
     // 기본 공격 스킬
     attack: {
         yinYangValue: -1,
