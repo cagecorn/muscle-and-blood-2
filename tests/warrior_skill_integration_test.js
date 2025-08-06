@@ -169,6 +169,36 @@ const doubleStrikeBase = {
 };
 // --- ▲ [신규] 더블 스트라이크 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 회전 베기 테스트 데이터 추가 ▼ ---
+const spinningSlashBase = {
+    NORMAL: {
+        id: 'spinningSlash',
+        type: 'ACTIVE',
+        cost: 3,
+        cooldown: 3,
+        damageMultiplier: { min: 0.65, max: 0.75 },
+        range: 0,
+        aoe: { shape: 'CROSS', radius: 1 },
+        generatesResource: { type: 'WIND', amount: 1 }
+    }
+};
+// --- ▲ [신규] 회전 베기 테스트 데이터 추가 ▲ ---
+
+// --- ▼ [신규] 대지 가르기 테스트 데이터 추가 ▼ ---
+const earthSplitterBase = {
+    NORMAL: {
+        id: 'earthSplitter',
+        type: 'ACTIVE',
+        cost: 3,
+        cooldown: 3,
+        damageMultiplier: { min: 0.65, max: 0.75 },
+        range: 3,
+        aoe: { shape: 'LINE', length: 3 },
+        generatesResource: { type: 'EARTH', amount: 1 }
+    }
+};
+// --- ▲ [신규] 대지 가르기 테스트 데이터 추가 ▲ ---
+
 const ironWillBase = {
     rankModifiers: [0.39, 0.36, 0.33, 0.30],
     NORMAL: { maxReduction: 0.30, hpRegen: 0 },
@@ -364,6 +394,38 @@ for (const grade of grades) {
     }
 }
 // --- ▲ [신규] 더블 스트라이크 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 회전 베기 테스트 로직 추가 ▼ ---
+{
+    const skill = skillModifierEngine.getModifiedSkill(spinningSlashBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.cost, 3, 'Spinning Slash cost failed');
+    assert.strictEqual(skill.cooldown, 3, 'Spinning Slash cooldown failed');
+    assert.strictEqual(skill.range, 0, 'Spinning Slash range failed');
+    assert(skill.aoe && skill.aoe.shape === 'CROSS' && skill.aoe.radius === 1, 'Spinning Slash AOE failed');
+    assert(
+        skill.generatesResource &&
+            skill.generatesResource.type === 'WIND' &&
+            skill.generatesResource.amount === 1,
+        'Spinning Slash resource generation failed'
+    );
+}
+// --- ▲ [신규] 회전 베기 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 대지 가르기 테스트 로직 추가 ▼ ---
+{
+    const skill = skillModifierEngine.getModifiedSkill(earthSplitterBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.cost, 3, 'Earth Splitter cost failed');
+    assert.strictEqual(skill.cooldown, 3, 'Earth Splitter cooldown failed');
+    assert.strictEqual(skill.range, 3, 'Earth Splitter range failed');
+    assert(skill.aoe && skill.aoe.shape === 'LINE' && skill.aoe.length === 3, 'Earth Splitter AOE failed');
+    assert(
+        skill.generatesResource &&
+            skill.generatesResource.type === 'EARTH' &&
+            skill.generatesResource.amount === 1,
+        'Earth Splitter resource generation failed'
+    );
+}
+// --- ▲ [신규] 대지 가르기 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
 for (const grade of grades) {
