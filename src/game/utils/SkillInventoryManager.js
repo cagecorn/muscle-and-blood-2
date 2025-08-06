@@ -145,7 +145,8 @@ class SkillInventoryManager {
         
         const finalSkillData = { ...baseData, ...gradeData };
 
-        // [신규] 네이밍 규칙에 따라 이미지 경로를 확인하고, 없으면 리포트하도록 전달
+        // ✨ [수정] illustrationPath가 없을 경우, skillId를 기반으로 자동 경로를 생성합니다.
+        // placeholderManager는 경로가 실제로 없을 때만 경고를 출력합니다.
         if (!finalSkillData.illustrationPath) {
             const expectedPath = `assets/images/skills/${finalSkillData.id}.png`;
             finalSkillData.illustrationPath = placeholderManager.getPath(null, expectedPath);

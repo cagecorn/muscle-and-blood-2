@@ -303,7 +303,8 @@ export class BattleSimulatorEngine {
                 this.currentTurnIndex = 0;
                 this.currentTurnNumber++; // 모든 유닛의 턴이 끝나면 전체 턴 수 증가
 
-                statusEffectManager.onTurnEnd();
+                // ✨ [수정] 턴 종료 시 지속 피해 효과 처리를 statusEffectManager로 위임
+                statusEffectManager.onTurnEnd(this.turnQueue);
                 // ✨ 턴 종료 시 음양 지수 자연 감소를 적용합니다.
                 yinYangEngine.applyTurnDecay();
                 tokenEngine.addTokensForNewTurn();
