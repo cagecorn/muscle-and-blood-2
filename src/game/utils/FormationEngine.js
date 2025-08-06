@@ -323,6 +323,37 @@ class FormationEngine {
             debugLogEngine.log('FormationEngine', `끌어당기기 실패: ${pullerUnit.instanceName} 주변에 빈 공간이 없습니다.`);
         }
     }
+
+    // ▼▼▼ [신규] 두 유닛의 위치를 교환하는 메서드 추가 ▼▼▼
+    /**
+     * 두 유닛의 그리드 위치를 서로 교환하고 애니메이션을 재생합니다.
+     * @param {object} unitA
+     * @param {object} unitB
+     * @param {AnimationEngine} animationEngine
+     * @returns {Promise<void>}
+     */
+    async swapUnitPositions(unitA, unitB, animationEngine) {
+        if (!this.grid || !unitA || !unitB || !unitA.sprite || !unitB.sprite) return;
+
+        const cellA = this.grid.getCell(unitA.gridX, unitA.gridY);
+        const cellB = this.grid.getCell(unitB.gridX, unitB.gridY);
+
+        if (!cellA || !cellB) return;
+
+        await Promise.all([
+            animationEngine.moveTo(unitA.sprite, cellB.x, cellB.y, 400),
+            animationEngine.moveTo(unitB.sprite, cellA.x, cellA.y, 400)
+        ]);
+
+        [unitA.gridX, unitB.gridX] = [unitB.gridX, unitA.gridX];
+        [unitA.gridY, unitB.gridY] = [unitB.gridY, unitA.gridY];
+
+        cellA.sprite = unitB.sprite;
+        cellB.sprite = unitA.sprite;
+
+        debugLogEngine.log('FormationEngine', `[${unitA.instanceName}]와(과) [${unitB.instanceName}]의 위치를 교환했습니다.`);
+    }
+    // ▲▲▲ [신규] 추가 완료 ▲▲▲
 }
 
 export const formationEngine = new FormationEngine();

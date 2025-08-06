@@ -240,6 +240,40 @@ class StatusEffectManager {
         return totalValue;
     }
 
+    // ▼▼▼ [신규] 유닛의 모든 버프를 제거하는 메서드 추가 ▼▼▼
+    /**
+     * 특정 유닛의 모든 이로운 효과(BUFF)를 제거합니다.
+     * @param {object} unit - 버프를 제거할 유닛
+     * @returns {number} - 제거된 버프의 개수
+     */
+    removeAllBuffs(unit) {
+        const effects = this.activeEffects.get(unit.uniqueId);
+        if (!effects || effects.length === 0) return 0;
+
+        let removedCount = 0;
+        const remainingEffects = [];
+
+        effects.forEach(effect => {
+            if (effect.type === EFFECT_TYPES.BUFF) {
+                const def = statusEffects[effect.id];
+                if (def && def.onRemove) {
+                    def.onRemove(unit);
+                }
+                debugStatusEffectManager.logEffectExpired(unit.uniqueId, effect);
+                removedCount++;
+            } else {
+                remainingEffects.push(effect);
+            }
+        });
+
+        this.activeEffects.set(unit.uniqueId, remainingEffects);
+        if (removedCount > 0) {
+            debugLogEngine.log('StatusEffectManager', `[${unit.instanceName}]의 버프 ${removedCount}개를 제거했습니다.`);
+        }
+        return removedCount;
+    }
+    // ▲▲▲ [신규] 추가 완료 ▲▲▲
+
     // ✨ [신규] 해로운 효과 1개를 제거합니다.
     removeOneDebuff(unit) {
         const effects = this.activeEffects.get(unit.uniqueId);

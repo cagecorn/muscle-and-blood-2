@@ -20,6 +20,8 @@ import { areaOfEffectEngine } from './AreaOfEffectEngine.js';
 import { statEngine } from './StatEngine.js';
 // 상태 효과 데이터베이스를 통해 해커 패시브에 사용할 디버프를 조회합니다.
 import { statusEffects } from '../data/status-effects.js';
+import { cooldownManager } from './CooldownManager.js'; // 쿨다운 매니저 import 추가
+import { aspirationEngine } from './AspirationEngine.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -49,8 +51,16 @@ class SkillEffectProcessor {
         switch (skill.type) {
             case 'ACTIVE':
             case 'DEBUFF':
-                await this._processOffensiveSkill(unit, target, skill, instanceId, grade);
+                // ▼▼▼ [수정] 무효화(nullify)와 깜짝쇼(surpriseShow)를 위한 로직 추가 ▼▼▼
+                if (skill.id === 'nullify') {
+                    await this._processNullifySkill(unit, target, skill);
+                } else if (skill.id === 'surpriseShow') {
+                    await this._processSurpriseShowSkill(unit, target, skill);
+                } else {
+                    await this._processOffensiveSkill(unit, target, skill, instanceId, grade);
+                }
                 break;
+                // ▲▲▲ [수정] 완료 ▲▲▲
             case 'AID':
                 await this._processAidSkill(unit, target, skill);
                 break;
@@ -216,6 +226,27 @@ class SkillEffectProcessor {
 
         if (skill.type !== 'ACTIVE') return;
 
+        // [신규] 열망(Aspiration) 조작 스킬 처리
+        if (skill.aspirationEffect) {
+            const aoeCells = areaOfEffectEngine.getAffectedCells(
+                skill.aoe.shape,
+                { col: unit.gridX, row: unit.gridY },
+                skill.aoe.radius,
+                unit
+            );
+            const allUnits = this.battleSimulator.turnQueue;
+            allUnits.forEach(u => {
+                if (u.currentHp > 0 && aoeCells.some(cell => cell.col === u.gridX && cell.row === u.gridY)) {
+                    if (u.team === unit.team) {
+                        aspirationEngine.addAspiration(u.uniqueId, skill.aspirationEffect.ally, skill.name);
+                    } else {
+                        aspirationEngine.addAspiration(u.uniqueId, skill.aspirationEffect.enemy, skill.name);
+                    }
+                }
+            });
+            return; // 열망 스킬은 데미지를 주지 않고 종료
+        }
+
         // ▼▼▼ [수정] 단일/광역 타겟 처리 로직 ▼▼▼
         let finalTargets = [target];
 
@@ -258,10 +289,27 @@ class SkillEffectProcessor {
                 // 이미 죽은 대상은 더 이상 공격하지 않습니다.
                 if (currentTarget.currentHp <= 0) continue;
 
+                // [신규] 암살 일격(assassinate) 추가 데미지 계산
+                let finalSkillData = { ...skill };
+                if (skill.id === 'assassinate') {
+                    const effects = statusEffectManager.activeEffects.get(currentTarget.uniqueId) || [];
+                    const debuffCount = effects.filter(e => e.type !== EFFECT_TYPES.BUFF).length;
+                    const bonusMultiplier = debuffCount * (skill.damagePerDebuff || 0);
+
+                    const baseMultiplier = typeof skill.damageMultiplier === 'object'
+                        ? (skill.damageMultiplier.min + skill.damageMultiplier.max) / 2
+                        : skill.damageMultiplier;
+                    finalSkillData.damageMultiplier = baseMultiplier + bonusMultiplier;
+
+                    if (debuffCount > 0) {
+                        debugLogEngine.log(this.constructor.name, `[암살 일격] 디버프 ${debuffCount}개로 피해량 +${(bonusMultiplier * 100).toFixed(0)}%`);
+                    }
+                }
+
                 const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(
                     unit,
                     currentTarget,
-                    skill,
+                    finalSkillData,
                     instanceId,
                     grade
                 );
@@ -362,7 +410,36 @@ class SkillEffectProcessor {
 
     async _processAidSkill(unit, target, skill) {
         spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
-        if (target.isHealingProhibited) {
+
+        // [신규] 자기 피해(selfDamage) 처리 로직
+        if (skill.selfDamage) {
+            const damage = Math.round(unit.finalStats.hp * skill.selfDamage.value);
+            unit.currentHp -= damage;
+            this.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y, `-${damage}`, '#9333ea');
+        }
+
+        // [신규] 배리어 회복(restoresBarrierPercent) 처리 로직
+        if (skill.restoresBarrierPercent && target.maxBarrier > 0) {
+            const healAmount = Math.round(target.maxBarrier * skill.restoresBarrierPercent);
+            target.currentBarrier = Math.min(target.maxBarrier, target.currentBarrier + healAmount);
+            this.vfxManager.createDamageNumber(target.sprite.x, target.sprite.y - 10, `+${healAmount}`, '#ffd700', '배리어');
+        }
+
+        // [신규] 쿨타임 감소(cooldownReduction) 처리 로직
+        if (skill.cooldownReduction) {
+            cooldownManager.reduceCooldowns(target.uniqueId); // 대상의 모든 쿨타임 1 감소
+            this.vfxManager.showEffectName(target.sprite, '재정비', '#60a5fa');
+        }
+        
+        // [신규] 특정 디버프 해제(cleanses) 처리 로직
+        if (skill.cleanses && skill.cleanses.length > 0) {
+            const effects = statusEffectManager.activeEffects.get(target.uniqueId) || [];
+            const remainingEffects = effects.filter(e => !skill.cleanses.includes(e.id));
+            statusEffectManager.activeEffects.set(target.uniqueId, remainingEffects);
+            this.vfxManager.showEffectName(target.sprite, '상태 회복', '#22c55e');
+        }
+
+        if (target.isHealingProhibited && skill.healMultiplier > 0) {
             debugLogEngine.log('SkillEffectProcessor', `${target.instanceName}은(는) 치료 금지 상태라 회복 불가!`);
             return;
         }
@@ -393,6 +470,28 @@ class SkillEffectProcessor {
             statusEffectManager.removeOneDebuff(target);
         }
     }
+
+    // ▼▼▼ [신규] 특수 스킬 처리 메서드 2개 추가 ▼▼▼
+    async _processNullifySkill(unit, target, skill) {
+        spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
+        await this.animationEngine.attack(unit.sprite, target.sprite);
+
+        const removedCount = statusEffectManager.removeAllBuffs(target);
+
+        if (removedCount > 0) {
+            this.vfxManager.showEffectName(target.sprite, '버프 해제!', '#f97316');
+        } else if (skill.fallbackEffect) {
+            statusEffectManager.addEffect(target, { name: skill.name, effect: skill.fallbackEffect }, unit);
+        }
+    }
+
+    async _processSurpriseShowSkill(unit, target, skill) {
+        spriteEngine.changeSpriteForDuration(unit, 'cast', 600);
+        this.vfxManager.showSkillName(unit.sprite, skill.name, SKILL_TYPES[skill.type].color);
+
+        await formationEngine.swapUnitPositions(unit, target, this.animationEngine);
+    }
+    // ▲▲▲ [신규] 추가 완료 ▲▲▲
 
     async _processSummonSkill(unit, skill) {
         spriteEngine.changeSpriteForDuration(unit, 'cast', 600);

@@ -1062,6 +1062,46 @@ export const activeSkills = {
     },
     // --- ▲ [신규] 더블 스트라이크 스킬 추가 ▲ ---
 
+    // --- ▼ [신규] 광대 전용 스킬 추가 ▼ ---
+    surpriseShow: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'surpriseShow',
+            name: '깜짝쇼',
+            type: 'ACTIVE',
+            requiredClass: ['clown'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.KINETIC, SKILL_TAGS.MIND, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy', // 타겟팅 시스템이 'healer', 'supporter'를 우선하도록 만들어야 함
+            description: '적 진영의 힐러나 서포터 중 한 명과 자신의 위치를 강제로 뒤바꿉니다. (소모 자원: 바람 3)',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 99, // 맵 전체
+            resourceCost: { type: 'WIND', amount: 3 },
+            swapPosition: true // 위치 교환 플래그
+        }
+    },
+
+    harmlessJoke: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'harmlessJoke',
+            name: '무해한 농담',
+            type: 'ACTIVE', // 버프와 디버프를 동시에 하므로 ACTIVE로 분류
+            requiredClass: ['clown'],
+            tags: [SKILL_TAGS.AURA, SKILL_TAGS.MIND],
+            cost: 2,
+            targetType: 'self', // 자신을 중심으로 발동
+            description: '주위 3타일 내 모든 아군의 열망을 10 올리고, 모든 적의 열망을 10 내립니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 0,
+            aoe: { shape: 'SQUARE', radius: 3 },
+            aspirationEffect: { ally: 10, enemy: -10 } // 열망 조작 효과
+        }
+    },
+    // --- ▲ [신규] 광대 전용 스킬 추가 ▲ ---
+
     // --- ▼ [신규] 암살 일격, 맹독 구름, 아드레날린 주사 스킬 추가 ▼ ---
     assassinate: {
         yinYangValue: -5,

@@ -1,6 +1,7 @@
 // tests/status_effect_interaction_test.js
 
 import assert from 'assert';
+import { EFFECT_TYPES } from '../src/game/utils/EffectTypes.js';
 
 // IndexedDB를 사용하지 않는 Node 테스트 환경을 위한 스텁
 globalThis.indexedDB = { open: () => ({}) };
@@ -61,6 +62,19 @@ assert.strictEqual(effects.length, 1, '테스트 2-1 실패: 지속시간 없는
 assert.strictEqual(effects[0].id, 'willGuard', '테스트 2-2 실패: 남아있는 버프가 올바르지 않습니다.');
 console.log('✅ 테스트 2 통과: 지속시간 없는 버프가 턴이 지나도 유지됩니다.');
 
+
+// 3. removeAllBuffs 메서드 테스트
+statusEffectManager.activeEffects.clear();
+const buffSkill = { name: 'Adrenaline', effect: { id: 'adrenaline', type: EFFECT_TYPES.BUFF, duration: 2 } };
+const debuffSkill = { name: 'Poison', effect: { id: 'poison', type: EFFECT_TYPES.DEBUFF, duration: 2 } };
+statusEffectManager.addEffect(mockUnit, buffSkill);
+statusEffectManager.addEffect(mockUnit, debuffSkill);
+const removedCount = statusEffectManager.removeAllBuffs(mockUnit);
+assert.strictEqual(removedCount, 1, '테스트 3-1 실패: 버프 제거 개수가 올바르지 않습니다.');
+const remaining = statusEffectManager.activeEffects.get(mockUnit.uniqueId) || [];
+assert.strictEqual(remaining.length, 1, '테스트 3-2 실패: 디버프가 남아있어야 합니다.');
+assert.strictEqual(remaining[0].id, 'poison', '테스트 3-3 실패: 남은 효과가 디버프가 아닙니다.');
+console.log('✅ 테스트 3 통과: removeAllBuffs가 버프만 제거합니다.');
 
 statusEffectManager.activeEffects.clear(); // 테스트 후 상태 초기화
 
