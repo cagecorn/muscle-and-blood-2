@@ -119,12 +119,13 @@ export const statusEffects = {
     huntSenseBuff: {
         id: 'huntSenseBuff',
         name: '사냥꾼의 감각',
-        description: '다음 3턴간 치명타 확률이 25% 증가합니다.',
-        iconPath: 'assets/images/icons/buffs/hunt-sense.png',
+        // ▼▼▼ [수정] iconPath를 올바른 경로로 변경합니다. ▼▼▼
+        description: '다음 3턴간 치명타 확률이 15% 증가합니다.',
+        iconPath: 'assets/images/skills/hunt-sense.png',
         duration: 3,
         type: EFFECT_TYPES.BUFF,
         stats: {
-            critChance: 0.25,
+            critChance: 0.15,
         },
         tags: ['buff', 'crit'],
     },
