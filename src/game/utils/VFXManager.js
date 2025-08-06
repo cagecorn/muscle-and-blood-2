@@ -82,7 +82,9 @@ export class VFXManager {
         // ✨ 2. 체력/열망바 너비를 절반으로 줄입니다.
         const barWidth = 4;
         const barHeight = 80;
-        const xOffset = unit.sprite.displayWidth / 2 + barWidth / 2;
+        // 기존에는 바가 스프라이트 바깥쪽에 위치했으나, 보다 밀착된 UI를 위해
+        // 스프라이트 내부로 10px 들여보냅니다.
+        const xOffset = unit.sprite.displayWidth / 2 - 10;
         const healthYOffset = 25;
         const aspirationYOffset = 15;
 
