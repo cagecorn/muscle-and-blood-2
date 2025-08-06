@@ -642,4 +642,94 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 끌어당기기 스킬 추가 ▲ ---
+    // --- ▼ [신규] 파이어볼 스킬 추가 ▼ ---
+    fireball: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'fireball',
+            name: '파이어볼',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.FIRE, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '지정한 위치에 거대한 화염구를 날려 십자(5칸) 범위의 적들에게 {{damage}}%의 마법 피해를 주고, 2턴간 [화상] 효과를 부여합니다.',
+            illustrationPath: 'assets/images/skills/fire-ball.png',
+            cooldown: 3,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 1.0, max: 1.2 },
+            effect: {
+                id: 'burn',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+            }
+        },
+        RARE: {
+            id: 'fireball',
+            name: '파이어볼 [R]',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.FIRE, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '지정한 위치에 거대한 화염구를 날려 십자(5칸) 범위의 적들에게 {{damage}}%의 마법 피해를 주고, 2턴간 [화상] 효과를 부여합니다. (쿨타임 1 감소)',
+            illustrationPath: 'assets/images/skills/fire-ball.png',
+            cooldown: 2,
+            range: 4,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 1.1, max: 1.3 },
+            effect: {
+                id: 'burn',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+            }
+        },
+        EPIC: {
+            id: 'fireball',
+            name: '파이어볼 [E]',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.FIRE, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '지정한 위치에 거대한 화염구를 날려 십자(5칸) 범위의 적들에게 {{damage}}%의 마법 피해를 주고, 3턴간 [화상] 효과를 부여합니다.',
+            illustrationPath: 'assets/images/skills/fire-ball.png',
+            cooldown: 2,
+            range: 5,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 1.2, max: 1.4 },
+            effect: {
+                id: 'burn',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 3,
+            }
+        },
+        LEGENDARY: {
+            id: 'fireball',
+            name: '파이어볼 [L]',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.FIRE, SKILL_TAGS.SPECIAL],
+            cost: 3,
+            targetType: 'enemy',
+            description: '지정한 위치에 거대한 화염구를 날려 십자(5칸) 범위의 적들에게 {{damage}}%의 마법 피해를 주고, 3턴간 [화상] 효과를 부여하며, 중심부의 적을 1턴간 기절시킵니다.',
+            illustrationPath: 'assets/images/skills/fire-ball.png',
+            cooldown: 2,
+            range: 5,
+            aoe: { shape: 'CROSS', radius: 1 },
+            damageMultiplier: { min: 1.3, max: 1.5 },
+            effect: {
+                id: 'burn',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 3,
+            },
+            centerTargetEffect: {
+                id: 'stun',
+                type: EFFECT_TYPES.STATUS_EFFECT,
+                duration: 1,
+            }
+        }
+    },
+    // --- ▲ [신규] 파이어볼 스킬 추가 ▲ ---
 };
