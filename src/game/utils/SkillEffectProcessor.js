@@ -221,66 +221,121 @@ class SkillEffectProcessor {
 
         if (skill.aoe) {
             const targetCellPos = { col: target.gridX, row: target.gridY };
-            const affectedCells = areaOfEffectEngine.getAffectedCells(skill.aoe.shape, targetCellPos, skill.aoe.radius || skill.aoe.length, unit);
+            const affectedCells = areaOfEffectEngine.getAffectedCells(
+                skill.aoe.shape,
+                targetCellPos,
+                skill.aoe.radius || skill.aoe.length,
+                unit
+            );
 
             const allUnits = this.battleSimulator.turnQueue;
-            const affectedEnemies = allUnits.filter(u =>
-                u.team !== unit.team &&
-                u.currentHp > 0 &&
-                affectedCells.some(cell => cell.col === u.gridX && cell.row === u.gridY)
+            const affectedEnemies = allUnits.filter(
+                u =>
+                    u.team !== unit.team &&
+                    u.currentHp > 0 &&
+                    affectedCells.some(cell => cell.col === u.gridX && cell.row === u.gridY)
             );
             finalTargets = affectedEnemies.length > 0 ? affectedEnemies : [];
         }
 
-        for (const currentTarget of finalTargets) {
-            const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(unit, currentTarget, skill, instanceId, grade);
+        // ▼▼▼ [핵심 수정] 다단히트 로직 추가 ▼▼▼
+        const hitCount = skill.hitCount || 1;
+        const effectPerHit = skill.effect;
 
-            const damageToBarrier = Math.min(currentTarget.currentBarrier, totalDamage);
-            const damageToHp = totalDamage - damageToBarrier;
-
-            if (damageToBarrier > 0) {
-                currentTarget.currentBarrier -= damageToBarrier;
-                this.vfxManager.createDamageNumber(currentTarget.sprite.x, currentTarget.sprite.y - 10, damageToBarrier, '#ffd700', hitType);
+        for (let i = 0; i < hitCount; i++) {
+            if (i > 0) {
+                await this.delayEngine.hold(150);
+                spriteEngine.changeSpriteForDuration(unit, 'attack', 300);
+                if (skill.tags?.includes(SKILL_TAGS.MAGIC)) {
+                    this.vfxManager.createMagicImpact(target.sprite.x, target.sprite.y, 'placeholder');
+                } else {
+                    await this.animationEngine.attack(unit.sprite, target.sprite);
+                }
+                spriteEngine.changeSpriteForDuration(target, 'hitted', 200);
             }
-            if (damageToHp > 0) {
-                currentTarget.currentHp -= damageToHp;
-                this.vfxManager.createDamageNumber(currentTarget.sprite.x, currentTarget.sprite.y + 10, damageToHp, '#ff4d4d', hitType);
 
-                if (currentTarget.classPassive?.id === 'ghosting') {
-                    currentTarget.cumulativeDamageTaken += damageToHp;
-                    const threshold = currentTarget.finalStats.hp * 0.20;
+            for (const currentTarget of finalTargets) {
+                // 이미 죽은 대상은 더 이상 공격하지 않습니다.
+                if (currentTarget.currentHp <= 0) continue;
 
-                    if (currentTarget.cumulativeDamageTaken >= threshold) {
-                        currentTarget.cumulativeDamageTaken = 0;
-                        const buffEffect = {
-                            id: 'ghostingBuff',
-                            type: EFFECT_TYPES.BUFF,
-                            duration: 1,
-                            sourceSkillName: '투명화'
-                        };
-                        statusEffectManager.addEffect(currentTarget, { name: '투명화', effect: buffEffect }, currentTarget);
-                        this.vfxManager.showEffectName(currentTarget.sprite, '투명화!', '#a78bfa');
+                const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(
+                    unit,
+                    currentTarget,
+                    skill,
+                    instanceId,
+                    grade
+                );
+
+                const damageToBarrier = Math.min(currentTarget.currentBarrier, totalDamage);
+                const damageToHp = totalDamage - damageToBarrier;
+
+                if (damageToBarrier > 0) {
+                    currentTarget.currentBarrier -= damageToBarrier;
+                    this.vfxManager.createDamageNumber(
+                        currentTarget.sprite.x,
+                        currentTarget.sprite.y - 10,
+                        damageToBarrier,
+                        '#ffd700',
+                        hitType
+                    );
+                }
+                if (damageToHp > 0) {
+                    currentTarget.currentHp -= damageToHp;
+                    this.vfxManager.createDamageNumber(
+                        currentTarget.sprite.x,
+                        currentTarget.sprite.y + 10,
+                        damageToHp,
+                        '#ff4d4d',
+                        hitType
+                    );
+
+                    if (currentTarget.classPassive?.id === 'ghosting') {
+                        currentTarget.cumulativeDamageTaken += damageToHp;
+                        const threshold = currentTarget.finalStats.hp * 0.20;
+
+                        if (currentTarget.cumulativeDamageTaken >= threshold) {
+                            currentTarget.cumulativeDamageTaken = 0;
+                            const buffEffect = {
+                                id: 'ghostingBuff',
+                                type: EFFECT_TYPES.BUFF,
+                                duration: 1,
+                                sourceSkillName: '투명화'
+                            };
+                            statusEffectManager.addEffect(currentTarget, { name: '투명화', effect: buffEffect }, currentTarget);
+                            this.vfxManager.showEffectName(currentTarget.sprite, '투명화!', '#a78bfa');
+                        }
+                    }
+                }
+
+                this.vfxManager.showComboCount(comboCount);
+                this.vfxManager.createBloodSplatter(currentTarget.sprite.x, currentTarget.sprite.y);
+
+                // [수정] 상태이상 효과는 매 타격마다 적용될 수 있도록 반복문 안으로 이동
+                if (effectPerHit) {
+                    statusEffectManager.addEffect(currentTarget, { ...skill, effect: effectPerHit }, unit);
+                }
+
+                if (skill.centerTargetEffect && currentTarget.uniqueId === target.uniqueId) {
+                    statusEffectManager.addEffect(currentTarget, { name: skill.name, effect: skill.centerTargetEffect }, unit);
+                }
+
+                if (currentTarget.currentHp <= 0) {
+                    this.terminationManager.handleUnitDeath(currentTarget, unit);
+
+                    if (
+                        skill.tags?.includes(SKILL_TAGS.EXECUTE) &&
+                        classSpecializations[unit.id]?.some(s => s.tag === SKILL_TAGS.EXECUTE)
+                    ) {
+                        tokenEngine.addTokens(unit.uniqueId, 1, '처형 특화');
                     }
                 }
             }
-
-            this.vfxManager.showComboCount(comboCount);
-            this.vfxManager.createBloodSplatter(currentTarget.sprite.x, currentTarget.sprite.y);
-
-            if (skill.centerTargetEffect && currentTarget.uniqueId === target.uniqueId) {
-                statusEffectManager.addEffect(currentTarget, { name: skill.name, effect: skill.centerTargetEffect }, unit);
-            }
-
-            if (currentTarget.currentHp <= 0) {
-                this.terminationManager.handleUnitDeath(currentTarget, unit);
-
-                if (skill.tags?.includes(SKILL_TAGS.EXECUTE) &&
-                    classSpecializations[unit.id]?.some(s => s.tag === SKILL_TAGS.EXECUTE)) {
-                    tokenEngine.addTokens(unit.uniqueId, 1, '처형 특화');
-                }
-            }
         }
-        // ▲▲▲ [수정] 종료 ▲▲▲
+        // ▲▲▲ [핵심 수정] 종료 ▲▲▲
+
+        if (hitCount > 1 && skill.effect) {
+            delete skill.effect;
+        }
 
         // ✨ [신규] 공격이 끝났으므로, 다음 공격의 콤보 연계를 위해 현재 스킬의 태그를 ComboManager에 기록합니다.
         comboManager.updateLastSkillTags(unit.uniqueId, skill.tags || []);
