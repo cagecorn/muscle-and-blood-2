@@ -48,8 +48,13 @@ class SkillEngine {
      * @param {object} unit - 스킬을 사용하려는 유닛
      * @param {object} skill - 사용하려는 스킬 데이터
      * @returns {boolean} - 스킬 사용 가능 여부
-     */
+    */
     canUseSkill(unit, skill) {
+        // ✨ [수정] 무장 해제 상태인지 가장 먼저 확인합니다.
+        if (unit.isDisarmed) {
+            return false;
+        }
+
         // 1. 토큰이 충분한가?
         const currentTokens = tokenEngine.getTokens(unit.uniqueId);
         if (currentTokens < skill.cost) {

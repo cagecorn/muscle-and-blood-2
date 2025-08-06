@@ -41,12 +41,12 @@ statusEffectManager.addEffect(mockUnit, stunSkill2);
 assert.strictEqual(mockUnit.isStunned, true, '테스트 1-1 실패: 기절 효과가 적용되지 않았습니다.');
 
 // 1턴 경과
-statusEffectManager.onTurnEnd();
+statusEffectManager.onTurnEnd([mockUnit]);
 assert.strictEqual(mockUnit.isStunned, true, '테스트 1-2 실패: 기절 중첩 시 조기에 효과가 해제되었습니다.');
 console.log('✅ 테스트 1 통과: 기절 효과가 올바르게 중첩됩니다.');
 
 // 2턴 경과 (모든 기절 해제)
-statusEffectManager.onTurnEnd();
+statusEffectManager.onTurnEnd([mockUnit]);
 assert.strictEqual(mockUnit.isStunned, false, '테스트 1-3 실패: 모든 기절 효과 만료 후에도 상태가 해제되지 않았습니다.');
 assert.strictEqual(mockUnit.justRecoveredFromStun, true, '테스트 1-4 실패: 기절에서 막 회복한 상태 플래그가 설정되지 않았습니다.');
 
@@ -56,7 +56,7 @@ const willGuardSkill = { name: 'Will Guard', effect: { id: 'willGuard' } }; // d
 statusEffectManager.addEffect(mockUnit, willGuardSkill);
 
 // 1턴 경과
-statusEffectManager.onTurnEnd();
+statusEffectManager.onTurnEnd([mockUnit]);
 const effects = statusEffectManager.activeEffects.get(mockUnit.uniqueId) || [];
 assert.strictEqual(effects.length, 1, '테스트 2-1 실패: 지속시간 없는 버프가 조기에 만료되었습니다.');
 assert.strictEqual(effects[0].id, 'willGuard', '테스트 2-2 실패: 남아있는 버프가 올바르지 않습니다.');

@@ -30,7 +30,8 @@ class StatusEffectManager {
     /**
      * 턴 종료 시 모든 활성 효과의 지속시간을 감소시키고 만료된 효과를 제거합니다.
      */
-    onTurnEnd() {
+    onTurnEnd(turnQueue) {
+        // 먼저 모든 효과의 지속시간을 감소시킵니다.
         for (const [unitId, effects] of this.activeEffects.entries()) {
             const remainingEffects = [];
             const expiredEffects = [];
@@ -64,14 +65,37 @@ class StatusEffectManager {
             }
         }
 
-        // ✨ 아이언 윌 체력 회복 로직 추가
-        if (this.battleSimulator) {
-            this.battleSimulator.turnQueue.forEach(unit => {
-                if (unit.currentHp > 0) {
-                    this.applyIronWillRegen(unit);
-                }
-            });
-        }
+        // ✨ 지속 피해 및 기타 턴 종료 효과를 처리합니다.
+        turnQueue.forEach(unit => {
+            if (unit.currentHp > 0) {
+                const effects = this.activeEffects.get(unit.uniqueId) || [];
+                effects.forEach(effect => {
+                    let damage = 0;
+                    let damageType = '';
+
+                    if (effect.id === 'burn') {
+                        damage = Math.round(unit.finalStats.hp * 0.05);
+                        damageType = '화상';
+                    } else if (effect.id === 'poison') {
+                        damage = Math.round(unit.finalStats.hp * 0.08);
+                        damageType = '중독';
+                    }
+
+                    if (damage > 0) {
+                        unit.currentHp -= damage;
+                        if (this.battleSimulator.vfxManager) {
+                            this.battleSimulator.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y, damage, '#9333ea', damageType);
+                        }
+                        if (unit.currentHp <= 0) {
+                            this.battleSimulator.terminationManager.handleUnitDeath(unit);
+                        }
+                    }
+                });
+
+                // 아이언 윌 체력 회복 로직은 여기에 그대로 둡니다.
+                this.applyIronWillRegen(unit);
+            }
+        });
     }
 
     /**
@@ -137,6 +161,15 @@ class StatusEffectManager {
 
     // ✨ 기존 addEffect 로직을 별도 함수로 분리
     applySingleEffect(targetUnit, sourceSkill, attackerUnit = null) {
+        // ✨ [수정] 버프 면역 상태인지 확인하는 로직을 추가합니다.
+        if (targetUnit.isBuffImmune && sourceSkill.effect.type === EFFECT_TYPES.BUFF) {
+            debugLogEngine.log('StatusEffectManager', `[${targetUnit.instanceName}]은(는) 버프 면역 상태라 [${sourceSkill.name}] 효과를 받지 않습니다.`);
+            if (this.battleSimulator && this.battleSimulator.vfxManager) {
+                this.battleSimulator.vfxManager.showEffectName(targetUnit.sprite, '면역', '#8b5cf6');
+            }
+            return; // 버프 효과 적용을 중단합니다.
+        }
+
         const effectId = sourceSkill.effect.id;
         const effectDefinition = statusEffects[effectId];
 

@@ -27,6 +27,7 @@ import { aspirationEngine } from './AspirationEngine.js';
 // ▼▼▼ [추가] 새로 만든 데미지 타입 매니저를 import 합니다. ▼▼▼
 import { damageTypeManager } from './DamageTypeManager.js';
 import { debugLogEngine } from './DebugLogEngine.js';
+import { statusEffects } from '../data/status-effects.js';
 
 /**
  * 실제 전투 데미지 계산을 담당하는 엔진
@@ -294,6 +295,14 @@ class CombatCalculationEngine {
         }
 
         // 디버그 로그에 강화된 스탯을 반영하도록 수정
+        // ✨ [추가] 맹독 부여(poisonWeapon) 버프 처리
+        const attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
+        const poisonWeaponBuff = attackerEffects.find(e => e.id === 'poisonWeapon');
+        if (poisonWeaponBuff && Math.random() < (poisonWeaponBuff.poisonChance || 0.5)) {
+            const poisonSkill = { name: '맹독 부여', effect: statusEffects.poison };
+            statusEffectManager.addEffect(defender, poisonSkill, attacker);
+        }
+
         debugCombatLogManager.logAttackCalculation(
             { ...attacker, finalStats: attackerStats },
             { ...defender, finalStats: defenderStats },
