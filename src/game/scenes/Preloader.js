@@ -177,6 +177,10 @@ export class Preloader extends Scene
         redParticle.generateTexture('red-particle', 4, 4);
         redParticle.destroy();
 
+        // ▼▼▼ [추가] 마법 효과용 플레이스홀더 이미지 로드 ▼▼▼
+        this.load.image('placeholder', 'images/placeholder.png');
+        // ▲▲▲ [추가] 마법 효과용 플레이스홀더 이미지 로드 ▲▲▲
+
         // 상태 효과 아이콘 로드
         Object.values(statusEffects).forEach(e => {
             const path = e.iconPath.replace(/^assets\//, '');
