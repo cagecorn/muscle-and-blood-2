@@ -577,7 +577,12 @@ class SkillEffectProcessor {
     
         // --- ▼ [신규] '팔라딘의 인도' 패시브 로직 추가 ▼ ---
         let finalEffect = skill.effect;
-        if (unit.classPassive?.id === 'paladinsGuide' && skill.tags?.includes(SKILL_TAGS.AURA) && finalEffect?.modifiers) {
+        if (
+            unit.classPassive?.id === 'paladinsGuide' &&
+            skill.tags?.includes(SKILL_TAGS.AURA) &&
+            finalEffect &&
+            finalEffect.modifiers
+        ) {
             // 원본 effect 객체를 변경하지 않기 위해 깊은 복사를 수행합니다.
             finalEffect = JSON.parse(JSON.stringify(skill.effect));
 
