@@ -49,7 +49,8 @@ function createRangedAI(engines = {}) {
     // --- MBTI 기반 특수 행동들 ---
     const kitingBehavior = new SequenceNode([
         new HasNotMovedNode(),
-        new IsTargetTooCloseNode({ ...engines, dangerZone: 2 }),
+        // 적이 바로 인접했을 때만 "위협"으로 간주하도록 조건을 완화합니다.
+        new IsTargetTooCloseNode({ ...engines, dangerZone: 1 }),
         new FindKitingPositionNode(engines),
         new MoveToTargetNode(engines)
     ]);

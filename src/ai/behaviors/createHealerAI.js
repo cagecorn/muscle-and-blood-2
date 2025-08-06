@@ -10,6 +10,7 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import FindSafeHealingPositionNode from '../nodes/FindSafeHealingPositionNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
+// 적이 없을 때는 가장 가까운 적을 찾아 공격하기 위해 사용됩니다.
 import FindTargetNode from '../nodes/FindTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
 
@@ -29,19 +30,22 @@ function createHealerAI(engines = {}) {
         ])
     ]);
     
-    // --- 기본 행동 (최후의 보루) ---
+    // --- 기본 행동 로직 ---
     const basicActionBranch = new SelectorNode([
+        // 1순위: 지원할 아군을 찾고, 힐/버프/디버프 등 스킬을 사용합니다.
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
+        // 2순위: 지원할 대상이 없다면, 가장 가까운 적을 공격하기 위해 이동합니다.
         new SequenceNode([
             new HasNotMovedNode(),
             new FindTargetNode(engines),
             new FindPathToTargetNode(engines),
             new MoveToTargetNode(engines)
         ]),
+        // 3순위: 공격할 적도 없다면 안전한 위치로 재배치합니다.
         new SequenceNode([
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),

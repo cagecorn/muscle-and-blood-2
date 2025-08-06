@@ -47,7 +47,8 @@ class FindSafeHealingPositionNode extends Node {
             }
 
             const travelDist = Math.abs(cell.col - unit.gridX) + Math.abs(cell.row - unit.gridY);
-            const score = minEnemyDist - travelDist * 0.5;
+            // 아군과 지나치게 멀어지는 위치에는 페널티를 주어, 적당히 가까운 곳을 선호합니다.
+            const score = minEnemyDist - (travelDist * 0.5) - (distToAlly * 0.2);
             if (score > maxScore) {
                 maxScore = score;
                 bestCell = cell;
