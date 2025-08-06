@@ -51,6 +51,45 @@ export const statusEffects = {
         modifiers: { stat: 'movement', type: 'flat', value: -1 } // 이동력 1 감소
     },
     // ▲▲▲ [신규] 추가 완료 ▲▲▲
+    // --- ▼ [신규] 4대 원소 상태이상 효과 추가 ▼ ---
+    shock: {
+        id: 'shock',
+        name: '감전',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '턴 시작 시 50% 확률로 토큰 1개를 잃습니다.',
+        iconPath: null, // 추후 전용 아이콘 추가 예정
+    },
+    weaken: {
+        id: 'weaken',
+        name: '약화',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '물리 및 마법 공격력이 15% 감소합니다.',
+        iconPath: null,
+        modifiers: [
+            { stat: 'physicalAttack', type: 'percentage', value: -0.15 },
+            { stat: 'magicAttack', type: 'percentage', value: -0.15 }
+        ]
+    },
+    vulnerable: {
+        id: 'vulnerable',
+        name: '취약',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '받는 모든 피해가 15% 증가합니다.',
+        iconPath: null,
+        modifiers: { stat: 'damageIncrease', type: 'percentage', value: 0.15 }
+    },
+    drain: {
+        id: 'drain',
+        name: '정기 흡수',
+        type: EFFECT_TYPES.DEBUFF,
+        description: '지능과 지혜가 15% 감소합니다.',
+        iconPath: null,
+        modifiers: [
+            { stat: 'intelligence', type: 'percentage', value: -0.15 },
+            { stat: 'wisdom', type: 'percentage', value: -0.15 }
+        ]
+    },
+    // --- ▲ [신규] 추가 완료 ▲ ---
     // ✨ [신규] 이동력 감소(slow) 및 속박(bind) 효과 추가
     slow: {
         id: 'slow',
