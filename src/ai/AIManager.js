@@ -1,6 +1,7 @@
 import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
 import { tokenEngine } from '../game/utils/TokenEngine.js';
 import { skillEngine } from '../game/utils/SkillEngine.js';
+import { aspirationEngine } from '../game/utils/AspirationEngine.js';
 import { createMeleeAI } from './behaviors/MeleeAI.js';
 import { createRangedAI } from './behaviors/RangedAI.js';
 import { createHealerAI } from './behaviors/createHealerAI.js';
@@ -176,6 +177,8 @@ class AIManager {
 
         // --- \u25BC [핵심 추가] 턴 시작 시 피격 기록 초기화 \u25BC ---
         unit.wasAttackedBy = null;
+        // \u2728 턴 시작 시 공격 행동 플래그 초기화
+        unit.offensiveActionTakenThisTurn = false;
 
         // ✨ [신규] 턴 시작 시, 전략적 상황을 계산하여 블랙보드에 업데이트
         const blackboard = data.behaviorTree.blackboard;
@@ -232,6 +235,13 @@ class AIManager {
                 break;
             }
         }
+
+        // \u2728 --- [핵심 추가] 턴 종료 후 공격 행동 여부 확인 --- \u2728
+        if (unit.currentHp > 0 && !unit.offensiveActionTakenThisTurn) {
+            // 공격 행동을 하지 않았다면 열망을 5 감소시킵니다.
+            aspirationEngine.addAspiration(unit.uniqueId, -5, '비전투');
+        }
+        // \u2728 --- 추가 완료 --- \u2728
 
         console.groupEnd();
     }
