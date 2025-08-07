@@ -9,6 +9,8 @@ import { passiveSkills } from '../data/skills/passive.js';
 import { spriteEngine } from './SpriteEngine.js';
 // 효과 타입 상수 분리
 import { EFFECT_TYPES } from './EffectTypes.js';
+// ✨ [버그 수정] tokenEngine import 추가
+import { tokenEngine } from './TokenEngine.js';
 
 /**
  * 게임 내 모든 상태 효과(버프, 디버프, 상태이상)를 관리하는 중앙 엔진
