@@ -59,7 +59,10 @@ export const itemAffixes = {
         { name: '파괴적인', stat: 'criticalDamageMultiplier', value: { min: 10, max: 15 } },
         { name: '맹공의', stat: 'physicalAttack', value: { min: 5, max: 8 }, isPercentage: true },
         { name: '마력의', stat: 'magicAttack', value: { min: 5, max: 8 }, isPercentage: true },
-        { name: '정밀한', stat: 'accuracy', value: { min: 5, max: 10 } }
+        { name: '정밀한', stat: 'accuracy', value: { min: 5, max: 10 } },
+        // --- ▼ [신규] 드레드노트용 접두사 추가 ▼ ---
+        { name: '도발하는', stat: 'threat', value: { min: 10, max: 20 } },
+        { name: '응보의', stat: 'retaliationDamage', value: { min: 5, max: 10 } }
     ],
 
     // --- 접미사 (주로 방어, 유틸리티 관련) ---
@@ -68,7 +71,11 @@ export const itemAffixes = {
         { name: '회피의', stat: 'physicalEvadeChance', value: { min: 3, max: 5 } },
         { name: '재생의', stat: 'hpRegen', value: { min: 5, max: 10 } },
         { name: '흡혈의', stat: 'lifeSteal', value: { min: 2, max: 4 } },
-        { name: '끈기의', stat: 'aspirationDecayReduction', value: { min: 10, max: 15 } }
+        { name: '끈기의', stat: 'aspirationDecayReduction', value: { min: 10, max: 15 } },
+        // --- ▼ [신규] 드레드노트용 접미사 추가 ▼ ---
+        { name: '수호의', stat: 'allyDamageReduction', value: { min: 3, max: 5 } },
+        { name: '철벽의', stat: 'damageReduction', value: { min: 2, max: 4 }, isPercentage: true },
+        { name: '용기의', stat: 'valor', value: { min: 2, max: 5 } }
     ]
 };
 
@@ -81,7 +88,13 @@ export const mbtiGradeEffects = {
     T: [{ trait: 'T', description: '사고형 장착 시, 받는 치명타 피해량 -{value}%', stat: 'criticalDamageReduction', value: { min: 10, max: 15 } }],
     F: [{ trait: 'F', description: '감정형 장착 시, 아군에게 주는 치유량 +{value}%', stat: 'healingGivenPercentage', value: { min: 5, max: 10 } }],
     J: [{ trait: 'J', description: '판단형 장착 시, 모든 스킬 재사용 대기시간 -{value}턴', stat: 'cooldownReduction', value: { min: 1, max: 1 } }],
-    P: [{ trait: 'P', description: '인식형 장착 시, {value}% 확률로 토큰 미소모', stat: 'tokenFreeChance', value: { min: 5, max: 10 } }]
+    P: [{ trait: 'P', description: '인식형 장착 시, {value}% 확률로 토큰 미소모', stat: 'tokenFreeChance', value: { min: 5, max: 10 } }],
+
+    // --- ▼ [신규] 드레드노트용 MBTI 효과 추가 ▼ ---
+    // ISTJ, ISFJ 같은 수호자 타입을 위한 효과들
+    I_DREADNOUGHT: [{ trait: 'I', description: '내향형 장착 시, [방어 태세] 발동. 턴 종료 시 방어력 +{value}% (최대 3중첩)', stat: 'defenseStackOnTurnEnd', value: { min: 3, max: 5 } }],
+    S_DREADNOUGHT: [{ trait: 'S', description: '감각형 장착 시, [의지 방패] 스킬로 생성되는 스택 +{value}개', stat: 'willGuardStackBonus', value: { min: 1, max: 1 } }],
+    J_DREADNOUGHT: [{ trait: 'J', description: '판단형 장착 시, 피격 시 {value}% 확률로 [철] 자원 1개 생성', stat: 'ironGenerationOnHitChance', value: { min: 15, max: 25 } }]
 };
 
 // --- ▼ [신규] 장비 시너지 세트 효과 데이터베이스 ▼ ---
