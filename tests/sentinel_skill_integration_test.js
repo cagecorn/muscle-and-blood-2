@@ -6,6 +6,7 @@ const { mercenaryData } = await import('../src/game/data/mercenaries.js');
 const { statEngine } = await import('../src/game/utils/StatEngine.js');
 const { statusEffectManager } = await import('../src/game/utils/StatusEffectManager.js');
 const { combatCalculationEngine } = await import('../src/game/utils/CombatCalculationEngine.js');
+const { activeSkills } = await import('../src/game/data/skills/active.js');
 
 console.log('--- 센티넬 클래스 통합 테스트 시작 ---');
 
@@ -67,4 +68,15 @@ const reducedDamage = combatCalculationEngine.calculateDamage(attacker, sentinel
 assert.strictEqual(reducedDamage, Math.round(baseDamage * 0.85), '3스택 시 데미지가 15% 감소해야 합니다.');
 
 console.log('✅ 클래스 패시브 테스트 통과');
+
+// 3. 신규 스킬 데이터 검증
+const tauntSkill = activeSkills.taunt.NORMAL;
+assert(tauntSkill && tauntSkill.cooldown === 3, '도발 스킬의 기본 쿨타임이 3이어야 합니다.');
+assert(tauntSkill.selfEffect && tauntSkill.selfEffect.modifiers.stat === 'physicalDefense', '도발 스킬은 방어력 증가 효과를 가져야 합니다.');
+
+const shieldBashSkill = activeSkills.shieldBash.NORMAL;
+assert(shieldBashSkill && shieldBashSkill.range === 1, '방패 치기 스킬의 사거리는 1이어야 합니다.');
+assert(shieldBashSkill.effect && shieldBashSkill.effect.chance === 0.3, '방패 치기 스킬은 30% 확률로 기절시켜야 합니다.');
+
+console.log('✅ 신규 센티넬 스킬 테스트 통과');
 console.log('--- 모든 센티넬 테스트 완료 ---');

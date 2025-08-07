@@ -199,6 +199,38 @@ const earthSplitterBase = {
 };
 // --- ▲ [신규] 대지 가르기 테스트 데이터 추가 ▲ ---
 
+// --- ▼ [신규] 도발 & 방패 치기 테스트 데이터 추가 ▼ ---
+const tauntBase = {
+    NORMAL: {
+        id: 'taunt',
+        type: 'ACTIVE',
+        cost: 2,
+        cooldown: 3,
+        range: 0,
+        aoe: { shape: 'SQUARE', radius: 3 },
+        effect: { id: 'tauntDebuff', type: 'DEBUFF', duration: 2 },
+        selfEffect: {
+            id: 'tauntBuff',
+            type: 'BUFF',
+            duration: 2,
+            modifiers: { stat: 'physicalDefense', type: 'percentage', value: 0.2 }
+        }
+    }
+};
+
+const shieldBashBase = {
+    NORMAL: {
+        id: 'shieldBash',
+        type: 'ACTIVE',
+        cost: 2,
+        cooldown: 1,
+        range: 1,
+        damageBasedOn: { stat: 'hp', percentage: 0.15 },
+        effect: { id: 'stun', type: 'STATUS_EFFECT', duration: 1, chance: 0.3 }
+    }
+};
+// --- ▲ [신규] 도발 & 방패 치기 테스트 데이터 추가 ▲ ---
+
 const ironWillBase = {
     rankModifiers: [0.39, 0.36, 0.33, 0.30],
     NORMAL: { maxReduction: 0.30, hpRegen: 0 },
@@ -426,6 +458,19 @@ for (const grade of grades) {
     );
 }
 // --- ▲ [신규] 대지 가르기 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 도발 & 방패 치기 테스트 로직 추가 ▼ ---
+{
+    const skill = skillModifierEngine.getModifiedSkill(tauntBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.cooldown, 3, 'Taunt cooldown failed');
+    assert(skill.selfEffect && skill.selfEffect.modifiers.stat === 'physicalDefense', 'Taunt selfEffect failed');
+}
+{
+    const skill = skillModifierEngine.getModifiedSkill(shieldBashBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.range, 1, 'Shield Bash range failed');
+    assert(skill.effect && skill.effect.chance === 0.3, 'Shield Bash effect failed');
+}
+// --- ▲ [신규] 도발 & 방패 치기 테스트 로직 추가 ▲ ---
 
 // Throwing Axe
 for (const grade of grades) {
