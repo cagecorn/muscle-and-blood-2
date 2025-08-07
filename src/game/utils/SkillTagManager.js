@@ -28,6 +28,11 @@ export const SKILL_TAGS = {
     DELAY: '지연',      // 대상의 턴 순서를 미루는 메커니즘
     PROHIBITION: '금지',// 특정 행동(치유 등)을 막는 메커니즘
     WILL_GUARD: '의지 방패', // 스택 기반 방어 효과를 부여하는 메커니즘
+    STACKABLE: '중첩',    // 중첩 가능 효과
+    CHAIN: '연쇄',       // 주변 적에게 튕기는 효과
+    ON_HIT: '타격시 발동', // 공격 성공 시 부가 효과
+    AREA_DENIAL: '지역 장악', // 장판기 스킬
+    SUMMON_BUFF: '소환수 강화', // 소환수 직접 강화
 
     // --- 6. 테마 및 자원 (Theme & Resource) ---
     WILL: '의지',       // '정신력', '용기' 테마 스킬 그룹
@@ -39,6 +44,11 @@ export const SKILL_TAGS = {
     WATER: '물',
     WIND: '바람',
     DARK: '어둠',
+    POISON: '독',
+    HOLY: '신성',
+    ACID: '산성',
+    STEALTH: '은신',
+    BLOOD_MAGIC: '혈마법',
     PRODUCTION: '생산', // 공유 자원을 생성하는 스킬
     THROWING: '투척',   // 무기나 물체를 던지는 컨셉
     SPECIAL: '특수 스킬',// 특수 슬롯 전용 스킬

@@ -102,6 +102,31 @@ class MercenaryCardSelector {
                 if (isConventional) score += mercenary.mbti.J;
                 if (!isConventional) score += mercenary.mbti.P;
 
+                // ✨ --- [신규] 추가된 태그에 대한 MBTI 선호도 점수 --- ✨
+                // INTJ, ENTJ (전략가, 통솔관)는 전장 통제 스킬을 선호
+                if (tags.includes(SKILL_TAGS.AREA_DENIAL)) score += (mercenary.mbti.N + mercenary.mbti.T) / 2;
+
+                // INTP, ESTJ (논리술사, 관리자)는 중첩을 통한 꾸준한 이득을 선호
+                if (tags.includes(SKILL_TAGS.STACKABLE)) score += (mercenary.mbti.I + mercenary.mbti.T) / 2;
+
+                // ENFP, ENTP (활동가, 변론가)는 변수를 창출하는 연쇄 효과를 선호
+                if (tags.includes(SKILL_TAGS.CHAIN)) score += (mercenary.mbti.E + mercenary.mbti.P) / 2;
+
+                // ISTP (재주꾼)와 S타입은 타격 시 발동하는 확실한 효과를 선호
+                if (tags.includes(SKILL_TAGS.ON_HIT)) score += (mercenary.mbti.S + mercenary.mbti.T) / 2;
+
+                // ENFJ (선도자)는 자신의 소환수를 강화하는 것을 선호
+                if (tags.includes(SKILL_TAGS.SUMMON_BUFF)) score += mercenary.mbti.E + mercenary.mbti.F;
+
+                // F타입은 '신성' 태그에, T타입은 '산성' 태그에 높은 가중치
+                if (tags.includes(SKILL_TAGS.HOLY)) score += mercenary.mbti.F;
+                if (tags.includes(SKILL_TAGS.ACID)) score += mercenary.mbti.T;
+
+                // ISFP, I타입은 '은신'에, ESTP, INFJ는 '혈마법'에 높은 가중치
+                if (tags.includes(SKILL_TAGS.STEALTH)) score += mercenary.mbti.I + mercenary.mbti.P;
+                if (tags.includes(SKILL_TAGS.BLOOD_MAGIC)) score += mercenary.mbti.E + mercenary.mbti.N; // 리스크와 변수 창출
+                // ✨ --- 추가 완료 --- ✨
+
                 return { instance: inst, score };
             });
 

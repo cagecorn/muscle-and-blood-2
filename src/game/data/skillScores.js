@@ -23,6 +23,15 @@ export const SCORE_BY_TAG = {
     HEAL: 8,         // 치유 (점수 상향)
     CHARGE: 4,       // 돌진
     KINETIC: 4,      // 넉백
-    SACRIFICE: 9     // ✨ 희생 태그 추가
+    SACRIFICE: 9,     // ✨ 희생 태그 추가
+    EXECUTE: 15,      // 처형 (마무리 능력은 매우 가치 있음)
+    AREA_DENIAL: 11,  // 지역 장악 (전략적으로 매우 유용함)
+    COUNTER: 10,      // 반격 (조건부지만 강력함)
+    CHAIN: 7,         // 연쇄 (다중 타겟 가능성)
+    STACKABLE: 6,     // 중첩 (지속적인 압박)
+    SUMMON_BUFF: 8,   // 소환수 강화 (소환사에게 매우 중요)
+    ON_HIT: 5,        // 타격시 발동 (부가적인 이득)
+    BLOOD_MAGIC: 4,   // 혈마법 (리스크가 따름)
+    STEALTH: 7        // 은신 (생존 및 기습에 유리)
     // 기타 태그는 필요에 따라 추가할 수 있습니다.
 };
