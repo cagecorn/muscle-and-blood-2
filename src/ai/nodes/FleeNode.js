@@ -43,7 +43,7 @@ class FleeNode extends Node {
 
         const start = { col: unit.gridX, row: unit.gridY };
         const end = { col: bestCell.col, row: bestCell.row };
-        const path = this.pathfinderEngine.findPath(unit, start, end);
+        const path = await this.pathfinderEngine.findPath(unit, start, end);
         if (path && path.length > 0) {
             blackboard.set('movementPath', path);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `도주 경로 설정 (${end.col}, ${end.row})`);

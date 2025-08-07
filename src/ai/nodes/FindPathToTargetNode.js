@@ -17,7 +17,7 @@ class FindPathToTargetNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const path = this._findPathToUnit(unit, target);
+        const path = await this._findPathToUnit(unit, target);
         if (path) {
             blackboard.set('movementPath', path);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `목표(${target.instanceName})에게 경로 설정`);
@@ -28,7 +28,7 @@ class FindPathToTargetNode extends Node {
         return NodeState.FAILURE;
     }
 
-    _findPathToUnit(unit, target) {
+    async _findPathToUnit(unit, target) {
         const attackRange = unit.finalStats.attackRange || 1;
         const start = { col: unit.gridX, row: unit.gridY };
         const targetPos = { col: target.gridX, row: target.gridY };
@@ -60,7 +60,7 @@ class FindPathToTargetNode extends Node {
         });
 
         for (const bestCell of potentialCells) {
-            const path = this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
+            const path = await this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) return path;
         }
         return null;

@@ -10,7 +10,7 @@ class FindMeleeStrategicTargetNode extends Node {
     }
 
     // 유닛을 공격할 수 있는 가장 가까운 위치로의 경로를 찾는 헬퍼 메서드
-    _findPathToUnit(unit, target) {
+    async _findPathToUnit(unit, target) {
         const attackRange = unit.finalStats.attackRange || 1;
         const start = { col: unit.gridX, row: unit.gridY };
         const targetPos = { col: target.gridX, row: target.gridY };
@@ -42,7 +42,7 @@ class FindMeleeStrategicTargetNode extends Node {
         });
 
         for (const bestCell of potentialAttackCells) {
-            const path = this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
+            const path = await this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) return path;
         }
         return null;
@@ -65,7 +65,7 @@ class FindMeleeStrategicTargetNode extends Node {
             .sort((a, b) => a.currentHp - b.currentHp);
 
         for (const lowHpEnemy of lowHpEnemies) {
-            const path = this._findPathToUnit(unit, lowHpEnemy);
+            const path = await this._findPathToUnit(unit, lowHpEnemy);
             if (path && path.length <= movementRange) {
                 blackboard.set('movementTarget', lowHpEnemy);
                 debugAIManager.logNodeResult(NodeState.SUCCESS, `체력이 적고 도달 가능한 타겟 [${lowHpEnemy.instanceName}] 설정`);

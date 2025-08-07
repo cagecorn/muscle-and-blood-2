@@ -265,4 +265,24 @@ for (const grade of grades) {
 }
 // --- ▲ [신규] 집중 포화 테스트 로직 추가 ▲ ---
 
+// --- ▼ [신규] 강철 덫 테스트 로직 추가 ▼ ---
+const steelTrapBase = {
+    NORMAL: {
+        id: 'steelTrap',
+        cost: 2,
+        cooldown: 2,
+        range: 3,
+        trapData: {
+            duration: 3,
+            effect: { id: 'bind', type: 'STATUS_EFFECT', duration: 1 }
+        }
+    }
+};
+const steelTrap = skillModifierEngine.getModifiedSkill(steelTrapBase.NORMAL, 'NORMAL');
+assert.strictEqual(steelTrap.cost, 2, 'Steel Trap cost failed');
+assert.strictEqual(steelTrap.cooldown, 2, 'Steel Trap cooldown failed');
+assert(steelTrap.trapData && steelTrap.trapData.duration === 3, 'Steel Trap duration failed');
+assert.strictEqual(steelTrap.trapData.effect.id, 'bind', 'Steel Trap effect id failed');
+// --- ▲ [신규] 강철 덫 테스트 로직 추가 ▲ ---
+
 console.log('Gunner skills integration test passed.');

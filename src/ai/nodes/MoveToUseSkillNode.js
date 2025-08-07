@@ -18,7 +18,7 @@ class MoveToUseSkillNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const path = this.pathfinderEngine.findBestPathToAttack(unit, skill, target);
+        const path = await this.pathfinderEngine.findBestPathToAttack(unit, skill, target);
         if (!path) {
             debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${skill.name}] 사용 위치 없음`);
             return NodeState.FAILURE;

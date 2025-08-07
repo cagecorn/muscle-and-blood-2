@@ -22,6 +22,7 @@ import { statEngine } from './StatEngine.js';
 import { statusEffects } from '../data/status-effects.js';
 import { cooldownManager } from './CooldownManager.js'; // 쿨다운 매니저 import 추가
 import { aspirationEngine } from './AspirationEngine.js';
+import { trapManager } from './TrapManager.js';
 
 /**
  * 스킬의 실제 효과(데미지, 치유, 상태이상 등)를 게임 세계에 적용하는 것을 전담하는 엔진
@@ -44,8 +45,19 @@ class SkillEffectProcessor {
     async process(context) {
         const { unit, target, skill, instanceId, grade, blackboard } = context;
 
-        // 1. 공통 처리: 태그 기록, 자원 소모, 음양 지수 업데이트
         this._handleCommonPreEffects(unit, target, skill);
+
+        if (skill.trapData) {
+            trapManager.addTrap(
+                target.gridX,
+                target.gridY,
+                { owner: unit, skillData: skill },
+                this.battleSimulator.scene
+            );
+            this._handleCommonPostEffects(unit, target, skill, blackboard);
+            this._handleClassPassiveTrigger(unit, skill);
+            return;
+        }
 
         // 2. 스킬 타입별 분기 처리
         switch (skill.type) {

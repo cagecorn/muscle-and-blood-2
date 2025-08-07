@@ -5,6 +5,8 @@ import { formationEngine } from '../../game/utils/FormationEngine.js';
 import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
 import { EFFECT_TYPES } from '../../game/utils/EffectTypes.js';
 // --- ▲ [신규] 상태 효과 적용을 위한 모듈 import ▲ ---
+import { trapManager } from '../../game/utils/TrapManager.js';
+import { aiMemoryEngine } from '../../game/utils/AIMemoryEngine.js';
 
 class MoveToTargetNode extends Node {
     constructor({ animationEngine, cameraControl, vfxManager }) { // vfxManager 추가
@@ -12,6 +14,7 @@ class MoveToTargetNode extends Node {
         this.animationEngine = animationEngine;
         this.cameraControl = cameraControl;
         this.vfxManager = vfxManager; // vfxManager 저장
+        this.skillEffectProcessor = this.vfxManager.battleSimulator.skillEffectProcessor;
     }
 
     async evaluate(unit, blackboard) {
@@ -60,6 +63,18 @@ class MoveToTargetNode extends Node {
                 );
                 unit.gridX = step.col;
                 unit.gridY = step.row;
+
+                const trap = trapManager.getTrapAt(step.col, step.row);
+                if (trap && trap.owner.team !== unit.team) {
+                    await trapManager.triggerTrap(unit, this.skillEffectProcessor);
+                    aiMemoryEngine.updateTileMemory(unit.uniqueId, step.col, step.row, 1);
+                    const cell = formationEngine.grid.getCell(step.col, step.row);
+                    if (cell) {
+                        cell.isOccupied = true;
+                        cell.sprite = unit.sprite;
+                    }
+                    return NodeState.SUCCESS;
+                }
             }
         }
 
