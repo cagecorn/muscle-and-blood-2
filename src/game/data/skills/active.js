@@ -4,6 +4,99 @@ import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 
 // 액티브 스킬 데이터 정의
 export const activeSkills = {
+    // --- ▼ [신규] 프로스트위버 전용 스킬 3종 추가 ▼ ---
+    iceBolt: {
+        yinYangValue: -1, // 가벼운 견제 기술
+        NORMAL: {
+            id: 'iceBolt',
+            name: '아이스 볼트',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC, SKILL_TAGS.WATER],
+            cost: 1,
+            targetType: 'enemy',
+            description:
+                '날카로운 얼음 조각을 날려 적에게 80%의 마법 피해를 주고, 20% 확률로 1턴간 [둔화](이동력 -1)시킵니다.',
+            illustrationPath: null,
+            cooldown: 0,
+            range: 3,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            effect: {
+                id: 'slow',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 1,
+                chance: 0.2,
+                modifiers: { stat: 'movement', type: 'flat', value: -1 },
+            },
+        },
+    },
+
+    frostNova: {
+        yinYangValue: -4, // 다수의 적을 무력화시키는 강력한 기술
+        NORMAL: {
+            id: 'frostNova',
+            name: '프로스트 노바',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [
+                SKILL_TAGS.ACTIVE,
+                SKILL_TAGS.RANGED,
+                SKILL_TAGS.MAGIC,
+                SKILL_TAGS.WATER,
+                SKILL_TAGS.AREA_DENIAL,
+                SKILL_TAGS.BIND,
+            ],
+            cost: 3,
+            targetType: 'enemy', // 타겟 지점을 중심으로 발동
+            description:
+                '지정한 위치를 중심으로 차가운 폭발을 일으켜, 3x3 범위 내 모든 적에게 50%의 마법 피해를 주고 1턴간 [속박](이동 불가) 상태로 만듭니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            aoe: { shape: 'SQUARE', radius: 1 }, // 3x3 정사각형 범위
+            damageMultiplier: { min: 0.45, max: 0.55 },
+            effect: {
+                id: 'bind',
+                type: EFFECT_TYPES.STATUS_EFFECT,
+                duration: 1,
+            },
+        },
+    },
+
+    blizzard: {
+        yinYangValue: -5, // 광범위한 지역을 장악하는 궁극기
+        NORMAL: {
+            id: 'blizzard',
+            name: '블리자드',
+            type: 'ACTIVE',
+            requiredClass: ['nanomancer', 'esper'],
+            tags: [
+                SKILL_TAGS.ACTIVE,
+                SKILL_TAGS.RANGED,
+                SKILL_TAGS.MAGIC,
+                SKILL_TAGS.WATER,
+                SKILL_TAGS.AREA_DENIAL,
+                SKILL_TAGS.DELAY,
+            ],
+            cost: 0, // 자원만 소모
+            targetType: 'enemy',
+            description:
+                '지정한 위치에 2턴 동안 눈보라를 소환합니다. 눈보라 범위(3x3)에 들어온 모든 적은 이동력이 2 감소합니다. (소모 자원: 물 3)',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 4,
+            resourceCost: { type: 'WATER', amount: 3 },
+            aoe: { shape: 'SQUARE', radius: 1 },
+            effect: {
+                id: 'blizzardSlow', // 고유 효과 ID
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+                modifiers: { stat: 'movement', type: 'flat', value: -2 },
+            },
+        },
+    },
+    // --- ▲ [신규] 프로스트위버 전용 스킬 3종 추가 ▲ ---
+
     // --- ▼ [신규] 드레드노트 전용 스킬 2종 추가 ▼ ---
     taunt: {
         yinYangValue: -3,
