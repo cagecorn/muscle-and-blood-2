@@ -313,15 +313,6 @@ class CombatCalculationEngine {
             }
         }
 
-        // 디버그 로그에 강화된 스탯을 반영하도록 수정
-        // ✨ [추가] 맹독 부여(poisonWeapon) 버프 처리
-        const attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
-        const poisonWeaponBuff = attackerEffects.find(e => e.id === 'poisonWeapon');
-        if (poisonWeaponBuff && Math.random() < (poisonWeaponBuff.poisonChance || 0.5)) {
-            const poisonSkill = { name: '맹독 부여', effect: statusEffects.poison };
-            statusEffectManager.addEffect(defender, poisonSkill, attacker);
-        }
-
         debugCombatLogManager.logAttackCalculation(
             { ...attacker, finalStats: attackerStats },
             { ...defender, finalStats: defenderStats },
@@ -331,35 +322,35 @@ class CombatCalculationEngine {
         );
         // --- \u25BC [핵심 추가] 피격 사실을 방어자에게 기록 \u25BC ---
         defender.wasAttackedBy = attacker.uniqueId;
+        
+        // ✨ --- [핵심 버그 수정] 'attackerEffects' 변수 중복 선언 수정 --- ✨
+        // 1. 변수를 let으로 한번만 선언합니다.
+        let attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
 
-        // ✨ --- [핵심 추가] 나노봇 추가타 로직 --- ✨
-        const attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
+        // 2. 나노봇 로직에서는 선언 없이 값을 사용합니다.
         const nanobotBuff = attackerEffects.find(e => e.id === 'nanobotBuff');
-
         if (nanobotBuff && skill.type === 'ACTIVE' && finalDamage > 0) {
-            const baseAttack = Math.max(attackerStats.physicalAttack || 0, attackerStats.magicAttack || 0);
+            const baseAttack = Math.max(attacker.finalStats.physicalAttack || 0, attacker.finalStats.magicAttack || 0);
             const nanobotDamage = Math.round(baseAttack * 0.3);
-
             if (nanobotDamage > 0) {
                 defender.currentHp -= nanobotDamage;
-
                 if (this.battleSimulator && this.battleSimulator.vfxManager) {
-                    this.battleSimulator.vfxManager.createDamageNumber(
-                        defender.sprite.x + 10,
-                        defender.sprite.y - 10,
-                        nanobotDamage,
-                        '#0ea5e9',
-                        '나노봇'
-                    );
+                    this.battleSimulator.vfxManager.createDamageNumber(defender.sprite.x + 10, defender.sprite.y - 10, nanobotDamage, '#0ea5e9', '나노봇');
                 }
-                debugLogEngine.log('CombatCalculationEngine', `[나노봇] 효과 발동! ${defender.instanceName}에게 추가 피해 ${nanobotDamage} 적용.`);
-
+                debugLogEngine.log(this.name, `[나노봇] 효과 발동! ${defender.instanceName}에게 추가 피해 ${nanobotDamage} 적용.`);
                 if (defender.currentHp <= 0) {
                     this.battleSimulator.terminationManager.handleUnitDeath(defender, attacker);
                 }
             }
         }
-        // ✨ --- 추가 완료 --- ✨
+
+        // 3. 맹독 부여 로직에서도 선언 없이 값을 사용합니다. (이 부분은 이미 attackerEffects를 참조하고 있었으므로 수정 불필요)
+        const poisonWeaponBuff = attackerEffects.find(e => e.id === 'poisonWeapon');
+        if (poisonWeaponBuff && Math.random() < (poisonWeaponBuff.poisonChance || 0.5)) {
+            const poisonSkill = { name: '맹독 부여', effect: statusEffects.poison };
+            statusEffectManager.addEffect(defender, poisonSkill, attacker);
+        }
+        // ✨ --- 수정 완료 --- ✨
 
         return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
     }
