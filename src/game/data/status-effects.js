@@ -417,6 +417,17 @@ export const statusEffects = {
         iconPath: null, // 나중에 전용 아이콘 추가
         // 'damageIncrease' modifier를 사용하여 CombatCalculationEngine에서 자동으로 처리되도록 합니다.
         modifiers: { stat: 'damageIncrease', type: 'percentage', value: 0.15 } // 기본 15% 추가 피해
-    }
+    },
     // --- ▲ [신규] 추가 완료 ▲ ---
+
+    // --- ▼ [신규] 나노봇 착용 버프 효과 추가 ▼ ---
+    nanobotBuff: {
+        id: 'nanobotBuff',
+        name: '나노봇 착용',
+        type: EFFECT_TYPES.BUFF,
+        description: '액티브 스킬로 피해를 주면 나노봇이 추가 공격합니다.',
+        iconPath: 'assets/images/skills/mechanical-enhancement.png', // 임시로 메카닉 아이콘 재사용
+        // onApply, onRemove는 실제 효과가 CombatCalculationEngine에서 처리되므로 필요 없습니다.
+    }
+    // --- ▲ [신규] 나노봇 착용 버프 효과 추가 ▲ ---
 };

@@ -332,6 +332,35 @@ class CombatCalculationEngine {
         // --- \u25BC [핵심 추가] 피격 사실을 방어자에게 기록 \u25BC ---
         defender.wasAttackedBy = attacker.uniqueId;
 
+        // ✨ --- [핵심 추가] 나노봇 추가타 로직 --- ✨
+        const attackerEffects = statusEffectManager.activeEffects.get(attacker.uniqueId) || [];
+        const nanobotBuff = attackerEffects.find(e => e.id === 'nanobotBuff');
+
+        if (nanobotBuff && skill.type === 'ACTIVE' && finalDamage > 0) {
+            const baseAttack = Math.max(attackerStats.physicalAttack || 0, attackerStats.magicAttack || 0);
+            const nanobotDamage = Math.round(baseAttack * 0.3);
+
+            if (nanobotDamage > 0) {
+                defender.currentHp -= nanobotDamage;
+
+                if (this.battleSimulator && this.battleSimulator.vfxManager) {
+                    this.battleSimulator.vfxManager.createDamageNumber(
+                        defender.sprite.x + 10,
+                        defender.sprite.y - 10,
+                        nanobotDamage,
+                        '#0ea5e9',
+                        '나노봇'
+                    );
+                }
+                debugLogEngine.log('CombatCalculationEngine', `[나노봇] 효과 발동! ${defender.instanceName}에게 추가 피해 ${nanobotDamage} 적용.`);
+
+                if (defender.currentHp <= 0) {
+                    this.battleSimulator.terminationManager.handleUnitDeath(defender, attacker);
+                }
+            }
+        }
+        // ✨ --- 추가 완료 --- ✨
+
         return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
     }
 

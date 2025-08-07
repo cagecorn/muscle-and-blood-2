@@ -420,6 +420,29 @@ export const buffSkills = {
                 ]
             }
         }
-    }
+    },
     // --- ▲ [신규] 사냥꾼의 감각 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 나노봇 스킬 추가 ▼ ---
+    nanobot: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'nanobot',
+            name: '나노봇',
+            type: 'BUFF',
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.ON_HIT, SKILL_TAGS.MAGIC, SKILL_TAGS.PRODUCTION],
+            cost: 3,
+            targetType: 'self',
+            description: '5턴간 [나노봇 착용] 상태가 됩니다. 이 상태에서 [액티브] 스킬로 적에게 피해를 주면, 공격력의 30%로 나노봇이 함께 공격합니다. (쿨타임 6턴)',
+            illustrationPath: null,
+            cooldown: 6,
+            range: 0,
+            effect: {
+                id: 'nanobotBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 5,
+            }
+        }
+    },
+    // --- ▲ [신규] 나노봇 스킬 추가 ▲ ---
 };
