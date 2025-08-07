@@ -193,20 +193,32 @@ class SkillScoreEngine {
             }
         }
 
-        // \u2728 --- [핵심 로직 추가] 열망이 낮을수록 공격적으로 변합니다 --- \u2728
+        // ✨ --- [핵심 로직 수정] 열망이 낮을수록 역할에 맞는 행동을 선호합니다 --- ✨
         const aspirationData = aspirationEngine.getAspirationData(unit.uniqueId);
-        // '평온' 상태이고 열망이 40 미만일 때만 발동
         if (aspirationData.state === ASPIRATION_STATE.NORMAL && aspirationData.aspiration < 40) {
+            const aggressionFactor = (40 - aspirationData.aspiration) / 40.0;
+            const bonus = 30 * aggressionFactor;
+
+            const coreRoleTags = {
+                medic: [SKILL_TAGS.HEAL, SKILL_TAGS.AID],
+                paladin: [SKILL_TAGS.AURA, SKILL_TAGS.BUFF],
+                sentinel: [SKILL_TAGS.WILL_GUARD, SKILL_TAGS.GUARDIAN],
+                // 다른 지원 클래스 추가 가능
+            };
+
+            const unitRoleTags = coreRoleTags[unit.id] || [];
+            const isCoreRoleSkill = skillData.tags?.some(tag => unitRoleTags.includes(tag));
             const isOffensiveSkill = skillData.type === 'ACTIVE' || skillData.type === 'DEBUFF';
 
-            if (isOffensiveSkill) {
-                // 열망이 0에 가까울수록 보너스가 커집니다 (최대 +30점).
-                const aggressionFactor = (40 - aspirationData.aspiration) / 40.0;
-                aspirationBonus = 30 * aggressionFactor;
-                situationLogs.push(`낮은 열망 공격성:+${aspirationBonus.toFixed(0)}`);
+            if (isCoreRoleSkill) {
+                aspirationBonus = bonus * 1.5; // 150%
+                situationLogs.push(`낮은 열망(역할):+${aspirationBonus.toFixed(0)}`);
+            } else if (isOffensiveSkill) {
+                aspirationBonus = bonus;
+                situationLogs.push(`낮은 열망(공격):+${aspirationBonus.toFixed(0)}`);
             }
         }
-        // \u2728 --- 추가 완료 --- \u2728
+        // ✨ --- 수정 완료 --- ✨
 
         // ✨ 4. 최종 점수 계산에 음양 보너스 합산
         // ✨ 최종 점수 계산에 MBTI 보너스 합산
