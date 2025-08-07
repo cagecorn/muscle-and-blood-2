@@ -62,7 +62,9 @@ export const itemAffixes = {
         { name: '정밀한', stat: 'accuracy', value: { min: 5, max: 10 } },
         // --- ▼ [신규] 드레드노트용 접두사 추가 ▼ ---
         { name: '도발하는', stat: 'threat', value: { min: 10, max: 20 } },
-        { name: '응보의', stat: 'retaliationDamage', value: { min: 5, max: 10 } }
+        { name: '응보의', stat: 'retaliationDamage', value: { min: 5, max: 10 } },
+        // --- ▼ [신규] 프로스트위버용 접두사 추가 ▼ ---
+        { name: '빙결의', stat: 'frostDamage', value: { min: 8, max: 12 } } // 냉기 속성 데미지를 추가하는 신규 스탯
     ],
 
     // --- 접미사 (주로 방어, 유틸리티 관련) ---
@@ -75,7 +77,9 @@ export const itemAffixes = {
         // --- ▼ [신규] 드레드노트용 접미사 추가 ▼ ---
         { name: '수호의', stat: 'allyDamageReduction', value: { min: 3, max: 5 } },
         { name: '철벽의', stat: 'damageReduction', value: { min: 2, max: 4 }, isPercentage: true },
-        { name: '용기의', stat: 'valor', value: { min: 2, max: 5 } }
+        { name: '용기의', stat: 'valor', value: { min: 2, max: 5 } },
+        // --- ▼ [신규] 프로스트위버용 접미사 추가 ▼ ---
+        { name: '지연의', stat: 'statusEffectApplication', value: { min: 5, max: 8 } } // 상태이상 적용 확률 증가
     ]
 };
 
@@ -94,7 +98,10 @@ export const mbtiGradeEffects = {
     // ISTJ, ISFJ 같은 수호자 타입을 위한 효과들
     I_DREADNOUGHT: [{ trait: 'I', description: '내향형 장착 시, [방어 태세] 발동. 턴 종료 시 방어력 +{value}% (최대 3중첩)', stat: 'defenseStackOnTurnEnd', value: { min: 3, max: 5 } }],
     S_DREADNOUGHT: [{ trait: 'S', description: '감각형 장착 시, [의지 방패] 스킬로 생성되는 스택 +{value}개', stat: 'willGuardStackBonus', value: { min: 1, max: 1 } }],
-    J_DREADNOUGHT: [{ trait: 'J', description: '판단형 장착 시, 피격 시 {value}% 확률로 [철] 자원 1개 생성', stat: 'ironGenerationOnHitChance', value: { min: 15, max: 25 } }]
+    J_DREADNOUGHT: [{ trait: 'J', description: '판단형 장착 시, 피격 시 {value}% 확률로 [철] 자원 1개 생성', stat: 'ironGenerationOnHitChance', value: { min: 15, max: 25 } }],
+    // --- ▼ [신규] 프로스트위버용 MBTI 효과 추가 ▼ ---
+    I_FROSTWEAVER: [{ trait: 'I', description: '내향형 장착 시, 매 턴 [물] 자원 1개를 가지고 시작', stat: 'startingWaterResource', value: { min: 1, max: 1 } }],
+    N_FROSTWEAVER: [{ trait: 'N', description: '직관형 장착 시, [둔화], [속박] 효과 지속시간 +{value}턴', stat: 'debuffDurationBonus', value: { min: 1, max: 1 } }]
 };
 
 // --- ▼ [신규] 장비 시너지 세트 효과 데이터베이스 ▼ ---
