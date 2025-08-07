@@ -148,7 +148,12 @@ class CombatCalculationEngine {
         // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
         const skillDamage = amplifiedAttack * damageMultiplier;
 
-        let initialDamage = Math.max(1, skillDamage - finalDefense);
+        // ✨ --- [핵심 수정] 데미지 계산 공식 변경 --- ✨
+        // 기존: let initialDamage = Math.max(1, skillDamage - finalDefense);
+        // 변경: 방어력이 100일 때 데미지가 50% 감소하는 공식
+        const damageReduction = 100 / (100 + finalDefense);
+        let initialDamage = skillDamage * damageReduction;
+        // ✨ --- 수정 완료 --- ✨
 
         // --- 센티넬 패시브 데미지 감소 로직 추가 ---
         const sentryDutyEffects = (statusEffectManager.activeEffects.get(attacker.uniqueId) || [])

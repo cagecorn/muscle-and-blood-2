@@ -50,14 +50,14 @@ const magicSkill = { name: 'Test Bolt', tags: ['마법'], damageMultiplier: 1.0 
 // 1. 기본 물리 데미지 테스트
 statusEffectManager.activeEffects.clear(); // 테스트 전 상태 초기화
 let result = combatCalculationEngine.calculateDamage(mockWarrior, mockZombie, physicalSkill);
-// 예상 데미지: (공격력 20 - 방어력 10) * 1.0 = 10
-assert.strictEqual(result.damage, 10, '테스트 1 실패: 기본 물리 데미지 계산이 올바르지 않습니다.');
+// 예상 데미지: 20 * (100 / (100 + 10)) ≈ 18.18 → 반올림 18
+assert.strictEqual(result.damage, 18, '테스트 1 실패: 기본 물리 데미지 계산이 올바르지 않습니다.');
 console.log('✅ 테스트 1 통과: 기본 물리 데미지 계산이 정확합니다.');
 
 // 2. 마법 데미지 테스트 (이전 버그 수정 검증)
 result = combatCalculationEngine.calculateDamage(mockNanomancer, mockZombie, magicSkill);
-// 예상 데미지: (마법 공격력 25 - 마법 방어력 5) * 1.0 = 20
-assert.strictEqual(result.damage, 20, '테스트 2 실패: 마법 데미지가 마법 공격력/방어력으로 계산되지 않았습니다.');
+// 예상 데미지: 25 * (100 / (100 + 5)) ≈ 23.81 → 반올림 24
+assert.strictEqual(result.damage, 24, '테스트 2 실패: 마법 데미지가 마법 공격력/방어력으로 계산되지 않았습니다.');
 console.log('✅ 테스트 2 통과: 마법 데미지 계산이 정확합니다.');
 
 // 3. 공격자 버프 적용 테스트 (이전 버그 수정 검증)
@@ -72,8 +72,8 @@ const attackBuff = {
 statusEffectManager.activeEffects.set(mockWarrior.uniqueId, [attackBuff]);
 
 result = combatCalculationEngine.calculateDamage(mockWarrior, mockZombie, physicalSkill);
-// 예상 데미지: (공격력 20 * 1.5 - 방어력 10) * 1.0 = 20
-assert.strictEqual(result.damage, 20, '테스트 3 실패: 공격자 버프가 데미지 계산에 적용되지 않았습니다.');
+// 예상 데미지: (20 * 1.5) * (100 / (100 + 10)) ≈ 27.27 → 반올림 27
+assert.strictEqual(result.damage, 27, '테스트 3 실패: 공격자 버프가 데미지 계산에 적용되지 않았습니다.');
 console.log('✅ 테스트 3 통과: 공격력 버프가 정상적으로 적용됩니다.');
 
 statusEffectManager.activeEffects.clear(); // 테스트 후 상태 초기화
