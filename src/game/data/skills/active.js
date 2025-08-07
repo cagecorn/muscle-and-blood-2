@@ -4,6 +4,63 @@ import { SHARED_RESOURCE_TYPES } from '../../utils/SharedResourceEngine.js';
 
 // 액티브 스킬 데이터 정의
 export const activeSkills = {
+    // --- ▼ [신규] 드레드노트 전용 스킬 2종 추가 ▼ ---
+    taunt: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'taunt',
+            name: '도발',
+            type: 'ACTIVE',
+            requiredClass: ['sentinel', 'warrior'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.DEBUFF, SKILL_TAGS.AURA, SKILL_TAGS.GUARDIAN],
+            cost: 2,
+            targetType: 'self',
+            description:
+                '주위 3타일 내의 모든 적을 2턴간 [도발]하여 자신을 공격하게 만듭니다. 효과가 지속되는 동안 자신의 물리 방어력이 20% 증가합니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 0,
+            aoe: { shape: 'SQUARE', radius: 3 },
+            effect: {
+                id: 'tauntDebuff',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+            },
+            selfEffect: {
+                id: 'tauntBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 2,
+                modifiers: { stat: 'physicalDefense', type: 'percentage', value: 0.2 },
+            },
+        },
+    },
+
+    shieldBash: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'shieldBash',
+            name: '방패 치기',
+            type: 'ACTIVE',
+            requiredClass: ['sentinel', 'warrior', 'paladin'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.GUARDIAN],
+            cost: 2,
+            targetType: 'enemy',
+            description:
+                '자신의 최대 체력의 15%에 해당하는 물리 피해를 입히고, 30% 확률로 1턴간 [기절]시킵니다.',
+            illustrationPath: null,
+            cooldown: 1,
+            range: 1,
+            damageBasedOn: { stat: 'hp', percentage: 0.15 },
+            effect: {
+                id: 'stun',
+                type: EFFECT_TYPES.STATUS_EFFECT,
+                duration: 1,
+                chance: 0.3,
+            },
+        },
+    },
+    // --- ▲ [신규] 드레드노트 전용 스킬 2종 추가 ▲ ---
+
     // --- ▼ [신규] 회전 베기 스킬 추가 ▼ ---
     spinningSlash: {
         yinYangValue: -3,
