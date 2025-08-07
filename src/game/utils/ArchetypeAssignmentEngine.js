@@ -1,19 +1,15 @@
-import { mercenaryData } from '../data/mercenaries.js';
+import { archetypes } from '../data/archetypes/index.js';
 
 /**
  * 용병의 MBTI 성향에 따라 아키타입(하위 클래스)을 **확률적으로** 결정하는 엔진
  */
 class ArchetypeAssignmentEngine {
     constructor() {
-        // 각 아키타입별로 선호하는 MBTI 특성과 가중치를 정의합니다.
-        this.archetypeProfiles = {
-            Dreadnought: { I: 3, S: 2, J: 2, F: 1 },
-            Frostweaver: { I: 3, N: 3, T: 1 },
-            Aquilifer: { E: 1, F: 3, J: 1 },
-            Trapmaster: { N: 3, P: 2, T: 1 },
-            Executioner: { I: 2, S: 1, P: 3 },
-            Dreadbringer: { I: 2, N: 2, T: 2, F: 1 }
-        };
+        // ✨ 이제 아키타입 프로필을 데이터 파일에서 직접 가져와 사용합니다.
+        this.archetypeProfiles = {};
+        for (const key in archetypes) {
+            this.archetypeProfiles[key] = archetypes[key].mbtiProfile;
+        }
     }
 
     /**
@@ -26,6 +22,7 @@ class ArchetypeAssignmentEngine {
 
         for (const [archetype, profile] of Object.entries(this.archetypeProfiles)) {
             let currentScore = 0;
+            // 해당 아키타입의 프로필과 용병의 MBTI 점수를 비교하여 총점을 계산합니다.
             for (const [trait, weight] of Object.entries(profile)) {
                 currentScore += (mercenary.mbti[trait] || 0) * weight;
             }
@@ -35,10 +32,11 @@ class ArchetypeAssignmentEngine {
                 totalScore += currentScore;
             }
         }
-
+        
         // --- ▼ [핵심 로직] 가중치 기반 랜덤 선택 ▼ ---
         let random = Math.random() * totalScore;
-        let finalArchetype = scoredArchetypes[scoredArchetypes.length - 1].archetype; // Fallback
+        // scoredArchetypes가 비어있는 경우를 대비한 기본값 설정
+        let finalArchetype = scoredArchetypes.length > 0 ? scoredArchetypes[scoredArchetypes.length - 1].archetype : Object.keys(this.archetypeProfiles)[0];
 
         for (const scored of scoredArchetypes) {
             if (random < scored.score) {
