@@ -51,6 +51,13 @@ class UseSkillNode extends Node {
             this.narrationEngine.show(`${unit.instanceName}이(가) [${skillTarget.instanceName}]에게 [${finalSkill.name}]을(를) 사용합니다.`);
         }
 
+        // \u2728 --- [핵심 추가] 공격적 스킬 사용 시 플래그 설정 --- \u2728
+        const offensiveTypes = ['ACTIVE', 'DEBUFF'];
+        if (offensiveTypes.includes(finalSkill.type)) {
+            unit.offensiveActionTakenThisTurn = true;
+        }
+        // \u2728 --- 추가 완료 --- \u2728
+
         // 스킬 사용 기록
         this.skillEngine.recordSkillUse(unit, finalSkill);
         const usedSkills = blackboard.get('usedSkillsThisTurn') || new Set();

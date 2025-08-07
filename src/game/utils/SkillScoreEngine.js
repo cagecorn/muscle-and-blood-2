@@ -12,6 +12,7 @@ import { debugAIMemoryManager } from '../debug/DebugAIMemoryManager.js';
 // ✨ 1. YinYangEngine을 import 합니다.
 import { yinYangEngine } from './YinYangEngine.js';
 import { debugYinYangManager } from '../debug/DebugYinYangManager.js';
+import { aspirationEngine, ASPIRATION_STATE } from './AspirationEngine.js';
 
 /**
  * AI의 스킬 선택을 위해 각 스킬의 전략적 가치를 계산하는 엔진
@@ -44,6 +45,8 @@ class SkillScoreEngine {
         let yinYangBonus = 0;
         // ✨ [신규] MBTI 성향 점수 변수
         let mbtiScore = 0;
+        // ✨ 열망 보너스 점수 변수 추가
+        let aspirationBonus = 0;
         const situationLogs = [];
 
         if (skillData.tags) {
@@ -190,9 +193,25 @@ class SkillScoreEngine {
             }
         }
 
+        // \u2728 --- [핵심 로직 추가] 열망이 낮을수록 공격적으로 변합니다 --- \u2728
+        const aspirationData = aspirationEngine.getAspirationData(unit.uniqueId);
+        // '평온' 상태이고 열망이 40 미만일 때만 발동
+        if (aspirationData.state === ASPIRATION_STATE.NORMAL && aspirationData.aspiration < 40) {
+            const isOffensiveSkill = skillData.type === 'ACTIVE' || skillData.type === 'DEBUFF';
+
+            if (isOffensiveSkill) {
+                // 열망이 0에 가까울수록 보너스가 커집니다 (최대 +30점).
+                const aggressionFactor = (40 - aspirationData.aspiration) / 40.0;
+                aspirationBonus = 30 * aggressionFactor;
+                situationLogs.push(`낮은 열망 공격성:+${aspirationBonus.toFixed(0)}`);
+            }
+        }
+        // \u2728 --- 추가 완료 --- \u2728
+
         // ✨ 4. 최종 점수 계산에 음양 보너스 합산
         // ✨ 최종 점수 계산에 MBTI 보너스 합산
-        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore;
+        // ✨ 최종 점수에 열망 보너스 합산
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus;
 
         // ✨ AI 기억 가중치 적용 로직을 수정합니다.
         let finalScore = calculatedScore;
@@ -236,7 +255,7 @@ class SkillScoreEngine {
 
         debugYinYangManager.logScoreModification(
             skillData.name,
-            baseScore + tagScore + situationScore + mbtiScore,
+            baseScore + tagScore + situationScore + mbtiScore + aspirationBonus,
             yinYangBonus,
             finalScore
         );
@@ -244,7 +263,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 열망(${aspirationBonus.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
