@@ -80,7 +80,7 @@ class MercenaryEquipmentSelector {
     }
 
     /**
-     * 용병의 MBTI 성향에 따라 아이템의 점수를 계산합니다.
+     * 용병의 MBTI 성향과 아키타입에 따라 아이템의 점수를 계산합니다.
      * @param {object} mercenary
      * @param {object} item
      * @returns {number}
@@ -90,6 +90,25 @@ class MercenaryEquipmentSelector {
         let score = 100; // 기본 점수
         const mbti = mercenary.mbti;
         const stats = item.stats;
+
+        // --- ▼ [핵심 수정] 아키타입 보너스 점수 계산 ▼ ---
+        if (mercenary.archetype === 'Dreadnought') {
+            let archetypeScore = 0;
+            const dreadnoughtStats = ['threat', 'retaliationDamage', 'allyDamageReduction', 'damageReduction', 'valor'];
+            dreadnoughtStats.forEach(stat => {
+                if (stats[stat]) archetypeScore += 50;
+            });
+
+            if (item.mbtiEffects) {
+                item.mbtiEffects.forEach(effect => {
+                    if (effect.trait.includes('_DREADNOUGHT')) {
+                        archetypeScore += 100;
+                    }
+                });
+            }
+            score += archetypeScore;
+        }
+        // --- ▲ [핵심 수정] 아키타입 보너스 점수 계산 ▲ ---
 
         // E vs I: 공격/지속력 vs 방어/효율
         if (stats.physicalAttack || stats.valor || stats.strength) score += (mbti.E / 100) * 20;
@@ -104,7 +123,6 @@ class MercenaryEquipmentSelector {
         if (stats.hp || stats.healingGivenPercentage) score += (mbti.F / 100) * 15;
 
         // J vs P: 계획(세트 완성) vs 즉흥(특수 효과)
-        // (세트 완성 로직은 더 복잡하므로 여기서는 MBTI 효과에만 집중)
         if (item.mbtiEffects && item.mbtiEffects.length > 0) {
              score += (mbti.P / 100) * 30; // P는 특이한 MBTI 효과를 선호
         }

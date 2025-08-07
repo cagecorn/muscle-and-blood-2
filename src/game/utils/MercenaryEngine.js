@@ -7,6 +7,8 @@ import { uniqueIDManager } from './UniqueIDManager.js';
 // ✨ 1. 속성 특화 데이터와 주사위 엔진을 가져옵니다.
 import { attributeSpecializations } from '../data/attributeSpecializations.js';
 import { diceEngine } from './DiceEngine.js';
+// ✨ [추가] 아키타입 결정 엔진을 가져옵니다.
+import { archetypeAssignmentEngine } from './ArchetypeAssignmentEngine.js';
 
 /**
  * 용병의 생성, 저장, 관리를 전담하는 엔진 (싱글턴)
@@ -56,6 +58,9 @@ class MercenaryEngine {
             // ✨ 각 용병은 고유한 MBTI 성향을 가집니다.
             mbti: this._generateMBTI()
         };
+
+        // ✨ [핵심 추가] 용병 생성 직후 아키타입을 결정합니다.
+        archetypeAssignmentEngine.assignArchetype(newInstance);
 
         // ✨ 2. [신규] 용병 생성 시 무작위 속성 특화 태그를 부여합니다.
         const randomAttribute = diceEngine.getRandomElement(attributeSpecializations);
