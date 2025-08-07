@@ -9,6 +9,8 @@ import { diceEngine } from '../../game/utils/DiceEngine.js';
 import SkillEffectProcessor from '../../game/utils/SkillEffectProcessor.js'; // 새로 만든 클래스를 import
 import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
+// ✨ YinYangEngine을 import하여 음양 지수를 조회합니다.
+import { yinYangEngine } from '../../game/utils/YinYangEngine.js';
 
 class UseSkillNode extends Node {
     constructor(engines = {}) {
@@ -60,7 +62,17 @@ class UseSkillNode extends Node {
         const finalSkill = this._applyProficiency(unit, modifiedSkill);
 
         if (this.narrationEngine) {
-            this.narrationEngine.show(`${unit.instanceName}이(가) [${skillTarget.instanceName}]에게 [${finalSkill.name}]을(를) 사용합니다.`);
+            const targetBalance = yinYangEngine.getBalance(skillTarget.uniqueId);
+            const skillValue = finalSkill.yinYangValue || 0;
+            let narrationMessage = `${unit.instanceName}이(가) [${skillTarget.instanceName}]에게 [${finalSkill.name}]을(를) 사용합니다.`;
+
+            if (targetBalance < -10 && skillValue > 0) {
+                narrationMessage = `[${skillTarget.instanceName}]의 음기가 강해진 것을 보고, ${unit.instanceName}이(가) 양의 기술인 [${finalSkill.name}]으로 균형을 맞춥니다.`;
+            }
+            else if (targetBalance > 10 && skillValue < 0) {
+                narrationMessage = `[${skillTarget.instanceName}]의 양기가 과해진 틈을 노려, ${unit.instanceName}이(가) 음의 기술인 [${finalSkill.name}]으로 허점을 파고듭니다.`;
+            }
+            this.narrationEngine.show(narrationMessage);
         }
 
 
