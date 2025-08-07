@@ -83,6 +83,24 @@ class StatusEffectManager {
                         damageType = '중독';
                     }
 
+                    // ✨ --- [핵심 추가] 용맹의 증거 오라 효과 처리 --- ✨
+                    if (effect.id === 'proofOfValorAura' && effect.isAura) {
+                        const caster = this.findUnitById(effect.attackerId);
+                        if (caster && caster.currentHp > 0) {
+                            const distance = Math.abs(unit.gridX - caster.gridX) + Math.abs(unit.gridY - caster.gridY);
+                            if (distance <= effect.radius) {
+                                const barrierHeal = Math.round(unit.maxBarrier * 0.05);
+                                if (barrierHeal > 0) {
+                                    unit.currentBarrier = Math.min(unit.maxBarrier, unit.currentBarrier + barrierHeal);
+                                    if (this.battleSimulator.vfxManager) {
+                                        this.battleSimulator.vfxManager.createDamageNumber(unit.sprite.x, unit.sprite.y - 10, `+${barrierHeal}`, '#ffd700', '배리어');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // ✨ --- 추가 완료 --- ✨
+
                     if (damage > 0) {
                         unit.currentHp -= damage;
                         if (this.battleSimulator.vfxManager) {

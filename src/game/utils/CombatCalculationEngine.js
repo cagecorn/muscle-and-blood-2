@@ -48,6 +48,12 @@ class CombatCalculationEngine {
         // (예: if (damageTypes.includes(DAMAGE_TYPES.FIRE) && defender.fireResistance > 0) { ... })
         // ▲▲▲ [추가 끝] ▲▲▲
 
+        // ✨ --- [핵심 수정] 데미지 계산 로직 확장 --- ✨
+        // '나노레일건'의 복합 데미지를 처리하기 위해 함수를 분리합니다.
+        if (skill.id === 'nanoRailgun' && typeof skill.damageMultiplier === 'object') {
+            return this._calculateNanoRailgunDamage(attacker, defender, skill, instanceId, grade);
+        }
+
         // ✨ --- [신규] 피해 무효화 효과 최우선 처리 --- ✨
         if (stackManager.hasStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY)) {
             stackManager.consumeStack(defender.uniqueId, FIXED_DAMAGE_TYPES.DAMAGE_IMMUNITY);
@@ -132,6 +138,14 @@ class CombatCalculationEngine {
         if (instanceId) {
             finalSkill = skillModifierEngine.getModifiedSkill(skill, grade);
         }
+        // ✨ [추가] 저격, 화염병 투척의 조건부 데미지 로직
+        let bonusMultiplier = 1.0;
+        if (finalSkill.id === 'snipe' && (attacker.finalStats.attackRange || 1) >= 2) {
+            bonusMultiplier += 0.20;
+        }
+        if (finalSkill.id === 'fireBottle' && (attacker.finalStats.attackRange || 1) <= 1) {
+            bonusMultiplier += 0.20;
+        }
 
         // ✨ [신규] 방어력 관통 효과 적용
         const armorPen = finalSkill.armorPenetration || 0;
@@ -144,7 +158,7 @@ class CombatCalculationEngine {
 
         const finalDefense = initialDefense * (1 + defenseReductionPercent) * (1 - armorPen);
 
-        const damageMultiplier = finalSkill.damageMultiplier || 1.0;
+        const damageMultiplier = (finalSkill.damageMultiplier || 1.0) * bonusMultiplier;
         // ✨ 2. 증폭된 공격력을 기반으로 스킬 데미지를 계산합니다.
         const skillDamage = amplifiedAttack * damageMultiplier;
 
@@ -319,6 +333,28 @@ class CombatCalculationEngine {
         defender.wasAttackedBy = attacker.uniqueId;
 
         return { damage: Math.round(finalDamage), hitType: hitType, comboCount };
+    }
+
+    // ✨ --- [신규] 나노레일건 전용 데미지 계산 메서드 --- ✨
+    _calculateNanoRailgunDamage(attacker, defender, skill, instanceId, grade) {
+        // 1. 물리 데미지 계산
+        const physicalPart = { ...skill, damageMultiplier: skill.damageMultiplier.physical, tags: [SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL] };
+        const { damage: physicalDamage, comboCount } = this.calculateDamage(attacker, defender, physicalPart, instanceId, grade);
+
+        // 2. 마법 데미지 계산
+        let magicMultiplier = skill.damageMultiplier.magic;
+        if (['nanomancer', 'esper'].includes(attacker.id)) {
+            magicMultiplier += 0.20; // 클래스 보너스
+        }
+        const magicPart = { ...skill, damageMultiplier: magicMultiplier, tags: [SKILL_TAGS.RANGED, SKILL_TAGS.MAGIC] };
+        const { damage: magicDamage } = this.calculateDamage(attacker, defender, magicPart, instanceId, grade);
+
+        const totalDamage = physicalDamage + magicDamage;
+
+        debugLogEngine.log('CombatCalculationEngine', `[나노레일건] 최종 피해량: 물리(${physicalDamage}) + 마법(${magicDamage}) = ${totalDamage}`);
+
+        // hitType은 물리/마법 중 더 높게 나온 쪽을 따르거나, 별도 규칙을 정할 수 있습니다. 여기서는 고정 문자열을 사용합니다.
+        return { damage: Math.round(totalDamage), hitType: 'Railgun', comboCount };
     }
 
     /**

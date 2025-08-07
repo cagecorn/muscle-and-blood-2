@@ -1223,4 +1223,91 @@ export const activeSkills = {
         }
     },
     // --- ▲ [신규] 암살 일격, 맹독 구름, 아드레날린 주사 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 쟈벨린 투척 스킬 추가 ▼ ---
+    javelinThrow: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'javelinThrow',
+            name: '쟈벨린 투척',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.IRON, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '5타일 거리의 적에게 100%의 물리 피해를 주는 쟈벨린을 투척합니다. (소모 자원: 철 2)',
+            illustrationPath: 'assets/images/skills/throwing-javelin.png',
+            cooldown: 0,
+            range: 5,
+            damageMultiplier: { min: 0.95, max: 1.05 },
+            resourceCost: { type: 'IRON', amount: 2 }
+        }
+    },
+    // --- ▲ [신규] 쟈벨린 투척 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 저격 스킬 추가 ▼ ---
+    snipe: {
+        yinYangValue: -3,
+        NORMAL: {
+            id: 'snipe',
+            name: '저격',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.FIXED],
+            cost: 3,
+            targetType: 'enemy',
+            description: '5타일 거리의 적에게 100%의 물리 피해를 줍니다. 기본 사거리가 2 이상일 경우, 20%의 추가 피해를 입힙니다. (쿨타임 2턴)',
+            illustrationPath: 'assets/images/skills/gunner-attack-icon.png',
+            cooldown: 2,
+            range: 5,
+            damageMultiplier: { min: 0.95, max: 1.05 }
+            // 추가 데미지 로직은 CombatCalculationEngine에서 처리됩니다.
+        }
+    },
+    // --- ▲ [신규] 저격 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 화염병 투척 스킬 추가 ▼ ---
+    fireBottle: {
+        yinYangValue: -2,
+        NORMAL: {
+            id: 'fireBottle',
+            name: '화염병 투척',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.THROWING, SKILL_TAGS.FIRE, SKILL_TAGS.PRODUCTION],
+            cost: 2,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 80%의 물리 피해를 주고 2턴간 [화상] 상태로 만듭니다. 기본 사거리가 1 이하일 경우, 20%의 추가 피해를 입힙니다. [불] 자원을 1 생산합니다. (쿨타임 2턴)',
+            illustrationPath: 'assets/images/skills/fire-bottle.png',
+            cooldown: 2,
+            range: 3,
+            damageMultiplier: { min: 0.75, max: 0.85 },
+            generatesResource: { type: 'FIRE', amount: 1 },
+            effect: {
+                id: 'burn',
+                type: EFFECT_TYPES.DEBUFF,
+                duration: 2,
+            }
+            // 추가 데미지 로직은 CombatCalculationEngine에서 처리됩니다.
+        }
+    },
+    // --- ▲ [신규] 화염병 투척 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 나노레일건 스킬 추가 ▼ ---
+    nanoRailgun: {
+        yinYangValue: -4,
+        NORMAL: {
+            id: 'nanoRailgun',
+            name: '나노레일건',
+            type: 'ACTIVE',
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.RANGED, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MAGIC, SKILL_TAGS.LIGHT, SKILL_TAGS.SPECIAL],
+            cost: 0,
+            targetType: 'enemy',
+            description: '3타일 거리의 적에게 50%의 물리 피해와 50%의 마법 피해를 동시에 입힙니다. 나노맨서/에스퍼가 사용 시 마법 피해가 20% 증가합니다. (소모 자원: 빛 2, 쿨타임 4턴)',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            resourceCost: { type: 'LIGHT', amount: 2 },
+            // 이 스킬은 CombatCalculationEngine에서 특별하게 처리됩니다.
+            damageMultiplier: { physical: 0.5, magic: 0.5 }
+        }
+    }
+    // --- ▲ [신규] 나노레일건 스킬 추가 ▲ ---
 };
