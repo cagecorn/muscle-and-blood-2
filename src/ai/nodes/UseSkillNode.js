@@ -8,6 +8,7 @@ import { classProficiencies } from '../../game/data/classProficiencies.js';
 import { diceEngine } from '../../game/utils/DiceEngine.js';
 import SkillEffectProcessor from '../../game/utils/SkillEffectProcessor.js'; // 새로 만든 클래스를 import
 import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 
 class UseSkillNode extends Node {
     constructor(engines = {}) {
@@ -43,6 +44,17 @@ class UseSkillNode extends Node {
         // MBTI 스택 버프 시스템 제거로 관련 로직을 삭제합니다.
 
         debugSkillExecutionManager.logSkillExecution(unit, baseSkillData, modifiedSkill, instanceData.grade);
+        // ✨ --- [핵심 수정] 공격 또는 지원 스킬 사용 시 플래그 설정 --- ✨
+        const offensiveTypes = ['ACTIVE', 'DEBUFF'];
+        const isOffensive = offensiveTypes.includes(modifiedSkill.type);
+        const isSupport = modifiedSkill.tags?.includes(SKILL_TAGS.AID);
+
+        if (isOffensive || isSupport) {
+            // AIManager가 이 플래그를 보고 열망 감소 여부를 결정합니다.
+            unit.offensiveActionTakenThisTurn = true;
+        }
+        // ✨ --- 수정 완료 --- ✨
+
 
         // 최종 사용할 스킬 데이터를 준비합니다 (숙련도 보너스 적용)
         const finalSkill = this._applyProficiency(unit, modifiedSkill);
@@ -51,12 +63,6 @@ class UseSkillNode extends Node {
             this.narrationEngine.show(`${unit.instanceName}이(가) [${skillTarget.instanceName}]에게 [${finalSkill.name}]을(를) 사용합니다.`);
         }
 
-        // \u2728 --- [핵심 추가] 공격적 스킬 사용 시 플래그 설정 --- \u2728
-        const offensiveTypes = ['ACTIVE', 'DEBUFF'];
-        if (offensiveTypes.includes(finalSkill.type)) {
-            unit.offensiveActionTakenThisTurn = true;
-        }
-        // \u2728 --- 추가 완료 --- \u2728
 
         // 스킬 사용 기록
         this.skillEngine.recordSkillUse(unit, finalSkill);
