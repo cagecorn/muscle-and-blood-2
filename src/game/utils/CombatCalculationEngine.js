@@ -33,6 +33,14 @@ import { statusEffects } from '../data/status-effects.js';
  * 실제 전투 데미지 계산을 담당하는 엔진
  */
 class CombatCalculationEngine {
+    // ✨ --- [핵심 버그 수정] 생성자와 name 속성 추가 --- ✨
+    constructor() {
+        this.name = 'CombatCalculationEngine';
+        // 다른 엔진들과의 일관성을 위해 debugLogEngine에 등록할 수도 있습니다.
+        debugLogEngine.register(this);
+    }
+    // ✨ --- 수정 완료 --- ✨
+
     /**
      * 스킬 또는 기본 공격 데미지 계산
      * @param {object} attacker
