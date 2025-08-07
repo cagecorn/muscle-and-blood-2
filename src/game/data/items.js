@@ -64,7 +64,9 @@ export const itemAffixes = {
         { name: '도발하는', stat: 'threat', value: { min: 10, max: 20 } },
         { name: '응보의', stat: 'retaliationDamage', value: { min: 5, max: 10 } },
         // --- ▼ [신규] 프로스트위버용 접두사 추가 ▼ ---
-        { name: '빙결의', stat: 'frostDamage', value: { min: 8, max: 12 } } // 냉기 속성 데미지를 추가하는 신규 스탯
+        { name: '빙결의', stat: 'frostDamage', value: { min: 8, max: 12 } }, // 냉기 속성 데미지를 추가하는 신규 스탯
+        // --- ▼ [신규] 아퀼리퍼용 접두사 추가 ▼ ---
+        { name: '지휘관의', stat: 'auraRadius', value: { min: 1, max: 1 } } // 오라 반경
     ],
 
     // --- 접미사 (주로 방어, 유틸리티 관련) ---
@@ -79,7 +81,9 @@ export const itemAffixes = {
         { name: '철벽의', stat: 'damageReduction', value: { min: 2, max: 4 }, isPercentage: true },
         { name: '용기의', stat: 'valor', value: { min: 2, max: 5 } },
         // --- ▼ [신규] 프로스트위버용 접미사 추가 ▼ ---
-        { name: '지연의', stat: 'statusEffectApplication', value: { min: 5, max: 8 } } // 상태이상 적용 확률 증가
+        { name: '지연의', stat: 'statusEffectApplication', value: { min: 5, max: 8 } }, // 상태이상 적용 확률 증가
+        // --- ▼ [신규] 아퀼리퍼용 접미사 추가 ▼ ---
+        { name: '신념의', stat: 'effectDuration', value: { min: 1, max: 1 } } // 효과 지속시간
     ]
 };
 
@@ -101,7 +105,10 @@ export const mbtiGradeEffects = {
     J_DREADNOUGHT: [{ trait: 'J', description: '판단형 장착 시, 피격 시 {value}% 확률로 [철] 자원 1개 생성', stat: 'ironGenerationOnHitChance', value: { min: 15, max: 25 } }],
     // --- ▼ [신규] 프로스트위버용 MBTI 효과 추가 ▼ ---
     I_FROSTWEAVER: [{ trait: 'I', description: '내향형 장착 시, 매 턴 [물] 자원 1개를 가지고 시작', stat: 'startingWaterResource', value: { min: 1, max: 1 } }],
-    N_FROSTWEAVER: [{ trait: 'N', description: '직관형 장착 시, [둔화], [속박] 효과 지속시간 +{value}턴', stat: 'debuffDurationBonus', value: { min: 1, max: 1 } }]
+    N_FROSTWEAVER: [{ trait: 'N', description: '직관형 장착 시, [둔화], [속박] 효과 지속시간 +{value}턴', stat: 'debuffDurationBonus', value: { min: 1, max: 1 } }],
+    // --- ▼ [신규] 아퀼리퍼용 MBTI 효과 추가 ▼ ---
+    F_AQUILIFER: [{ trait: 'F', description: '감정형 장착 시, [오라] 스킬의 효과가 {value}% 증폭됩니다.', stat: 'auraEffectAmplification', value: { min: 10, max: 15 } }],
+    J_AQUILIFER: [{ trait: 'J', description: '판단형 장착 시, 전투 시작 시 [빛] 자원 {value}개를 가지고 시작합니다.', stat: 'startingLightResource', value: { min: 1, max: 2 } }]
 };
 
 // --- ▼ [신규] 장비 시너지 세트 효과 데이터베이스 ▼ ---

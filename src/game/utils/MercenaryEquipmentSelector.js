@@ -122,6 +122,21 @@ class MercenaryEquipmentSelector {
                 });
             }
             score += archetypeScore;
+        } else if (mercenary.archetype === 'Aquilifer') {
+            let archetypeScore = 0;
+            const aquiliferStats = ['auraRadius', 'effectDuration'];
+            aquiliferStats.forEach(stat => {
+                if (stats[stat]) archetypeScore += 50;
+            });
+
+            if (item.mbtiEffects) {
+                item.mbtiEffects.forEach(effect => {
+                    if (effect.trait.includes('_AQUILIFER')) {
+                        archetypeScore += 100;
+                    }
+                });
+            }
+            score += archetypeScore;
         }
         // --- ▲ [핵심 수정] 아키타입 보너스 점수 계산 ▲ ---
 
