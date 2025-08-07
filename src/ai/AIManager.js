@@ -236,12 +236,12 @@ class AIManager {
             }
         }
 
-        // \u2728 --- [핵심 추가] 턴 종료 후 공격 행동 여부 확인 --- \u2728
-        if (unit.currentHp > 0 && !unit.offensiveActionTakenThisTurn) {
-            // 공격 행동을 하지 않았다면 열망을 5 감소시킵니다.
+        // \u2728 --- [핵심 수정] 턴 종료 후 비행동 여부 확인 --- \u2728
+        // 공격/지원 스킬을 사용하지 않았고, 이번 턴에 피격당하지도 않았다면 열망 감소
+        if (unit.currentHp > 0 && !unit.offensiveActionTakenThisTurn && !unit.wasAttackedBy) {
             aspirationEngine.addAspiration(unit.uniqueId, -5, '비전투');
         }
-        // \u2728 --- 추가 완료 --- \u2728
+        // \u2728 --- 수정 완료 --- \u2728
 
         console.groupEnd();
     }
