@@ -59,4 +59,28 @@ for (const grade of grades) {
 }
 // --- ▲ [신규] 윌 가드 테스트 로직 추가 ▲ ---
 
+// --- ▼ [신규] 성역 스킬 테스트 추가 ▼ ---
+const sanctuaryBase = {
+    NORMAL: {
+        id: 'sanctuary',
+        type: 'BUFF',
+        cost: 3,
+        cooldown: 4,
+        effect: {
+            radius: 2,
+            modifiers: [
+                { stat: 'physicalDefense', type: 'percentage', value: 0.15 },
+                { stat: 'magicDefense', type: 'percentage', value: 0.15 }
+            ]
+        }
+    }
+};
+
+{
+    const skill = skillModifierEngine.getModifiedSkill(sanctuaryBase.NORMAL, 'NORMAL');
+    assert.strictEqual(skill.effect.radius, 2, 'Sanctuary aura radius mismatch');
+    assert(Array.isArray(skill.effect.modifiers) && skill.effect.modifiers.length === 2, 'Sanctuary modifiers missing');
+}
+// --- ▲ [신규] 성역 스킬 테스트 추가 ▲ ---
+
 console.log('Medic skill integration test passed.');

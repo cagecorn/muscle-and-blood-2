@@ -61,6 +61,61 @@ export const buffSkills = {
     },
     // --- ▲ [신규] 용맹의 증거 스킬 추가 ▲ ---
 
+    // --- ▼ [신규] 아퀼리퍼 전용 오라 스킬 2종 추가 ▼ ---
+    sanctuary: {
+        yinYangValue: +4, // 아군을 보호하는 강력한 양(Yang)의 기술
+        NORMAL: {
+            id: 'sanctuary',
+            name: '성역',
+            type: 'BUFF',
+            requiredClass: ['paladin', 'medic'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.AURA, SKILL_TAGS.WILL_GUARD, SKILL_TAGS.HOLY],
+            cost: 3,
+            targetType: 'self',
+            description: '자신을 중심으로 성역을 펼칩니다. 3턴간 자신과 주위 2칸 내 모든 아군의 물리 및 마법 방어력을 15% 증가시킵니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 0,
+            effect: {
+                id: 'sanctuaryAura',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                isAura: true,
+                radius: 2,
+                modifiers: [
+                    { stat: 'physicalDefense', type: 'percentage', value: 0.15 },
+                    { stat: 'magicDefense', type: 'percentage', value: 0.15 }
+                ]
+            }
+        }
+    },
+
+    auraOfRetribution: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'auraOfRetribution',
+            name: '응징의 오라',
+            type: 'BUFF',
+            requiredClass: ['paladin', 'commander'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.AURA, SKILL_TAGS.HOLY, SKILL_TAGS.LIGHT],
+            cost: 2,
+            targetType: 'self',
+            description: '주위 2칸 내 모든 아군에게 응징의 오라를 부여합니다. 3턴간 오라 안의 아군이 공격 시, 대상에게 시전자 지혜의 30%만큼 추가 [신성] 피해를 입힙니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 0,
+            effect: {
+                id: 'retributionAuraBuff',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                isAura: true,
+                radius: 2
+                // 실제 추가 데미지 로직은 CombatCalculationEngine에서 이 버프 유무를 체크하여 처리해야 합니다.
+            }
+        }
+    },
+    // --- ▲ [신규] 아퀼리퍼 전용 오라 스킬 2종 추가 ▲ ---
+
     stoneSkin: {
         yinYangValue: +2,
         // NORMAL 등급: 기본 효과
