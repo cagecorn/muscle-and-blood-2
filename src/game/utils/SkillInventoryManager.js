@@ -63,6 +63,15 @@ class SkillInventoryManager {
             this.addSkillById('chargeOrder', 'NORMAL');
         }
 
+        // ✨ [추가] 테스트를 위해 새로운 스킬 카드를 5장씩 지급합니다.
+        for (let i = 0; i < 5; i++) {
+            this.addSkillById('javelinThrow', 'NORMAL');
+            this.addSkillById('snipe', 'NORMAL');
+            this.addSkillById('fireBottle', 'NORMAL');
+            this.addSkillById('nanoRailgun', 'NORMAL');
+            this.addSkillById('proofOfValor', 'NORMAL');
+        }
+
         // 나머지 스킬은 노멀 등급으로 10장씩 생성
         for (const skillId in skillCardDatabase) {
             if (skillCardDatabase.hasOwnProperty(skillId) && skillId !== 'charge' && skillId !== 'attack') {

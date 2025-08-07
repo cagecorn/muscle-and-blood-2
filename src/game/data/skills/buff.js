@@ -32,6 +32,35 @@ export const buffSkills = {
         }
     },
     // --- ▲ [신규] 집결의 뿔피리 스킬 추가 ▲ ---
+
+    // --- ▼ [신규] 용맹의 증거 스킬 추가 ▼ ---
+    proofOfValor: {
+        yinYangValue: +4,
+        NORMAL: {
+            id: 'proofOfValor',
+            name: '용맹의 증거',
+            type: 'BUFF',
+            requiredClass: ['commander', 'paladin'],
+            tags: [SKILL_TAGS.BUFF, SKILL_TAGS.AURA, SKILL_TAGS.WILL, SKILL_TAGS.LIGHT, SKILL_TAGS.PRODUCTION],
+            cost: 3,
+            targetType: 'self',
+            description: '3턴간 자신 주위 3타일 내 아군들의 용맹 보호막을 매 턴 최대치의 5%만큼 회복시키는 오라를 두릅니다. [빛] 자원을 2개 생성합니다. (쿨타임 5턴)',
+            illustrationPath: null,
+            cooldown: 5,
+            range: 0, // 자신에게 거는 오라이므로 0
+            generatesResource: { type: 'LIGHT', amount: 2 },
+            effect: {
+                id: 'proofOfValorAura',
+                type: EFFECT_TYPES.BUFF,
+                duration: 3,
+                isAura: true,
+                radius: 3,
+                // 실제 회복 로직은 StatusEffectManager에서 처리됩니다.
+            }
+        }
+    },
+    // --- ▲ [신규] 용맹의 증거 스킬 추가 ▲ ---
+
     stoneSkin: {
         yinYangValue: +2,
         // NORMAL 등급: 기본 효과

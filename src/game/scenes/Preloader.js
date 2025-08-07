@@ -161,6 +161,12 @@ export class Preloader extends Scene
         // ▼▼▼ [추가] 관통 사격 스킬 아이콘 로드 ▼▼▼
         this.load.image('impale-shot', 'images/skills/impale-shot.png');
         // ▲▲▲ [추가] 관통 사격 스킬 아이콘 로드 ▲▲▲
+
+        // --- ▼ [신규] 스킬 아이콘 로드 ▼ ---
+        this.load.image('throwing-javelin', 'images/skills/throwing-javelin.png');
+        this.load.image('gunner-attack-icon', 'images/skills/gunner-attack-icon.png');
+        this.load.image('fire-bottle', 'images/skills/fire-bottle.png');
+        // --- ▲ [신규] 스킬 아이콘 로드 ▲ ---
         // 공통 패널 배경 이미지
         this.load.image('panel-background', 'images/ui-panel.png');
         this.load.image('battle-stage-arena', 'images/battle/battle-stage-arena.png');
