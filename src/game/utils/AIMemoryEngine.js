@@ -110,6 +110,36 @@ class AIMemoryEngine {
         const store = transaction.objectStore(this.storeName);
         store.put({ id: attackerId, memory: memory });
     }
+
+    /**
+     * 특정 유닛의 '위험 타일' 기억을 갱신합니다.
+     * @param {number} unitId - 기억을 갱신할 유닛 ID
+     * @param {number} col - 위험한 타일의 열
+     * @param {number} row - 위험한 타일의 행
+     * @param {number} dangerIncrease - 증가시킬 위험도
+     */
+    async updateTileMemory(unitId, col, row, dangerIncrease) {
+        await this.initPromise;
+        if (!this.db) return;
+
+        const memory = await this.getMemory(unitId);
+        if (!memory.dangerousTiles) {
+            memory.dangerousTiles = {};
+        }
+
+        const tileKey = `${col},${row}`;
+        const oldDanger = memory.dangerousTiles[tileKey] || 0;
+        memory.dangerousTiles[tileKey] = oldDanger + dangerIncrease;
+
+        const transaction = this.db.transaction([this.storeName], 'readwrite');
+        const store = transaction.objectStore(this.storeName);
+        store.put({ id: unitId, memory: memory });
+
+        console.log(
+            `%c[AIMemoryEngine] 유닛 ${unitId}가 (${tileKey}) 타일을 위험 지역으로 기억합니다. (위험도: ${memory.dangerousTiles[tileKey]})`,
+            'color: #8b5cf6;'
+        );
+    }
 }
 
 export const aiMemoryEngine = new AIMemoryEngine();

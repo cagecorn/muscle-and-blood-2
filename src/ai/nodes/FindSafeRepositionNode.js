@@ -68,7 +68,7 @@ class FindSafeRepositionNode extends Node {
         });
 
         if (bestCell) {
-            const path = this.pathfinderEngine.findPath(
+            const path = await this.pathfinderEngine.findPath(
                 unit,
                 { col: unit.gridX, row: unit.gridY },
                 { col: bestCell.col, row: bestCell.row }

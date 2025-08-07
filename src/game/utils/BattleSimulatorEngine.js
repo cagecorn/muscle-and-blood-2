@@ -6,6 +6,8 @@ import { AnimationEngine } from './AnimationEngine.js';
 import { TerminationManager } from './TerminationManager.js';
 // ✨ SummoningEngine을 새로 import 합니다.
 import { SummoningEngine } from './SummoningEngine.js';
+import SkillEffectProcessor from './SkillEffectProcessor.js';
+import { trapManager } from './TrapManager.js';
 
 import { aiManager } from '../../ai/AIManager.js';
 
@@ -56,6 +58,14 @@ export class BattleSimulatorEngine {
         this.summoningEngine = new SummoningEngine(scene, this);
         // 소환 엔진을 참조하는 종료 매니저를 초기화합니다.
         this.terminationManager = new TerminationManager(scene, this.summoningEngine, this);
+        this.skillEffectProcessor = new SkillEffectProcessor({
+            vfxManager: this.vfxManager,
+            animationEngine: this.animationEngine,
+            terminationManager: this.terminationManager,
+            summoningEngine: this.summoningEngine,
+            battleSimulator: this,
+            delayEngine
+        });
         // 전투 속도 매니저
         this.battleSpeedManager = new BattleSpeedManager();
         // 전투 중 유닛 정보를 표시할 UI 매니저
@@ -81,6 +91,7 @@ export class BattleSimulatorEngine {
             summoningEngine: this.summoningEngine,
             battleSimulator: this,
             narrationEngine: this.narrationUI,
+            skillEffectProcessor: this.skillEffectProcessor,
         };
 
         // ✨ AspirationEngine에 battleSimulator 참조 설정
@@ -131,6 +142,7 @@ export class BattleSimulatorEngine {
         this.battleSpeedManager.reset();
         cooldownManager.reset();
         this.summoningEngine.reset();
+        trapManager.reset();
         // ✨ [수정] 각 팀의 자원을 개별적으로 초기화
         sharedResourceEngine.initialize('ally');
         sharedResourceEngine.initialize('enemy');

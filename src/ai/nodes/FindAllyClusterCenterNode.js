@@ -45,7 +45,7 @@ class FindAllyClusterCenterNode extends Node {
         });
         const bestCell = availableCells[0];
 
-        const path = this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: bestCell.col, row: bestCell.row });
+        const path = await this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: bestCell.col, row: bestCell.row });
         if (path && path.length > 0) {
             blackboard.set('movementPath', path);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `아군 중심(${bestCell.col}, ${bestCell.row})으로 경로 설정`);

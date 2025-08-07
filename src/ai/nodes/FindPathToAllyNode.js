@@ -18,7 +18,7 @@ class FindPathToAllyNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const path = this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: target.gridX, row: target.gridY });
+        const path = await this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: target.gridX, row: target.gridY });
         if (path && path.length > 0) {
             const finalPath = path.slice(0, path.length - 1);
             blackboard.set('movementPath', finalPath);

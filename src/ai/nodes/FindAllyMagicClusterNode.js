@@ -57,7 +57,7 @@ class FindAllyMagicClusterNode extends Node {
         const bestCell = availableCells[0];
 
         // 4. 해당 위치로의 경로 탐색 및 블랙보드에 저장
-        const path = this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: bestCell.col, row: bestCell.row });
+        const path = await this.pathfinderEngine.findPath(unit, { col: unit.gridX, row: unit.gridY }, { col: bestCell.col, row: bestCell.row });
 
         if (path && path.length > 0) {
             blackboard.set('movementPath', path);

@@ -1,5 +1,6 @@
 import { debugLogEngine } from './DebugLogEngine.js';
 import { formationEngine } from './FormationEngine.js';
+import { aiMemoryEngine } from './AIMemoryEngine.js';
 
 /**
  * A* 알고리즘을 사용하여 유닛의 이동 경로를 계산하는 엔진
@@ -21,9 +22,12 @@ class PathfinderEngine {
      * @param {object} endPos - 목표 그리드 좌표 { col, row }
      * @returns {Array<object>|null} - 경로 좌표 배열 또는 null (경로 없음)
      */
-    findPath(unit, startPos, endPos) {
+    async findPath(unit, startPos, endPos) {
         const grid = this.formationEngine?.grid;
         if (!grid) return null;
+
+        const memory = await aiMemoryEngine.getMemory(unit.uniqueId);
+        const dangerousTiles = memory.dangerousTiles || {};
 
         const openSet = [];
         const closedSet = new Set();
@@ -63,7 +67,13 @@ class PathfinderEngine {
                     return;
                 }
 
-                const newCost = currentNode.gCost + this._getDistance(currentNode, neighbor);
+                let movementCost = this._getDistance(currentNode, neighbor);
+                const neighborKey = `${neighbor.col},${neighbor.row}`;
+                if (dangerousTiles[neighborKey]) {
+                    movementCost *= 10 * dangerousTiles[neighborKey];
+                }
+
+                const newCost = currentNode.gCost + movementCost;
                 const existing = openSet.find(n => n.col === neighbor.col && n.row === neighbor.row);
 
                 if (!existing || newCost < neighbor.gCost) {
@@ -90,7 +100,7 @@ class PathfinderEngine {
      * @param {object} target - 공격 대상 유닛
      * @returns {Array<object>|null} - 이동 경로 또는 null (이동 불가)
      */
-    findBestPathToAttack(unit, skill, target) {
+    async findBestPathToAttack(unit, skill, target) {
         const grid = this.formationEngine?.grid;
         if (!grid || !skill || !target) return null;
 
@@ -114,7 +124,7 @@ class PathfinderEngine {
 
         const reachable = [];
         for (const tile of candidateTiles) {
-            const path = this.findPath(unit, start, tile);
+            const path = await this.findPath(unit, start, tile);
             if (path && path.length <= moveRange) {
                 reachable.push({ path });
             }

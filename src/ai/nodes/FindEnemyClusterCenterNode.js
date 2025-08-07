@@ -47,7 +47,7 @@ class FindEnemyClusterCenterNode extends Node {
         });
         const bestCell = availableCells[0];
 
-        const path = this.pathfinderEngine.findPath(
+        const path = await this.pathfinderEngine.findPath(
             unit,
             { col: unit.gridX, row: unit.gridY },
             { col: bestCell.col, row: bestCell.row }

@@ -1441,6 +1441,32 @@ export const activeSkills = {
     // --- ▲ [신규] 화염병 투척 스킬 추가 ▲ ---
 
     // --- ▼ [신규] 나노레일건 스킬 추가 ▼ ---
+    // --- ▼ [신규] 트랩마스터용 함정 스킬 추가 ▼ ---
+    steelTrap: {
+        yinYangValue: +3,
+        NORMAL: {
+            id: 'steelTrap',
+            name: '강철 덫',
+            type: 'ACTIVE',
+            requiredClass: ['gunner', 'hacker'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.TRAP, SKILL_TAGS.PROHIBITION],
+            cost: 2,
+            targetType: 'tile',
+            description: '지정한 타일에 3턴 동안 유지되는 강철 덫을 설치합니다. 덫을 밟은 적은 1턴간 [속박] 상태가 됩니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 3,
+            trapData: {
+                duration: 3,
+                effect: {
+                    id: 'bind',
+                    type: EFFECT_TYPES.STATUS_EFFECT,
+                    duration: 1
+                }
+            }
+        }
+    },
+    // --- ▲ [신규] 트랩마스터용 함정 스킬 추가 ▲ ---
     nanoRailgun: {
         yinYangValue: -4,
         NORMAL: {
