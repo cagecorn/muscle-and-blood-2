@@ -66,6 +66,14 @@ class DebugLogEngine {
         this._recordLog('error', source, args);
     }
 
+    reset() {
+        this.logHistory = [];
+    }
+
+    startRecording() {
+        this.reset();
+    }
+
     _getSourceColor(source) {
         let hash = 0;
         for (let i = 0; i < source.length; i++) {
