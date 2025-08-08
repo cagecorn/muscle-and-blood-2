@@ -120,7 +120,11 @@ class SkillEngine {
             cooldownManager.setCooldown(unit.uniqueId, skill.id, finalCooldown);
         }
 
-        debugLogEngine.log('SkillEngine', `${unit.instanceName}이(가) 스킬 [${skill.name}] 사용 (토큰 ${skill.cost} 소모).`);
+        const skillLabel = skill.name || skill.id || 'Unknown';
+        debugLogEngine.log(
+            'SkillEngine',
+            `${unit.instanceName}이(가) 스킬 [${skillLabel}] 사용 (토큰 ${skill.cost} 소모).`
+        );
     }
 
     /**
