@@ -9,6 +9,7 @@ import UseSkillNode from '../nodes/UseSkillNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindAllyClusterCenterNode from '../nodes/FindAllyClusterCenterNode.js';
 import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
 
 /**
  * ESFJ: 사교적인 외교관 아키타입 행동 트리 (팔라딘)
@@ -22,6 +23,17 @@ function createESFJ_AI(engines = {}) {
     const useSkillImmediately = new SequenceNode([
         new IsSkillInRangeNode(engines),
         new UseSkillNode(engines)
+    ]);
+
+    const executeSkillBranch = new SelectorNode([
+        useSkillImmediately,
+        new SequenceNode([
+            new HasNotMovedNode(),
+            new FindPathToSkillRangeNode(engines),
+            new MoveToTargetNode(engines),
+            new IsSkillInRangeNode(engines),
+            new UseSkillNode(engines)
+        ])
     ]);
 
     const rootNode = new SelectorNode([
@@ -43,16 +55,13 @@ function createESFJ_AI(engines = {}) {
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
-            new SelectorNode([
-                useSkillImmediately, // 바로 공격 가능하면 공격
-                new SequenceNode([ // 아니면 이동 후 공격
-                    new HasNotMovedNode(),
-                    new FindPathToSkillRangeNode(engines),
-                    new MoveToTargetNode(engines),
-                    new IsSkillInRangeNode(engines),
-                    new UseSkillNode(engines)
-                ])
-            ])
+            executeSkillBranch
+        ]),
+        // 4순위: 모든 행동이 실패했다면 가까운 적에게 공격 시도
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetNode(engines),
+            executeSkillBranch
         ])
     ]);
 

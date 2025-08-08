@@ -75,6 +75,12 @@ function createISTJ_AI(engines = {}) {
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
         ]),
+        // 6순위: 모든 행동이 실패했다면 가까운 적에게 공격 시도
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetNode(engines),
+            executeSkillBranch
+        ])
     ]);
 
     return new BehaviorTree(rootNode);

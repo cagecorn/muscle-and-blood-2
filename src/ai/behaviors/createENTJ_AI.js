@@ -11,6 +11,7 @@ import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import IsEarlyBattleNode from '../nodes/IsEarlyBattleNode.js';
 import FindStrategySkillNode from '../nodes/FindStrategySkillNode.js';
 import FindAllyClusterCenterNode from '../nodes/FindAllyClusterCenterNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
 
 /**
  * ENTJ: 통솔관 아키타입 행동 트리
@@ -53,6 +54,12 @@ function createENTJ_AI(engines = {}) {
             new FindTargetBySkillTypeNode(engines),
             executeSkillBranch
         ]),
+        // 4순위: 모든 행동이 실패했다면 가까운 적에게 공격 시도
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetNode(engines),
+            executeSkillBranch
+        ])
     ]);
 
     return new BehaviorTree(rootNode);

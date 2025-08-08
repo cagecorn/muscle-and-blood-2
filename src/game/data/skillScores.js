@@ -5,12 +5,13 @@
 
 // 스킬 타입별 기본 점수
 export const SCORE_BY_TYPE = {
-    ACTIVE: 2,
-    BUFF: 3,
-    DEBUFF: 2,
-    AID: 4,
-    SUMMON: 3,
-    STRATEGY: 3
+    // ACTIVE 점수를 다른 스킬과 비슷하거나 더 높게 설정하여 공격을 장려합니다.
+    ACTIVE: 5, // 기존 2점에서 5점으로 상향
+    BUFF: 4,   // 기존 3점에서 4점으로 상향
+    DEBUFF: 3, // 기존 2점에서 3점으로 상향
+    AID: 5,    // 기존 4점에서 5점으로 상향
+    SUMMON: 4, // 기존 3점에서 4점으로 상향
+    STRATEGY: 5 // 기존 3점에서 5점으로 상향
     // PASSIVE는 AI가 직접 사용하는 스킬이 아니므로 점수 계산에서 제외됩니다.
 };
 
