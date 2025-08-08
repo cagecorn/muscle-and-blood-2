@@ -1,9 +1,9 @@
 import StartGame from './game/main.js';
 import { archetypeMemoryEngine } from './game/utils/ArchetypeMemoryEngine.js';
 
-// [4차 강화학습 데이터] - 2025-08-07 로그 기반
-const learnedData_v4 = {
-    // ESTJ, ESFJ, INFP, INTP, INFJ는 이전 학습 데이터 유지
+// [5차 강화학습 데이터] - 2025-08-08 로그 기반
+const learnedData_v5 = {
+    // 기존 학습 데이터 유지
     'ESTJ': {
         'target_medic': { 'melee_weight': 1.4 }, 'target_gunner': { 'melee_weight': 1.3 },
         'target_warrior': { 'melee_weight': 1.1 }, 'target_darkKnight': { 'melee_weight': 1.1 }
@@ -34,13 +34,26 @@ const learnedData_v4 = {
     'ISFP': { // ISFP: 처형 각이 안 나올 때, '고스트'나 '해커' 같은 기동성 좋은 적을 우선 공격하도록 학습
         'target_ghost': { 'melee_weight': 1.25 },
         'target_hacker': { 'melee_weight': 1.20 }
+    },
+
+    // 2025-08-08 추가 학습 데이터
+    'ENTJ': {
+        'target_gunner': { 'attack_weight': 1.4 }, // 거너 대상 공격 가중치 +40%
+        'target_medic': { 'attack_weight': 1.5 }   // 메딕 대상 공격 가중치 +50%
+    },
+    'ISTP': {
+        'target_warrior': { 'deploy_turret_weight': 1.6 }, // 전사 근접 시 포탑 설치 가중치 +60%
+        'target_sentinel': { 'deploy_turret_weight': 1.5 }  // 센티넬 근접 시 포탑 설치 가중치 +50%
+    },
+    'ISFJ': {
+        'target_warrior': { 'magic_weight': 1.3 } // 전사 대상 마법(디버프) 가중치 +30%
     }
 };
 
 // 학습 데이터 적용 함수 (기존과 동일)
 async function applyLearnedData() {
-    console.log('AI 강화학습 v4 데이터를 적용합니다...');
-    for (const [mbti, memory] of Object.entries(learnedData_v4)) {
+    console.log('AI 강화학습 v5 데이터를 적용합니다...');
+    for (const [mbti, memory] of Object.entries(learnedData_v5)) {
         await archetypeMemoryEngine.updateMemory(mbti, memory);
     }
     console.log('모든 아키타입의 집단 기억이 성공적으로 업데이트되었습니다!');
