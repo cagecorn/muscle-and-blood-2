@@ -1363,6 +1363,7 @@ export const activeSkills = {
             type: 'AID', // 지원 스킬이지만 액티브로도 분류 가능
             tags: [SKILL_TAGS.AID, SKILL_TAGS.BUFF],
             cost: 3,
+            // 대상을 '아군'으로 명확히 지정해 AI가 올바른 유닛을 선택하도록 합니다.
             targetType: 'ally',
             description: '아군 하나의 [둔화]와 [속박]을 즉시 해제하고, 2턴간 [아드레날린] 버프를 부여합니다.',
             illustrationPath: null,

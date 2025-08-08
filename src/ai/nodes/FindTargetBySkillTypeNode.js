@@ -36,7 +36,7 @@ class FindTargetBySkillTypeNode extends Node {
                 const healthRatioB = b.currentHp / b.finalStats.hp;
                 return healthRatioA - healthRatioB;
             })[0];
-        } else if (targetType === 'enemy') {
+        } else if (targetType === 'enemy' || skillData.type === 'DEBUFF' || skillData.type === 'ACTIVE') {
             if (!enemyUnits || enemyUnits.length === 0) {
                 debugAIManager.logNodeResult(NodeState.FAILURE, "공격할 적 유닛 없음");
                 return NodeState.FAILURE;
@@ -76,7 +76,7 @@ class FindTargetBySkillTypeNode extends Node {
                     })[0];
                 }
             } else {
-                // 그 외(ACTIVE, DEBUFF 등)는 기존 로직대로 가장 가까운 적을 공격합니다.
+                // 그 외 스킬은 기존 로직대로 가장 가까운 적을 공격합니다.
                 if (!enemyUnits || enemyUnits.length === 0) {
                     debugAIManager.logNodeResult(NodeState.FAILURE, "공격할 적 유닛 없음");
                     return NodeState.FAILURE;
