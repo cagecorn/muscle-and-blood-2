@@ -15,6 +15,7 @@ import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 import { NodeState } from '../nodes/Node.js';
 import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import UseBuffSkillOrWaitNode from '../nodes/UseBuffSkillOrWaitNode.js';
 
 /**
  * MeleeAI: 근접 공격형 AI 행동 트리 (개선 버전)
@@ -93,7 +94,9 @@ function createMeleeAI(engines = {}) {
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
-        ])
+        ]),
+        // 7순위: 경로를 찾지 못한 경우 버프 스킬 사용 또는 대기
+        new UseBuffSkillOrWaitNode(engines)
     ]);
 
     return new BehaviorTree(rootNode);

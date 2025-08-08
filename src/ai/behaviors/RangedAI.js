@@ -14,6 +14,7 @@ import FindSafeRepositionNode from '../nodes/FindSafeRepositionNode.js';
 import MoveToUseSkillNode from '../nodes/MoveToUseSkillNode.js';
 import FindTargetNode from '../nodes/FindTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import UseBuffSkillOrWaitNode from '../nodes/UseBuffSkillOrWaitNode.js';
 
 function createRangedAI(engines = {}) {
     // --- 공통 사용 브랜치 ---
@@ -43,7 +44,9 @@ function createRangedAI(engines = {}) {
             new HasNotMovedNode(),
             new FindSafeRepositionNode(engines),
             new MoveToTargetNode(engines)
-        ])
+        ]),
+        // 경로를 찾지 못했다면 버프 스킬 사용 또는 대기
+        new UseBuffSkillOrWaitNode(engines)
     ]);
 
     // --- MBTI 기반 특수 행동들 ---
