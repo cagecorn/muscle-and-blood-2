@@ -74,6 +74,37 @@ class DebugLogEngine {
         this.reset();
     }
 
+    getHistory() {
+        return [...this.logHistory];
+    }
+
+    /**
+     * 기록된 로그를 JSON 파일로 저장합니다.
+     * 브라우저 환경에서만 동작하며, 로그가 비어 있으면 아무 작업도 하지 않습니다.
+     * @param {string} [filename] 저장할 파일 이름
+     */
+    saveLog(filename = `debug-log-${Date.now()}.json`) {
+        if (!this.enabled || this.logHistory.length === 0) {
+            return;
+        }
+
+        if (typeof document === 'undefined') {
+            this.warn('Engine', 'saveLog는 브라우저 환경에서만 사용할 수 있습니다.');
+            return;
+        }
+
+        const blob = new Blob(
+            [JSON.stringify(this.logHistory, null, 2)],
+            { type: 'application/json' }
+        );
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
     _getSourceColor(source) {
         let hash = 0;
         for (let i = 0; i < source.length; i++) {
