@@ -49,11 +49,7 @@ class CrisisEngine {
             if (tile.col === unit.gridX && tile.row === unit.gridY) continue;
             actions.push({ type: 'MOVE', target: { col: tile.col, row: tile.row }, description: `(${tile.col}, ${tile.row}) 위치로 이동` });
         }
-        // 일부 유닛은 스킬 목록이 정의되지 않을 수 있으므로 안전하게 처리합니다.
-        const skills = Array.isArray(unit.skills) ? unit.skills : [];
-        const availableSkills = skills
-            .map(s => s && (s.NORMAL || s))
-            .filter(skill => skill && skillEngine.canUseSkill(unit, skill));
+        const availableSkills = unit.skills.map(s => s.NORMAL || s).filter(skill => skillEngine.canUseSkill(unit, skill));
         for (const skill of availableSkills) {
             const targets = targetManager.findTargets(unit, skill.targetType, skill.range, allies, enemies);
             for (const target of targets) {
