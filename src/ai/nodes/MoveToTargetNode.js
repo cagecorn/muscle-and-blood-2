@@ -23,7 +23,7 @@ class MoveToTargetNode extends Node {
         const movementRange = unit.finalStats.movement || 3;
 
         // ✨ [수정] 경로가 없는 경우(null)와 이미 도착한 경우(빈 배열)를 분리해서 처리합니다.
-        if (path === null) { // 경로 탐색 실패
+        if (!path) { // 경로 탐색 실패
             debugAIManager.logNodeResult(NodeState.FAILURE, '경로가 없음');
             return NodeState.FAILURE;
         }
@@ -35,6 +35,9 @@ class MoveToTargetNode extends Node {
 
         // 이동력만큼만 경로를 잘라냅니다.
         const movePath = path.slice(0, movementRange);
+        if (movePath.length === 0) {
+            return NodeState.SUCCESS;
+        }
 
         // 현재 위치의 점유 상태를 해제합니다.
         const originalCell = formationEngine.grid.getCell(unit.gridX, unit.gridY);
