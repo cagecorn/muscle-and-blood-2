@@ -11,6 +11,7 @@ class MoveToUseSkillNode extends Node {
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
+
         const skill = blackboard.get('currentSkillData');
         const target = blackboard.get('skillTarget');
         if (!skill || !target) {
@@ -18,21 +19,35 @@ class MoveToUseSkillNode extends Node {
             return NodeState.FAILURE;
         }
 
-        const path = await this.pathfinderEngine.findBestPathToAttack(unit, skill, target);
+        let path = blackboard.get('movementPath');
         if (!path) {
-            debugAIManager.logNodeResult(NodeState.FAILURE, `스킬 [${skill.name}] 사용 위치 없음`);
-            return NodeState.FAILURE;
+            path = await this.pathfinderEngine.findBestPathToAttack(unit, skill, target);
+            if (!path) {
+                debugAIManager.logNodeResult(
+                    NodeState.FAILURE,
+                    `스킬 [${skill.name}] 사용 위치 없음`
+                );
+                return NodeState.FAILURE;
+            }
+        }
+
+        if (path.length === 0) {
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '이동 필요 없음');
+            return NodeState.SUCCESS;
         }
 
         blackboard.set('movementPath', path);
         const result = await this.moveNode.evaluate(unit, blackboard);
         if (result === NodeState.SUCCESS) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skill.name}] 사용 위치로 이동`);
-            return NodeState.SUCCESS;
+            debugAIManager.logNodeResult(
+                NodeState.SUCCESS,
+                `스킬 [${skill.name}] 사용 위치로 이동 완료`
+            );
+        } else {
+            debugAIManager.logNodeResult(NodeState.FAILURE, '경로 이동 실패');
         }
 
-        debugAIManager.logNodeResult(NodeState.FAILURE, '경로 탐색 실패');
-        return NodeState.FAILURE;
+        return result;
     }
 }
 
