@@ -1,83 +1,121 @@
-// src/ai/nodes/MoveToTargetNode.js
-
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
-import { gameSystem } from '../../game/GameSystem.js'; // GameSystem을 통해 엔진에 접근
+import { formationEngine } from '../../game/utils/FormationEngine.js';
+// --- ▼ [신규] 상태 효과 적용을 위한 모듈 import ▼ ---
+import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
+import { EFFECT_TYPES } from '../../game/utils/EffectTypes.js';
+// --- ▲ [신규] 상태 효과 적용을 위한 모듈 import ▲ ---
+import { trapManager } from '../../game/utils/TrapManager.js';
+import { aiMemoryEngine } from '../../game/utils/AIMemoryEngine.js';
 
 class MoveToTargetNode extends Node {
-    constructor() {
+    constructor({ animationEngine, cameraControl, vfxManager }) { // vfxManager 추가
         super();
-        // 생성자에서 직접 엔진을 참조하지 않고, 필요할 때 GameSystem을 통해 가져옵니다.
+        this.animationEngine = animationEngine;
+        this.cameraControl = cameraControl;
+        this.vfxManager = vfxManager; // vfxManager 저장
+        this.skillEffectProcessor = this.vfxManager?.battleSimulator?.skillEffectProcessor;
     }
 
     async evaluate(unit, blackboard) {
         debugAIManager.logNodeEvaluation(this, unit);
+        const path = blackboard.get('movementPath');
+        const movementRange = unit.finalStats.movement || 3;
 
-        // 이제 'movementPath'에는 경로가 아닌 최종 목적지 {col, row}가 담겨 있습니다.
-        const destination = blackboard.get('movementPath');
-
-        // 1. 데이터 유효성 검사
-        if (!destination) {
-            debugAIManager.logNodeResult(NodeState.FAILURE, '이동 목적지 없음');
+        // ✨ [수정] 경로가 없는 경우(null)와 이미 도착한 경우(빈 배열)를 분리해서 처리합니다.
+        if (!path) { // 경로 탐색 실패
+            debugAIManager.logNodeResult(NodeState.FAILURE, '경로가 없음');
             return NodeState.FAILURE;
         }
 
-        const startPos = { col: unit.gridX, row: unit.gridY };
-
-        // 2. 이미 목적지에 있는지 확인
-        if (startPos.col === destination.col && startPos.row === destination.row) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, '이동 불필요, 이미 목적지에 있음');
-            return NodeState.SUCCESS; // 이동이 필요 없으므로 성공 처리
-        }
-
-        // 3. 필요한 엔진이 초기화되었는지 확인
-        if (
-            !gameSystem.pathfinderEngine ||
-            !gameSystem.scene ||
-            typeof gameSystem.scene.moveUnitAlongPath !== 'function'
-        ) {
-            debugAIManager.logNodeResult(
-                NodeState.FAILURE,
-                'GameSystem 미초기화: pathfinder 또는 scene 없음'
-            );
-            return NodeState.FAILURE;
-        }
-
-        // GameSystem을 통해 pathfinderEngine에 접근합니다.
-        let path;
-        try {
-            path = await gameSystem.pathfinderEngine.findPath(startPos, destination);
-        } catch (error) {
-            console.error('MoveToTargetNode 경로 탐색 중 오류 발생:', error);
-            debugAIManager.logNodeResult(NodeState.FAILURE, '경로 탐색 중 오류');
-            return NodeState.FAILURE;
-        }
-
-        if (!path || path.length <= 1) { // 경로가 없거나, 시작점만 있는 경우
-            debugAIManager.logNodeResult(NodeState.FAILURE, '목적지까지의 유효한 경로 없음');
-            return NodeState.FAILURE;
-        }
-
-        // 4. 유닛 이동 실행 (GameSystem을 통해 scene의 메서드 호출)
-        try {
-            // 경로의 첫 번째 지점은 현재 위치이므로 제외하고 실제 이동 경로를 전달
-            const movementPath = path.slice(1);
-            await gameSystem.scene.moveUnitAlongPath(unit, movementPath);
-
-            // 이동 후 유닛 상태는 moveUnitAlongPath 내부에서 업데이트된다고 가정합니다.
-            // 만약 자동으로 업데이트되지 않는다면 아래 코드가 필요합니다.
-            // const finalPos = path[path.length - 1];
-            // unit.gridX = finalPos.col;
-            // unit.gridY = finalPos.row;
-
-            debugAIManager.logNodeResult(NodeState.SUCCESS, '목적지로 이동 완료');
+        if (path.length === 0) { // 이미 목표 위치에 도달함
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '이미 목표 위치에 있음');
             return NodeState.SUCCESS;
-        } catch (error) {
-            console.error('MoveToTargetNode에서 유닛 이동 중 오류 발생:', error);
-            debugAIManager.logNodeResult(NodeState.FAILURE, '유닛 이동 중 오류');
-            return NodeState.FAILURE;
         }
+
+        // 이동력만큼만 경로를 잘라냅니다.
+        const movePath = path.slice(0, movementRange);
+        if (movePath.length === 0) {
+            return NodeState.SUCCESS;
+        }
+
+        // 현재 위치의 점유 상태를 해제합니다.
+        const originalCell = formationEngine.grid.getCell(unit.gridX, unit.gridY);
+        if (originalCell) {
+            originalCell.isOccupied = false;
+            originalCell.sprite = null;
+        }
+
+        // 경로를 따라 한 칸씩 이동합니다.
+        for (const step of movePath) {
+            const targetCell = formationEngine.grid.getCell(step.col, step.row);
+            if (targetCell) {
+                await this.animationEngine.moveTo(
+                    unit.sprite,
+                    targetCell.x,
+                    targetCell.y,
+                    200,
+                    () => {
+                        if (this.cameraControl && unit.sprite.active) {
+                            this.cameraControl.panTo(unit.sprite.x, unit.sprite.y, 0);
+                        }
+                    }
+                );
+                unit.gridX = step.col;
+                unit.gridY = step.row;
+
+                const trap = trapManager.getTrapAt(step.col, step.row);
+                if (trap && trap.owner.team !== unit.team) {
+                    await trapManager.triggerTrap(unit, this.skillEffectProcessor);
+                    aiMemoryEngine.updateTileMemory(unit.uniqueId, step.col, step.row, 1);
+                    const cell = formationEngine.grid.getCell(step.col, step.row);
+                    if (cell) {
+                        cell.isOccupied = true;
+                        cell.sprite = unit.sprite;
+                    }
+                    return NodeState.SUCCESS;
+                }
+            }
+        }
+
+        // 최종 위치의 점유 상태를 갱신합니다.
+        const destination = movePath[movePath.length - 1];
+        const finalCell = formationEngine.grid.getCell(destination.col, destination.row);
+        if (finalCell) {
+            finalCell.isOccupied = true;
+            finalCell.sprite = unit.sprite;
+        }
+
+        // --- ▼ [핵심 추가] 저거너트 패시브 발동 로직 ▼ ---
+        if (unit.classPassive?.id === 'juggernaut' && movePath.length > 0) {
+            const defenseBonus = movePath.length * 0.03;
+            const effects = statusEffectManager.activeEffects.get(unit.uniqueId) || [];
+            let existingBuff = effects.find(e => e.id === 'juggernautBuff');
+
+            if (existingBuff) {
+                existingBuff.modifiers.forEach(mod => mod.value += defenseBonus);
+                existingBuff.duration = 1;
+            } else {
+                const buffEffect = {
+                    id: 'juggernautBuff',
+                    type: EFFECT_TYPES.BUFF,
+                    duration: 1,
+                    modifiers: [
+                        { stat: 'physicalDefense', type: 'percentage', value: defenseBonus },
+                        { stat: 'magicDefense', type: 'percentage', value: defenseBonus }
+                    ]
+                };
+                statusEffectManager.addEffect(unit, { name: '저거너트', effect: buffEffect }, unit);
+            }
+            this.vfxManager.showEffectName(unit.sprite, '저거너트!', '#22c55e');
+        }
+        // --- ▲ [핵심 추가] 저거너트 패시브 발동 로직 ▲ ---
+
+        // 이동 완료 플래그 설정
+        blackboard.set('hasMovedThisTurn', true);
+
+        debugAIManager.logNodeResult(NodeState.SUCCESS);
+        return NodeState.SUCCESS;
     }
 }
-
 export default MoveToTargetNode;
