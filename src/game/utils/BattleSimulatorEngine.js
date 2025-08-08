@@ -397,7 +397,7 @@ export class BattleSimulatorEngine {
 
 export const battleSimulatorEngine = {
     async runFullSimulation(initialAllies, initialEnemies) {
-        debugLogEngine.clear();
+        debugLogEngine.reset();
         debugLogEngine.startRecording();
 
         const simAllies = JSON.parse(JSON.stringify(initialAllies));
