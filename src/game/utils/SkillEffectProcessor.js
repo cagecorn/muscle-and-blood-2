@@ -52,7 +52,7 @@ class SkillEffectProcessor {
                 target.gridX,
                 target.gridY,
                 { owner: unit, skillData: skill },
-                this.battleSimulator.scene
+                this.battleSimulator
             );
             this._handleCommonPostEffects(unit, target, skill, blackboard);
             this._handleClassPassiveTrigger(unit, skill);
