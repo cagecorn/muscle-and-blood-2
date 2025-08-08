@@ -8,6 +8,7 @@ import { TerminationManager } from './TerminationManager.js';
 import { SummoningEngine } from './SummoningEngine.js';
 import SkillEffectProcessor from './SkillEffectProcessor.js';
 import { trapManager } from './TrapManager.js';
+import { debugLogEngine } from './DebugLogEngine.js';
 
 import { aiManager } from '../../ai/AIManager.js';
 
@@ -393,3 +394,51 @@ export class BattleSimulatorEngine {
         }
     }
 }
+
+export const battleSimulatorEngine = {
+    async runFullSimulation(initialAllies, initialEnemies) {
+        debugLogEngine.clear();
+        debugLogEngine.startRecording();
+
+        const simAllies = JSON.parse(JSON.stringify(initialAllies));
+        const simEnemies = JSON.parse(JSON.stringify(initialEnemies));
+        let turn = 0;
+        const MAX_TURNS = 100;
+
+        while (
+            turn < MAX_TURNS &&
+            simAllies.some(u => u.currentHp > 0) &&
+            simEnemies.some(u => u.currentHp > 0)
+        ) {
+            turn++;
+            debugLogEngine.log('System', `======= Turn ${turn} =======`);
+            const turnOrder = turnOrderManager.createTurnQueue([...simAllies, ...simEnemies]);
+            for (const unit of turnOrder) {
+                if (unit.currentHp <= 0) continue;
+                const targets = unit.team === 'ally' ? simEnemies : simAllies;
+                const target = targets.find(t => t.currentHp > 0);
+                if (target) {
+                    target.currentHp -= unit.finalStats?.physicalAttack || 1;
+                    debugLogEngine.log(
+                        unit.instanceName,
+                        `${target.instanceName}에게 공격, 남은 HP: ${Math.max(0, target.currentHp)}`
+                    );
+                    if (target.currentHp <= 0) {
+                        debugLogEngine.log('System', `${target.instanceName} 쓰러짐`);
+                    }
+                }
+                if (
+                    !simAllies.some(u => u.currentHp > 0) ||
+                    !simEnemies.some(u => u.currentHp > 0)
+                ) {
+                    break;
+                }
+            }
+        }
+
+        const winner = simAllies.some(u => u.currentHp > 0) ? 'ally' : 'enemy';
+        debugLogEngine.log('System', `전투 종료! 결과: ${winner}`);
+        debugLogEngine.stopRecording();
+        return debugLogEngine.getHistory();
+    }
+};

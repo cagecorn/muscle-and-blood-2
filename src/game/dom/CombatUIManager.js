@@ -4,6 +4,11 @@ import { statusEffects } from '../data/status-effects.js';
 import { ownedSkillsManager } from '../utils/OwnedSkillsManager.js';
 import { skillInventoryManager } from '../utils/SkillInventoryManager.js';
 import { cooldownManager } from '../utils/CooldownManager.js';
+import { battleSimulatorEngine } from '../utils/BattleSimulatorEngine.js';
+import { logDownloader } from '../utils/LogDownloader.js';
+import { debugLogEngine } from '../utils/DebugLogEngine.js';
+import { partyEngine } from '../utils/PartyEngine.js';
+import { monsterEngine } from '../utils/MonsterEngine.js';
 
 /**
  * 전투 중 활성화된 유닛의 상세 정보를 표시하는 하단 UI 매니저 (최적화 버전)
@@ -26,6 +31,7 @@ export class CombatUIManager {
 
         // UI 구조를 미리 생성합니다.
         this._createBaseLayout();
+        this._setupInstantResultButton();
         this.container.style.display = 'none'; // 초기에는 숨김
     }
 
@@ -87,21 +93,52 @@ export class CombatUIManager {
         this.portraitPanel = document.createElement('div');
         this.portraitPanel.className = 'combat-portrait-panel';
 
+        const controlsContainer = document.createElement('div');
+        controlsContainer.id = 'battle-controls';
+
         this.speedButton = document.createElement('button');
         this.speedButton.id = 'battle-speed-button';
+        this.speedButton.className = 'battle-control-button';
         this.speedButton.innerText = '1x';
         this.speedButton.onclick = () => {
             const newSpeed = this.battleSpeedManager.cycleSpeed();
             this.speedButton.innerText = `${newSpeed}x`;
         };
 
+        this.instantResultButton = document.createElement('button');
+        this.instantResultButton.id = 'instant-result-btn';
+        this.instantResultButton.textContent = '전투 종료 결과';
+        this.instantResultButton.className = 'battle-control-button';
+        controlsContainer.appendChild(this.speedButton);
+        controlsContainer.appendChild(this.instantResultButton);
+
         const rightPanel = document.createElement('div');
         rightPanel.className = 'combat-right-panel';
         rightPanel.appendChild(this.portraitPanel);
-        rightPanel.appendChild(this.speedButton);
+        rightPanel.appendChild(controlsContainer);
 
         this.container.appendChild(infoPanel);
         this.container.appendChild(rightPanel);
+    }
+
+    _setupInstantResultButton() {
+        if (!this.instantResultButton) return;
+        this.instantResultButton.addEventListener('click', async () => {
+            console.log('전투 시뮬레이션을 시작합니다...');
+            debugLogEngine.log('UI', '전투 시뮬레이션 시작');
+            this.instantResultButton.disabled = true;
+            this.instantResultButton.textContent = '시뮬레이션 중...';
+
+            const allies = partyEngine.getDeployedMercenaries();
+            const enemies = monsterEngine.getAllMonsters('enemy');
+
+            const battleLog = await battleSimulatorEngine.runFullSimulation(allies, enemies);
+
+            logDownloader.download(battleLog, 'battle-simulation-log.json');
+
+            this.instantResultButton.textContent = '시뮬레이션 완료';
+            console.log('전투 시뮬레이션이 완료되었습니다. 로그 파일을 확인하세요.');
+        });
     }
 
     /**
