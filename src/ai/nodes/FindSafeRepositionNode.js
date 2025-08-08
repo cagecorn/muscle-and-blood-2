@@ -17,10 +17,8 @@ class FindSafeRepositionNode extends Node {
         debugAIManager.logNodeEvaluation(this, unit);
         const enemies = blackboard.get('enemyUnits');
 
-        // ✨ [핵심 추가] 현재 위협받고 있는지(isThreatened) 확인하는 로직
+        // ✨ [핵심 수정] 위협받는 상황이 아니면, 전투 중에는 재배치를 수행하지 않도록 로직을 명확화합니다.
         const isThreatened = blackboard.get('isThreatened');
-
-        // 만약 적이 있는데 위협받는 상황이 아니라면, 굳이 후퇴하지 않고 전투를 지속합니다.
         if (enemies && enemies.length > 0 && !isThreatened) {
             debugAIManager.logNodeResult(NodeState.FAILURE, '전투 중 불필요한 재배치는 수행하지 않음');
             return NodeState.FAILURE;
@@ -30,6 +28,7 @@ class FindSafeRepositionNode extends Node {
             if (isThreatened) {
                 this.narrationEngine.show(`${unit.instanceName}이(가) 위협을 피해 안전한 위치로 후퇴합니다.`);
             } else {
+                // ✨ 전투 중이 아닐 때만 이 메시지가 표시됩니다.
                 this.narrationEngine.show(`${unit.instanceName}이(가) 다음 행동을 위해 유리한 위치로 이동합니다.`);
             }
         }
