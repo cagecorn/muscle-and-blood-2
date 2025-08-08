@@ -9,53 +9,6 @@ class TargetManager {
     }
 
     /**
-     * 스킬의 targetType과 사거리에 따라 유효한 타겟 목록을 찾습니다.
-     * @param {object} unit - 기준이 되는 유닛
-     * @param {string} targetType - 'self', 'ally', 'enemy', 'all'
-     * @param {number} range - 스킬 사거리
-     * @param {Array<object>} allies - 아군 목록
-     * @param {Array<object>} enemies - 적군 목록
-     * @returns {Array<object>} - 선택 가능한 대상 배열
-     */
-    findTargets(unit, targetType, range, allies = [], enemies = []) {
-        const targets = [];
-        const inRange = (a, b) => {
-            const dist = Math.abs(a.gridX - b.gridX) + Math.abs(a.gridY - b.gridY);
-            return dist <= (range ?? 0);
-        };
-
-        switch (targetType) {
-            case 'self':
-                targets.push(unit);
-                break;
-            case 'ally':
-                allies.forEach(ally => {
-                    if (ally !== unit && inRange(unit, ally)) {
-                        targets.push(ally);
-                    }
-                });
-                break;
-            case 'enemy':
-                enemies.forEach(enemy => {
-                    if (inRange(unit, enemy)) {
-                        targets.push(enemy);
-                    }
-                });
-                break;
-            case 'all':
-                [...allies, ...enemies].forEach(other => {
-                    if (inRange(unit, other)) {
-                        targets.push(other);
-                    }
-                });
-                break;
-            default:
-                break;
-        }
-        return targets;
-    }
-
-    /**
      * 유닛과 가장 가까운 거리에 있는 적을 찾습니다.
      * @param {object} unit - 기준이 되는 유닛
      * @param {Array<object>} enemyList - 탐색 대상이 되는 적 유닛 목록
