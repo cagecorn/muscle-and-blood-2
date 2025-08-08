@@ -18,9 +18,19 @@ class FindPathToTargetNode extends Node {
         }
 
         const path = await this._findPathToUnit(unit, target);
-        if (path) {
+        if (Array.isArray(path)) {
             blackboard.set('movementPath', path);
             debugAIManager.logNodeResult(NodeState.SUCCESS, `목표(${target.instanceName})에게 경로 설정`);
+            return NodeState.SUCCESS;
+        }
+
+        // 🛠 경로 탐색 실패 시 한 칸 전진 시도
+        const start = { col: unit.gridX, row: unit.gridY };
+        const targetPos = { col: target.gridX, row: target.gridY };
+        const fallback = this._getDirectStep(start, targetPos);
+        if (fallback) {
+            blackboard.set('movementPath', [fallback]);
+            debugAIManager.logNodeResult(NodeState.SUCCESS, '경로 탐색 실패, 직접 한 칸 전진');
             return NodeState.SUCCESS;
         }
 
@@ -62,6 +72,22 @@ class FindPathToTargetNode extends Node {
         for (const bestCell of potentialCells) {
             const path = await this.pathfinderEngine.findPath(unit, start, { col: bestCell.col, row: bestCell.row });
             if (path && path.length > 0) return path;
+        }
+        return null;
+    }
+
+    _getDirectStep(start, targetPos) {
+        const dx = Math.sign(targetPos.col - start.col);
+        const dy = Math.sign(targetPos.row - start.row);
+        const candidates = [];
+        if (dx !== 0) candidates.push({ col: start.col + dx, row: start.row });
+        if (dy !== 0) candidates.push({ col: start.col, row: start.row + dy });
+
+        for (const step of candidates) {
+            const cell = this.formationEngine.grid.getCell(step.col, step.row);
+            if (cell && !cell.isOccupied) {
+                return step;
+            }
         }
         return null;
     }
