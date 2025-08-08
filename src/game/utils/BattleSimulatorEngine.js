@@ -23,6 +23,7 @@ import { tokenEngine } from './TokenEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { statusEffectManager } from './StatusEffectManager.js';
 import { cooldownManager } from './CooldownManager.js';
+import { SKILL_TAGS } from './SkillTagManager.js';
 // 전투 중 하단 UI를 관리하는 매니저
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { TurnOrderUIManager } from '../dom/TurnOrderUIManager.js';
@@ -400,8 +401,35 @@ export const battleSimulatorEngine = {
         debugLogEngine.reset();
         debugLogEngine.startRecording();
 
+        // 깊은 복사로 시뮬레이션용 유닛 생성
         const simAllies = JSON.parse(JSON.stringify(initialAllies));
         const simEnemies = JSON.parse(JSON.stringify(initialEnemies));
+
+        simAllies.forEach(u => (u.team = 'ally'));
+        simEnemies.forEach(u => (u.team = 'enemy'));
+        const allUnits = [...simAllies, ...simEnemies];
+
+        // 전투 관련 엔진 초기화
+        tokenEngine.initializeUnits(allUnits);
+        tokenEngine.addTokensForNewTurn();
+        cooldownManager.reset();
+        skillEngine.resetTurnActions();
+        statusEffectManager.activeEffects.clear();
+
+        // 컴뱃 계산 엔진과 상태 효과 매니저가 참조할 전투 컨텍스트
+        const battleContext = { turnQueue: allUnits };
+        statusEffectManager.setBattleSimulator(battleContext);
+        combatCalculationEngine.battleSimulator = battleContext;
+
+        const basicAttack = {
+            id: 'basicAttack',
+            name: '기본 공격',
+            type: 'ACTIVE',
+            cost: 0,
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL],
+            damageMultiplier: { min: 1, max: 1 }
+        };
+
         let turn = 0;
         const MAX_TURNS = 100;
 
@@ -412,21 +440,44 @@ export const battleSimulatorEngine = {
         ) {
             turn++;
             debugLogEngine.log('System', `======= Turn ${turn} =======`);
-            const turnOrder = turnOrderManager.createTurnQueue([...simAllies, ...simEnemies]);
+
+            battleContext.turnQueue = [...simAllies, ...simEnemies];
+            const turnOrder = turnOrderManager.createTurnQueue(battleContext.turnQueue);
+
             for (const unit of turnOrder) {
                 if (unit.currentHp <= 0) continue;
-                const targets = unit.team === 'ally' ? simEnemies : simAllies;
-                const target = targets.find(t => t.currentHp > 0);
-                if (target) {
-                    target.currentHp -= unit.finalStats?.physicalAttack || 1;
-                    debugLogEngine.log(
-                        unit.instanceName,
-                        `${target.instanceName}에게 공격, 남은 HP: ${Math.max(0, target.currentHp)}`
-                    );
-                    if (target.currentHp <= 0) {
-                        debugLogEngine.log('System', `${target.instanceName} 쓰러짐`);
-                    }
+                const opponents = unit.team === 'ally' ? simEnemies : simAllies;
+                const target = opponents.find(t => t.currentHp > 0);
+                if (!target) break;
+
+                // 스킬 선택 (현재는 첫 번째 스킬 또는 기본 공격)
+                let chosen = unit.skills?.[0];
+                chosen = chosen?.NORMAL || chosen; // 등급 구분이 있는 경우 처리
+                if (!chosen || !skillEngine.canUseSkill(unit, chosen)) {
+                    chosen = basicAttack;
                 }
+
+                skillEngine.recordSkillUse(unit, chosen);
+                const { damage } = combatCalculationEngine.calculateDamage(unit, target, chosen);
+                target.currentHp = Math.max(0, target.currentHp - damage);
+
+                debugLogEngine.log(
+                    unit.instanceName,
+                    `${chosen.name} 사용 -> ${target.instanceName}에게 ${damage} 피해 (남은 HP: ${target.currentHp})`
+                );
+
+                if (chosen.effect && target.currentHp > 0) {
+                    statusEffectManager.addEffect(target, chosen, unit);
+                    debugLogEngine.log(
+                        'StatusEffect',
+                        `${target.instanceName}에게 [${chosen.effect.id}] 적용`
+                    );
+                }
+
+                if (target.currentHp <= 0) {
+                    debugLogEngine.log('System', `${target.instanceName} 쓰러짐`);
+                }
+
                 if (
                     !simAllies.some(u => u.currentHp > 0) ||
                     !simEnemies.some(u => u.currentHp > 0)
@@ -434,6 +485,10 @@ export const battleSimulatorEngine = {
                     break;
                 }
             }
+
+            statusEffectManager.onTurnEnd(battleContext.turnQueue);
+            tokenEngine.addTokensForNewTurn();
+            skillEngine.resetTurnActions();
         }
 
         const winner = simAllies.some(u => u.currentHp > 0) ? 'ally' : 'enemy';
