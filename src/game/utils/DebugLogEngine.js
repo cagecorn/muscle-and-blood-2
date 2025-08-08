@@ -66,6 +66,16 @@ class DebugLogEngine {
         this._recordLog('error', source, args);
     }
 
+    // 간단한 행동 트리 로그 헬퍼 메서드
+    logNodeEvaluation(node, unit) {
+        this.log('NodeEvaluation', `${node.constructor.name} evaluating ${unit?.name ?? unit?.uniqueId ?? ''}`);
+    }
+
+    logNodeResult(state, message = '') {
+        const suffix = message ? `: ${message}` : '';
+        this.log('NodeResult', `${state}${suffix}`);
+    }
+
     _getSourceColor(source) {
         let hash = 0;
         for (let i = 0; i < source.length; i++) {
