@@ -1,4 +1,5 @@
 import { debugLogEngine } from './DebugLogEngine.js';
+import { formationEngine } from './FormationEngine.js';
 
 class TrapManager {
     constructor() {
@@ -30,14 +31,19 @@ class TrapManager {
             return;
         }
 
+        if (!formationEngine.grid) {
+            console.error('TrapManager: formationEngine.grid가 등록되어 있지 않습니다.');
+            return;
+        }
+
         const key = `${col},${row}`;
         if (this.activeTraps.has(key)) {
             debugLogEngine.warn(this.name, `[${key}] 타일에는 이미 함정이 존재하여 덮어썼습니다.`);
             this.activeTraps.get(key).sprite?.destroy();
         }
 
-        // battle의 scene을 사용하여 셀을 조회합니다.
-        const cell = battle.scene.gridEngine.getCell(col, row);
+        // formationEngine의 그리드를 사용하여 셀을 조회합니다.
+        const cell = formationEngine.grid.getCell(col, row);
         if (cell) {
             const trapSprite = battle.scene.add
                 .image(cell.x, cell.y, 'placeholder')
