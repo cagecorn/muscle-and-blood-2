@@ -64,13 +64,8 @@ class AspirationEngine {
                 this._applyExaltedBuffs(unit);
                 debugAspirationManager.logStateChange(unit.instanceName, ASPIRATION_STATE.EXALTED);
             }
-        } else if (data.aspiration <= 0) {
-            data.state = ASPIRATION_STATE.COLLAPSED;
-            const unit = this.battleSimulator.turnQueue.find(u => u.uniqueId === unitId);
-            if (unit) {
-                debugAspirationManager.logStateChange(unit.instanceName, ASPIRATION_STATE.COLLAPSED);
-            }
         }
+        // ✨ [수정] 열망 붕괴 로직을 삭제했습니다.
     }
 
     _applyExaltedBuffs(unit) {
