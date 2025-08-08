@@ -14,6 +14,7 @@ import WasAttackedRecentlyNode from '../nodes/WasAttackedRecentlyNode.js';
 import FindAttackerNode from '../nodes/FindAttackerNode.js';
 import FindTargetNode from '../nodes/FindTargetNode.js';
 import FindPathToTargetNode from '../nodes/FindPathToTargetNode.js';
+import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
 
 /**
  * ISTP: 만능 재주꾼 아키타입 행동 트리
