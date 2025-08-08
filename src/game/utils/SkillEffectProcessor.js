@@ -416,22 +416,25 @@ class SkillEffectProcessor {
             // 최대 2명에게 튕김
             const ricochetTargets = diceEngine.getRandomElement(candidates, 2);
 
-            for (const ricochetTarget of ricochetTargets) {
-                await this.delayEngine.hold(200);
+            // ✨ [버그 수정] ricochetTargets가 배열이고 비어있지 않은지 확인합니다.
+            if (Array.isArray(ricochetTargets) && ricochetTargets.length > 0) {
+                for (const ricochetTarget of ricochetTargets) {
+                    await this.delayEngine.hold(200);
 
-                // 도탄 시각 효과 (임시)
-                this.vfxManager.createMagicImpact(ricochetTarget.sprite.x, ricochetTarget.sprite.y, 'placeholder');
+                    // 도탄 시각 효과 (임시)
+                    this.vfxManager.createMagicImpact(ricochetTarget.sprite.x, ricochetTarget.sprite.y, 'placeholder');
 
-                const ricochetSkill = {
-                    ...skill,
-                    damageMultiplier:
-                        ((skill.damageMultiplier.min + skill.damageMultiplier.max) / 2) * 0.5
-                };
-                const { damage: ricochetDamage, hitType: ricochetHitType } =
-                    combatCalculationEngine.calculateDamage(unit, ricochetTarget, ricochetSkill, instanceId, grade);
+                    const ricochetSkill = {
+                        ...skill,
+                        damageMultiplier:
+                            ((skill.damageMultiplier.min + skill.damageMultiplier.max) / 2) * 0.5
+                    };
+                    const { damage: ricochetDamage, hitType: ricochetHitType } =
+                        combatCalculationEngine.calculateDamage(unit, ricochetTarget, ricochetSkill, instanceId, grade);
 
-                this._applyDamage(ricochetTarget, ricochetDamage, ricochetHitType);
-                if (ricochetTarget.currentHp <= 0) this.terminationManager.handleUnitDeath(ricochetTarget, unit);
+                    this._applyDamage(ricochetTarget, ricochetDamage, ricochetHitType);
+                    if (ricochetTarget.currentHp <= 0) this.terminationManager.handleUnitDeath(ricochetTarget, unit);
+                }
             }
         }
         // ▲▲▲ [신규] 추가 완료 ▲▲▲
