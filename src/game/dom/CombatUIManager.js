@@ -129,15 +129,22 @@ export class CombatUIManager {
             this.instantResultButton.disabled = true;
             this.instantResultButton.textContent = '시뮬레이션 중...';
 
-            const allies = partyEngine.getDeployedMercenaries();
-            const enemies = monsterEngine.getAllMonsters('enemy');
+            try {
+                const allies = partyEngine.getDeployedMercenaries();
+                const enemies = monsterEngine.getAllMonsters('enemy');
 
-            const battleLog = await battleSimulatorEngine.runFullSimulation(allies, enemies);
+                const battleLog = await battleSimulatorEngine.runFullSimulation(allies, enemies);
 
-            logDownloader.download(battleLog, 'battle-simulation-log.json');
+                logDownloader.download(battleLog, 'battle-simulation-log.json');
 
-            this.instantResultButton.textContent = '시뮬레이션 완료';
-            console.log('전투 시뮬레이션이 완료되었습니다. 로그 파일을 확인하세요.');
+                console.log('전투 시뮬레이션이 완료되었습니다. 로그 파일을 확인하세요.');
+            } catch (error) {
+                console.error('전투 시뮬레이션 중 오류 발생:', error);
+                debugLogEngine.error('UI', '전투 시뮬레이션 중 오류 발생', error);
+            } finally {
+                this.instantResultButton.disabled = false;
+                this.instantResultButton.textContent = '전투 종료 결과';
+            }
         });
     }
 
