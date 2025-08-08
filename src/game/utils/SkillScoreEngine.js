@@ -79,6 +79,8 @@ class SkillScoreEngine {
         let yinYangBonus = 0;
         // ✨ [신규] MBTI 성향 점수 변수
         let mbtiScore = 0;
+        // ✨ [신규] 역할군 보너스 점수 변수
+        let roleScore = 0;
         // ✨ 열망 보너스 점수 변수 추가
         let aspirationBonus = 0;
         const situationLogs = [];
@@ -93,8 +95,16 @@ class SkillScoreEngine {
         if (skillData.type === 'ACTIVE') {
             baseScore *= 1.5;
             if (target && target.currentHp < target.finalStats.hp * 0.4) {
-                situationScore += 20;
-                situationLogs.push('마무리:+20');
+                situationScore += 45; // ✨ 마무리 점수 상향 (20 -> 45)
+                situationLogs.push('마무리:+45');
+            }
+        }
+
+        // ✨ [신규] 공격 역할군 보너스
+        const offensiveClasses = ['warrior', 'gunner', 'flyingmen', 'ghost', 'darkKnight', 'hacker'];
+        if (offensiveClasses.includes(unit.id)) {
+            if (skillData.type === 'ACTIVE' || skillData.type === 'DEBUFF') {
+                roleScore += 20;
             }
         }
 
@@ -268,7 +278,8 @@ class SkillScoreEngine {
             }
         }
 
-        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus + customScore;
+        // ✨ 최종 점수 계산에 역할군 보너스 합산
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus + customScore + roleScore;
 
         // ✨ AI 기억 가중치 적용 로직을 수정합니다.
         let finalScore = calculatedScore;
@@ -312,7 +323,7 @@ class SkillScoreEngine {
 
         debugYinYangManager.logScoreModification(
             skillData.name,
-            baseScore + tagScore + situationScore + mbtiScore + aspirationBonus + customScore,
+            baseScore + tagScore + situationScore + mbtiScore + roleScore + aspirationBonus + customScore,
             yinYangBonus,
             finalScore
         );
@@ -320,7 +331,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 열망(${aspirationBonus.toFixed(2)}) + 커스텀(${customScore.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 역할(${roleScore}) + 열망(${aspirationBonus.toFixed(2)}) + 커스텀(${customScore.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
