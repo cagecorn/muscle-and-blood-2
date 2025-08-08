@@ -1,5 +1,7 @@
 import Blackboard from './Blackboard.js';
 import { debugLogEngine } from '../game/utils/DebugLogEngine.js';
+import { NodeState } from './nodes/Node.js';
+import ExecuteDesperateMeasureNode from './nodes/ExecuteDesperateMeasureNode.js';
 
 /**
  * 행동 트리와 블랙보드를 함께 캡슐화하는 클래스입니다.
@@ -31,7 +33,13 @@ class BehaviorTree {
         // --- ▲ [버그 수정] ▲ ---
 
         // 루트 노드부터 평가를 시작합니다.
-        await this.root.evaluate(unit, this.blackboard);
+        const result = await this.root.evaluate(unit, this.blackboard);
+
+        // 다른 모든 노드가 실패했을 경우 크라이시스 엔진에 의존합니다.
+        if (result === NodeState.FAILURE) {
+            const desperateNode = new ExecuteDesperateMeasureNode();
+            await desperateNode.evaluate(unit, this.blackboard);
+        }
     }
 }
 
