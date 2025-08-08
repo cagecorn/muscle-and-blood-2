@@ -36,9 +36,14 @@ export async function findBestActionForUnit(unit, allies = [], enemies = [], use
             const skillData = skillInventoryManager.getSkillData(instData.skillId, instData.grade);
             if (!skillEngine.canUseSkill(virtualUnit, skillData)) continue;
 
-            const candidates = skillData.targetType === 'ally' ? allies : enemies;
+            const isSelfTarget = skillData.targetType === 'self';
+            const candidates = isSelfTarget ? [virtualUnit] : (skillData.targetType === 'ally' ? allies : enemies);
+
             const targets = candidates.filter(t => {
-                if (skillData.targetType === 'self') return t.uniqueId === virtualUnit.uniqueId;
+                if (isSelfTarget) return t.uniqueId === virtualUnit.uniqueId;
+
+                if (t.uniqueId === virtualUnit.uniqueId) return false;
+
                 const dist = Math.abs(t.gridX - virtualUnit.gridX) + Math.abs(t.gridY - virtualUnit.gridY);
                 return dist <= (skillData.range || 1);
             });
