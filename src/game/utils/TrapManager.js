@@ -22,24 +22,33 @@ class TrapManager {
      * @param {number} col - 설치할 타일의 열
      * @param {number} row - 설치할 타일의 행
      * @param {object} trapData - { owner, skillData }
-     * @param {Phaser.Scene} scene - 시각 효과를 표시할 씬
+     * @param {object} battle - 현재 전투 정보 객체
      */
-    addTrap(col, row, trapData, scene) {
+    addTrap(col, row, trapData, battle) {
+        if (!battle || !battle.scene) {
+            console.error('addTrap 호출 시 battle 객체가 전달되지 않았습니다.');
+            return;
+        }
+
         const key = `${col},${row}`;
         if (this.activeTraps.has(key)) {
             debugLogEngine.warn(this.name, `[${key}] 타일에는 이미 함정이 존재하여 덮어썼습니다.`);
             this.activeTraps.get(key).sprite?.destroy();
         }
 
-        // 함정의 시각적 표현 (VFX) - 지금은 간단한 아이콘으로 대체
-        const cell = scene.gridEngine.getCell(col, row);
-        const trapSprite = scene.add
-            .image(cell.x, cell.y, 'placeholder')
-            .setScale(0.1)
-            .setAlpha(0.5);
+        // battle의 scene을 사용하여 셀을 조회합니다.
+        const cell = battle.scene.gridEngine.getCell(col, row);
+        if (cell) {
+            const trapSprite = battle.scene.add
+                .image(cell.x, cell.y, 'placeholder')
+                .setScale(0.1)
+                .setAlpha(0.5);
 
-        this.activeTraps.set(key, { ...trapData, sprite: trapSprite });
-        debugLogEngine.log(this.name, `[${key}] 타일에 [${trapData.skillData.name}] 함정을 설치했습니다.`);
+            this.activeTraps.set(key, { ...trapData, sprite: trapSprite });
+            debugLogEngine.log(this.name, `[${key}] 타일에 [${trapData.skillData.name}] 함정을 설치했습니다.`);
+        } else {
+            console.error(`(${col}, ${row}) 위치에 해당하는 셀을 찾을 수 없습니다.`);
+        }
     }
 
     /**
