@@ -22,9 +22,9 @@ class MoveToTargetNode extends Node {
         const path = blackboard.get('movementPath');
         const movementRange = unit.finalStats.movement || 3;
 
-        // ✨ [수정] 경로가 없는 경우(null)와 이미 도착한 경우(빈 배열)를 분리해서 처리합니다.
-        if (!path) { // 경로 탐색 실패
-            debugAIManager.logNodeResult(NodeState.FAILURE, '경로가 없음');
+        // ✨ [버그 수정] 경로가 배열이 아닌 경우에 대한 방어 코드를 추가하여 안정성을 높입니다.
+        if (!Array.isArray(path)) {
+            debugAIManager.logNodeResult(NodeState.FAILURE, `경로가 유효하지 않습니다 (배열이 아님): ${JSON.stringify(path)}`);
             return NodeState.FAILURE;
         }
 
