@@ -21,6 +21,40 @@ class SkillScoreEngine {
     constructor() {
         this.name = 'SkillScoreEngine';
 
+        // Scorer 시스템을 통해 추가적인 상황 평가 로직을 주입할 수 있습니다.
+        this.scorers = [
+            {
+                name: 'MissingHealthScorer',
+                weight: 1.5,
+                logic: (unit, skill, target) => {
+                    // 힐 태그가 없는 스킬은 점수 부여 없음
+                    if (!skill.tags?.includes(SKILL_TAGS.HEAL) || !target) return 0;
+
+                    const maxHp = target.finalStats?.hp ?? target.maxHp ?? 0;
+                    const missingHealth = maxHp - target.currentHp;
+                    if (missingHealth <= 0) return -100; // 체력이 가득 차 있으면 사용 금지
+                    return (missingHealth / maxHp) * 100;
+                }
+            },
+            {
+                name: 'FocusFireScorer',
+                weight: 1.2,
+                logic: (unit, skill, target) => {
+                    if (!target) return 0;
+                    // 공격/디버프 스킬이 아니면 무시
+                    const offensive = skill.targetType === 'enemy' && (skill.type === 'ACTIVE' || skill.type === 'DEBUFF');
+                    if (!offensive || target.team === unit.team) return 0;
+
+                    const maxHp = target.finalStats?.hp ?? target.maxHp ?? 1;
+                    let score = ((maxHp - target.currentHp) / maxHp) * 50; // 체력이 낮을수록 가산
+                    if (target.isAlreadyTargetedByAllies) {
+                        score += 30; // 아군이 집중하고 있는 대상이면 추가 점수
+                    }
+                    return score;
+                }
+            }
+        ];
+
         debugLogEngine.register(this);
     }
 
@@ -223,7 +257,18 @@ class SkillScoreEngine {
         // ✨ 4. 최종 점수 계산에 음양 보너스 합산
         // ✨ 최종 점수 계산에 MBTI 보너스 합산
         // ✨ 최종 점수에 열망 보너스 합산
-        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus;
+        // 커스텀 스코어러들이 부여하는 추가 점수를 계산합니다.
+        let customScore = 0;
+        for (const scorer of this.scorers) {
+            try {
+                const val = scorer.logic(unit, skillData, target, allies, enemies) || 0;
+                customScore += (scorer.weight || 1) * val;
+            } catch (e) {
+                // scorer 실패는 무시하고 진행합니다.
+            }
+        }
+
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus + customScore;
 
         // ✨ AI 기억 가중치 적용 로직을 수정합니다.
         let finalScore = calculatedScore;
@@ -267,7 +312,7 @@ class SkillScoreEngine {
 
         debugYinYangManager.logScoreModification(
             skillData.name,
-            baseScore + tagScore + situationScore + mbtiScore + aspirationBonus,
+            baseScore + tagScore + situationScore + mbtiScore + aspirationBonus + customScore,
             yinYangBonus,
             finalScore
         );
@@ -275,7 +320,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 열망(${aspirationBonus.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 열망(${aspirationBonus.toFixed(2)}) + 커스텀(${customScore.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
