@@ -3,7 +3,7 @@ import { skillInventoryManager } from '../../game/utils/SkillInventoryManager.js
 import { skillEngine } from '../../game/utils/SkillEngine.js';
 import { skillScoreEngine } from '../../game/utils/SkillScoreEngine.js';
 import { formationEngine } from '../../game/utils/FormationEngine.js';
-import { getReachableTiles } from '../../game/utils/GridEngine.js';
+import { pathfinderEngine } from '../../game/utils/PathfinderEngine.js';
 
 /**
  * 이동과 스킬 사용을 세트로 평가하여 최적의 행동을 찾습니다.
@@ -16,9 +16,7 @@ import { getReachableTiles } from '../../game/utils/GridEngine.js';
 export async function findBestActionForUnit(unit, allies = [], enemies = [], usedSkills = new Set()) {
     let bestAction = { move: null, skill: null, target: null, score: -Infinity };
 
-    const grid = formationEngine.grid;
-    const moveRange = unit.finalStats?.movement || 0;
-    const possibleMoves = getReachableTiles({ col: unit.gridX, row: unit.gridY }, moveRange, grid);
+    const possibleMoves = pathfinderEngine.findAllReachableTiles(unit);
     // 현재 위치도 포함
     if (!possibleMoves.some(p => p.col === unit.gridX && p.row === unit.gridY)) {
         possibleMoves.push({ col: unit.gridX, row: unit.gridY });

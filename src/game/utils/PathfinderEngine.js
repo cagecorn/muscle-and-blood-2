@@ -94,6 +94,54 @@ class PathfinderEngine {
     }
 
     /**
+     * 시작 위치에서 이동력 범위 내에 도달 가능한 모든 타일을 반환합니다.
+     * @param {object} unit 탐색의 주체가 되는 유닛
+     * @returns {Array<{col:number,row:number}>}
+     */
+    findAllReachableTiles(unit) {
+        const grid = this.formationEngine?.grid;
+        if (!grid) return [];
+
+        const start = { col: unit.gridX, row: unit.gridY };
+        const moveRange = unit.finalStats.movement;
+
+        const visited = new Set();
+        const queue = [{ col: start.col, row: start.row, dist: 0 }];
+        const tiles = [];
+
+        visited.add(`${start.col},${start.row}`);
+
+        while (queue.length > 0) {
+            const { col, row, dist } = queue.shift();
+
+            if (dist > 0) {
+                tiles.push({ col, row });
+            }
+            if (dist >= moveRange) continue;
+
+            const directions = [
+                { x: 0, y: 1 },
+                { x: 0, y: -1 },
+                { x: 1, y: 0 },
+                { x: -1, y: 0 }
+            ];
+
+            for (const dir of directions) {
+                const nc = col + dir.x;
+                const nr = row + dir.y;
+                const key = `${nc},${nr}`;
+                if (visited.has(key)) continue;
+                const cell = grid.getCell(nc, nr);
+                if (!cell || cell.isOccupied) continue;
+                visited.add(key);
+                queue.push({ col: nc, row: nr, dist: dist + 1 });
+            }
+        }
+
+        return tiles;
+    }
+
+    /**
      * 대상 주위에서 스킬을 사용할 수 있는 최적의 타일까지의 경로를 계산합니다.
      * @param {object} unit - 이동 주체 유닛
      * @param {object} skill - 사용하려는 스킬 데이터
@@ -152,6 +200,10 @@ class PathfinderEngine {
         const cell = this.formationEngine?.grid?.getCell(col, row);
         if (!cell) return null;
         return { col: cell.col, row: cell.row, gCost: Infinity, hCost: Infinity, fCost: Infinity, parent: null };
+    }
+
+    getDistance(col1, row1, col2, row2) {
+        return this._getDistance({ col: col1, row: row1 }, { col: col2, row: row2 });
     }
 
     _getNeighbors(node) {
