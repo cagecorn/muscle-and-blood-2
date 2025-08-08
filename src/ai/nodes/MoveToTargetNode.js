@@ -14,7 +14,7 @@ class MoveToTargetNode extends Node {
         this.animationEngine = animationEngine;
         this.cameraControl = cameraControl;
         this.vfxManager = vfxManager; // vfxManager 저장
-        this.skillEffectProcessor = this.vfxManager.battleSimulator.skillEffectProcessor;
+        this.skillEffectProcessor = this.vfxManager?.battleSimulator?.skillEffectProcessor;
     }
 
     async evaluate(unit, blackboard) {
