@@ -1,12 +1,14 @@
 import Node, { NodeState } from './Node.js';
 import { debugAIManager } from '../../game/debug/DebugAIManager.js';
 import MoveToTargetNode from './MoveToTargetNode.js';
+import IsSkillInRangeNode from './IsSkillInRangeNode.js';
 
 class MoveToUseSkillNode extends Node {
     constructor(engines = {}) {
         super();
         this.pathfinderEngine = engines.pathfinderEngine;
         this.moveNode = new MoveToTargetNode(engines);
+        this.rangeNode = new IsSkillInRangeNode(engines);
     }
 
     async evaluate(unit, blackboard) {
@@ -27,8 +29,13 @@ class MoveToUseSkillNode extends Node {
         blackboard.set('movementPath', path);
         const result = await this.moveNode.evaluate(unit, blackboard);
         if (result === NodeState.SUCCESS) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skill.name}] 사용 위치로 이동`);
-            return NodeState.SUCCESS;
+            const inRange = await this.rangeNode.evaluate(unit, blackboard);
+            if (inRange === NodeState.SUCCESS) {
+                debugAIManager.logNodeResult(NodeState.SUCCESS, `스킬 [${skill.name}] 사용 위치로 이동`);
+                return NodeState.SUCCESS;
+            }
+            debugAIManager.logNodeResult(NodeState.FAILURE, `이동 후에도 스킬 [${skill.name}] 사거리 밖`);
+            return NodeState.FAILURE;
         }
 
         debugAIManager.logNodeResult(NodeState.FAILURE, '경로 탐색 실패');
