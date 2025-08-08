@@ -39,8 +39,6 @@ import { createESFP_AI } from './behaviors/createESFP_AI.js';
 import { createENFJ_AI } from './behaviors/createENFJ_AI.js';
 // ✨ 용병 데이터에서 ai_archetype을 참조합니다.
 import { mercenaryData } from '../game/data/mercenaries.js';
-import SelectorNode from './nodes/SelectorNode.js';
-import ExecuteDesperateMeasureNode from './nodes/ExecuteDesperateMeasureNode.js';
 
 /**
  * 게임 내 모든 AI 유닛을 관리하고, 각 유닛의 행동 트리를 실행합니다.
@@ -144,13 +142,6 @@ class AIManager {
         }
 
         const behaviorTree = behaviorTreeOverride || this._createAIFromArchetype(unitInstance);
-
-        // 모든 AI에 궁여지책을 최후의 수단으로 추가합니다.
-        behaviorTree.root = new SelectorNode([
-            behaviorTree.root,
-            new ExecuteDesperateMeasureNode()
-        ]);
-
         this.unitData.set(unitInstance.uniqueId, {
             instance: unitInstance,
             behaviorTree: behaviorTree,

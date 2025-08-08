@@ -184,21 +184,6 @@ class StatEngine {
     }
 
     /**
-     * 단일 스킬에 의해 회복되는 체력을 계산합니다.
-     * @param {object} unit - 힐을 시전하는 유닛
-     * @param {object} skill - 힐 스킬 데이터
-     * @returns {number} 계산된 힐량
-     */
-    calculateHeal(unit, skill) {
-        if (!skill || !skill.healMultiplier) return 0;
-        let healAmount = Math.round(unit.finalStats.wisdom * skill.healMultiplier);
-        if (unit.finalStats.healingGivenPercentage) {
-            healAmount = Math.round(healAmount * (1 + unit.finalStats.healingGivenPercentage / 100));
-        }
-        return healAmount;
-    }
-
-    /**
      * 기본 스탯, 장비 정보 등을 바탕으로 최종 적용될 스탯 객체를 생성합니다.
      * @param {object} unitData - 유닛의 기본 정보 (예: { name: '전사', baseWeight: 10 })
      * @param {object} baseStats - 순수 스탯 포인트 (예: { hp: 100, strength: 10, valor: 5 })
