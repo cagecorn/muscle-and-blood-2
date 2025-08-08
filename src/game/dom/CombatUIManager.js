@@ -132,9 +132,9 @@ export class CombatUIManager {
             const allies = partyEngine.getDeployedMercenaries();
             const enemies = monsterEngine.getAllMonsters('enemy');
 
-            await battleSimulatorEngine.runFullSimulation(allies, enemies);
+            const battleLog = await battleSimulatorEngine.runFullSimulation(allies, enemies);
 
-            logDownloader.download();
+            logDownloader.download(battleLog, 'battle-simulation-log.json');
 
             this.instantResultButton.textContent = '시뮬레이션 완료';
             console.log('전투 시뮬레이션이 완료되었습니다. 로그 파일을 확인하세요.');
