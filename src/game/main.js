@@ -7,6 +7,8 @@ import { Preloader } from './scenes/Preloader.js';
 import { TerritoryScene } from './scenes/TerritoryScene.js';
 // 게임 해상도와 그리드 규격을 관리하는 SurveyEngine을 불러옵니다.
 import { surveyEngine } from './utils/SurveyEngine.js';
+// GameSystem을 초기화하기 위해 가져옵니다.
+import { gameSystem } from './GameSystem.js';
 // phaser 모듈을 직접 불러오면 로컬 서버에서 해석되지 않으므로
 // node_modules 경로를 상대 경로로 지정합니다.
 // Phaser를 CDN에서 불러와 배포 시 404 오류를 방지합니다.
@@ -40,6 +42,12 @@ const config = {
         antialias: true, // 안티에일리어싱을 활성화하여 이미지를 부드럽게 표현합니다.
         resolution: window.devicePixelRatio || 1, // 기기의 픽셀 비율에 맞춰 해상도를 설정합니다.
         roundPixels: true,
+    },
+    // 게임이 시작될 때 GameSystem을 초기화합니다.
+    callbacks: {
+        preBoot() {
+            gameSystem.initialize(this);
+        }
     },
     // Boot 씬만 초기 설정에 등록합니다.
     // Boot 씬이 실행되면서 나머지 씬들을 동적으로 추가합니다.
