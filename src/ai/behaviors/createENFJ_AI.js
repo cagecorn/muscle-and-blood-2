@@ -11,6 +11,7 @@ import FindPathToSkillRangeNode from '../nodes/FindPathToSkillRangeNode.js';
 import HasNotMovedNode from '../nodes/HasNotMovedNode.js';
 import FindPriorityTargetNode from '../nodes/FindPriorityTargetNode.js';
 import FindBestSkillByScoreNode from '../nodes/FindBestSkillByScoreNode.js';
+import FindTargetNode from '../nodes/FindTargetNode.js';
 import { SKILL_TAGS } from '../../game/utils/SkillTagManager.js';
 
 /**
@@ -53,6 +54,12 @@ function createENFJ_AI(engines = {}) {
         new SequenceNode([
             new FindBestSkillByScoreNode(engines),
             new FindTargetBySkillTypeNode(engines),
+            executeSkillBranch
+        ]),
+        // 4순위: 모든 행동이 실패했다면 가까운 적에게 공격 시도
+        new SequenceNode([
+            new FindBestSkillByScoreNode(engines),
+            new FindTargetNode(engines),
             executeSkillBranch
         ])
     ]);
