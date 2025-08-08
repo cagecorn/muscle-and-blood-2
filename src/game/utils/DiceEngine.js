@@ -9,16 +9,26 @@ class DiceEngine {
     }
 
     /**
-     * 주어진 배열에서 무작위 요소를 하나 선택하여 반환합니다.
+     * 주어진 배열에서 무작위 요소를 하나 또는 여러 개 선택하여 반환합니다.
      * @param {Array<*>} array - 요소를 선택할 배열
-     * @returns {*|undefined} - 무작위로 선택된 요소
+     * @param {number} [count=1] - 선택할 요소의 개수
+     * @returns {*|Array<*>|undefined} - 선택된 요소 또는 요소들의 배열
      */
-    getRandomElement(array) {
+    getRandomElement(array, count = 1) {
         if (!array || array.length === 0) {
-            return undefined;
+            // count가 1이면 undefined, 아니면 빈 배열을 반환하여 일관성을 유지합니다.
+            return count === 1 ? undefined : [];
         }
-        const index = Math.floor(Math.random() * array.length);
-        return array[index];
+
+        // count가 1이면 기존 로직대로 단일 요소를 반환합니다.
+        if (count === 1) {
+            const index = Math.floor(Math.random() * array.length);
+            return array[index];
+        }
+
+        // count가 1보다 크면, 배열을 섞은 뒤 원하는 개수만큼 잘라서 반환합니다.
+        const shuffled = [...array].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, Math.min(count, array.length));
     }
 
     /**
