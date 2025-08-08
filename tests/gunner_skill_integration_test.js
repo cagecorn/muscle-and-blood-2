@@ -285,4 +285,64 @@ assert(steelTrap.trapData && steelTrap.trapData.duration === 3, 'Steel Trap dura
 assert.strictEqual(steelTrap.trapData.effect.id, 'bind', 'Steel Trap effect id failed');
 // --- ▲ [신규] 강철 덫 테스트 로직 추가 ▲ ---
 
+// --- ▼ [신규] 맹독 함정 테스트 로직 추가 ▼ ---
+const venomTrapBase = {
+    NORMAL: {
+        id: 'venomTrap',
+        cost: 2,
+        cooldown: 3,
+        range: 3,
+        trapData: {
+            duration: 3,
+            effect: { id: 'poison', type: 'DEBUFF', duration: 2 }
+        }
+    }
+};
+const venomTrap = skillModifierEngine.getModifiedSkill(venomTrapBase.NORMAL, 'NORMAL');
+assert.strictEqual(venomTrap.cost, 2, 'Venom Trap cost failed');
+assert.strictEqual(venomTrap.cooldown, 3, 'Venom Trap cooldown failed');
+assert(venomTrap.trapData && venomTrap.trapData.duration === 3, 'Venom Trap duration failed');
+assert.strictEqual(venomTrap.trapData.effect.id, 'poison', 'Venom Trap effect id failed');
+// --- ▲ [신규] 맹독 함정 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 전격 함정 테스트 로직 추가 ▼ ---
+const shockTrapBase = {
+    NORMAL: {
+        id: 'shockTrap',
+        cost: 3,
+        cooldown: 4,
+        range: 3,
+        trapData: {
+            duration: 2,
+            effect: { id: 'shock', type: 'DEBUFF', duration: 2 }
+        }
+    }
+};
+const shockTrap = skillModifierEngine.getModifiedSkill(shockTrapBase.NORMAL, 'NORMAL');
+assert.strictEqual(shockTrap.cost, 3, 'Shock Trap cost failed');
+assert.strictEqual(shockTrap.cooldown, 4, 'Shock Trap cooldown failed');
+assert(shockTrap.trapData && shockTrap.trapData.duration === 2, 'Shock Trap duration failed');
+assert.strictEqual(shockTrap.trapData.effect.id, 'shock', 'Shock Trap effect id failed');
+// --- ▲ [신규] 전격 함정 테스트 로직 추가 ▲ ---
+
+// --- ▼ [신규] 빙결 함정 테스트 로직 추가 ▼ ---
+const frostTrapBase = {
+    NORMAL: {
+        id: 'frostTrap',
+        cost: 1,
+        cooldown: 2,
+        range: 3,
+        trapData: {
+            duration: 3,
+            effect: { id: 'frost', type: 'DEBUFF', duration: 2 }
+        }
+    }
+};
+const frostTrap = skillModifierEngine.getModifiedSkill(frostTrapBase.NORMAL, 'NORMAL');
+assert.strictEqual(frostTrap.cost, 1, 'Frost Trap cost failed');
+assert.strictEqual(frostTrap.cooldown, 2, 'Frost Trap cooldown failed');
+assert(frostTrap.trapData && frostTrap.trapData.duration === 3, 'Frost Trap duration failed');
+assert.strictEqual(frostTrap.trapData.effect.id, 'frost', 'Frost Trap effect id failed');
+// --- ▲ [신규] 빙결 함정 테스트 로직 추가 ▲ ---
+
 console.log('Gunner skills integration test passed.');

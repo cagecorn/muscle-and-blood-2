@@ -1467,6 +1467,78 @@ export const activeSkills = {
             }
         }
     },
+    venomTrap: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'venomTrap',
+            name: '맹독 함정',
+            type: 'ACTIVE',
+            requiredClass: ['gunner', 'hacker'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.TRAP, SKILL_TAGS.DEBUFF],
+            cost: 2,
+            targetType: 'tile',
+            description: '3턴 동안 유지되는 독 함정을 설치합니다. 밟은 적은 2턴간 [중독] 상태가 됩니다.',
+            illustrationPath: null,
+            cooldown: 3,
+            range: 3,
+            trapData: {
+                duration: 3,
+                effect: {
+                    id: 'poison',
+                    type: EFFECT_TYPES.DEBUFF,
+                    duration: 2
+                }
+            }
+        }
+    },
+    shockTrap: {
+        yinYangValue: +2,
+        NORMAL: {
+            id: 'shockTrap',
+            name: '전격 함정',
+            type: 'ACTIVE',
+            requiredClass: ['gunner', 'hacker'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.TRAP, SKILL_TAGS.DEBUFF],
+            cost: 3,
+            targetType: 'tile',
+            description: '2턴 동안 유지되는 전격 함정을 설치합니다. 밟은 적은 2턴간 [감전] 상태가 됩니다.',
+            illustrationPath: null,
+            cooldown: 4,
+            range: 3,
+            trapData: {
+                duration: 2,
+                effect: {
+                    id: 'shock',
+                    type: EFFECT_TYPES.DEBUFF,
+                    duration: 2
+                }
+            }
+        }
+    },
+    frostTrap: {
+        yinYangValue: +1,
+        NORMAL: {
+            id: 'frostTrap',
+            name: '빙결 함정',
+            type: 'ACTIVE',
+            requiredClass: ['gunner', 'hacker'],
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.TRAP, SKILL_TAGS.DEBUFF],
+            cost: 1,
+            targetType: 'tile',
+            description: '3턴 동안 유지되는 냉기 함정을 설치합니다. 밟은 적은 2턴간 [동상] 상태가 됩니다.',
+            illustrationPath: null,
+            cooldown: 2,
+            range: 3,
+            trapData: {
+                duration: 3,
+                effect: {
+                    id: 'frost',
+                    type: EFFECT_TYPES.DEBUFF,
+                    duration: 2
+                }
+            }
+        }
+    },
     // --- ▲ [신규] 트랩마스터용 함정 스킬 추가 ▲ ---
     nanoRailgun: {
         yinYangValue: -4,
