@@ -12,7 +12,14 @@ import { statEngine } from '../src/game/utils/StatEngine.js';
 import { skillEngine } from '../src/game/utils/SkillEngine.js';
 import { sharedResourceEngine, SHARED_RESOURCE_TYPES } from '../src/game/utils/SharedResourceEngine.js';
 import { diceEngine } from '../src/game/utils/DiceEngine.js';
+import { tokenEngine } from '../src/game/utils/TokenEngine.js';
+import MoveToTargetNode from '../src/ai/nodes/MoveToTargetNode.js';
 import SkillEffectProcessor from '../src/game/utils/SkillEffectProcessor.js';
+import { SummoningEngine } from '../src/game/utils/SummoningEngine.js';
+import { formationEngine } from '../src/game/utils/FormationEngine.js';
+import { monsterEngine } from '../src/game/utils/MonsterEngine.js';
+import { aiManager } from '../src/ai/AIManager.js';
+import { TerminationManager } from '../src/game/utils/TerminationManager.js';
 console.log('--- 클래스 전용 패시브 통합 테스트 시작 ---');
 
 // 공통 스텁
@@ -121,6 +128,34 @@ combatCalculationEngine.battleSimulator = battleSimulator;
   const increased = Object.keys(resourcesAfter).some(k => resourcesAfter[k] > resourcesBefore[k]);
   assert(increased, 'Nanomancer should generate a random resource');
   console.log('✅ Nanomancer passive');
+}
+
+// -------------------- Flyingman - Juggernaut --------------------
+{
+  const vfxManager = { showEffectName() {} };
+  const moveNode = new MoveToTargetNode({ ...baseEngines, vfxManager });
+  statusEffectManager.activeEffects.clear();
+  formationEngine.grid = {
+    getCell(col, row) {
+      return { col, row, x: col, y: row, isOccupied: false, sprite: null };
+    }
+  };
+  const unit = {
+    uniqueId: 'fly1',
+    ...mercenaryData.flyingmen,
+    classPassive: mercenaryData.flyingmen.classPassive,
+    sprite: { x: 0, y: 0, active: true },
+    gridX: 0,
+    gridY: 0,
+    finalStats: { movement: mercenaryData.flyingmen.baseStats.movement }
+  };
+  const blackboard = new Map();
+  blackboard.set('movementPath', [ { col:1,row:0 }, { col:2,row:0 } ]);
+  await moveNode.evaluate(unit, blackboard);
+  const effects = statusEffectManager.activeEffects.get('fly1') || [];
+  const buff = effects.find(e => e.id === 'juggernautBuff');
+  assert(buff && buff.modifiers.some(m => Math.abs(m.value - 0.06) < 1e-6), 'Juggernaut buff should scale with moved tiles');
+  console.log('✅ Flyingman passive');
 }
 
 // -------------------- Esper - Mind Explosion --------------------
