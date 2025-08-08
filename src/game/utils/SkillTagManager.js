@@ -32,6 +32,7 @@ export const SKILL_TAGS = {
     CHAIN: '연쇄',       // 주변 적에게 튕기는 효과
     ON_HIT: '타격시 발동', // 공격 성공 시 부가 효과
     AREA_DENIAL: '지역 장악', // 장판기 스킬
+    TRAP: '함정',        // 발동형 함정을 설치하는 스킬
     SUMMON_BUFF: '소환수 강화', // 소환수 직접 강화
 
     // --- 6. 테마 및 자원 (Theme & Resource) ---
