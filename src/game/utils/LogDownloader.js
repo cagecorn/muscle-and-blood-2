@@ -5,11 +5,12 @@ import { debugLogEngine } from './DebugLogEngine.js';
  */
 class LogDownloader {
     /**
-     * 기록된 모든 로그를 JSON 파일로 다운로드합니다.
+     * 주어진 로그를 JSON 파일로 다운로드합니다.
+     * @param {any} logs 다운로드할 로그 데이터
+     * @param {string} [filename] 저장할 파일 이름
      */
-    static download() {
-        const logs = debugLogEngine.logHistory;
-        if (logs.length === 0) {
+    static download(logs = debugLogEngine.logHistory, filename) {
+        if (!logs || (Array.isArray(logs) && logs.length === 0)) {
             alert('다운로드할 로그가 없습니다.');
             return;
         }
@@ -34,7 +35,7 @@ class LogDownloader {
             const a = document.createElement('a');
             a.href = url;
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            a.download = `muscle-and-blood-log-${timestamp}.json`;
+            a.download = filename || `muscle-and-blood-log-${timestamp}.json`;
 
             document.body.appendChild(a);
             a.click();
