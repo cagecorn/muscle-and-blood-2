@@ -1,77 +1,65 @@
+// src/ai/nodes/MoveToTargetNode.js
+
 import Node, { NodeState } from './Node.js';
-import { debugAIManager } from '../../game/debug/DebugAIManager.js';
-import { formationEngine } from '../../game/utils/FormationEngine.js';
-import { delayEngine } from '../../game/utils/DelayEngine.js';
-import { statusEffectManager } from '../../game/utils/StatusEffectManager.js';
-import { EFFECT_TYPES } from '../../game/utils/EffectTypes.js';
+import { debugLogEngine } from '../../game/utils/DebugLogEngine.js';
+// ✨ GameSystem을 통해 다른 엔진에 안전하게 접근합니다.
+import { gameSystem } from '../../game/GameSystem.js';
 
 class MoveToTargetNode extends Node {
-    constructor(engines = {}) {
+    constructor() {
         super();
-        this.formationEngine = engines.formationEngine || formationEngine;
-        this.animationEngine = engines.animationEngine;
-        this.delayEngine = engines.delayEngine || delayEngine;
-        this.vfxManager = engines.vfxManager;
+        // 생성자에서 직접 엔진을 참조하지 않고, 필요할 때 GameSystem을 통해 가져옵니다.
     }
 
     async evaluate(unit, blackboard) {
-        debugAIManager.logNodeEvaluation(this, unit);
+        debugLogEngine.logNodeEvaluation(this, unit);
 
-        const path = blackboard.get('movementPath');
+        // 'movementPath' 블랙보드 값은 이제 경로가 아니라 최종 목적지 {col, row} 입니다.
+        const destination = blackboard.get('movementPath');
 
-        // 1. 이동할 경로가 없으면 즉시 성공 처리
-        if (!path || path.length === 0) {
-            debugAIManager.logNodeResult(NodeState.SUCCESS, "이동 경로 없음, 이동 불필요");
+        // 1. 데이터 유효성 검사
+        if (!destination || typeof destination.col === 'undefined' || typeof destination.row === 'undefined') {
+            debugLogEngine.logNodeResult(NodeState.FAILURE, '유효하지 않은 이동 목적지');
+            return NodeState.FAILURE;
+        }
+
+        const startPos = { col: unit.gridX, row: unit.gridY };
+
+        // 2. 이미 목적지에 있는지 확인 (이동이 불필요한 경우)
+        if (startPos.col === destination.col && startPos.row === destination.row) {
+            debugLogEngine.logNodeResult(NodeState.SUCCESS, '이동 불필요, 이미 목적지에 있음');
             return NodeState.SUCCESS;
         }
-        
-        // 2. 이동력이 충분한지 확인
-        const moveRange = unit.finalStats.movement || 0;
-        if (path.length > moveRange) {
-             debugAIManager.logNodeResult(NodeState.FAILURE, `경로가 너무 김 (경로: ${path.length}, 이동력: ${moveRange})`);
-             blackboard.set('movementPath', null); // 경로 초기화
-             return NodeState.FAILURE;
-        }
 
-        // 3. 경로의 각 단계를 순차적으로 이동
-        let movedTiles = 0;
-        for (const step of path) {
-            const success = await this.formationEngine.moveUnitOnGrid(
-                unit,
-                step,
-                this.animationEngine,
-                200 // 한 칸 이동에 걸리는 시간
+        // 3. 경로 탐색 (PathfinderEngine.js의 함수 시그니처에 맞게 호출)
+        const path = await gameSystem.pathfinderEngine.findPath(unit, startPos, destination);
+
+        // 4. 경로 유효성 검사 (경로가 배열이 아니거나 비어있으면 실패 처리)
+        if (!path || !Array.isArray(path) || path.length === 0) {
+            debugLogEngine.logNodeResult(
+                NodeState.FAILURE,
+                `목적지까지의 경로 없음: (${startPos.col},${startPos.row}) -> (${destination.col},${destination.row})`
             );
-            if (!success) {
-                debugAIManager.logNodeResult(NodeState.FAILURE, `(${step.col}, ${step.row})로 이동 중 장애물 발견`);
-                blackboard.set('movementPath', null); // 경로 초기화
-                return NodeState.FAILURE;
-            }
-            movedTiles++;
-        }
-        
-        // 4. (보너스) 플라잉맨의 '저거너트' 패시브 효과 적용
-        if (unit.classPassive?.id === 'juggernaut' && movedTiles > 0) {
-            const bonus = 0.03 * movedTiles;
-            const buffEffect = {
-                id: 'juggernautBuff',
-                type: EFFECT_TYPES.BUFF,
-                duration: 1, // 1턴 동안 지속
-                sourceSkillName: '저거너트',
-                modifiers: [{ stat: 'physicalDefense', type: 'percentage', value: bonus }]
-            };
-            statusEffectManager.addEffect(unit, { name: '저거너트', effect: buffEffect }, unit);
-            if(this.vfxManager) this.vfxManager.showEffectName(unit.sprite, `저거너트 (+${(bonus * 100).toFixed(0)}%)`, '#f59e0b');
+            return NodeState.FAILURE;
         }
 
-        // 5. 이동 완료 후 상태 업데이트
-        blackboard.set('hasMovedThisTurn', true);
-        blackboard.set('movementPath', null); // 이동 완료 후 경로 초기화
-        
-        await this.delayEngine.hold(100); // 이동 후 짧은 딜레이
+        // 5. 유닛 이동 실행
+        try {
+            // path.slice(1)은 시작점(현재 위치)을 제외한 실제 이동 경로입니다.
+            // 이제 path는 항상 배열이므로 이 라인에서 에러가 발생하지 않습니다.
+            const movementSteps = path.slice(1);
 
-        debugAIManager.logNodeResult(NodeState.SUCCESS, '경로 이동 완료');
-        return NodeState.SUCCESS;
+            // 유닛 이동 명령
+            await gameSystem.scene.moveUnitAlongPath(unit, movementSteps);
+
+            debugLogEngine.logNodeResult(NodeState.SUCCESS, '목적지로 이동 완료');
+            return NodeState.SUCCESS;
+        } catch (error) {
+            // moveUnitAlongPath 함수 자체에서 에러가 발생할 경우를 대비한 방어 코드
+            console.error('MoveToTargetNode에서 유닛 이동 중 오류 발생:', error);
+            debugLogEngine.logNodeResult(NodeState.FAILURE, '유닛 이동 중 심각한 오류 발생');
+            return NodeState.FAILURE;
+        }
     }
 }
 
