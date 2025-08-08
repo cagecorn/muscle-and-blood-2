@@ -131,6 +131,50 @@ class AIManager {
         return createMeleeAI(this.aiEngines);
     }
 
+    // ✨ [신규] 행동 실패 시 직업에 맞는 기본 AI를 생성하고 실행하는 메서드
+    async _executeFallbackAI(unit, allUnits, enemyUnits) {
+        let fallbackAI;
+        const unitClass = unit.id;
+
+        // 16개 클래스를 3개의 기본 역할군으로 분류합니다.
+        switch (unitClass) {
+            // --- 원거리 딜러 ---
+            case 'gunner':
+            case 'nanomancer':
+            case 'esper':
+                fallbackAI = createRangedAI(this.aiEngines);
+                break;
+
+            // --- 힐러 및 지원가 ---
+            case 'medic':
+            case 'plagueDoctor':
+            case 'mechanic': // 소환사는 지원 역할군으로 분류
+                fallbackAI = createHealerAI(this.aiEngines);
+                break;
+
+            // --- 그 외 모든 근접/돌격 클래스 ---
+            case 'warrior':
+            case 'commander':
+            case 'android':
+            case 'sentinel':
+            case 'flyingmen':
+            case 'ghost':
+            case 'darkKnight':
+            case 'hacker':
+            case 'clown':
+            case 'paladin':
+            default:
+                fallbackAI = createMeleeAI(this.aiEngines);
+                break;
+        }
+
+        if (fallbackAI) {
+            debugLogEngine.log('AIManager', `[${unit.instanceName}]가 기본 [${fallbackAI.root.constructor.name}] AI로 행동합니다.`);
+            // 기본 AI를 즉시 실행합니다.
+            await fallbackAI.execute(unit, allUnits, enemyUnits);
+        }
+    }
+
     /**
      * 새로운 AI 유닛을 등록하고 MBTI 아키타입에 맞는 행동 트리를 생성합니다.
      * @param {object} unitInstance - AI에 의해 제어될 유닛
@@ -195,6 +239,9 @@ class AIManager {
 
         console.group(`[AIManager] --- ${data.instance.instanceName} (ID: ${unit.uniqueId}) 턴 시작 ---`);
 
+        // ✨ [신규] 턴 동안 어떤 행동이라도 했는지 추적하는 플래그
+        let actionTakenInTurn = false;
+
         // 남은 토큰이 없더라도 0코스트 스킬 사용을 시도할 수 있도록
         // 일정 횟수만큼 행동 트리를 반복 실행합니다.
         const maxActionsPerTurn = 10;
@@ -228,12 +275,27 @@ class AIManager {
             const skillUsed = currentSkillsUsedSize > prevSkillsUsedSize;
             const movedThisLoop = !wasMoved && hasMoved;
 
+            // ✨ [신규] 이번 루프에서 행동했다면 플래그를 true로 설정합니다.
+            if (tokenSpent || skillUsed || movedThisLoop) {
+                actionTakenInTurn = true;
+            }
+
             // 토큰 소모, 스킬 사용, 이동 중 아무것도 하지 않았다면
             // 더 이상 할 행동이 없는 것으로 간주하고 종료합니다.
             if (!tokenSpent && !skillUsed && !movedThisLoop) {
                 debugLogEngine.log('AIManager', `[${unit.instanceName}] 행동 종료: 변화 없음.`);
                 break;
             }
+        }
+
+        // ✨ [신규] 턴 전체를 통틀어 아무 행동도 하지 않았다면 기본 AI를 실행합니다.
+        if (!actionTakenInTurn && unit.currentHp > 0) {
+            debugLogEngine.warn('AIManager', `[${unit.instanceName}]가 아키타입 AI로 행동을 결정하지 못했습니다. 기본 AI로 대체합니다.`);
+            // 혼란 상태를 반영하여 적/아군 목록을 전달합니다.
+            const enemiesForFallback = unit.isConfused
+                ? allUnits.filter(u => u.team === unit.team)
+                : allUnits.filter(u => u.team !== unit.team);
+            await this._executeFallbackAI(unit, allUnits, enemiesForFallback);
         }
 
         // \u2728 --- [핵심 수정] 턴 종료 후 비행동 여부 확인 --- \u2728
