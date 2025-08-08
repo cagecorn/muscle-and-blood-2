@@ -62,8 +62,27 @@ class FindTargetBySkillTypeNode extends Node {
                 target = this.targetManager.findHighestHealthEnemy(enemyUnits);
             }
         } else {
-            // targetType이 명시되지 않은 경우, 기존 로직으로 대체 작동
-            target = this.targetManager.findNearestEnemy(unit, enemyUnits);
+            // targetType이 명시되지 않은 경우, 스킬 타입에 따라 대상을 추론합니다.
+            if (skillData.type === 'BUFF' || skillData.type === 'AID') {
+                if (!alliedUnits || alliedUnits.length === 0) {
+                    // 지원할 아군이 없으면 자기 자신을 대상으로 할 수 있는지 확인
+                    target = unit;
+                } else {
+                    // 지원 스킬은 체력이 가장 낮은 아군을 우선 대상으로 합니다.
+                    target = [...alliedUnits].sort((a, b) => {
+                        const healthRatioA = a.currentHp / a.finalStats.hp;
+                        const healthRatioB = b.currentHp / b.finalStats.hp;
+                        return healthRatioA - healthRatioB;
+                    })[0];
+                }
+            } else {
+                // 그 외(ACTIVE, DEBUFF 등)는 기존 로직대로 가장 가까운 적을 공격합니다.
+                if (!enemyUnits || enemyUnits.length === 0) {
+                    debugAIManager.logNodeResult(NodeState.FAILURE, "공격할 적 유닛 없음");
+                    return NodeState.FAILURE;
+                }
+                target = this.targetManager.findNearestEnemy(unit, enemyUnits);
+            }
         }
 
         if (target) {
