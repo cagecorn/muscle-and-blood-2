@@ -26,8 +26,15 @@ export const gameSystem = {
 };
 
 // utils 폴더의 모든 모듈을 한 번에 불러옵니다.
-// Vite의 import.meta.glob 기능을 이용해 빌드 시 정적으로 해석됩니다.
-const utilModules = import.meta.glob('./utils/*.js', { eager: true });
+// Vite 환경에서는 import.meta.glob을 사용하고, 그렇지 않으면 자동 등록을 건너뜁니다.
+let utilModules = {};
+
+if (typeof import.meta.glob === 'function') {
+    // Vite와 같은 번들러에서 정적으로 해석됩니다.
+    utilModules = import.meta.glob('./utils/*.js', { eager: true });
+} else {
+    console.warn('import.meta.glob is not available; util modules will not be auto-registered.');
+}
 
 // --- 자동 등록 단계 ---
 // utils 폴더에서 가져온 모듈들 중 이름이 Engine/Manager로 끝나고
