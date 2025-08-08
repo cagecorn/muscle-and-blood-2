@@ -493,6 +493,7 @@ export const battleSimulatorEngine = {
 
         const winner = simAllies.some(u => u.currentHp > 0) ? 'ally' : 'enemy';
         debugLogEngine.log('System', `전투 종료! 결과: ${winner}`);
+        debugLogEngine.saveLog();
         return debugLogEngine.getHistory();
     }
 };
