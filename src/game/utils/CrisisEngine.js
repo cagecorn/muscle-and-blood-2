@@ -2,8 +2,9 @@ import { pathfinderEngine } from './PathfinderEngine.js';
 import { skillEngine } from './SkillEngine.js';
 import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { formationEngine } from './FormationEngine.js';
-// TODO: MBTI 가중치 적용을 위한 아키타입 데이터는 추후 추가 예정
-// import { MBTI_ARCHETYPES } from '../../ai/mbti/MBTIArchetypes.js';
+import { MBTI_ARCHETYPES } from '../../ai/mbti/MBTIArchetypes.js';
+// ✨ targetManager를 import하여 스킬 대상 탐색에 사용합니다.
+import { targetManager } from './TargetManager.js';
 
 /**
  * AI가 일반적인 행동 트리로는 유효한 행동을 찾지 못했을 때,
@@ -29,21 +30,23 @@ class CrisisEngine {
     findBestDesperateMeasure(unit, allies, enemies) {
         console.log(`%c[CrisisEngine] ${unit.instanceName}의 궁여지책 탐색 시작...`, "color: #e11d48; font-weight: bold;");
 
-        // 1. 가능한 모든 행동 생성 (이동, 스킬 사용 등)
         const possibleActions = this._generateAllPossibleActions(unit, allies, enemies);
         if (possibleActions.length === 0) {
-            console.log(`%c[CrisisEngine] 궁여지책으로 실행할 행동을 찾지 못했습니다.`, "color: #e11d48;");
-            return null;
+            console.log(`%c[CrisisEngine] 궁여지책으로 실행할 행동을 찾지 못했습니다.`);
+            return null; // 정말 할 수 있는 게 아무것도 없으면 null 반환
         }
 
-        // 2. 각 행동을 4대 철학에 따라 평가
         const scoredActions = this._evaluateActions(possibleActions, unit, allies, enemies);
-
-        // 3. 유닛의 MBTI에 따라 최종 행동 결정
         const bestAction = this._selectBestActionByMBTI(unit, scoredActions);
-        
-        console.log(`%c[CrisisEngine] 최종 결정: ${bestAction.description}`, "color: #e11d48; font-weight: bold;");
 
+        // bestAction이 null이 아닌지 확인 후 로그 출력
+        if (bestAction && bestAction.description) {
+            console.log(`%c[CrisisEngine] 최종 결정: ${bestAction.description}`, "color: #e11d48; font-weight: bold;");
+        } else {
+            console.log(`%c[CrisisEngine] 최종 행동을 결정하지 못했습니다.`);
+            return null;
+        }
+        
         return bestAction;
     }
 
@@ -52,9 +55,43 @@ class CrisisEngine {
      * @private
      */
     _generateAllPossibleActions(unit, allies, enemies) {
-        // TODO: 구현 예정
-        // 예: 이동 가능한 모든 타일, 사용 가능한 모든 스킬과 대상의 조합
-        return []; 
+        const actions = [];
+
+        // --- 1. 이동 액션 생성 ---
+        const reachableTiles = pathfinderEngine.findAllReachableTiles(unit);
+        for (const tile of reachableTiles) {
+            // 자기 자신 위치로의 이동은 제외
+            if (tile.col === unit.gridX && tile.row === unit.gridY) continue;
+
+            actions.push({
+                type: 'MOVE',
+                target: { col: tile.col, row: tile.row },
+                description: `(${tile.col}, ${tile.row}) 위치로 이동`
+            });
+        }
+
+        // --- 2. 스킬 사용 액션 생성 ---
+        const availableSkills = unit.skills
+            .map(s => s.NORMAL || s) // 등급 객체가 있으면 일반 스킬 데이터를 가져옴
+            .filter(skill => skillEngine.canUseSkill(unit, skill));
+
+        for (const skill of availableSkills) {
+            // 스킬의 대상 규칙에 따라 유효한 대상들을 찾음
+            const targets = targetManager.findTargets(unit, skill.targetType, skill.range, allies, enemies);
+
+            for (const target of targets) {
+                // 스킬과 대상을 묶어 하나의 행동으로 추가
+                actions.push({
+                    type: 'SKILL',
+                    skill: skill,
+                    target: target,
+                    description: `[${target.instanceName}]에게 [${skill.name}] 스킬 사용`
+                });
+            }
+        }
+        
+        console.log(`[CrisisEngine] ${unit.instanceName}이(가) 수행 가능한 ${actions.length}가지 행동 발견.`);
+        return actions;
     }
 
     /**
