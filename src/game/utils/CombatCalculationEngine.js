@@ -154,6 +154,12 @@ class CombatCalculationEngine {
         if (finalSkill.id === 'fireBottle' && (attacker.finalStats.attackRange || 1) <= 1) {
             bonusMultiplier += 0.20;
         }
+        // --- ▼ [1. '처형' 스킬 효과 로직 추가] ▼ ---
+        if (finalSkill.tags?.includes(SKILL_TAGS.EXECUTE) && (defender.currentHp / defender.finalStats.hp) <= 0.3) {
+            bonusMultiplier *= 2.0; // 피해량 2배
+            debugLogEngine.log(this.name, `[처형] 효과 발동! 대상의 체력이 낮아 피해량이 2배가 됩니다.`);
+        }
+        // --- ▲ [1. '처형' 스킬 효과 로직 추가] ▲ ---
 
         // ✨ [신규] 방어력 관통 효과 적용
         const armorPen = finalSkill.armorPenetration || 0;
@@ -281,7 +287,15 @@ class CombatCalculationEngine {
 
         // 모든 데미지 감소/증가 효과를 합산
         const finalDamageMultiplier = 1 - damageReductionPercent - ironWillReduction + damageIncreasePercent;
-        const damageBeforeCombo = damageAfterGrade * finalDamageMultiplier;
+
+        // --- ▼ [2. '약점 포착' 패시브 로직 추가] ▼ ---
+        let damageAfterPassives = damageAfterGrade * finalDamageMultiplier;
+        if (attacker.classPassive?.id === 'weaknessDetection' && (defender.currentHp / defender.finalStats.hp) <= 0.4) {
+            damageAfterPassives *= 1.25; // 최종 데미지 25% 증가
+            debugLogEngine.log(this.name, `[약점 포착] 패시브 발동! 대상의 체력이 낮아 최종 피해량이 25% 증가합니다.`);
+        }
+        const damageBeforeCombo = damageAfterPassives;
+        // --- ▲ [2. '약점 포착' 패시브 로직 추가] ▲ ---
         const finalDamage = damageBeforeCombo * comboMultiplier;
 
         // 콤보 배율 적용 과정을 디버그 로그로 남깁니다.
