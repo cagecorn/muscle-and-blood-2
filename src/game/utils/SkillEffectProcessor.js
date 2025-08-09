@@ -327,22 +327,7 @@ class SkillEffectProcessor {
                 // 이미 죽은 대상은 더 이상 공격하지 않습니다.
                 if (currentTarget.currentHp <= 0) continue;
 
-                // [신규] 암살 일격(assassinate) 추가 데미지 계산
-                let finalSkillData = { ...skill };
-                if (skill.id === 'assassinate') {
-                    const effects = statusEffectManager.activeEffects.get(currentTarget.uniqueId) || [];
-                    const debuffCount = effects.filter(e => e.type !== EFFECT_TYPES.BUFF).length;
-                    const bonusMultiplier = debuffCount * (skill.damagePerDebuff || 0);
-
-                    const baseMultiplier = typeof skill.damageMultiplier === 'object'
-                        ? (skill.damageMultiplier.min + skill.damageMultiplier.max) / 2
-                        : skill.damageMultiplier;
-                    finalSkillData.damageMultiplier = baseMultiplier + bonusMultiplier;
-
-                    if (debuffCount > 0) {
-                        debugLogEngine.log(this.constructor.name, `[암살 일격] 디버프 ${debuffCount}개로 피해량 +${(bonusMultiplier * 100).toFixed(0)}%`);
-                    }
-                }
+                const finalSkillData = { ...skill };
 
                 const { damage: totalDamage, hitType, comboCount } = combatCalculationEngine.calculateDamage(
                     unit,

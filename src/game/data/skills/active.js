@@ -1315,26 +1315,7 @@ export const activeSkills = {
     },
     // --- ▲ [신규] 광대 전용 스킬 추가 ▲ ---
 
-    // --- ▼ [신규] 암살 일격, 맹독 구름, 아드레날린 주사 스킬 추가 ▼ ---
-    assassinate: {
-        yinYangValue: -5,
-        NORMAL: {
-            id: 'assassinate',
-            name: '암살 일격',
-            type: 'ACTIVE',
-            requiredClass: ['clown', 'ghost'],
-            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.EXECUTE, SKILL_TAGS.SPECIAL],
-            cost: 3,
-            targetType: 'enemy',
-            description: '적에게 100%의 물리 피해를 주고, 대상에게 걸린 해로운 효과 하나당 20%의 추가 피해를 입힙니다.',
-            illustrationPath: null,
-            cooldown: 3,
-            range: 1,
-            damageMultiplier: { min: 0.9, max: 1.1 },
-            damagePerDebuff: 0.2 // 디버프당 20% 추가 데미지 (나중에 CombatCalculationEngine에서 이 값을 사용)
-        }
-    },
-
+    // --- ▼ [신규] 맹독 구름, 아드레날린 주사 스킬 추가 ▼ ---
     poisonCloud: {
         yinYangValue: -3,
         NORMAL: {
@@ -1557,6 +1538,26 @@ export const activeSkills = {
             // 이 스킬은 CombatCalculationEngine에서 특별하게 처리됩니다.
             damageMultiplier: { physical: 0.5, magic: 0.5 }
         }
-    }
+    },
     // --- ▲ [신규] 나노레일건 스킬 추가 ▲ ---
+    // --- ▼ [신규] 엑시큐셔너 전용 '암살' 스킬 추가 ▼ ---
+    assassinate: {
+        yinYangValue: -5, // 매우 공격적인 음(Yin)의 기술
+        NORMAL: {
+            id: 'assassinate',
+            name: '암살',
+            type: 'ACTIVE',
+            requiredClass: ['ghost'], // '고스트' 클래스 전용
+            tags: [SKILL_TAGS.ACTIVE, SKILL_TAGS.PHYSICAL, SKILL_TAGS.MELEE, SKILL_TAGS.EXECUTE],
+            cost: 3,
+            targetType: 'enemy',
+            description: '적에게 100%의 물리 피해를 줍니다. 대상의 체력이 30% 이하라면 피해량이 2배로 증가합니다.',
+            illustrationPath: null, // 임시 아이콘
+            cooldown: 2,
+            range: 1,
+            damageMultiplier: { min: 0.95, max: 1.05 }
+            // 실제 처형 로직은 CombatCalculationEngine에서 처리됩니다.
+        }
+    }
+    // --- ▲ [신규] 엑시큐셔너 전용 '암살' 스킬 추가 ▲ ---
 };
