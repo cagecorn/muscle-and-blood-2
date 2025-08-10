@@ -1,15 +1,15 @@
 import StartGame from './game/main.js';
 import { archetypeMemoryEngine } from './game/utils/ArchetypeMemoryEngine.js';
 
-// [5차 강화학습 데이터] - 2025-08-08 로그 기반
-const learnedData_v5 = {
+// [6차 강화학습 데이터] - 2025-08-10 로그 기반
+const learnedData_v6 = {
     // 기존 학습 데이터 유지
     'ESTJ': {
         'target_medic': { 'melee_weight': 1.4 }, 'target_gunner': { 'melee_weight': 1.3 },
         'target_warrior': { 'melee_weight': 1.1 }, 'target_darkKnight': { 'melee_weight': 1.1 }
     },
     'ESFJ': {
-        'target_sentinel': { 'melee_weight': 0.7 }, 'target_warrior': { 'melee_weight': 0.75 },
+        'target_sentinel': { 'melee_weight': 0.8 }, 'target_warrior': { 'melee_weight': 0.85 },
         'target_medic': { 'melee_weight': 1.2 }, 'target_plagueDoctor': { 'melee_weight': 1.2 }
     },
     'INFP': {
@@ -36,24 +36,24 @@ const learnedData_v5 = {
         'target_hacker': { 'melee_weight': 1.20 }
     },
 
-    // 2025-08-08 추가 학습 데이터
-    'ENTJ': {
-        'target_gunner': { 'attack_weight': 1.4 }, // 거너 대상 공격 가중치 +40%
-        'target_medic': { 'attack_weight': 1.5 }   // 메딕 대상 공격 가중치 +50%
+    // 2025-08-10 추가 학습 데이터
+    'ENTJ': { // ENTJ(통솔관)는 적 딜러를 보면 공격보다 아군 버프를 우선하도록 학습
+        'target_gunner': { 'attack_weight': 0.7 }, // 거너 상대 시, 일반 공격 선호도 -30%
+        'target_nanomancer': { 'attack_weight': 0.7 } // 나노맨서 상대 시, 일반 공격 선호도 -30%
     },
-    'ISTP': {
-        'target_warrior': { 'deploy_turret_weight': 1.6 }, // 전사 근접 시 포탑 설치 가중치 +60%
-        'target_sentinel': { 'deploy_turret_weight': 1.5 }  // 센티넬 근접 시 포탑 설치 가중치 +50%
+    'ISTP': { // ISTP(해커)는 근접 유닛이 접근하면 반격/함정 스킬을 최우선으로 고려하도록 학습
+        'target_warrior': { 'counter_weight': 1.6 }, // 전사 상대 시, 반격 스킬 가중치 +60%
+        'target_flyingmen': { 'trap_weight': 1.5 }  // 플라잉맨 상대 시, 함정 스킬 가중치 +50%
     },
-    'ISFJ': {
-        'target_warrior': { 'magic_weight': 1.3 } // 전사 대상 마법(디버프) 가중치 +30%
+    'ISFJ': { // ISFJ(메딕)는 공격적인 적을 만나면 공격보다 디버프를 걸어 아군을 보호하는 것을 선호하도록 학습
+        'target_warrior': { 'magic_weight': 1.3 } // 전사 상대 시, 마법(디버프) 가중치 +30%
     }
 };
 
 // 학습 데이터 적용 함수 (기존과 동일)
 async function applyLearnedData() {
-    console.log('AI 강화학습 v5 데이터를 적용합니다...');
-    for (const [mbti, memory] of Object.entries(learnedData_v5)) {
+    console.log('AI 강화학습 v6 데이터를 적용합니다...');
+    for (const [mbti, memory] of Object.entries(learnedData_v6)) {
         await archetypeMemoryEngine.updateMemory(mbti, memory);
     }
     console.log('모든 아키타입의 집단 기억이 성공적으로 업데이트되었습니다!');
