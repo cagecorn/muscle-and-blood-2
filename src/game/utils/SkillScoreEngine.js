@@ -83,6 +83,9 @@ class SkillScoreEngine {
         let roleScore = 0;
         // ✨ 열망 보너스 점수 변수 추가
         let aspirationBonus = 0;
+        // --- ▼ [신규] 스탯 시너지 점수 변수 추가 ▼ ---
+        let statSynergyScore = 0;
+        // --- ▲ [신규] 스탯 시너지 점수 변수 추가 ▲ ---
         const situationLogs = [];
 
         if (skillData.tags) {
@@ -264,6 +267,24 @@ class SkillScoreEngine {
         }
         // ✨ --- 수정 완료 --- ✨
 
+        // --- ▼ [신규] 스탯 시너지 점수 계산 로직 ▼ ---
+        const tags = skillData.tags || [];
+        const unitStats = unit.finalStats || {};
+
+        if (tags.includes(SKILL_TAGS.PHYSICAL)) {
+            // 물리 스킬일 경우, 힘(strength) 수치에 비례하여 점수 추가
+            statSynergyScore += (unitStats.strength || 0) * 1.5;
+        } else if (tags.includes(SKILL_TAGS.MAGIC)) {
+            // 마법 스킬일 경우, 지능(intelligence) 수치에 비례하여 점수 추가
+            statSynergyScore += (unitStats.intelligence || 0) * 1.5;
+        }
+
+        if (tags.includes(SKILL_TAGS.HEAL) || tags.includes(SKILL_TAGS.WILL_GUARD)) {
+            // 치유 및 보호막 스킬은 지혜(wisdom)에 비례하여 점수 추가
+            statSynergyScore += (unitStats.wisdom || 0) * 1.2;
+        }
+        // --- ▲ [신규] 스탯 시너지 점수 계산 로직 ▲ ---
+
         // ✨ 4. 최종 점수 계산에 음양 보너스 합산
         // ✨ 최종 점수 계산에 MBTI 보너스 합산
         // ✨ 최종 점수에 열망 보너스 합산
@@ -279,7 +300,7 @@ class SkillScoreEngine {
         }
 
         // ✨ 최종 점수 계산에 역할군 보너스 합산
-        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus + customScore + roleScore;
+        const calculatedScore = baseScore + tagScore + situationScore + yinYangBonus + mbtiScore + aspirationBonus + customScore + roleScore + statSynergyScore;
 
         // ✨ AI 기억 가중치 적용 로직을 수정합니다.
         let finalScore = calculatedScore;
@@ -323,7 +344,7 @@ class SkillScoreEngine {
 
         debugYinYangManager.logScoreModification(
             skillData.name,
-            baseScore + tagScore + situationScore + mbtiScore + roleScore + aspirationBonus + customScore,
+            baseScore + tagScore + situationScore + mbtiScore + roleScore + aspirationBonus + customScore + statSynergyScore,
             yinYangBonus,
             finalScore
         );
@@ -331,7 +352,7 @@ class SkillScoreEngine {
         debugLogEngine.log(
             this.name,
             `[${unit.instanceName}] 스킬 [${skillData.name}] 점수: ` +
-                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 역할(${roleScore}) + 열망(${aspirationBonus.toFixed(2)}) + 커스텀(${customScore.toFixed(2)}) = 최종 ${finalScore.toFixed(2)}` +
+                `기본(${baseScore}) + 태그(${tagScore}) + 상황(${situationScore}) + 음양(${yinYangBonus.toFixed(2)}) + MBTI(${mbtiScore}) + 역할(${roleScore}) + 열망(${aspirationBonus.toFixed(2)}) + 커스텀(${customScore.toFixed(2)}) + 시너지(${statSynergyScore.toFixed(0)}) = 최종 ${finalScore.toFixed(2)}` +
                 (situationLogs.length > 0 ? ` (${situationLogs.join(', ')})` : '')
         );
 
