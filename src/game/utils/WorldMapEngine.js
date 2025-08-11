@@ -28,26 +28,35 @@ export class WorldMapEngine {
             height: this.MAP_HEIGHT_IN_TILES
         });
 
-        // 사용할 타일셋 이미지 불러오기
-        const tileset = this.map.addTilesetImage(
-            'mab-tiles',
-            'mab-tile-1',
-            this.TILE_WIDTH,
-            this.TILE_HEIGHT,
-            0,
-            0
-        );
-
-        // 추가 타일 이미지를 타일셋에 등록
-        for (let i = 2; i <= 15; i++) {
-            tileset.addImage(this.scene.textures.get(`mab-tile-${i}`));
+        // 사용할 모든 타일 이미지 키를 배열로 구성
+        const tileImageKeys = [];
+        for (let i = 1; i <= 15; i++) {
+            tileImageKeys.push(`mab-tile-${i}`);
         }
 
-        // 레이어 생성
-        this.layer = this.map.createBlankLayer('layer1', tileset, 0, 0);
+        // 각 이미지를 별도의 타일셋으로 맵에 추가
+        const tilesets = tileImageKeys.map(key => {
+            return this.map.addTilesetImage(
+                key,
+                key,
+                this.TILE_WIDTH,
+                this.TILE_HEIGHT,
+                0,
+                0
+            );
+        });
 
-        // 맵 전체를 랜덤 타일로 채움
-        this.layer.randomize(0, 0, this.map.width, this.map.height, Array.from(Array(15).keys()));
+        // 배열로 전달된 모든 타일셋을 사용해 레이어 생성
+        this.layer = this.map.createBlankLayer('layer1', tilesets, 0, 0);
+
+        // 맵 전체를 1부터 시작하는 인덱스로 랜덤 타일 배치
+        this.layer.randomize(
+            0,
+            0,
+            this.map.width,
+            this.map.height,
+            Array.from({ length: 15 }, (_, i) => i + 1)
+        );
 
         // 카메라 경계 설정
         this.scene.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
