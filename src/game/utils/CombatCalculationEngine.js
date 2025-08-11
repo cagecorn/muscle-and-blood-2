@@ -36,6 +36,7 @@ class CombatCalculationEngine {
     // ✨ --- [핵심 버그 수정] 생성자와 name 속성 추가 --- ✨
     constructor() {
         this.name = 'CombatCalculationEngine';
+        this.battleSimulator = null;
         // 다른 엔진들과의 일관성을 위해 debugLogEngine에 등록할 수도 있습니다.
         debugLogEngine.register(this);
     }
