@@ -149,6 +149,7 @@ export class BattleSimulatorEngine {
         sharedResourceEngine.initialize('ally');
         sharedResourceEngine.initialize('enemy');
         statusEffectManager.setBattleSimulator(this);
+        combatCalculationEngine.battleSimulator = this;
         // ✨ 전투 시작 시 음양 엔진을 초기화합니다.
         yinYangEngine.initializeUnits([...allies, ...enemies]);
 
