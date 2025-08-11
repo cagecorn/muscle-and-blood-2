@@ -35,6 +35,7 @@ export class TerritoryDOMEngine {
         // ✨ [신규] 장비 관리 아이콘을 추가합니다.
         this.addEquipmentManagementButton(1, 2); // 비어있는 (1, 2) 슬롯에 추가
         this.addArenaButton(0, 2); // 아레나 아이콘 추가
+        this.addWorldMapButton(2, 2); // 월드맵 아이콘 추가 (비어있는 2,2 위치)
     }
 
     createGrid() {
@@ -182,6 +183,22 @@ export class TerritoryDOMEngine {
         button.addEventListener('click', () => {
             this.container.style.display = 'none';
             this.scene.scene.start('ArenaScene');
+        });
+        this.grid.appendChild(button);
+    }
+
+    addWorldMapButton(col, row) {
+        const button = document.createElement('div');
+        button.className = 'building-icon';
+        // 월드맵 아이콘 이미지가 필요합니다. 여기서는 임시로 dungeon-icon을 재사용합니다.
+        button.style.backgroundImage = 'url(assets/images/territory/dungeon-icon.png)';
+        button.style.gridColumnStart = col + 1;
+        button.style.gridRowStart = row + 1;
+        button.addEventListener('mouseover', (event) => this.domEngine.showTooltip(event.clientX, event.clientY, '[월드맵]'));
+        button.addEventListener('mouseout', () => this.domEngine.hideTooltip());
+        button.addEventListener('click', () => {
+            this.container.style.display = 'none';
+            this.scene.scene.start('WorldMapScene');
         });
         this.grid.appendChild(button);
     }
