@@ -118,6 +118,15 @@ export class Preloader extends Scene
         this.load.image('cursed-forest', 'images/territory/cursed-forest.png');
         this.load.image('formation-icon', 'images/territory/formation-icon.png');
         this.load.image('arena-icon', 'images/territory/arena-icon.png');
+        // --- ▼ [신규] 월드맵 애셋 로드 ▼ ---
+        // 리더 스프라이트
+        this.load.image('leader-infp', 'images/leaders/infp.png');
+
+        // 월드맵 타일 (15개)
+        for (let i = 1; i <= 15; i++) {
+            this.load.image(`mab-tile-${i}`, `images/world-mab/mab-tile-${i}.png`);
+        }
+        // --- ▲ [신규] 월드맵 애셋 로드 ▲ ---
         // --- 스킬 관리 아이콘 및 씬 배경 로드 ---
         this.load.image('skills-icon', 'images/territory/skills-icon.png');
         this.load.image('skills-scene-background', 'images/territory/skills-scene.png');
