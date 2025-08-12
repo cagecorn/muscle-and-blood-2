@@ -1,5 +1,5 @@
 import { SkillEngine } from './SkillEngine.js';
-import { CombatCalculationEngine } from './CombatCalculationEngine.js';
+import { combatCalculationEngine } from './CombatCalculationEngine.js';
 import { StatusEffectManager } from './StatusEffectManager.js';
 import { SummoningEngine } from './SummoningEngine.js';
 
@@ -26,7 +26,8 @@ export class BattleEngine {
         this.aiManager = aiManager; // [변경점] aiManager 저장
 
         // 다른 엔진들에게도 필요한 부품들을 전달하며 생성합니다.
-        this.combatCalculationEngine = new CombatCalculationEngine(this.gridEngine);
+        // CombatCalculationEngine은 싱글턴 인스턴스를 사용합니다.
+        this.combatCalculationEngine = combatCalculationEngine;
         this.statusEffectManager = new StatusEffectManager(this.scene, this.allUnits, this.combatUIManager);
         this.summoningEngine = new SummoningEngine(this.scene, this.allUnits, this.spriteEngine, this.combatUIManager, this.aiManager); // [변경점] aiManager 전달
         this.skillEngine = new SkillEngine(this, this.gridEngine, this.combatCalculationEngine, this.statusEffectManager, this.summoningEngine, this.animationEngine, this.combatUIManager);
