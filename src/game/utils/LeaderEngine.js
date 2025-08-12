@@ -1,5 +1,9 @@
 import * as Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 
+/**
+ * 월드 맵에서 플레이어 리더를 제어하는 엔진.
+ * WorldMapEngine이 타일맵을 사용하지 않으므로 좌표 계산도 직접 수행합니다.
+ */
 export class LeaderEngine {
     /**
      * @param {Phaser.Scene} scene 리더가 생성될 씬
@@ -10,17 +14,18 @@ export class LeaderEngine {
         this.mapEngine = mapEngine;
         this.sprite = null;
 
-        // 리더의 현재 타일 좌표
-        this.tileX = 25;
-        this.tileY = 25;
+        // 맵의 중앙에서 시작합니다.
+        this.tileX = Math.floor(mapEngine.MAP_WIDTH_IN_TILES / 2);
+        this.tileY = Math.floor(mapEngine.MAP_HEIGHT_IN_TILES / 2);
     }
 
     /**
      * 리더 스프라이트를 생성하고 초기 위치를 설정합니다.
      */
     create() {
-        const startX = this.mapEngine.map.tileToWorldX(this.tileX);
-        const startY = this.mapEngine.map.tileToWorldY(this.tileY);
+        // 타일 좌표를 월드 좌표로 직접 계산합니다.
+        const startX = this.tileX * this.mapEngine.TILE_WIDTH + this.mapEngine.TILE_WIDTH / 2;
+        const startY = this.tileY * this.mapEngine.TILE_HEIGHT + this.mapEngine.TILE_HEIGHT / 2;
 
         this.sprite = this.scene.physics.add.sprite(startX, startY, 'leader-infp');
         this.sprite.setDisplaySize(512, 512);
@@ -50,6 +55,8 @@ export class LeaderEngine {
             case 'right':
                 targetX += 1;
                 break;
+            default:
+                break;
         }
 
         if (targetX >= 0 && targetX < this.mapEngine.MAP_WIDTH_IN_TILES &&
@@ -57,15 +64,16 @@ export class LeaderEngine {
             this.tileX = targetX;
             this.tileY = targetY;
 
-            const worldX = this.mapEngine.map.tileToWorldX(this.tileX);
-            const worldY = this.mapEngine.map.tileToWorldY(this.tileY);
+            // 이동할 월드 좌표를 계산합니다.
+            const worldX = this.tileX * this.mapEngine.TILE_WIDTH + this.mapEngine.TILE_WIDTH / 2;
+            const worldY = this.tileY * this.mapEngine.TILE_HEIGHT + this.mapEngine.TILE_HEIGHT / 2;
 
             this.scene.tweens.add({
                 targets: this.sprite,
                 x: worldX,
                 y: worldY,
                 ease: 'Sine.easeInOut',
-                duration: 200
+                duration: 200,
             });
         }
     }
