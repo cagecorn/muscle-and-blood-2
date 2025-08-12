@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { GridEngine } from '../utils/GridEngine.js';
 import { SpriteEngine } from '../utils/SpriteEngine.js';
 import { BattleEngine } from '../utils/BattleEngine.js';
@@ -10,7 +10,7 @@ import { CameraEngine } from '../utils/CameraEngine.js';
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { GlobalTurnClock } from '../utils/GlobalTurnClock.js'; // 새로운 시계 가져오기
 
-export class ArenaBattleScene extends Phaser.Scene {
+export class ArenaBattleScene extends Scene {
     constructor() {
         super({ key: 'ArenaBattleScene' });
     }
