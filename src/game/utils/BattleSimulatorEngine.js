@@ -10,7 +10,7 @@ import SkillEffectProcessor from './SkillEffectProcessor.js';
 import { trapManager } from './TrapManager.js';
 import { debugLogEngine } from './DebugLogEngine.js';
 
-import { aiManager } from '../../ai/AIManager.js';
+import { AIManager } from '../../ai/AIManager.js';
 
 import { targetManager } from './TargetManager.js';
 import { pathfinderEngine } from './PathfinderEngine.js';
@@ -76,7 +76,9 @@ export class BattleSimulatorEngine {
         this.turnOrderUI = new TurnOrderUIManager();
         this.sharedResourceUI = new SharedResourceUIManager();
         this.narrationUI = new NarrationUIManager();
-        
+
+        this.aiManager = new AIManager(scene, [], null, null);
+
         // AI 노드에 주입할 엔진 패키지
         this.aiEngines = {
             targetManager,
@@ -139,7 +141,7 @@ export class BattleSimulatorEngine {
         if (this.isRunning) return;
         this.isRunning = true;
 
-        aiManager.clear();
+        this.aiManager.clear();
 
         this.battleSpeedManager.reset();
         cooldownManager.reset();
@@ -180,12 +182,12 @@ export class BattleSimulatorEngine {
         });
 
         // AI 엔진 패키지를 AIManager에 전달하고 각 유닛을 등록합니다.
-        aiManager.aiEngines = this.aiEngines;
+        this.aiManager.aiEngines = this.aiEngines;
         allUnits.forEach(unit => {
             if (unit.name === '커맨더') {
-                aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
+                this.aiManager.registerUnit(unit, createMeleeAI(this.aiEngines));
             } else {
-                aiManager.registerUnit(unit);
+                this.aiManager.registerUnit(unit);
             }
         });
 
@@ -264,7 +266,7 @@ export class BattleSimulatorEngine {
             const currentUnit = this.turnQueue[this.currentTurnIndex];
 
             // ✨ AI가 현재 턴을 인식할 수 있도록 블랙보드에 기록
-            const aiData = aiManager.unitData.get(currentUnit.uniqueId);
+            const aiData = this.aiManager.unitData.get(currentUnit.uniqueId);
             if (aiData) {
                 aiData.behaviorTree.blackboard.set('currentTurnNumber', this.currentTurnNumber);
             }
@@ -290,11 +292,11 @@ export class BattleSimulatorEngine {
                     this.scene.cameraControl.panTo(currentUnit.sprite.x, currentUnit.sprite.y);
                     await delayEngine.hold(500);
 
-                    if (aiManager.unitData.has(currentUnit.uniqueId)) {
+                    if (this.aiManager.unitData.has(currentUnit.uniqueId)) {
                         const allies = this.turnQueue.filter(u => u.team === 'ally' && u.currentHp > 0);
                         const enemies = this.turnQueue.filter(u => u.team === 'enemy' && u.currentHp > 0);
 
-                        await aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
+                        await this.aiManager.executeTurn(currentUnit, [...allies, ...enemies], currentUnit.team === 'ally' ? enemies : allies);
                     }
                 } else {
                     console.log(`%c[Battle] ${currentUnit.instanceName}은(는) 기절해서 움직일 수 없습니다!`, "color: yellow;");
