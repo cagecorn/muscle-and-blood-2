@@ -23,7 +23,7 @@ export const SKILL_TYPES = {
 /**
  * 용병의 스킬 사용, 우선순위 결정 등 스킬 관련 로직을 총괄하는 엔진
  */
-class SkillEngine {
+export class SkillEngine {
     constructor() {
         this.skillTypes = Object.keys(SKILL_TYPES);
         // ✨ 한 턴 동안 유닛별로 사용한 스킬을 추적합니다
