@@ -1,5 +1,11 @@
-import { Unit } from '../data/Unit';
 import { createBehaviorTree } from '../../ai/behaviors/createBehaviorTree.js';
+
+/**
+ * @typedef {Object} Unit
+ * @property {string} id - 유닛의 고유 식별자
+ * @property {string} name - 유닛 이름
+ * @property {string} mbti - AI 행동 트리를 결정하는 MBTI
+ */
 
 /**
  * 소환수 관련 로직을 처리하는 엔진입니다.
