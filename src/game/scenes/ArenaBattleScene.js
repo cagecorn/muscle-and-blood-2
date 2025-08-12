@@ -1,4 +1,6 @@
-import Phaser from 'phaser';
+// Vite 없이 debug.html을 직접 실행할 때 모듈 해석 에러가 발생하지 않도록
+// Phaser를 CDN의 ESM 빌드에서 직접 불러옵니다.
+import { Scene } from 'https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.esm.js';
 import { GridEngine } from '../utils/GridEngine.js';
 import { SpriteEngine } from '../utils/SpriteEngine.js';
 import { BattleEngine } from '../utils/BattleEngine.js';
@@ -10,7 +12,7 @@ import { CameraEngine } from '../utils/CameraEngine.js';
 import { CombatUIManager } from '../dom/CombatUIManager.js';
 import { GlobalTurnClock } from '../utils/GlobalTurnClock.js';
 
-export class ArenaBattleScene extends Phaser.Scene {
+export class ArenaBattleScene extends Scene {
     constructor() {
         super({ key: 'ArenaBattleScene' });
         this.isProcessingTurn = false; // 턴 처리 중복 실행 방지 플래그
