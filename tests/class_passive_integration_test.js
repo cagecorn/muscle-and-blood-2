@@ -18,7 +18,6 @@ import SkillEffectProcessor from '../src/game/utils/SkillEffectProcessor.js';
 import { SummoningEngine } from '../src/game/utils/SummoningEngine.js';
 import { formationEngine } from '../src/game/utils/FormationEngine.js';
 import { monsterEngine } from '../src/game/utils/MonsterEngine.js';
-import { aiManager } from '../src/ai/AIManager.js';
 import { TerminationManager } from '../src/game/utils/TerminationManager.js';
 console.log('--- 클래스 전용 패시브 통합 테스트 시작 ---');
 
